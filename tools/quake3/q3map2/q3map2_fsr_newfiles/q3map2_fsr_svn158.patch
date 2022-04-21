@@ -1,0 +1,19 @@
+Index: light.c
+===================================================================
+--- light.c	(revision 158)
++++ light.c	(working copy)
+@@ -357,12 +365,13 @@
+ 		intensity *= scale;
+ 		
+ 		/* ydnar: get deviance and samples */
++		/* VorteX: now set start value for _samples when _deviance is found */
+ 		deviance = FloatForKey( e, "_deviance" );
+ 		if( deviance == 0.0f )
+ 			deviance = FloatForKey( e, "_deviation" );
+ 		if( deviance == 0.0f )
+ 			deviance = FloatForKey( e, "_jitter" );
+-		numSamples = IntForKey( e, "_samples" );
++		numSamples = max(IntForKey( e, "_samples" ), deviance);
+ 		if( deviance < 0.0f || numSamples < 1 )
+ 		{
+ 			deviance = 0.0f;

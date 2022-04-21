@@ -1,0 +1,7 @@
+*.[oda]
+.settings
+games
+install
+.vscode
+.vs
+libs/assimp/out
