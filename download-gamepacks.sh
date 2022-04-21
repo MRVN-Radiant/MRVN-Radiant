@@ -147,7 +147,7 @@ pack()
 }
 
 mkdir -p games
-pack Titanfall2        unknown     git    git@github.com:F1F7Y/titanfall2-mapeditor-pack.git
+pack Titanfall2        unknown     git    https://github.com/F1F7Y/titanfall2-mapeditor-pack.git
 #pack AlienArenaPack    GPL         svn    https://svn.code.sf.net/p/alienarena-cc/code/trunk/tools/netradiant_gamepack/AlienArenaPack
 #pack DarkPlacesPack    GPL         svn    svn://svn.icculus.org/gtkradiant-gamepacks/DarkPlacesPack/branches/1.5/
 #pack Doom3Pack         proprietary svn    svn://svn.icculus.org/gtkradiant-gamepacks/Doom3Pack/branches/1.5/
