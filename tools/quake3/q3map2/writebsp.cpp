@@ -414,6 +414,16 @@ float MatrixDeterminant(Vector3 a, Vector3 b, Vector3 c)
 }
 
 
+/*
+   EmitMeshes()
+   writes the mesh list to the bsp
+ */
+void EmitEntityPartitions()
+{
+	bspEntityPartitions_t& p = bspEntityPartitions.emplace_back();
+	memcpy(p.partitions, "01* env fx script snd spawn", 27);
+}
+
 bool IsCloseEnough( Vector3 a, Vector3 b, float epsilon )
 {
 	if (fabs(a.x() - b.x()) < epsilon)
@@ -440,6 +450,7 @@ void EmitMeshes( const entity_t& e )
 		// Temporary vars
 		std::vector<bspVertices_t> meshVertices;
 		std::vector<bspMeshIndices_t> meshIndices;
+		uint16_t last_vertex_size = 0;
 
 		// Save Vertices
 		for (const side_t& s0 : b.sides)
@@ -449,20 +460,21 @@ void EmitMeshes( const entity_t& e )
 				bspVertices_t& db = meshVertices.emplace_back();
 				db.xyz = vertex;
 			}
-		}
 
+			// Triangles
+			for (std::size_t i = last_vertex_size ; i < meshVertices.size() - 2; i++)
+			{
+				bspMeshIndices_t& v0 = meshIndices.emplace_back();
+				v0.index = last_vertex_size;
 
-		// Triangles
-		for (std::size_t i = 0; i < meshVertices.size() - 2; i++)
-		{
-			bspMeshIndices_t& v0 = meshIndices.emplace_back();
-			v0.index = 0;
+				bspMeshIndices_t& v1 = meshIndices.emplace_back();
+				v1.index = i + 1;
 
-			bspMeshIndices_t& v1 = meshIndices.emplace_back();
-			v1.index = i + 1;
+				bspMeshIndices_t& v2 = meshIndices.emplace_back();
+				v2.index = i + 2;
+			}
 
-			bspMeshIndices_t& v2 = meshIndices.emplace_back();
-			v2.index = i + 2;
+			last_vertex_size = meshVertices.size();
 		}
 
 

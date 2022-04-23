@@ -249,6 +249,11 @@ struct bspMeshes_t
 	uint32_t flags;
 };
 
+struct bspEntityPartitions_t
+{
+	char partitions[27];
+};
+
 // Old
 struct bspModel_t
 {
@@ -1521,6 +1526,7 @@ int                         EmitShader( const char *shader, const int *contentFl
 void                        BeginBSPFile();
 void                        EndBSPFile( bool do_write );
 void                        EmitBrushes( brushlist_t& brushes, int *firstBrush, int *numBrushes );
+void						EmitEntityPartitions();
 void                        EmitMeshes( const entity_t& e );
 void                        EmitFogs();
 
@@ -2106,6 +2112,8 @@ inline std::vector<bspVertices_t> bspVertices;
 inline std::vector<bspMeshIndices_t> bspMeshIndices;
 
 inline std::vector<bspMeshes_t> bspMeshes;
+
+inline std::vector<bspEntityPartitions_t> bspEntityPartitions;
 
 
 inline std::size_t numBSPEntities;

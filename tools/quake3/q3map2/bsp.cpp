@@ -356,6 +356,9 @@ static void ProcessWorldModel( entity_t& e ){
 	/* generate bsp brushes from map brushes */
 	EmitBrushes( e.brushes, &e.firstBrush, &e.numBrushes );
 
+	/* */
+	EmitEntityPartitions();
+
 	/* generate bsp meshes from map brushes */
 	EmitMeshes( e );
 
