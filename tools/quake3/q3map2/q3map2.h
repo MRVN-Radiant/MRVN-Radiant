@@ -231,10 +231,26 @@ struct bspVertices_t
 	Vector3 xyz;
 };
 
+struct bspVertexNormals_t
+{
+	Vector3 xyz;
+};
+
 struct bspMeshIndices_t
 {
 	uint16_t index;
 };
+
+struct bspVertexLitBump_t
+{
+	uint32_t vertex_index;
+	uint32_t normal_index;
+	float uv0[2];
+	int32_t minus_one;
+	float uv1[2];
+	uint32_t unk[4];
+};
+
 
 struct bspMeshes_t
 {
@@ -247,6 +263,14 @@ struct bspMeshes_t
 	uint32_t unk2;
 	uint32_t material_offset;
 	uint32_t flags;
+};
+
+struct bspMeshBounds_t
+{
+	Vector3 mins;
+	uint32_t flags;
+	Vector3 maxs;
+	uint32_t unk;
 };
 
 struct bspEntityPartitions_t
@@ -2109,9 +2133,15 @@ inline Vector3 gridSize = { 64, 64, 128 };
 
 inline std::vector<bspVertices_t> bspVertices;
 
+inline std::vector<bspVertexNormals_t> bspVertexNormals;
+
+inline std::vector<bspVertexLitBump_t> bspVertexLutBump;
+
 inline std::vector<bspMeshIndices_t> bspMeshIndices;
 
 inline std::vector<bspMeshes_t> bspMeshes;
+
+inline std::vector<bspMeshBounds_t> bspMeshBounds;
 
 inline std::vector<bspEntityPartitions_t> bspEntityPartitions;
 

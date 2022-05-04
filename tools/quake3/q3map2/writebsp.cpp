@@ -489,8 +489,43 @@ void EmitMeshes( const entity_t& e )
 			}
 
 			{
+				// Save it
 				bspVertices_t& db = bspVertices.emplace_back();
 				db = meshVert;
+
+				// Generate Vertex Normal for it
+				std::vector<Vector3> sideNormals;
+
+				for (const side_t& s0 : b.sides)
+				{
+					for (const Vector3& vertex : s0.winding)
+					{
+						if (IsCloseEnough(meshVert.xyz, vertex, 0.001))
+						{
+							sideNormals.push_back(Vector3(s0.plane.a, s0.plane.b, s0.plane.c));
+							break;
+						}
+					}
+				}
+
+				Vector3 normal;
+				for (const Vector3& n : sideNormals)
+				{
+					normal = Vector3( n.x() + normal.x(), n.y() + normal.y(), n.z() + normal.z());
+				}
+
+				vector3_normalise(normal);
+
+				for (bspVertexNormals_t& n : bspVertexNormals)
+				{
+					if (IsCloseEnough(n.xyz, normal, 0.001))
+						goto cnt_0;
+				}
+
+				{
+					bspVertexNormals_t& vn = bspVertexNormals.emplace_back();
+					vn.xyz = normal;
+				}
 			}
 
 			cnt_0:;
@@ -520,6 +555,12 @@ void EmitMeshes( const entity_t& e )
 		mesh.tri_count = meshIndices.size() / 3;
 		mesh.first_vertex = vertex_offset;
 		mesh.vertex_count = bspVertices.size() - vertex_offset;
+
+
+		bspMeshBounds_t& bounds = bspMeshBounds.emplace_back();
+		bounds.mins = b.eMinmax.mins;
+		bounds.maxs = b.eMinmax.maxs;
+
 
 
 		triangle_offset += mesh.tri_count;

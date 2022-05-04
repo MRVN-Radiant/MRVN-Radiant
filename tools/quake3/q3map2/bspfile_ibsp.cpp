@@ -387,9 +387,12 @@ void WriteIBSPFile( const char *filename ){
 	//AddLump( file, header.lumps[LUMP_NODES], bspNodes );
 	//AddLump( file, header.lumps[LUMP_BRUSHES], bspBrushes );
 	AddLump( file, header.lumps[LUMP_VERTICES], bspVertices );
+	AddLump( file, header.lumps[LUMP_VERTEX_NORMALS], bspVertexNormals );
+	AddLump( file, header.lumps[LUMP_VERTEX_LIT_BUMP], bspVertexLutBump );
 	AddLump( file, header.lumps[LUMP_ENTITY_PARTITIONS], bspEntityPartitions );
 	AddLump( file, header.lumps[LUMP_MESH_INDICES], bspMeshIndices );
 	AddLump( file, header.lumps[LUMP_MESHES], bspMeshes );
+	AddLump( file, header.lumps[LUMP_MESH_BOUNDS], bspMeshBounds );
 	//AddLump( file, header.lumps[LUMP_BRUSHSIDES], std::vector<ibspBrushSide_t>( bspBrushSides.begin(), bspBrushSides.end() ) );
 	//AddLump( file, header.lumps[LUMP_LEAFSURFACES], bspLeafSurfaces );
 	//AddLump( file, header.lumps[LUMP_LEAFBRUSHES], bspLeafBrushes );
