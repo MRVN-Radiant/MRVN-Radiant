@@ -278,6 +278,13 @@ struct bspEntityPartitions_t
 	char partitions[27];
 };
 
+struct bspModel_t_new
+{
+	MinMax minmax;
+	uint32_t first_mesh;
+	uint32_t mesh_count;
+};
+
 // Old
 struct bspModel_t
 {
@@ -1553,6 +1560,7 @@ void                        EmitBrushes( brushlist_t& brushes, int *firstBrush, 
 void						EmitEntityPartitions();
 void                        EmitMeshes( const entity_t& e );
 void                        EmitFogs();
+void						EmitModels();
 
 void                        BeginModel( const entity_t& e );
 void                        EndModel( const entity_t& e, node_t *headnode );
@@ -2135,7 +2143,7 @@ inline std::vector<bspVertices_t> bspVertices;
 
 inline std::vector<bspVertexNormals_t> bspVertexNormals;
 
-inline std::vector<bspVertexLitBump_t> bspVertexLutBump;
+inline std::vector<bspVertexLitBump_t> bspVertexLitBump;
 
 inline std::vector<bspMeshIndices_t> bspMeshIndices;
 
@@ -2144,6 +2152,8 @@ inline std::vector<bspMeshes_t> bspMeshes;
 inline std::vector<bspMeshBounds_t> bspMeshBounds;
 
 inline std::vector<bspEntityPartitions_t> bspEntityPartitions;
+
+inline std::vector<bspModel_t_new> bspModels_new;
 
 
 inline std::size_t numBSPEntities;

@@ -440,132 +440,160 @@ bool IsCloseEnough( Vector3 a, Vector3 b, float epsilon )
  */
 void EmitMeshes( const entity_t& e )
 {
-	uint32_t triangle_offset = 0;
-	uint16_t vertex_offset = 0;
-
-
 	/* walk list of brushes */
-	for (const brush_t& b : e.brushes)
+	for ( const brush_t &brush : e.brushes )
 	{
-		// Temporary vars
+		/* These are parallel */
 		std::vector<bspVertices_t> meshVertices;
+		std::vector<bspVertexNormals_t> meshVertexNormals;
+		/* This isn't */
 		std::vector<bspMeshIndices_t> meshIndices;
-		uint16_t last_vertex_size = 0;
 
-		// Save Vertices
-		for (const side_t& s0 : b.sides)
+
+		/* Create Mesh entry */
+		bspMeshes_t& mesh = bspMeshes.emplace_back();
+
+		/* Create vertices and their normals for this brush */
+		for ( const side_t &side : brush.sides )
 		{
-			for (const Vector3& vertex : s0.winding)
+			/* Loop through vertices, only save unique ones */
+			for ( const Vector3 &vertex : side.winding )
 			{
-				bspVertices_t& db = meshVertices.emplace_back();
-				db.xyz = vertex;
-			}
-
-			// Triangles
-			for (std::size_t i = last_vertex_size ; i < meshVertices.size() - 2; i++)
-			{
-				bspMeshIndices_t& v0 = meshIndices.emplace_back();
-				v0.index = last_vertex_size;
-
-				bspMeshIndices_t& v1 = meshIndices.emplace_back();
-				v1.index = i + 1;
-
-				bspMeshIndices_t& v2 = meshIndices.emplace_back();
-				v2.index = i + 2;
-			}
-
-			last_vertex_size = meshVertices.size();
-		}
-
-
-		// Minify Vertices
-		for (bspVertices_t& meshVert : meshVertices)
-		{
-			// Compare with other vertices, if we havent saved this one yet save it
-			for ( bspVertices_t& savedVert : bspVertices )
-			{
-				if ( IsCloseEnough(meshVert.xyz, savedVert.xyz, 0.001) )
-					goto cnt_0;
-			}
-
-			{
-				// Save it
-				bspVertices_t& db = bspVertices.emplace_back();
-				db = meshVert;
-
-				// Generate Vertex Normal for it
-				std::vector<Vector3> sideNormals;
-
-				for (const side_t& s0 : b.sides)
+				std::size_t index = 0;
+				for ( bspVertices_t& v : meshVertices )
 				{
-					for (const Vector3& vertex : s0.winding)
+					if ( IsCloseEnough( v.xyz, vertex, 0.001 ) )
+						break;
+					
+					index++;
+				}
+
+
+				/* vertex doesn't exist, save it */
+				if ( index == meshVertices.size() )
+				{
+					bspVertices_t &vert = meshVertices.emplace_back();
+					vert.xyz = vertex;
+
+					/* Calculate it's normal */
+					std::vector<Vector3> sideNormals;
+					for ( const side_t &s  : brush.sides )
 					{
-						if (IsCloseEnough(meshVert.xyz, vertex, 0.001))
+						for ( const Vector3 &v : s.winding )
 						{
-							sideNormals.push_back(Vector3(s0.plane.a, s0.plane.b, s0.plane.c));
-							break;
+							if ( IsCloseEnough( vertex, v, 0.001 ) )
+							{
+								sideNormals.push_back( Vector3( s.plane.a, s.plane.b, s.plane.c ) );
+								break;
+							}
 						}
 					}
-				}
+					
+					Vector3 normal;
+					for (const Vector3 &n : sideNormals)
+					{
+						normal = Vector3(n.x() + normal.x(), n.y() + normal.y(), n.z() + normal.z());
+					}
 
-				Vector3 normal;
-				for (const Vector3& n : sideNormals)
-				{
-					normal = Vector3( n.x() + normal.x(), n.y() + normal.y(), n.z() + normal.z());
-				}
+					vector3_normalise( normal );
 
-				vector3_normalise(normal);
-
-				for (bspVertexNormals_t& n : bspVertexNormals)
-				{
-					if (IsCloseEnough(n.xyz, normal, 0.001))
-						goto cnt_0;
-				}
-
-				{
-					bspVertexNormals_t& vn = bspVertexNormals.emplace_back();
-					vn.xyz = normal;
+					bspVertexNormals_t &norm = meshVertexNormals.emplace_back();
+					norm.xyz = normal;
 				}
 			}
 
-			cnt_0:;
+
+			/* Make triangles for side */
+			for (std::size_t i = 0; i < side.winding.size() - 2; i++)
+			{
+				for ( int j = 0; j < 3; j++ )
+				{
+					Vector3 vertex;
+					vertex = side.winding.at( i + j );
+
+					std::size_t index = 0;
+					for ( bspVertices_t &v : meshVertices )
+					{
+						if ( IsCloseEnough( v.xyz, vertex, 0.001 ) )
+							break;
+
+						index++;
+					}
+
+					bspMeshIndices_t &mi = meshIndices.emplace_back();
+					mi.index = index;
+				}
+			}
 		}
-		
-		// Minify Indices
-		for (bspMeshIndices_t& meshIndex : meshIndices)
+
+		mesh.first_vertex = bspVertexLitBump.size();
+		mesh.vertex_count = meshVertices.size();
+		/* Merge into lumps */
+		for ( uint32_t i = 0; i < meshVertices.size(); i++ )
+		{
+			bspVertices_t vertex = meshVertices.at( i );
+			bspVertexNormals_t normal = meshVertexNormals.at( i );
+
+
+			bspVertexLitBump_t& vlb = bspVertexLitBump.emplace_back();
+			vlb.minus_one = -1;
+
+			/* Save vertex */
+			std::size_t vertex_index = 0;
+			for ( bspVertices_t &v : bspVertices )
+			{
+				if ( IsCloseEnough( v.xyz, vertex.xyz, 0.001 ) )
+					break;
+
+				vertex_index++;
+			}
+
+			if ( vertex_index == bspVertices.size() )
+			{
+				bspVertices_t& vert = bspVertices.emplace_back();
+				vert.xyz = vertex.xyz;
+			}
+
+			/* Save vertex normal */
+			std::size_t normal_index = 0;
+			for ( bspVertexNormals_t &n : bspVertexNormals )
+			{
+				if ( IsCloseEnough( n.xyz, normal.xyz, 0.001 ) )
+					break;
+
+				normal_index++;
+			}
+
+			if ( normal_index == bspVertexNormals.size() )
+			{
+				bspVertexNormals_t& norm = bspVertexNormals.emplace_back();
+				norm.xyz = normal.xyz;
+			}
+
+			vlb.vertex_index = vertex_index;
+			vlb.normal_index = normal_index;
+		}
+
+		mesh.tri_offset = bspMeshIndices.size();
+		mesh.tri_count = meshIndices.size() / 3;
+		/* Merge Mesh Indices */
+		for ( bspMeshIndices_t &i : meshIndices )
 		{
 			bspVertices_t vertex;
-			vertex.xyz = meshVertices.at(meshIndex.index).xyz;
+			vertex.xyz = meshVertices.at( i.index ).xyz;
 
-			uint16_t i = 0;
-			for (bspVertices_t& v : bspVertices)
+			uint16_t index = 0;
+			for ( bspVertices_t& v : bspVertices )
 			{
-				if (IsCloseEnough(vertex.xyz, v.xyz, 0.001))
-				{
-					bspMeshIndices_t& newIndex = bspMeshIndices.emplace_back();
-					newIndex.index = i;
+				if ( IsCloseEnough(v.xyz, vertex.xyz, 0.001 ) )
 					break;
-				}
-				i++;
+
+				index++;
 			}
+
+			bspMeshIndices_t &mi = bspMeshIndices.emplace_back();
+			mi.index = index;
 		}
-
-		bspMeshes_t& mesh = bspMeshes.emplace_back();
-		mesh.tri_offset = triangle_offset;
-		mesh.tri_count = meshIndices.size() / 3;
-		mesh.first_vertex = vertex_offset;
-		mesh.vertex_count = bspVertices.size() - vertex_offset;
-
-
-		bspMeshBounds_t& bounds = bspMeshBounds.emplace_back();
-		bounds.mins = b.eMinmax.mins;
-		bounds.maxs = b.eMinmax.maxs;
-
-
-
-		triangle_offset += mesh.tri_count;
-		vertex_offset += mesh.vertex_count;
-		// Mesh
 	}
 }
 
@@ -633,7 +661,11 @@ void EmitFogs(){
 		Sys_Warning( "MAX_IBSP_FOGS (%i) exceeded (%zu). Visual inconsistencies are expected.\n", MAX_IBSP_FOGS, mapFogs.size() );
 }
 
-
+void EmitModels()
+{
+	bspModel_t_new &m = bspModels_new.emplace_back();
+	m.mesh_count = bspMeshes.size();
+}
 
 /*
    BeginModel()

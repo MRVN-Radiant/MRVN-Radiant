@@ -388,7 +388,7 @@ void WriteIBSPFile( const char *filename ){
 	//AddLump( file, header.lumps[LUMP_BRUSHES], bspBrushes );
 	AddLump( file, header.lumps[LUMP_VERTICES], bspVertices );
 	AddLump( file, header.lumps[LUMP_VERTEX_NORMALS], bspVertexNormals );
-	AddLump( file, header.lumps[LUMP_VERTEX_LIT_BUMP], bspVertexLutBump );
+	AddLump( file, header.lumps[LUMP_VERTEX_LIT_BUMP], bspVertexLitBump );
 	AddLump( file, header.lumps[LUMP_ENTITY_PARTITIONS], bspEntityPartitions );
 	AddLump( file, header.lumps[LUMP_MESH_INDICES], bspMeshIndices );
 	AddLump( file, header.lumps[LUMP_MESHES], bspMeshes );
@@ -396,7 +396,7 @@ void WriteIBSPFile( const char *filename ){
 	//AddLump( file, header.lumps[LUMP_BRUSHSIDES], std::vector<ibspBrushSide_t>( bspBrushSides.begin(), bspBrushSides.end() ) );
 	//AddLump( file, header.lumps[LUMP_LEAFSURFACES], bspLeafSurfaces );
 	//AddLump( file, header.lumps[LUMP_LEAFBRUSHES], bspLeafBrushes );
-	//AddLump( file, header.lumps[LUMP_MODELS], bspModels );
+	AddLump( file, header.lumps[LUMP_MODELS], bspModels_new );
 	//AddLump( file, header.lumps[LUMP_VERTICES], std::vector<ibspDrawVert_t>( bspDrawVerts.begin(), bspDrawVerts.end() ) );
 	//AddLump( file, header.lumps[LUMP_SURFACES], std::vector<ibspDrawSurface_t>( bspDrawSurfaces.begin(), bspDrawSurfaces.end() ) );
 	//AddLump( file, header.lumps[LUMP_VISIBILITY], bspVisBytes );
