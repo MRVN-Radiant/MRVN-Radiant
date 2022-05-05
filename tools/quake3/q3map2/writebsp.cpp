@@ -508,8 +508,10 @@ void EmitMeshes( const entity_t& e )
 			{
 				for ( int j = 0; j < 3; j++ )
 				{
+					int vert_index = j == 0 ? 0 : i + j;
+
 					Vector3 vertex;
-					vertex = side.winding.at( i + j );
+					vertex = side.winding.at( vert_index );
 
 					std::size_t index = 0;
 					for ( bspVertices_t &v : meshVertices )
