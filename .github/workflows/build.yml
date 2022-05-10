@@ -41,7 +41,7 @@ jobs:
       run: |
         make DOWNLOAD_GAMEPACKS=no MAKEFILE_CONF=msys2-Makefile.conf BUILD=release -j$(nproc) CXXFLAGS="-Wno-deprecated-declarations" 2> windows-warn-${{ matrix.arch }}.log
         wget https://github.com/F1F7Y/r2radiant-game-packs/releases/download/test/gamepacks.zip
-        unzip -o netradiant-custom-extra-gamepacks.zip -d "install"
+        unzip -o gamepacks.zip -d "install"
         wget https://www.dropbox.com/s/hcgkwzzmja3m6c0/netradiant-custom-extra-win.zip
         unzip -o netradiant-custom-extra-win.zip -d "install"
 
