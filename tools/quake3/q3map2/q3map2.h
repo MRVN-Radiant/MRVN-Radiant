@@ -346,13 +346,6 @@ struct bspBrush_t
 };
 
 
-struct bspFog_t
-{
-	char shader[ MAX_QPATH ];
-	int brushNum;
-	int visibleSide;                /* the brush side that ray tests need to clip against (-1 == none) */
-};
-
 
 struct bspDrawVert_t
 {
@@ -410,14 +403,6 @@ struct bspDrawSurface_t
 };
 
 
-/* advertisements */
-struct bspAdvertisement_t
-{
-	int cellId;
-	Vector3 normal;
-	Vector3 rect[4];
-	char model[ MAX_QPATH ];
-};
 
 
 /* -------------------------------------------------------------------------------
@@ -2191,9 +2176,7 @@ inline std::vector<int> bspDrawIndexes;
 
 inline std::vector<bspDrawSurface_t> bspDrawSurfaces; // MAX_MAP_DRAW_SURFS
 
-inline std::vector<bspFog_t> bspFogs;
 
-inline std::vector<bspAdvertisement_t> bspAds;
 
 #define AUTOEXPAND_BY_REALLOC( ptr, reqitem, allocated, def ) \
 	do \

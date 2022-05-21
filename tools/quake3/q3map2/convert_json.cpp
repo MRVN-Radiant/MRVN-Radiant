@@ -329,17 +329,6 @@ static void write_json( const char *directory ){
 	}
 	{
 		doc.RemoveAllMembers();
-		for_indexed( const auto& fog : bspFogs ){
-			rapidjson::Value value( rapidjson::kObjectType );
-			value.AddMember( "shader", rapidjson::StringRef( fog.shader ), all );
-			value.AddMember( "brushNum", fog.brushNum, all );
-			value.AddMember( "visibleSide", fog.visibleSide, all );
-			doc.AddMember( rapidjson::Value( StringOutputStream( 16 )( "fog#", i ).c_str(), all ), value, all );
-		}
-		write_doc( StringOutputStream( 256 )( directory, "fogs.json" ), doc );
-	}
-	{
-		doc.RemoveAllMembers();
 		for_indexed( const auto& index : bspDrawIndexes ){
 			rapidjson::Value value( rapidjson::kObjectType );
 			value.AddMember( "Num", index, all );
@@ -561,15 +550,6 @@ static void read_json( const char *directory, bool useFlagNames, bool skipUnknow
 			value_to( obj.value["lightmapVecs"], item.lightmapVecs );
 			item.patchWidth = obj.value["patchWidth"].GetInt();
 			item.patchHeight = obj.value["patchHeight"].GetInt();
-		}
-	}
-	{
-		const auto doc = load_json( StringOutputStream( 256 )( directory, "fogs.json" ) );
-		for( auto&& obj : doc.GetObj() ){
-			auto&& item = bspFogs.emplace_back();
-			strcpy( item.shader, obj.value["shader"].GetString() );
-			item.brushNum = obj.value["brushNum"].GetInt();
-			item.visibleSide = obj.value["visibleSide"].GetInt();
 		}
 	}
 	{

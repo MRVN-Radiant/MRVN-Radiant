@@ -90,98 +90,7 @@ void SwapBlock( std::vector<T>& block ){
  */
 
 static void SwapBSPFile(){
-	/* models */
-	SwapBlock( bspModels );
-
-	/* shaders (don't swap the name) */
-	for ( bspShader_t& shader : bspShaders )
-	{
-		if ( doingBSP ){
-			const shaderInfo_t *si = ShaderInfoForShader( shader.shader );
-			if ( !strEmptyOrNull( si->remapShader ) ) {
-				// copy and clear the rest of memory // check for overflow by String64
-				const auto remap = String64()( si->remapShader );
-				strncpy( shader.shader, remap, sizeof( shader.shader ) );
-			}
-		}
-		shader.contentFlags = LittleLong( shader.contentFlags );
-		shader.surfaceFlags = LittleLong( shader.surfaceFlags );
-	}
-
-	/* planes */
-	SwapBlock( bspPlanes );
-
-	/* nodes */
-	SwapBlock( bspNodes );
-
-	/* leafs */
-	SwapBlock( bspLeafs );
-
-	/* leaffaces */
-	SwapBlock( bspLeafSurfaces );
-
-	/* leafbrushes */
-	SwapBlock( bspLeafBrushes );
-
-	// brushes
-	SwapBlock( bspBrushes );
-
-	// brushsides
-	SwapBlock( bspBrushSides );
-
-	// vis
-	if( !bspVisBytes.empty() ){
-		( (int*) bspVisBytes.data() )[ 0 ] = LittleLong( ( (int*) bspVisBytes.data() )[ 0 ] );
-		( (int*) bspVisBytes.data() )[ 1 ] = LittleLong( ( (int*) bspVisBytes.data() )[ 1 ] );
-	}
-
-	/* drawverts (don't swap colors) */
-	for ( bspDrawVert_t& v : bspDrawVerts )
-	{
-		v.xyz[ 0 ] = LittleFloat( v.xyz[ 0 ] );
-		v.xyz[ 1 ] = LittleFloat( v.xyz[ 1 ] );
-		v.xyz[ 2 ] = LittleFloat( v.xyz[ 2 ] );
-		v.normal[ 0 ] = LittleFloat( v.normal[ 0 ] );
-		v.normal[ 1 ] = LittleFloat( v.normal[ 1 ] );
-		v.normal[ 2 ] = LittleFloat( v.normal[ 2 ] );
-		v.st[ 0 ] = LittleFloat( v.st[ 0 ] );
-		v.st[ 1 ] = LittleFloat( v.st[ 1 ] );
-		for ( Vector2& lm : v.lightmap )
-		{
-			lm[ 0 ] = LittleFloat( lm[ 0 ] );
-			lm[ 1 ] = LittleFloat( lm[ 1 ] );
-		}
-	}
-
-	/* drawindexes */
-	SwapBlock( bspDrawIndexes );
-
-	/* drawsurfs */
-	/* note: rbsp files (and hence q3map2 abstract bsp) have byte lightstyles index arrays, this follows sof2map convention */
-	SwapBlock( bspDrawSurfaces );
-
-	/* fogs */
-	for ( bspFog_t& fog : bspFogs )
-	{
-		fog.brushNum = LittleLong( fog.brushNum );
-		fog.visibleSide = LittleLong( fog.visibleSide );
-	}
-
-	/* advertisements */
-	for ( bspAdvertisement_t& ad : bspAds )
-	{
-		ad.cellId = LittleLong( ad.cellId );
-		ad.normal[ 0 ] = LittleFloat( ad.normal[ 0 ] );
-		ad.normal[ 1 ] = LittleFloat( ad.normal[ 1 ] );
-		ad.normal[ 2 ] = LittleFloat( ad.normal[ 2 ] );
-
-		for ( Vector3& v : ad.rect )
-		{
-			v[ 0 ] = LittleFloat( v[ 0 ] );
-			v[ 1 ] = LittleFloat( v[ 1 ] );
-			v[ 2 ] = LittleFloat( v[ 2 ] );
-		}
-	}
+	
 }
 
 
@@ -280,8 +189,6 @@ void PrintBSPFileSizes(){
 	            bspBrushes.size(), bspBrushes.size() * sizeof( bspBrushes[0] ) );
 	Sys_Printf( "%9zu brushsides    %9zu *\n",
 	            bspBrushSides.size(), bspBrushSides.size() * sizeof( bspBrushSides[0] ) );
-	Sys_Printf( "%9zu fogs          %9zu\n",
-	            bspFogs.size(), bspFogs.size() * sizeof( bspFogs[0] ) );
 	Sys_Printf( "%9zu planes        %9zu\n",
 	            bspPlanes.size(), bspPlanes.size() * sizeof( bspPlanes[0] ) );
 	Sys_Printf( "%9zu entdata       %9zu\n",

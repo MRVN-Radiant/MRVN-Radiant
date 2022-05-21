@@ -92,49 +92,7 @@ static void autocaulk_write(){
  */
 
 static void ProcessAdvertisements() {
-	Sys_FPrintf( SYS_VRB, "--- ProcessAdvertisements ---\n" );
-
-	for ( const auto& e : entities ) {
-
-		/* is an advertisement? */
-		if ( e.classname_is( "advertisement" ) ) {
-			bspAdvertisement_t& ad = bspAds.emplace_back();
-			ad.cellId = e.intForKey( "cellId" );
-			// copy and clear the rest of memory // check for overflow by String64
-			const auto modelKey = String64()( e.valueForKey( "model" ) );
-			strncpy( ad.model, modelKey, sizeof( ad.model ) );
-
-			const bspModel_t& adModel = bspModels[atoi( modelKey.c_str() + 1 )];
-
-			if ( adModel.numBSPSurfaces != 1 ) {
-				Error( "Ad cell id %d has more than one surface.", ad.cellId );
-			}
-
-			const bspDrawSurface_t& adSurface = bspDrawSurfaces[adModel.firstBSPSurface];
-
-			// store the normal for use at run time.. all ad verts are assumed to
-			// have identical normals (because they should be a simple rectangle)
-			// so just use the first vert's normal
-			ad.normal = bspDrawVerts[adSurface.firstVert].normal;
-
-			// store the ad quad for quick use at run time
-			if ( adSurface.surfaceType == MST_PATCH ) {
-				const int v0 = adSurface.firstVert + adSurface.patchHeight - 1;
-				const int v1 = adSurface.firstVert + adSurface.numVerts - 1;
-				const int v2 = adSurface.firstVert + adSurface.numVerts - adSurface.patchWidth;
-				const int v3 = adSurface.firstVert;
-				ad.rect[0] = bspDrawVerts[v0].xyz;
-				ad.rect[1] = bspDrawVerts[v1].xyz;
-				ad.rect[2] = bspDrawVerts[v2].xyz;
-				ad.rect[3] = bspDrawVerts[v3].xyz;
-			}
-			else {
-				Error( "Ad cell %d has an unsupported Ad Surface type.", ad.cellId );
-			}
-		}
-	}
-
-	Sys_FPrintf( SYS_VRB, "%9zu in-game advertisements\n", bspAds.size() );
+	
 }
 
 /*

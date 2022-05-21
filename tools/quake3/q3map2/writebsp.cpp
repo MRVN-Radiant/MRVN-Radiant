@@ -441,7 +441,7 @@ bool IsCloseEnough( Vector3 a, Vector3 b, float epsilon )
 void EmitMeshes( const entity_t& e )
 {
 	/* As of now 1 brush = 1 mesh, this needs to change */
-
+	
 
 	/* walk list of brushes */
 	for ( const brush_t &brush : e.brushes )
@@ -609,61 +609,6 @@ void EmitMeshes( const entity_t& e )
  */
 
 void EmitFogs(){
-	/* walk list */
-	for ( size_t i = 0; i < mapFogs.size(); ++i )
-	{
-		const fog_t& fog = mapFogs[i];
-		bspFog_t& bspFog = bspFogs.emplace_back();
-		/* set shader */
-		strcpy( bspFog.shader, fog.si->shader );
-
-		/* global fog doesn't have an associated brush */
-		if ( fog.brush == NULL ) {
-			bspFog.brushNum = -1;
-			bspFog.visibleSide = -1;
-		}
-		else
-		{
-			/* set brush */
-			bspFog.brushNum = fog.brush->outputNum;
-			bspFog.visibleSide = -1; // default to something sensible, not just zero index
-
-			/* try to use forced visible side */
-			if ( fog.visibleSide >= 0 ) {
-				bspFog.visibleSide = fog.visibleSide;
-				continue;
-			}
-
-			/* find visible axial side */
-			for ( size_t j = 6; j-- > 0; ) // prioritize +Z (index 5) then -Z (index 4) in ambiguous case; fogged pit is assumed as most likely case
-			{
-				if ( !fog.brush->sides[ j ].visibleHull.empty() ) {
-					Sys_Printf( "Fog %zu has visible side %zu\n", i, j );
-					bspFog.visibleSide = j;
-					break;
-				}
-			}
-			/* try other sides */
-			if( bspFog.visibleSide < 0 ){
-				for ( size_t j = 6; j < fog.brush->sides.size(); ++j )
-				{
-					if ( !fog.brush->sides[ j ].visibleHull.empty() ) {
-						Sys_Printf( "Fog %zu has visible side %zu\n", i, j );
-						bspFog.visibleSide = j;
-						break;
-					}
-				}
-			}
-		}
-	}
-
-	/* warn about overflow */
-	if( strEqual( g_game->bspIdent, "RBSP" ) ){
-		if( mapFogs.size() > MAX_RBSP_FOGS )
-			Sys_Warning( "MAX_RBSP_FOGS (%i) exceeded (%zu). Visual inconsistencies are expected.\n", MAX_RBSP_FOGS, mapFogs.size() );
-	}
-	else if( mapFogs.size() > MAX_IBSP_FOGS )
-		Sys_Warning( "MAX_IBSP_FOGS (%i) exceeded (%zu). Visual inconsistencies are expected.\n", MAX_IBSP_FOGS, mapFogs.size() );
 }
 
 void EmitModels()
