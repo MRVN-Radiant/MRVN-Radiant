@@ -1,4 +1,4 @@
-NetRadiant-custom
+r2radiant
 =================
 
 The open-source, cross-platform level editor for id Tech based games.
