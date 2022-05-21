@@ -129,4 +129,43 @@ void LoadR2BSPFile(const char* filename)
  */
 void WriteR2BSPFile(const char* filename)
 {
+	rbspHeader_t header{};
+
+
+	/* set up header */
+	memcpy(header.ident, g_game->bspIdent, 4);
+	header.version = LittleLong(g_game->bspVersion);
+	header.mapVersion = 30;
+	header.maxLump = 127;
+
+	/* write initial header */
+	FILE* file = SafeOpenWrite(filename);
+	SafeWrite(file, &header, sizeof(header));    /* overwritten later */
+
+
+	/* :) */
+	char message[64] = "Built with love using r2radiant :) test";
+	SafeWrite(file, &message, sizeof(message));
+
+	/* Write lumps */
+	AddLump(file, header.lumps[LUMP_VERTICES], bspVertices);
+	AddLump(file, header.lumps[LUMP_VERTEX_NORMALS], bspVertexNormals);
+	AddLump(file, header.lumps[LUMP_VERTEX_LIT_BUMP], bspVertexLitBump);
+	AddLump(file, header.lumps[LUMP_ENTITY_PARTITIONS], bspEntityPartitions);
+	AddLump(file, header.lumps[LUMP_MESH_INDICES], bspMeshIndices);
+	AddLump(file, header.lumps[LUMP_MESHES], bspMeshes);
+	AddLump(file, header.lumps[LUMP_MESH_BOUNDS], bspMeshBounds);
+	AddLump(file, header.lumps[LUMP_MODELS], bspModels_new);
+
+
+	/* emit bsp size */
+	const int size = ftell(file);
+	Sys_Printf("Wrote %.1f MB (%d bytes)\n", (float)size / (1024 * 1024), size);
+
+	/* write the completed header */
+	fseek(file, 0, SEEK_SET);
+	SafeWrite(file, &header, sizeof(header));
+
+	/* close the file */
+	fclose(file);
 }
