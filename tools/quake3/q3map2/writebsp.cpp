@@ -440,6 +440,9 @@ bool IsCloseEnough( Vector3 a, Vector3 b, float epsilon )
  */
 void EmitMeshes( const entity_t& e )
 {
+	/* As of now 1 brush = 1 mesh, this needs to change */
+
+
 	/* walk list of brushes */
 	for ( const brush_t &brush : e.brushes )
 	{

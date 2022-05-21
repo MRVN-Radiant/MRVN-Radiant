@@ -29,6 +29,7 @@
 #include "games.h"
 #include "bspfile_ibsp.h"
 #include "bspfile_rbsp.h"
+#include "bspfile_r2bsp.h"
 #include "qstringops.h"
 #include "inout.h"
 
@@ -919,6 +920,54 @@ struct game_ja : game_sof2
 };
 
 
+/* titanfall2 */
+struct game_titanfall2 : game_t
+{
+	/* most of this is copied ower, just want to et vis tree injected first */
+	game_titanfall2() : game_t
+	{
+		"titanfall2",                 /* -game x */
+		"assets",                 /* default base game data dir */
+		".assets",                /* unix home sub-dir */
+		"soldier",              /* magic path word */
+		"shaders",              /* shader directory */
+		64,                     /* max lightmapped surface verts */
+		999,                    /* max surface verts */
+		6000,                   /* max surface indexes */
+		true,                   /* flares */
+		"gfx/misc/lens_flare",  /* default flare shader */
+		false,                  /* wolf lighting model? */
+		128,                    /* lightmap width/height */
+		1.0f,                   /* lightmap gamma */
+		false,                  /* lightmap sRGB */
+		false,                  /* texture sRGB */
+		false,                  /* color sRGB */
+		0.0f,                   /* lightmap exposure */
+		1.0f,                   /* lightmap compensate */
+		1.0f,                   /* lightgrid scale */
+		1.0f,                   /* lightgrid ambient scale */
+		false,                  /* light angle attenuation uses half-lambert curve */
+		false,                  /* disable shader lightstyles hack */
+		false,                  /* keep light entities on bsp */
+		8,                      /* default patchMeta subdivisions tolerance */
+		false,                  /* patch casting enabled */
+		false,                  /* compile deluxemaps */
+		0,                      /* deluxemaps default mode */
+		512,                    /* minimap size */
+		1.0f,                   /* minimap sharpener */
+		0.0f,                   /* minimap border */
+		true,                   /* minimap keep aspect */
+		EMiniMapMode::Gray,     /* minimap mode */
+		"%s.tga",               /* minimap name format */
+		"RBSP",                 /* bsp file prefix */
+		1,                      /* bsp file version */
+		false,                  /* cod-style lump len/ofs order */
+		LoadRBSPFile,           /* bsp load function */
+		WriteRBSPFile,          /* bsp write function */
+		{},
+		0
+	}{}
+};
 
 const std::vector<game_t> g_games = { game_quake3(),
                                       game_quakelive(),
@@ -939,5 +988,6 @@ const std::vector<game_t> g_games = { game_quake3(),
 									  game_sof2(),
 									  game_jk2(),
 									  game_ja(),
+									  game_titanfall2()
 									};
 const game_t *g_game = &g_games[0];
