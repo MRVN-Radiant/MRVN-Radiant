@@ -962,8 +962,8 @@ struct game_titanfall2 : game_t
 		"RBSP",                 /* bsp file prefix */
 		1,                      /* bsp file version */
 		false,                  /* cod-style lump len/ofs order */
-		LoadRBSPFile,           /* bsp load function */
-		WriteRBSPFile,          /* bsp write function */
+		LoadR2BSPFile,           /* bsp load function */
+		WriteR2BSPFile,          /* bsp write function */
 		{},
 		0
 	}{}
