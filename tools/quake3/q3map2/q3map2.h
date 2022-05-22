@@ -265,12 +265,13 @@ struct bspMeshes_t
 	uint32_t flags;
 };
 
+/* From testing on r2 the whole lump can be zeroed as long as its parallel with bspMeshes */
 struct bspMeshBounds_t
 {
-	Vector3 mins;
-	uint32_t flags;
-	Vector3 maxs;
-	uint32_t unk;
+	Vector3 origin;
+	uint32_t unk0;
+	Vector3 extents;
+	uint32_t unk1;
 };
 
 struct bspEntityPartitions_t
@@ -286,14 +287,6 @@ struct bspModel_t_new
 };
 
 // Old
-struct bspModel_t
-{
-	MinMax minmax;
-	int firstBSPSurface, numBSPSurfaces;
-	int firstBSPBrush, numBSPBrushes;
-};
-
-
 struct bspShader_t
 {
 	char shader[ MAX_QPATH ];
@@ -376,31 +369,6 @@ struct bspGridPoint_t
 	byte latLong[ 2 ];
 };
 
-
-struct bspDrawSurface_t
-{
-	int shaderNum;
-	int fogNum;
-	int surfaceType;
-
-	int firstVert;
-	int numVerts;
-
-	int firstIndex;
-	int numIndexes;
-
-	byte lightmapStyles[ MAX_LIGHTMAPS ];                               /* RBSP */
-	byte vertexStyles[ MAX_LIGHTMAPS ];                                 /* RBSP */
-	int lightmapNum[ MAX_LIGHTMAPS ];                                   /* RBSP */
-	int lightmapX[ MAX_LIGHTMAPS ], lightmapY[ MAX_LIGHTMAPS ];         /* RBSP */
-	int lightmapWidth, lightmapHeight;
-
-	Vector3 lightmapOrigin;
-	Vector3 lightmapVecs[ 3 ];       /* on patches, [ 0 ] and [ 1 ] are lodbounds */
-
-	int patchWidth;
-	int patchHeight;
-};
 
 
 
@@ -1440,8 +1408,6 @@ void                        InitPaths( Args& args );
 int                         BSPMain( Args& args );
 
 
-/* minimap.c */
-int                         MiniMapBSPMain( Args& args );
 
 /* convert_bsp.c */
 int                         FixAAS( Args& args );
@@ -1456,9 +1422,6 @@ int                         ConvertBSPMain( Args& args );
 int                         ConvertBSPToMap( char *bspName );
 int                         ConvertBSPToMap_BP( char *bspName );
 
-
-/* convert_ase.c */
-int                         ConvertBSPToASE( char *bspName );
 
 /* convert_obj.c */
 int                         ConvertBSPToOBJ( char *bspName );
@@ -2124,6 +2087,9 @@ inline Vector3 gridSize = { 64, 64, 128 };
 
    ------------------------------------------------------------------------------- */
 
+inline std::size_t numBSPEntities;
+inline std::vector<entity_t> entities;
+
 inline std::vector<bspVertices_t> bspVertices;
 
 inline std::vector<bspVertexNormals_t> bspVertexNormals;
@@ -2141,10 +2107,9 @@ inline std::vector<bspEntityPartitions_t> bspEntityPartitions;
 inline std::vector<bspModel_t_new> bspModels_new;
 
 
-inline std::size_t numBSPEntities;
-inline std::vector<entity_t> entities;
 
-inline std::vector<bspModel_t> bspModels;
+/* Old lumps, these need to go */
+
 
 inline std::vector<bspShader_t> bspShaders;
 
@@ -2174,7 +2139,6 @@ inline std::vector<bspDrawVert_t> bspDrawVerts;
 
 inline std::vector<int> bspDrawIndexes;
 
-inline std::vector<bspDrawSurface_t> bspDrawSurfaces; // MAX_MAP_DRAW_SURFS
 
 
 

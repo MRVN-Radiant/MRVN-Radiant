@@ -164,67 +164,7 @@ void WriteBSPFile( const char *filename ){
  */
 
 void PrintBSPFileSizes(){
-	/* parse entities first */
-	if ( entities.empty() ) {
-		ParseEntities();
-	}
-	int patchCount = 0, planarCount = 0, trisoupCount = 0;
-	for ( const bspDrawSurface_t& s : bspDrawSurfaces ){
-		if ( s.surfaceType == MST_PATCH )
-			++patchCount;
-		else if ( s.surfaceType == MST_PLANAR )
-			++planarCount;
-		else if ( s.surfaceType == MST_TRIANGLE_SOUP )
-			++trisoupCount;
-	}
-	/* note that this is abstracted */
-	Sys_Printf( "Abstracted BSP file components (*actual sizes may differ)\n" );
-
-	/* print various and sundry bits */
-	Sys_Printf( "%9zu models        %9zu\n",
-	            bspModels.size(), bspModels.size() * sizeof( bspModels[0] ) );
-	Sys_Printf( "%9zu shaders       %9zu\n",
-	            bspShaders.size(), bspShaders.size() * sizeof( bspShaders[0] ) );
-	Sys_Printf( "%9zu brushes       %9zu\n",
-	            bspBrushes.size(), bspBrushes.size() * sizeof( bspBrushes[0] ) );
-	Sys_Printf( "%9zu brushsides    %9zu *\n",
-	            bspBrushSides.size(), bspBrushSides.size() * sizeof( bspBrushSides[0] ) );
-	Sys_Printf( "%9zu planes        %9zu\n",
-	            bspPlanes.size(), bspPlanes.size() * sizeof( bspPlanes[0] ) );
-	Sys_Printf( "%9zu entdata       %9zu\n",
-	            entities.size(), bspEntData.size() );
-	Sys_Printf( "\n" );
-
-	Sys_Printf( "%9zu nodes         %9zu\n",
-	            bspNodes.size(), bspNodes.size() * sizeof( bspNodes[0] ) );
-	Sys_Printf( "%9zu leafs         %9zu\n",
-	            bspLeafs.size(), bspLeafs.size() * sizeof( bspLeafs[0] ) );
-	Sys_Printf( "%zu leafsurfaces  %zu\n",
-	            bspLeafSurfaces.size(), bspLeafSurfaces.size() * sizeof( bspLeafSurfaces[0] ) );
-	Sys_Printf( "%9zu leafbrushes   %9zu\n",
-	            bspLeafBrushes.size(), bspLeafBrushes.size() * sizeof( bspLeafBrushes[0] ) );
-	Sys_Printf( "\n" );
-
-	Sys_Printf( "%9zu drawsurfaces  %9zu *\n",
-	            bspDrawSurfaces.size(), bspDrawSurfaces.size() * sizeof( bspDrawSurfaces[0] ) );
-	Sys_Printf( "%9d   patch surfaces\n",
-	            patchCount );
-	Sys_Printf( "%9d   planar surfaces\n",
-	            planarCount );
-	Sys_Printf( "%9d   trisoup surfaces\n",
-	            trisoupCount );
-	Sys_Printf( "%9zu drawverts     %9zu *\n",
-	            bspDrawVerts.size(), bspDrawVerts.size() * sizeof( bspDrawVerts[0] ) );
-	Sys_Printf( "%9zu drawindexes   %9zu\n",
-	            bspDrawIndexes.size(), bspDrawIndexes.size() * sizeof( bspDrawIndexes[0] ) );
-	Sys_Printf( "\n" );
-
-	Sys_Printf( "%9zu lightmaps     %9zu\n",
-	            bspLightBytes.size() / ( g_game->lightmapSize * g_game->lightmapSize * 3 ), bspLightBytes.size() );
-	Sys_Printf( "%9zu lightgrid     %9zu *\n",
-	            bspGridPoints.size(), bspGridPoints.size() * sizeof( bspGridPoints[0] ) );
-	Sys_Printf( "          visibility    %9zu\n",
-	            bspVisBytes.size() );
+	
 }
 
 

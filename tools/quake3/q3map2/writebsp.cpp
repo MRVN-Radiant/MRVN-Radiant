@@ -308,18 +308,6 @@ void SetLightStyles(){
  */
 
 void BeginBSPFile(){
-	/* these values may actually be initialized if the file existed when loaded, so clear them explicitly */
-	bspModels.clear();
-	bspNodes.clear();
-	bspBrushSides.clear();
-	bspLeafSurfaces.clear();
-	bspLeafBrushes.clear();
-
-	/* leave leaf 0 as an error, because leafs are referenced as negative number nodes */
-	bspLeafs.resize( 1 );
-
-	/* ydnar: gs mods: set the first 6 drawindexes to 0 1 2 2 1 3 for triangles and quads */
-	bspDrawIndexes = { 0, 1, 2, 0, 2, 3 };
 }
 
 
@@ -608,8 +596,7 @@ void EmitMeshes( const entity_t& e )
    turns map fogs into bsp fogs
  */
 
-void EmitFogs(){
-}
+
 
 void EmitModels()
 {
@@ -623,53 +610,7 @@ void EmitModels()
  */
 
 void BeginModel( const entity_t& e ){
-	MinMax minmax;
-	MinMax lgMinmax;          /* ydnar: lightgrid mins/maxs */
 
-	/* bound the brushes */
-	for ( const brush_t& b : e.brushes )
-	{
-		/* ignore non-real brushes (origin, etc) */
-		if ( b.sides.empty() ) {
-			continue;
-		}
-		minmax.extend( b.minmax );
-
-		/* ydnar: lightgrid bounds */
-		if ( b.compileFlags & C_LIGHTGRID ) {
-			lgMinmax.extend( b.minmax );
-		}
-	}
-
-	/* bound patches */
-	for ( const parseMesh_t *p = e.patches; p; p = p->next )
-	{
-		for ( const bspDrawVert_t& vert : Span( p->mesh.verts, p->mesh.width * p->mesh.height ) )
-			minmax.extend( vert.xyz );
-	}
-
-	/* get model */
-	bspModel_t& mod = bspModels.emplace_back();
-
-	/* ydnar: lightgrid mins/maxs */
-	if ( lgMinmax.valid() ) {
-		/* use lightgrid bounds */
-		mod.minmax = lgMinmax;
-	}
-	else
-	{
-		/* use brush/patch bounds */
-		mod.minmax = minmax;
-	}
-
-	/* note size */
-	Sys_FPrintf( SYS_VRB, "BSP bounds: { %f %f %f } { %f %f %f }\n", minmax.mins[0], minmax.mins[1], minmax.mins[2], minmax.maxs[0], minmax.maxs[1], minmax.maxs[2] );
-	if ( lgMinmax.valid() )
-		Sys_FPrintf( SYS_VRB, "Lightgrid bounds: { %f %f %f } { %f %f %f }\n", lgMinmax.mins[0], lgMinmax.mins[1], lgMinmax.mins[2], lgMinmax.maxs[0], lgMinmax.maxs[1], lgMinmax.maxs[2] );
-
-	/* set firsts */
-	mod.firstBSPSurface = bspDrawSurfaces.size();
-	mod.firstBSPBrush = bspBrushes.size();
 }
 
 
@@ -681,15 +622,5 @@ void BeginModel( const entity_t& e ){
  */
 
 void EndModel( const entity_t& e, node_t *headnode ){
-	/* note it */
-	Sys_FPrintf( SYS_VRB, "--- EndModel ---\n" );
-
-	/* emit the bsp */
-	bspModel_t& mod = bspModels.back();
-	EmitDrawNode_r( headnode );
-
-	/* set surfaces and brushes */
-	mod.numBSPSurfaces = bspDrawSurfaces.size() - mod.firstBSPSurface;
-	mod.firstBSPBrush = e.firstBrush;
-	mod.numBSPBrushes = e.numBrushes;
+	
 }

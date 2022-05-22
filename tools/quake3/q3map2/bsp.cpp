@@ -517,7 +517,6 @@ static void ProcessModels(){
 		}
 
 		/* process the model */
-		Sys_FPrintf( SYS_VRB, "############### model %zu ###############\n", bspModels.size() );
 		if ( entityNum == 0 ) {
 			ProcessWorldModel( entity );
 		}
@@ -531,11 +530,6 @@ static void ProcessModels(){
 
 	/* restore -v setting */
 	verbose = oldVerbose;
-
-	Sys_FPrintf( SYS_VRB, "%9zu bspModels in total\n", bspModels.size() );
-
-	/* write fogs */
-	EmitFogs();
 
 	/* vortex: emit meta stats */
 	EmitMetaStats();

@@ -218,10 +218,6 @@ int main( int argc, char **argv ){
 		r = MergeBSPMain( args );
 	}
 
-	/* div0: minimap */
-	else if ( args.takeFront( "-minimap" ) ) {
-		r = MiniMapBSPMain( args );
-	}
 
 	/* ydnar: otherwise create a bsp */
 	else{

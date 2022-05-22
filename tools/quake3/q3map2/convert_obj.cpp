@@ -45,77 +45,7 @@ static int objVertexCount = 0;
 static int objLastShaderNum = -1;
 
 static void ConvertSurfaceToOBJ( FILE *f, int modelNum, int surfaceNum, const Vector3& origin, const std::vector<int>& lmIndices ){
-	const bspDrawSurface_t& ds = bspDrawSurfaces[ surfaceNum ];
 
-	/* ignore patches for now */
-	if ( ds.surfaceType != MST_PLANAR && ds.surfaceType != MST_TRIANGLE_SOUP ) {
-		return;
-	}
-
-	fprintf( f, "g mat%dmodel%dsurf%d\r\n", ds.shaderNum, modelNum, surfaceNum );
-	switch ( ds.surfaceType )
-	{
-	case MST_PLANAR:
-		fprintf( f, "# SURFACETYPE MST_PLANAR\r\n" );
-		break;
-	case MST_TRIANGLE_SOUP:
-		fprintf( f, "# SURFACETYPE MST_TRIANGLE_SOUP\r\n" );
-		break;
-	}
-
-	/* export shader */
-	if ( lightmapsAsTexcoord ) {
-		const int lmNum = ds.lightmapNum[0] >= 0? ds.lightmapNum[0]: lmIndices[ds.shaderNum] >= 0? lmIndices[ds.shaderNum] : ds.lightmapNum[0];
-		if ( objLastShaderNum != lmNum ) {
-			fprintf( f, "usemtl lm_%04d\r\n", lmNum + deluxemap );
-			objLastShaderNum = lmNum + deluxemap;
-		}
-		if ( lmNum + (int)deluxemap < firstLightmap ) {
-			Sys_Warning( "lightmap %d out of range (exporting anyway)\n", lmNum + deluxemap );
-			firstLightmap = lmNum + deluxemap;
-		}
-		if ( lmNum > lastLightmap ) {
-			Sys_Warning( "lightmap %d out of range (exporting anyway)\n", lmNum + deluxemap );
-			lastLightmap = lmNum + deluxemap;
-		}
-	}
-	else
-	{
-		if ( objLastShaderNum != ds.shaderNum ) {
-			fprintf( f, "usemtl %s\r\n", bspShaders[ds.shaderNum].shader );
-			objLastShaderNum = ds.shaderNum;
-		}
-	}
-
-	/* export vertex */
-	for ( int i = 0; i < ds.numVerts; i++ )
-	{
-		const bspDrawVert_t& dv = bspDrawVerts[ ds.firstVert + i ];
-		fprintf( f, "# vertex %d\r\n", i + objVertexCount + 1 );
-		fprintf( f, "v %f %f %f\r\n", dv.xyz[ 0 ], dv.xyz[ 2 ], -dv.xyz[ 1 ] );
-		fprintf( f, "vn %f %f %f\r\n", dv.normal[ 0 ], dv.normal[ 2 ], -dv.normal[ 1 ] );
-		if ( lightmapsAsTexcoord ) {
-			fprintf( f, "vt %f %f\r\n", dv.lightmap[0][0], ( 1.0 - dv.lightmap[0][1] ) ); // dv.lightmap[0][1] internal, ( 1.0 - dv.lightmap[0][1] ) external
-		}
-		else{
-			fprintf( f, "vt %f %f\r\n", dv.st[ 0 ], ( 1.0 - dv.st[ 1 ] ) );
-		}
-	}
-
-	/* export faces */
-	for ( int i = 0; i < ds.numIndexes; i += 3 )
-	{
-		const int a = bspDrawIndexes[ i + ds.firstIndex ];
-		const int c = bspDrawIndexes[ i + ds.firstIndex + 1 ];
-		const int b = bspDrawIndexes[ i + ds.firstIndex + 2 ];
-		fprintf( f, "f %d/%d/%d %d/%d/%d %d/%d/%d\r\n",
-		         a + objVertexCount + 1, a + objVertexCount + 1, a + objVertexCount + 1,
-		         b + objVertexCount + 1, b + objVertexCount + 1, b + objVertexCount + 1,
-		         c + objVertexCount + 1, c + objVertexCount + 1, c + objVertexCount + 1
-		       );
-	}
-
-	objVertexCount += ds.numVerts;
 }
 
 
@@ -126,13 +56,7 @@ static void ConvertSurfaceToOBJ( FILE *f, int modelNum, int surfaceNum, const Ve
  */
 
 static void ConvertModelToOBJ( FILE *f, int modelNum, const Vector3& origin, const std::vector<int>& lmIndices ){
-	const bspModel_t& model = bspModels[ modelNum ];
 
-	/* go through each drawsurf in the model */
-	for ( int i = 0; i < model.numBSPSurfaces; i++ )
-	{
-		ConvertSurfaceToOBJ( f, modelNum, model.firstBSPSurface + i, origin, lmIndices );
-	}
 }
 
 
