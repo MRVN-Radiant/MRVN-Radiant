@@ -226,20 +226,12 @@ struct bspHeader_t
 	bspLump_t lumps[ 128 ];     /* theoretical maximum # of bsp lumps */
 };
 
-struct bspVertices_t
-{
-	Vector3 xyz;
-};
+using bspVertex_t = Vector3;
 
-struct bspVertexNormals_t
-{
-	Vector3 xyz;
-};
+using bspVertexNormal_t = Vector3;
 
-struct bspMeshIndices_t
-{
-	uint16_t index;
-};
+using bspMeshIndex_t = uint16_t;
+
 
 struct bspVertexLitBump_t
 {
@@ -252,16 +244,18 @@ struct bspVertexLitBump_t
 };
 
 
-struct bspMeshes_t
+struct bspMesh_t
 {
 	uint32_t tri_offset;
 	uint16_t tri_count;
 	uint16_t first_vertex;
 	uint16_t vertex_count;
 	uint16_t unk0;
-	uint32_t unk1;
-	uint32_t unk2;
-	uint32_t material_offset;
+	uint32_t const0;
+	uint16_t unk1;
+	uint16_t unk2;
+	uint16_t unk3;
+	uint16_t material_offset;
 	uint32_t flags;
 };
 
@@ -2090,15 +2084,15 @@ inline Vector3 gridSize = { 64, 64, 128 };
 inline std::size_t numBSPEntities;
 inline std::vector<entity_t> entities;
 
-inline std::vector<bspVertices_t> bspVertices;
+inline std::vector<bspVertex_t> bspVertices;
 
-inline std::vector<bspVertexNormals_t> bspVertexNormals;
+inline std::vector<bspVertexNormal_t> bspVertexNormals;
 
 inline std::vector<bspVertexLitBump_t> bspVertexLitBump;
 
-inline std::vector<bspMeshIndices_t> bspMeshIndices;
+inline std::vector<bspMeshIndex_t> bspMeshIndices;
 
-inline std::vector<bspMeshes_t> bspMeshes;
+inline std::vector<bspMesh_t> bspMeshes;
 
 inline std::vector<bspMeshBounds_t> bspMeshBounds;
 

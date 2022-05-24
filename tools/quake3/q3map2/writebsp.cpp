@@ -32,7 +32,6 @@
 #include "q3map2.h"
 
 
-
 /*
    EmitShader()
    emits a bsp shader entry
@@ -393,18 +392,11 @@ void EmitBrushes( brushlist_t& brushes, int *firstBrush, int *numBrushes ){
 }
 
 
-float MatrixDeterminant(Vector3 a, Vector3 b, Vector3 c)
-{
-	double _d;
-	_d = a.x() * (b.y() * c.z() - b.z() * c.y()) - a.y() * (b.x() * c.z() - b.z() * c.x()) - a.z() * (b.x() * c.y() - b.y() * c.x());
-
-	return _d;
-}
 
 
 /*
-   EmitMeshes()
-   writes the mesh list to the bsp
+   EmitEntityPartitions()
+   writes the entitiy partitions
  */
 void EmitEntityPartitions()
 {
@@ -412,14 +404,41 @@ void EmitEntityPartitions()
 	memcpy(p.partitions, "01* env fx script snd spawn", 27);
 }
 
-bool IsCloseEnough( Vector3 a, Vector3 b, float epsilon )
+/* helpers */
+bool VertexLarger( Vector3 a, Vector3 b )
 {
-	if (fabs(a.x() - b.x()) < epsilon)
-		if (fabs(a.y() - b.y()) < epsilon)
-			if (fabs(a.z() - b.z()) < epsilon)
+	if (a.x() > b.x())
+		if (a.y() > b.y())
+			if (a.z() > b.z())
 				return true;
 
 	return false;
+}
+
+struct tempMesh_t
+{
+	MinMax minmax;
+	String64 shader;
+	/* Parallel */
+	std::vector<Vector3> Vertices;
+	std::vector<Vector3> Normals;
+
+	std::vector<uint16_t> Triangles;
+};
+
+bool MinMaxIntersecting( MinMax a, MinMax b)
+{
+	return (a.mins.x() < b.maxs.x() && a.maxs.x() > b.mins.x() &&
+		a.mins.y() < b.maxs.y() && a.maxs.y() > b.mins.y() &&
+		a.mins.z() < b.maxs.z() && a.maxs.z() > b.mins.z());
+}
+
+bool VectorsEqual( Vector3 a, Vector3 b )
+{
+	return	(fabs(a.x() - b.x()) < EQUAL_EPSILON) &&
+			(fabs(a.y() - b.y()) < EQUAL_EPSILON) &&
+			(fabs(a.z() - b.z()) < EQUAL_EPSILON);
+
 }
 
 /*
@@ -428,26 +447,236 @@ bool IsCloseEnough( Vector3 a, Vector3 b, float epsilon )
  */
 void EmitMeshes( const entity_t& e )
 {
-	/* As of now 1 brush = 1 mesh, this needs to change */
-	
+	/*
+		Each side in radiant can have a different material
+		while in the bsp we can only have one material per mesh.
 
+		We get around this by first spliting all brushes/patches into sides,
+		then combining the ones with the same material which are touching into
+		one bspMesh_t.
+	*/
+	
+	std::vector<tempMesh_t> tempMeshes;
 	/* walk list of brushes */
+	for (const brush_t& brush : e.brushes)
+	{
+		/* loop through sides */
+		for (const side_t& side : brush.sides)
+		{
+			tempMesh_t& mesh = tempMeshes.emplace_back();
+			mesh.shader = side.shaderInfo->shader;// textures / common / caulk
+			/* loop through vertices */
+			for (const Vector3& vertex : side.winding)
+			{
+				/* Check against aabb */
+				if (VertexLarger(vertex, mesh.minmax.maxs))
+					mesh.minmax.maxs = vertex;
+				
+				if (VertexLarger(vertex, mesh.minmax.mins))
+					mesh.minmax.mins = vertex;
+
+
+				/* Calculate it's normal */
+				std::vector<Vector3> sideNormals;
+				for (const side_t& s : brush.sides)
+				{
+					for (const Vector3& v : s.winding)
+					{
+						if (VectorCompare(vertex, v))
+						{
+							sideNormals.push_back(Vector3(s.plane.a, s.plane.b, s.plane.c));
+							break;
+						}
+					}
+				}
+				Vector3 normal;
+				for (const Vector3& n : sideNormals)
+				{
+					normal = Vector3(n.x() + normal.x(), n.y() + normal.y(), n.z() + normal.z());
+				}
+				
+				// For some reason this increased the amount of saved normals
+				// too late to investigate
+				//vector3_normalise(normal);
+				//VectorNormalize(normal);
+
+				/* save */
+				mesh.Vertices.emplace_back(vertex);
+				mesh.Normals.emplace_back(normal);
+			}
+
+			/* Create triangles for side */
+			for (std::size_t i = 0; i < side.winding.size() - 2; i++)
+			{
+				for (int j = 0; j < 3; j++)
+				{
+					int vert_index = j == 0 ? 0 : i + j;
+
+					Vector3 vertex;
+					vertex = side.winding.at(vert_index);
+
+					std::size_t index = 0;
+					for (Vector3& v : mesh.Vertices)
+					{
+						if (VectorCompare(v, vertex))
+							break;
+
+						index++;
+					}
+
+					mesh.Triangles.emplace_back(index);
+				}
+			}
+
+		}
+	}
+
+	/* walk list of patches */
+	parseMesh_t* patch;
+	while (patch != nullptr)
+	{
+		patch = patch->next;
+	}
+
+	/* loop through tempMeshes and combine */
+	std::vector<tempMesh_t> finishedMeshes;
+	for( const tempMesh_t &tempMesh : tempMeshes)
+	{
+		
+		for ( tempMesh_t& finishedMesh : finishedMeshes)
+		{
+			//if (!MinMaxIntersecting(tempMesh.minmax, finishedMesh.minmax))
+			//	break;
+
+			
+			// I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings 
+			//const char* test0 = tempMesh.shader.c_str();
+			//const char* test1 = finishedMesh.shader.c_str();
+			if (strcmp(tempMesh.shader.c_str() != finishedMesh.shader.c_str()) != 0 )
+				break;
+
+			/* meshes are touchingand have the same material, combine them 
+			uint16_t triangleCount = finishedMesh.Triangles.size();
+			for (std::size_t i = 0; i < tempMesh.Vertices.size(); i++)
+			{
+				finishedMesh.Vertices.emplace_back(tempMesh.Vertices.at(i));
+				finishedMesh.Normals.emplace_back(tempMesh.Normals.at(i));
+			}
+			for (std::size_t i = 0; i < tempMesh.Triangles.size(); i++)
+			{
+				finishedMesh.Triangles.emplace_back(tempMesh.Triangles.at(i) + triangleCount);
+			}
+
+			/* finished combining this tempMesh, go to the next one */
+			goto next;
+		}
+
+		{
+			/* mesh didn't meet requirements to be combined, save it separately */
+			finishedMeshes.emplace_back(tempMesh);
+		}
+		next:;
+	}
+
+
+	/* 
+		We now have a list of meshes with matching materials.
+		All that's left is converting into bsp structs :)
+	*/
+
+	for (const tempMesh_t& tempMesh : finishedMeshes)
+	{
+		bspMesh_t& mesh = bspMeshes.emplace_back();
+		mesh.const0 = 4294967040;
+		mesh.first_vertex = bspVertexLitBump.size();
+		mesh.vertex_count = tempMesh.Vertices.size();
+		mesh.tri_offset = bspMeshIndices.size();
+		mesh.tri_count = tempMesh.Triangles.size() / 3;
+
+
+		/* Save vertices and vertexnormals */
+		for (std::size_t i = 0; i < tempMesh.Vertices.size(); i++)
+		{
+			bspVertexLitBump_t& litVertex = bspVertexLitBump.emplace_back();
+			litVertex.minus_one = -1;
+
+			for (uint16_t j = 0; j < bspVertices.size(); j++)
+			{
+				if (VectorCompare(tempMesh.Vertices.at(i), bspVertices.at(j)))
+				{
+					litVertex.vertex_index = j;
+					goto normal;
+				}
+			}
+
+			{
+				litVertex.vertex_index = bspVertices.size();
+				bspVertices.emplace_back(tempMesh.Vertices.at(i));
+			}
+
+			normal:;
+
+			for (uint16_t j = 0; j < bspVertexNormals.size(); j++)
+			{
+				if (VectorCompare(tempMesh.Normals.at(i), bspVertexNormals.at(j)))
+				{
+					litVertex.normal_index = j;
+					goto end;
+				}
+			}
+
+			{
+				litVertex.normal_index = bspVertexNormals.size();
+				bspVertexNormals.emplace_back(tempMesh.Normals.at(i));
+			}
+
+			end:;
+		}
+
+		/* Save triangles */
+		for (uint16_t i = 0; i < tempMesh.Triangles.size(); i++)
+		{
+			uint16_t triangleOffset = tempMesh.Triangles.at(i);
+			for (uint32_t j = 0; j < bspVertices.size(); j++)
+			{
+				if (VectorCompare(bspVertices.at(j), tempMesh.Vertices.at(triangleOffset)))
+				{
+					bspMeshIndex_t& index = bspMeshIndices.emplace_back();
+					index = j;
+					break;
+				}
+			}
+		}
+
+	}
+
+
+
+
+
+
+
+
+
+
+	/* walk list of brushes 
 	for ( const brush_t &brush : e.brushes )
 	{
-		/* These are parallel */
+		/* These are parallel 
 		std::vector<bspVertices_t> meshVertices;
 		std::vector<bspVertexNormals_t> meshVertexNormals;
-		/* This isn't */
+		/* This isn't 
 		std::vector<bspMeshIndices_t> meshIndices;
 
 
-		/* Create Mesh entry */
+		/* Create Mesh entry 
 		bspMeshes_t& mesh = bspMeshes.emplace_back();
+		mesh.const0 = 4294967040;
 
-		/* Create vertices and their normals for this brush */
+		/* Create vertices and their normals for this brush 
 		for ( const side_t &side : brush.sides )
 		{
-			/* Loop through vertices, only save unique ones */
+			/* Loop through vertices, only save unique ones 
 			for ( const Vector3 &vertex : side.winding )
 			{
 				std::size_t index = 0;
@@ -460,13 +689,13 @@ void EmitMeshes( const entity_t& e )
 				}
 
 
-				/* vertex doesn't exist, save it */
+				/* vertex doesn't exist, save it 
 				if ( index == meshVertices.size() )
 				{
 					bspVertices_t &vert = meshVertices.emplace_back();
 					vert.xyz = vertex;
 
-					/* Calculate it's normal */
+					/* Calculate it's normal 
 					std::vector<Vector3> sideNormals;
 					for ( const side_t &s  : brush.sides )
 					{
@@ -494,7 +723,7 @@ void EmitMeshes( const entity_t& e )
 			}
 
 
-			/* Make triangles for side */
+			/* Make triangles for side 
 			for (std::size_t i = 0; i < side.winding.size() - 2; i++)
 			{
 				for ( int j = 0; j < 3; j++ )
@@ -521,7 +750,7 @@ void EmitMeshes( const entity_t& e )
 
 		mesh.first_vertex = bspVertexLitBump.size();
 		mesh.vertex_count = meshVertices.size();
-		/* Merge into lumps */
+		/* Merge into lumps 
 		for ( uint32_t i = 0; i < meshVertices.size(); i++ )
 		{
 			bspVertices_t vertex = meshVertices.at( i );
@@ -531,7 +760,7 @@ void EmitMeshes( const entity_t& e )
 			bspVertexLitBump_t& vlb = bspVertexLitBump.emplace_back();
 			vlb.minus_one = -1;
 
-			/* Save vertex */
+			/* Save vertex 
 			std::size_t vertex_index = 0;
 			for ( bspVertices_t &v : bspVertices )
 			{
@@ -547,7 +776,7 @@ void EmitMeshes( const entity_t& e )
 				vert.xyz = vertex.xyz;
 			}
 
-			/* Save vertex normal */
+			/* Save vertex normal 
 			std::size_t normal_index = 0;
 			for ( bspVertexNormals_t &n : bspVertexNormals )
 			{
@@ -569,7 +798,7 @@ void EmitMeshes( const entity_t& e )
 
 		mesh.tri_offset = bspMeshIndices.size();
 		mesh.tri_count = meshIndices.size() / 3;
-		/* Merge Mesh Indices */
+		/* Merge Mesh Indices 
 		for ( bspMeshIndices_t &i : meshIndices )
 		{
 			bspVertices_t vertex;
@@ -587,7 +816,7 @@ void EmitMeshes( const entity_t& e )
 			bspMeshIndices_t &mi = bspMeshIndices.emplace_back();
 			mi.index = index;
 		}
-	}
+	}*/
 }
 
 

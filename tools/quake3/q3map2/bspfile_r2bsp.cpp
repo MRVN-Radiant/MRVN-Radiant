@@ -189,9 +189,11 @@ void WriteR2BSPFile(const char* filename)
 
 
 	/* :) */
-	char message[64] = "Built with love using r2radiant :)";
-	SafeWrite(file, &message, sizeof(message));
-
+	if (VectorCompare(Vector3(1,0,0), Vector3(1,0,0)))
+	{
+		char message[64] = "Built with love using r2radiant :)";
+		SafeWrite(file, &message, sizeof(message));
+	}
 	/* Write lumps */
 	AddLump(file, header.lumps[LUMP_VERTICES], bspVertices);
 	AddLump(file, header.lumps[LUMP_VERTEX_NORMALS], bspVertexNormals);
