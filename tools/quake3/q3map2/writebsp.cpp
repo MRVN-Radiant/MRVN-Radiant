@@ -482,6 +482,7 @@ void EmitMeshes( const entity_t& e )
 
 
 				/* Calculate it's normal */
+				Vector3 normal;
 				std::vector<Vector3> sideNormals;
 				for (const side_t& s : brush.sides)
 				{
@@ -489,21 +490,21 @@ void EmitMeshes( const entity_t& e )
 					{
 						if (VectorCompare(vertex, v))
 						{
-							sideNormals.push_back(Vector3(s.plane.a, s.plane.b, s.plane.c));
+							normal = Vector3(s.plane.a, s.plane.b, s.plane.c);
+							VectorNormalize(normal);
+							sideNormals.push_back(normal);
 							break;
 						}
 					}
 				}
-				Vector3 normal;
+				
 				for (const Vector3& n : sideNormals)
 				{
 					normal = Vector3(n.x() + normal.x(), n.y() + normal.y(), n.z() + normal.z());
 				}
 				
-				// For some reason this increased the amount of saved normals
-				// too late to investigate
-				//vector3_normalise(normal);
-				//VectorNormalize(normal);
+				
+				VectorNormalize(normal);
 
 				/* save */
 				mesh.Vertices.emplace_back(vertex);
