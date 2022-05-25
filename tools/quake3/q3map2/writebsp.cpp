@@ -463,16 +463,21 @@ void EmitMeshes( const entity_t& e )
 		/* loop through sides */
 		for (const side_t& side : brush.sides)
 		{
+			if (strcmp(side.shaderInfo->shader.c_str(), "textures/common/caulk") == 0)
+				continue;
+
+
 			tempMesh_t& mesh = tempMeshes.emplace_back();
-			mesh.shader = side.shaderInfo->shader;// textures / common / caulk
+			mesh.shader = side.shaderInfo->shader;
 			/* loop through vertices */
 			for (const Vector3& vertex : side.winding)
 			{
 				/* Check against aabb */
+				/* this doesnt work on more complex shapes :) */
 				if (VertexLarger(vertex, mesh.minmax.maxs))
 					mesh.minmax.maxs = vertex;
 				
-				if (VertexLarger(vertex, mesh.minmax.mins))
+				if (!VertexLarger(vertex, mesh.minmax.mins))
 					mesh.minmax.mins = vertex;
 
 
@@ -506,25 +511,16 @@ void EmitMeshes( const entity_t& e )
 			}
 
 			/* Create triangles for side */
+			// Debug ramblings:
+			// 4 vertices -> 2 triangles
+			// 1 triangle = 3 indices
+			// i = 0; 0, 1, 2, 0, 2, 3
 			for (std::size_t i = 0; i < side.winding.size() - 2; i++)
 			{
 				for (int j = 0; j < 3; j++)
 				{
 					int vert_index = j == 0 ? 0 : i + j;
-
-					Vector3 vertex;
-					vertex = side.winding.at(vert_index);
-
-					std::size_t index = 0;
-					for (Vector3& v : mesh.Vertices)
-					{
-						if (VectorCompare(v, vertex))
-							break;
-
-						index++;
-					}
-
-					mesh.Triangles.emplace_back(index);
+					mesh.Triangles.emplace_back(vert_index);
 				}
 			}
 
@@ -659,14 +655,6 @@ void EmitMeshes( const entity_t& e )
 		}
 	}
 }
-
-
-/*
-   EmitFogs() - ydnar
-   turns map fogs into bsp fogs
- */
-
-
 
 void EmitModels()
 {
