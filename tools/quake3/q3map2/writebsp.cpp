@@ -540,50 +540,61 @@ void EmitMeshes( const entity_t& e )
 
 	/* loop through tempMeshes and combine */
 	std::vector<tempMesh_t> finishedMeshes;
-	for( const tempMesh_t &tempMesh : tempMeshes)
+	for( tempMesh_t &tempMesh : tempMeshes)
 	{
+		if (finishedMeshes.size() == 0)
+		{
+			tempMesh_t& newMesh = finishedMeshes.emplace_back();
+			newMesh = tempMesh;
+			continue;
+		}
+
 		
 		for ( tempMesh_t& finishedMesh : finishedMeshes)
 		{
 			//if (!MinMaxIntersecting(tempMesh.minmax, finishedMesh.minmax))
-			//	break;
+			//	continue;
 
-			
 			// I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings 
-			//const char* test0 = tempMesh.shader.c_str();
-			//const char* test1 = finishedMesh.shader.c_str();
-			if (strcmp(tempMesh.shader.c_str() != finishedMesh.shader.c_str()) != 0 )
-				break;
-
-			/* meshes are touchingand have the same material, combine them 
-			uint16_t triangleCount = finishedMesh.Triangles.size();
-			for (std::size_t i = 0; i < tempMesh.Vertices.size(); i++)
+			if (strcmp(tempMesh.shader.c_str(), finishedMesh.shader.c_str()) != 0 )
+				continue;
+			
+			/* meshes are touchingand have the same material, combine them */
+			uint16_t vertCount = finishedMesh.Vertices.size();
+			for (Vector3& vertex : tempMesh.Vertices)
 			{
-				finishedMesh.Vertices.emplace_back(tempMesh.Vertices.at(i));
-				finishedMesh.Normals.emplace_back(tempMesh.Normals.at(i));
+				finishedMesh.Vertices.emplace_back(vertex);
 			}
-			for (std::size_t i = 0; i < tempMesh.Triangles.size(); i++)
+
+			for (Vector3& normal : tempMesh.Normals)
 			{
-				finishedMesh.Triangles.emplace_back(tempMesh.Triangles.at(i) + triangleCount);
+				finishedMesh.Normals.emplace_back(normal);
+			}
+
+			for (uint16_t& index : tempMesh.Triangles)
+			{
+				finishedMesh.Triangles.emplace_back(index + vertCount);
 			}
 
 			/* finished combining this tempMesh, go to the next one */
 			goto next;
 		}
 
+		
 		{
 			/* mesh didn't meet requirements to be combined, save it separately */
 			finishedMeshes.emplace_back(tempMesh);
 		}
 		next:;
 	}
-
+	tempMeshes.clear();
 
 	/* 
 		We now have a list of meshes with matching materials.
 		All that's left is converting into bsp structs :)
 	*/
 
+	Sys_FPrintf(SYS_VRB, "pain suffering\n");
 	for (const tempMesh_t& tempMesh : finishedMeshes)
 	{
 		bspMesh_t& mesh = bspMeshes.emplace_back();
@@ -634,12 +645,11 @@ void EmitMeshes( const entity_t& e )
 		}
 
 		/* Save triangles */
-		for (uint16_t i = 0; i < tempMesh.Triangles.size(); i++)
+		for (uint16_t triangle : tempMesh.Triangles)
 		{
-			uint16_t triangleOffset = tempMesh.Triangles.at(i);
 			for (uint32_t j = 0; j < bspVertices.size(); j++)
 			{
-				if (VectorCompare(bspVertices.at(j), tempMesh.Vertices.at(triangleOffset)))
+				if (VectorCompare(bspVertices.at(j),tempMesh.Vertices.at(triangle)))
 				{
 					bspMeshIndex_t& index = bspMeshIndices.emplace_back();
 					index = j;
@@ -647,176 +657,7 @@ void EmitMeshes( const entity_t& e )
 				}
 			}
 		}
-
 	}
-
-
-
-
-
-
-
-
-
-
-	/* walk list of brushes 
-	for ( const brush_t &brush : e.brushes )
-	{
-		/* These are parallel 
-		std::vector<bspVertices_t> meshVertices;
-		std::vector<bspVertexNormals_t> meshVertexNormals;
-		/* This isn't 
-		std::vector<bspMeshIndices_t> meshIndices;
-
-
-		/* Create Mesh entry 
-		bspMeshes_t& mesh = bspMeshes.emplace_back();
-		mesh.const0 = 4294967040;
-
-		/* Create vertices and their normals for this brush 
-		for ( const side_t &side : brush.sides )
-		{
-			/* Loop through vertices, only save unique ones 
-			for ( const Vector3 &vertex : side.winding )
-			{
-				std::size_t index = 0;
-				for ( bspVertices_t& v : meshVertices )
-				{
-					if ( IsCloseEnough( v.xyz, vertex, 0.001 ) )
-						break;
-					
-					index++;
-				}
-
-
-				/* vertex doesn't exist, save it 
-				if ( index == meshVertices.size() )
-				{
-					bspVertices_t &vert = meshVertices.emplace_back();
-					vert.xyz = vertex;
-
-					/* Calculate it's normal 
-					std::vector<Vector3> sideNormals;
-					for ( const side_t &s  : brush.sides )
-					{
-						for ( const Vector3 &v : s.winding )
-						{
-							if ( IsCloseEnough( vertex, v, 0.001 ) )
-							{
-								sideNormals.push_back( Vector3( s.plane.a, s.plane.b, s.plane.c ) );
-								break;
-							}
-						}
-					}
-					
-					Vector3 normal;
-					for (const Vector3 &n : sideNormals)
-					{
-						normal = Vector3(n.x() + normal.x(), n.y() + normal.y(), n.z() + normal.z());
-					}
-
-					vector3_normalise( normal );
-
-					bspVertexNormals_t &norm = meshVertexNormals.emplace_back();
-					norm.xyz = normal;
-				}
-			}
-
-
-			/* Make triangles for side 
-			for (std::size_t i = 0; i < side.winding.size() - 2; i++)
-			{
-				for ( int j = 0; j < 3; j++ )
-				{
-					int vert_index = j == 0 ? 0 : i + j;
-
-					Vector3 vertex;
-					vertex = side.winding.at( vert_index );
-
-					std::size_t index = 0;
-					for ( bspVertices_t &v : meshVertices )
-					{
-						if ( IsCloseEnough( v.xyz, vertex, 0.001 ) )
-							break;
-
-						index++;
-					}
-
-					bspMeshIndices_t &mi = meshIndices.emplace_back();
-					mi.index = index;
-				}
-			}
-		}
-
-		mesh.first_vertex = bspVertexLitBump.size();
-		mesh.vertex_count = meshVertices.size();
-		/* Merge into lumps 
-		for ( uint32_t i = 0; i < meshVertices.size(); i++ )
-		{
-			bspVertices_t vertex = meshVertices.at( i );
-			bspVertexNormals_t normal = meshVertexNormals.at( i );
-
-
-			bspVertexLitBump_t& vlb = bspVertexLitBump.emplace_back();
-			vlb.minus_one = -1;
-
-			/* Save vertex 
-			std::size_t vertex_index = 0;
-			for ( bspVertices_t &v : bspVertices )
-			{
-				if ( IsCloseEnough( v.xyz, vertex.xyz, 0.001 ) )
-					break;
-
-				vertex_index++;
-			}
-
-			if ( vertex_index == bspVertices.size() )
-			{
-				bspVertices_t& vert = bspVertices.emplace_back();
-				vert.xyz = vertex.xyz;
-			}
-
-			/* Save vertex normal 
-			std::size_t normal_index = 0;
-			for ( bspVertexNormals_t &n : bspVertexNormals )
-			{
-				if ( IsCloseEnough( n.xyz, normal.xyz, 0.001 ) )
-					break;
-
-				normal_index++;
-			}
-
-			if ( normal_index == bspVertexNormals.size() )
-			{
-				bspVertexNormals_t& norm = bspVertexNormals.emplace_back();
-				norm.xyz = normal.xyz;
-			}
-
-			vlb.vertex_index = vertex_index;
-			vlb.normal_index = normal_index;
-		}
-
-		mesh.tri_offset = bspMeshIndices.size();
-		mesh.tri_count = meshIndices.size() / 3;
-		/* Merge Mesh Indices 
-		for ( bspMeshIndices_t &i : meshIndices )
-		{
-			bspVertices_t vertex;
-			vertex.xyz = meshVertices.at( i.index ).xyz;
-
-			uint16_t index = 0;
-			for ( bspVertices_t& v : bspVertices )
-			{
-				if ( IsCloseEnough(v.xyz, vertex.xyz, 0.001 ) )
-					break;
-
-				index++;
-			}
-
-			bspMeshIndices_t &mi = bspMeshIndices.emplace_back();
-			mi.index = index;
-		}
-	}*/
 }
 
 
