@@ -644,9 +644,9 @@ void EmitMeshes( const entity_t& e )
 		/* Save triangles */
 		for (uint16_t triangle : tempMesh.Triangles)
 		{
-			for (uint32_t j = 0; j < bspVertices.size(); j++)
+			for (uint32_t j = 0; j < bspVertexLitBump.size(); j++)
 			{
-				if (VectorCompare(bspVertices.at(j),tempMesh.Vertices.at(triangle)))
+				if (VectorCompare(bspVertices.at(bspVertexLitBump.at(j).vertex_index),tempMesh.Vertices.at(triangle)))
 				{
 					bspMeshIndex_t& index = bspMeshIndices.emplace_back();
 					index = j;
