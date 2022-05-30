@@ -422,6 +422,7 @@ struct tempMesh_t
 	/* Parallel */
 	std::vector<Vector3> Vertices;
 	std::vector<Vector3> Normals;
+	std::vector<Vector2> UVs;
 
 	std::vector<uint16_t> Triangles;
 };
@@ -439,6 +440,10 @@ bool VectorsEqual( Vector3 a, Vector3 b )
 			(fabs(a.y() - b.y()) < EQUAL_EPSILON) &&
 			(fabs(a.z() - b.z()) < EQUAL_EPSILON);
 
+}
+
+float VectorDotProduct(Vector3 v1, Vector3 v2) {
+	return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
 }
 
 /*
@@ -473,14 +478,32 @@ void EmitMeshes( const entity_t& e )
 			for (const Vector3& vertex : side.winding)
 			{
 				/* Check against aabb */
-				/* this doesnt work on more complex shapes :) */
-				if (VertexLarger(vertex, mesh.minmax.maxs))
-					mesh.minmax.maxs = vertex;
+				/* Very cool piece of code I'm really proud of :) */
+				if (vertex.x() > mesh.minmax.maxs.x())
+					mesh.minmax.maxs.x() = vertex.x();
+				if (vertex.y() > mesh.minmax.maxs.y())
+					mesh.minmax.maxs.y() = vertex.y();
+				if (vertex.z() > mesh.minmax.maxs.z())
+					mesh.minmax.maxs.z() = vertex.z();
 				
-				if (!VertexLarger(vertex, mesh.minmax.mins))
-					mesh.minmax.mins = vertex;
+				if (vertex.x() < mesh.minmax.mins.x())
+					mesh.minmax.mins.x() = vertex.x();
+				if (vertex.y() < mesh.minmax.mins.y())
+					mesh.minmax.mins.y() = vertex.y();
+				if (vertex.z() < mesh.minmax.mins.z())
+					mesh.minmax.mins.z() = vertex.z();
 
+				/* Calculate it's UV */
+				/* or not */
+				Vector2 UV;
+				UV.x() = VectorDotProduct( vertex, side.texMat[0] );
+				UV.y() = VectorDotProduct( vertex, side.texMat[1] );
 
+				//UV.x() /= mesh.minmax.maxs.x() - mesh.minmax.mins.x();
+				//UV.y() /= mesh.minmax.maxs.z() - mesh.minmax.mins.z();
+
+				Sys_FPrintf(SYS_VRB, "vecs: %f, %f, %f : %f, %f, %f\n", side.shaderInfo->vecs[0].x(), side.shaderInfo->vecs[0].y(), side.shaderInfo->vecs[0].z(), side.shaderInfo->vecs[1].x(), side.shaderInfo->vecs[1].y(), side.shaderInfo->vecs[1].z());
+				
 				/* Calculate it's normal */
 				Vector3 normal;
 				std::vector<Vector3> sideNormals;
@@ -509,6 +532,7 @@ void EmitMeshes( const entity_t& e )
 				/* save */
 				mesh.Vertices.emplace_back(vertex);
 				mesh.Normals.emplace_back(normal);
+				mesh.UVs.emplace_back(UV);
 			}
 
 			/* Create triangles for side */
@@ -524,16 +548,18 @@ void EmitMeshes( const entity_t& e )
 					mesh.Triangles.emplace_back(vert_index);
 				}
 			}
-
 		}
 	}
 
 	/* walk list of patches */
+	/* one day */
+	/*
 	parseMesh_t* patch;
 	while (patch != nullptr)
 	{
 		patch = patch->next;
 	}
+	*/
 
 	/* loop through tempMeshes and combine */
 	std::vector<tempMesh_t> finishedMeshes;
@@ -556,7 +582,7 @@ void EmitMeshes( const entity_t& e )
 			if (strcmp(tempMesh.shader.c_str(), finishedMesh.shader.c_str()) != 0 )
 				continue;
 			
-			/* meshes are touchingand have the same material, combine them */
+			/* meshes are touching and have the same material, combine them */
 			uint16_t vertCount = finishedMesh.Vertices.size();
 			for (Vector3& vertex : tempMesh.Vertices)
 			{
@@ -566,6 +592,11 @@ void EmitMeshes( const entity_t& e )
 			for (Vector3& normal : tempMesh.Normals)
 			{
 				finishedMesh.Normals.emplace_back(normal);
+			}
+
+			for (Vector2& UV : tempMesh.UVs)
+			{
+				finishedMesh.UVs.emplace_back(UV);
 			}
 
 			for (uint16_t& index : tempMesh.Triangles)
@@ -595,7 +626,7 @@ void EmitMeshes( const entity_t& e )
 	for (const tempMesh_t& tempMesh : finishedMeshes)
 	{
 		bspMesh_t& mesh = bspMeshes.emplace_back();
-		mesh.const0 = 4294967040;
+		mesh.const0 = 4294967040; // :)
 		mesh.first_vertex = bspVertexLitBump.size();
 		mesh.vertex_count = tempMesh.Vertices.size();
 		mesh.tri_offset = bspMeshIndices.size();
@@ -607,6 +638,8 @@ void EmitMeshes( const entity_t& e )
 		{
 			bspVertexLitBump_t& litVertex = bspVertexLitBump.emplace_back();
 			litVertex.minus_one = -1;
+			litVertex.uv0 = tempMesh.UVs.at(i);
+
 
 			for (uint16_t j = 0; j < bspVertices.size(); j++)
 			{

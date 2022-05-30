@@ -237,9 +237,9 @@ struct bspVertexLitBump_t
 {
 	uint32_t vertex_index;
 	uint32_t normal_index;
-	float uv0[2];
+	Vector2 uv0;
 	int32_t minus_one;
-	float uv1[2];
+	Vector2 uv1;
 	uint32_t unk[4];
 };
 
