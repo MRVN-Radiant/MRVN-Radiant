@@ -632,18 +632,35 @@ void EmitMeshes( const entity_t& e )
 		mesh.tri_offset = bspMeshIndices.size();
 		mesh.tri_count = tempMesh.Triangles.size() / 3;
 
+		MinMax aabb;
 
 		/* Save vertices and vertexnormals */
 		for (std::size_t i = 0; i < tempMesh.Vertices.size(); i++)
 		{
+			Vector3 vertex = tempMesh.Vertices.at(i);
+			/* Check against aabb */
+			if (vertex.x() > aabb.maxs.x())
+				aabb.maxs.x() = vertex.x();
+			if (vertex.y() > aabb.maxs.y())
+				aabb.maxs.y() = vertex.y();
+			if (vertex.z() > aabb.maxs.z())
+				aabb.maxs.z() = vertex.z();
+
+			if (vertex.x() < aabb.mins.x())
+				aabb.mins.x() = vertex.x();
+			if (vertex.y() < aabb.mins.y())
+				aabb.mins.y() = vertex.y();
+			if (vertex.z() < aabb.mins.z())
+				aabb.mins.z() = vertex.z();
+
 			bspVertexLitBump_t& litVertex = bspVertexLitBump.emplace_back();
 			litVertex.minus_one = -1;
 			litVertex.uv0 = tempMesh.UVs.at(i);
 
-
+			/* Save vert */
 			for (uint16_t j = 0; j < bspVertices.size(); j++)
 			{
-				if (VectorCompare(tempMesh.Vertices.at(i), bspVertices.at(j)))
+				if (VectorCompare(vertex, bspVertices.at(j)))
 				{
 					litVertex.vertex_index = j;
 					goto normal;
@@ -687,6 +704,11 @@ void EmitMeshes( const entity_t& e )
 				}
 			}
 		}
+
+		/* Save MeshBounds */
+		bspMeshBounds_t& meshBounds = bspMeshBounds.emplace_back();
+		meshBounds.origin = (aabb.maxs + aabb.mins) / 2;
+		meshBounds.extents = (aabb.maxs - aabb.mins) / 2;
 	}
 }
 
