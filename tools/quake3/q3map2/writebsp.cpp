@@ -427,11 +427,26 @@ struct tempMesh_t
 	std::vector<uint16_t> Triangles;
 };
 
+bool FloatLargerEqual( float a, float b )
+{
+	return ( a > b ) || fabs( a - b ) < EQUAL_EPSILON;
+}
+
+bool FloatSmallerEqual( float a, float b )
+{
+	return ( a < b ) || fabs( a - b ) < EQUAL_EPSILON;
+}
+
+// I do indeed hate this
+// This crap is funny as hell
 bool MinMaxIntersecting( MinMax a, MinMax b)
 {
-	return (a.mins.x() < b.maxs.x() && a.maxs.x() > b.mins.x() &&
-		a.mins.y() < b.maxs.y() && a.maxs.y() > b.mins.y() &&
-		a.mins.z() < b.maxs.z() && a.maxs.z() > b.mins.z());
+	return	( FloatLargerEqual( a.maxs.x(), b.mins.x() ) && FloatSmallerEqual( a.maxs.x(), b.maxs.x() ) ) ||
+			( FloatLargerEqual( a.mins.x(), b.mins.x() ) && FloatSmallerEqual( a.mins.x(), b.maxs.x() ) ) ||
+			( FloatLargerEqual( a.maxs.y(), b.mins.y() ) && FloatSmallerEqual( a.maxs.y(), b.maxs.y() ) ) ||
+			( FloatLargerEqual( a.mins.y(), b.mins.y() ) && FloatSmallerEqual( a.mins.y(), b.maxs.y() ) ) || 
+			( FloatLargerEqual( a.maxs.z(), b.mins.z() ) && FloatSmallerEqual( a.maxs.z(), b.maxs.z() ) ) ||
+			( FloatLargerEqual( a.mins.z(), b.mins.z() ) && FloatSmallerEqual( a.mins.z(), b.maxs.z() ) );
 }
 
 bool VectorsEqual( Vector3 a, Vector3 b )
@@ -502,7 +517,6 @@ void EmitMeshes( const entity_t& e )
 				//UV.x() /= mesh.minmax.maxs.x() - mesh.minmax.mins.x();
 				//UV.y() /= mesh.minmax.maxs.z() - mesh.minmax.mins.z();
 
-				Sys_FPrintf(SYS_VRB, "vecs: %f, %f, %f : %f, %f, %f\n", side.shaderInfo->vecs[0].x(), side.shaderInfo->vecs[0].y(), side.shaderInfo->vecs[0].z(), side.shaderInfo->vecs[1].x(), side.shaderInfo->vecs[1].y(), side.shaderInfo->vecs[1].z());
 				
 				/* Calculate it's normal */
 				Vector3 normal;
@@ -536,10 +550,6 @@ void EmitMeshes( const entity_t& e )
 			}
 
 			/* Create triangles for side */
-			// Debug ramblings:
-			// 4 vertices -> 2 triangles
-			// 1 triangle = 3 indices
-			// i = 0; 0, 1, 2, 0, 2, 3
 			for (std::size_t i = 0; i < side.winding.size() - 2; i++)
 			{
 				for (int j = 0; j < 3; j++)
@@ -561,61 +571,90 @@ void EmitMeshes( const entity_t& e )
 	}
 	*/
 
-	/* loop through tempMeshes and combine */
-	std::vector<tempMesh_t> finishedMeshes;
-	for( tempMesh_t &tempMesh : tempMeshes)
+	/* Loop through meshes and combine the ones touching */
+	/* While this isn't fast, it's better than my last approach */
+	std::size_t index = 0;
+	std::size_t iterationsSinceCombine = 0;
+	while ( true )
 	{
-		if (finishedMeshes.size() == 0)
-		{
-			tempMesh_t& newMesh = finishedMeshes.emplace_back();
-			newMesh = tempMesh;
-			continue;
-		}
+		/* std::out_of_range can't comprehend this  */
+		if ( index >= tempMeshes.size() )
+			index = 0;
 
+		/* No more meshes to combine; break from teh loop */
+		if ( iterationsSinceCombine >= tempMeshes.size() )
+			break;
+
+		/* Get mesh which we then compare to the rest, maybe combine, maybe not */
+		tempMesh_t &mesh1 = tempMeshes.at( index );
 		
-		for ( tempMesh_t& finishedMesh : finishedMeshes)
+		for ( std::size_t i = 0; i < tempMeshes.size(); i++ )
 		{
-			//if (!MinMaxIntersecting(tempMesh.minmax, finishedMesh.minmax))
-			//	continue;
-
-			// I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings I hate strings 
-			if (strcmp(tempMesh.shader.c_str(), finishedMesh.shader.c_str()) != 0 )
+			/* We dont want to compare the same mesh */
+			if ( index == i )
 				continue;
+			//Sys_FPrintf(SYS_VRB, "false\n");
+			tempMesh_t &mesh2 = tempMeshes.at(i);
 			
-			/* meshes are touching and have the same material, combine them */
-			uint16_t vertCount = finishedMesh.Vertices.size();
-			for (Vector3& vertex : tempMesh.Vertices)
+			//Sys_FPrintf(SYS_VRB, "mesh1: maxs: %f, %f, %f; mins: %f, %f, %f\n", mesh1.minmax.maxs.x(), mesh1.minmax.maxs.y(), mesh1.minmax.maxs.z(), mesh1.minmax.mins.x(), mesh1.minmax.mins.y(), mesh1.minmax.mins.z());
+			//Sys_FPrintf(SYS_VRB, "mesh2: maxs: %f, %f, %f; mins: %f, %f, %f\n", mesh2.minmax.maxs.x(), mesh2.minmax.maxs.y(), mesh2.minmax.maxs.z(), mesh2.minmax.mins.x(), mesh2.minmax.mins.y(), mesh2.minmax.mins.z());
+
+			/* check if they have the same shader */
+			if ( strcmp( mesh1.shader.c_str(), mesh2.shader.c_str() ) != 0 )
+				continue;
+
+
+			/* Check if they're intersecting */
+			if ( !MinMaxIntersecting( mesh1.minmax, mesh2.minmax ) )
+				continue;
+			//Sys_FPrintf(SYS_VRB, "true\n");
+			/* Combine them */
+			//if (mesh2.minmax.maxs.x() > mesh1.minmax.maxs.x() && mesh2.minmax.maxs.y() > mesh1.minmax.maxs.y() && mesh2.minmax.maxs.z() > mesh1.minmax.maxs.z())
+			//	mesh1.minmax.maxs = mesh2.minmax.maxs;
+
+			//if (mesh2.minmax.mins.x() < mesh1.minmax.mins.x() && mesh2.minmax.maxs.y() < mesh1.minmax.mins.y() && mesh2.minmax.mins.z() < mesh1.minmax.mins.z())
+			//	mesh1.minmax.mins = mesh2.minmax.mins;
+
+			/* Triangles */
+			for ( uint16_t& triIndex : mesh2.Triangles )
 			{
-				finishedMesh.Vertices.emplace_back(vertex);
+				mesh1.Triangles.emplace_back( triIndex + mesh1.Vertices.size() );
 			}
 
-			for (Vector3& normal : tempMesh.Normals)
+			/* All these are parallel so we chillin */
+			for ( std::size_t v = 0; v < mesh2.Vertices.size(); v++ )
 			{
-				finishedMesh.Normals.emplace_back(normal);
+				mesh1.Vertices.emplace_back(mesh2.Vertices.at(v));
+				mesh1.Normals.emplace_back(mesh2.Normals.at(v));
+				mesh1.UVs.emplace_back(mesh2.UVs.at(v));
 			}
 
-			for (Vector2& UV : tempMesh.UVs)
+			for (Vector3& vertex : mesh1.Vertices)
 			{
-				finishedMesh.UVs.emplace_back(UV);
+				if (vertex.x() > mesh1.minmax.maxs.x())
+					mesh1.minmax.maxs.x() = vertex.x();
+				if (vertex.y() > mesh1.minmax.maxs.y())
+					mesh1.minmax.maxs.y() = vertex.y();
+				if (vertex.z() > mesh1.minmax.maxs.z())
+					mesh1.minmax.maxs.z() = vertex.z();
+
+				if (vertex.x() < mesh1.minmax.mins.x())
+					mesh1.minmax.mins.x() = vertex.x();
+				if (vertex.y() < mesh1.minmax.mins.y())
+					mesh1.minmax.mins.y() = vertex.y();
+				if (vertex.z() < mesh1.minmax.mins.z())
+					mesh1.minmax.mins.z() = vertex.z();
 			}
 
-			for (uint16_t& index : tempMesh.Triangles)
-			{
-				finishedMesh.Triangles.emplace_back(index + vertCount);
-			}
-
-			/* finished combining this tempMesh, go to the next one */
-			goto next;
+			/* Delete mesh we combined as to not create duplicates */
+			tempMeshes.erase( tempMeshes.begin() + i );
+			iterationsSinceCombine = 0;
 		}
 
-		
-		{
-			/* mesh didn't meet requirements to be combined, save it separately */
-			finishedMeshes.emplace_back(tempMesh);
-		}
-		next:;
+		iterationsSinceCombine++;
+		index++;
 	}
-	tempMeshes.clear();
+
 
 	/* 
 		We now have a list of meshes with matching materials.
@@ -623,7 +662,7 @@ void EmitMeshes( const entity_t& e )
 	*/
 
 	Sys_FPrintf(SYS_VRB, "pain suffering\n");
-	for (const tempMesh_t& tempMesh : finishedMeshes)
+	for (const tempMesh_t& tempMesh : tempMeshes)
 	{
 		bspMesh_t& mesh = bspMeshes.emplace_back();
 		mesh.const0 = 4294967040; // :)
@@ -709,6 +748,8 @@ void EmitMeshes( const entity_t& e )
 		bspMeshBounds_t& meshBounds = bspMeshBounds.emplace_back();
 		meshBounds.origin = (aabb.maxs + aabb.mins) / 2;
 		meshBounds.extents = (aabb.maxs - aabb.mins) / 2;
+
+		Sys_FPrintf(SYS_VRB, "mesh1: maxs: %f, %f, %f; mins: %f, %f, %f\n", aabb.maxs.x(), aabb.maxs.y(), aabb.maxs.z(), aabb.mins.x(), aabb.mins.y(), aabb.mins.z());
 	}
 }
 
