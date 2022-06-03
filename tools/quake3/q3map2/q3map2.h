@@ -2139,6 +2139,50 @@ inline std::vector<uint8_t> bspCMPrimitiveBounds_stub;
 
 inline std::vector<uint8_t> bspCMUniqueContents_stub;
 
+inline std::vector<uint8_t> bspCMBrushes_stub;
+
+inline std::vector<uint8_t> bspCMBrushSidePlaneOffsets_stub;
+
+inline std::vector<uint8_t> bspCMBrushSideProps_stub;
+
+inline std::vector<uint8_t> bspCMBrushTexVecs_stub;
+
+inline std::vector<uint8_t> bspTricollBevelStarts_stub;
+
+inline std::vector<uint8_t> bspLightMapDataSky_stub;
+
+inline std::vector<uint8_t> bspCSMAABBNodes_stub;
+
+inline std::vector<uint8_t> bspCellBSPNodes_stub;
+
+inline std::vector<uint8_t> bspCells_stub;
+
+inline std::vector<uint8_t> bspPortals_stub;
+
+inline std::vector<uint8_t> bspPortalVertices_stub;
+
+inline std::vector<uint8_t> bspPortalEdges_stub;
+
+inline std::vector<uint8_t> bspPortalVertexEdges_stub;
+
+inline std::vector<uint8_t> bspPortalVertexReferences_stub;
+
+inline std::vector<uint8_t> bspPortalEdgeReferences_stub;
+
+inline std::vector<uint8_t> bspPortalEdgeIntersectEdge_stub;
+
+inline std::vector<uint8_t> bspPortalEdgeIntersectAtVertex_stub;
+
+inline std::vector<uint8_t> bspPortalEdgeIntersectHeader_stub;
+
+inline std::vector<uint8_t> bspCellAABBNodes_stub;
+
+inline std::vector<uint8_t> bspObjReferences_stub;
+
+inline std::vector<uint8_t> bspObjReferenceBounds_stub;
+
+inline std::vector<uint8_t> bspLevelInfo_stub;
+
 /* Old lumps, these need to go */
 
 
