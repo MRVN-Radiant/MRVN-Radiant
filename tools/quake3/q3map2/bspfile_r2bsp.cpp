@@ -264,7 +264,7 @@ void WriteR2BSPFile(const char* filename)
 	AddLump(file, header.lumps[LUMP_CELL_AABB_NODES],					bspCellAABBNodes_stub);
 	AddLump(file, header.lumps[LUMP_OBJ_REFERENCES],					bspObjReferences);
 	AddLump(file, header.lumps[LUMP_OBJ_REFERENCE_BOUNDS],				bspObjReferenceBounds);
-	AddLump(file, header.lumps[LUMP_LEVEL_INFO],						bspLevelInfo_stub);
+	AddLump(file, header.lumps[LUMP_LEVEL_INFO],						bspLevelInfo);
 
 	/* emit bsp size */
 	const int size = ftell(file);

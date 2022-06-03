@@ -291,6 +291,15 @@ struct bspObjReferenceBounds_t
 
 using bspObjReferences_t = uint16_t;
 
+struct bspLevelInfo_t
+{
+	uint32_t unk0;
+	uint32_t unk1;
+	uint32_t obj_ref_count; // maybe, idk tbh
+	uint32_t prop_count;
+	Vector3 unk2;
+};
+
 // Old
 struct bspShader_t
 {
@@ -1515,6 +1524,7 @@ void                        EmitMeshes( const entity_t& e );
 void						EmitObjReferences();
 void                        EmitFogs();
 void						EmitModels();
+void						EmitLevelInfo();
 void						EmitStubs();
 
 void                        BeginModel( const entity_t& e );
@@ -2117,6 +2127,8 @@ inline std::vector<bspObjReferenceBounds_t> bspObjReferenceBounds;
 
 inline std::vector<bspObjReferences_t> bspObjReferences;
 
+inline std::vector<bspLevelInfo_t> bspLevelInfo;
+
 /* Stubs */
 inline std::vector<char> bspEntities_stub;
 
@@ -2192,7 +2204,6 @@ inline std::vector<uint8_t> bspPortalEdgeIntersectHeader_stub;
 
 inline std::vector<uint8_t> bspCellAABBNodes_stub;
 
-inline std::vector<uint8_t> bspLevelInfo_stub;
 
 /* Old lumps, these need to go */
 
