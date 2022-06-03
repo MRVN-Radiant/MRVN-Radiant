@@ -691,7 +691,7 @@ void EmitMeshes( const entity_t& e )
 	{
 		bspMesh_t& mesh = bspMeshes.emplace_back();
 		mesh.const0 = 4294967040; // :)
-		mesh.flags = 1028;
+		mesh.flags = 1051136;
 		mesh.first_vertex = bspVertexLitBump.size();
 		mesh.vertex_count = tempMesh.Vertices.size();
 		mesh.tri_offset = bspMeshIndices.size();
