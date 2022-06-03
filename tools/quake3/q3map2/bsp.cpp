@@ -323,6 +323,9 @@ static void ProcessWorldModel( entity_t& e ){
 	/* Generate Model lump */
 	EmitModels();
 
+	/* Generate unknown lumps */
+	EmitStubs();
+
 	/* add references to the detail brushes */
 	FilterDetailBrushesIntoTree( e, tree );
 

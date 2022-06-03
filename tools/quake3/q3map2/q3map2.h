@@ -233,6 +233,7 @@ using bspVertexNormal_t = Vector3;
 using bspMeshIndex_t = uint16_t;
 
 
+
 struct bspVertexLitBump_t
 {
 	uint32_t vertex_index;
@@ -1503,6 +1504,7 @@ void						EmitEntityPartitions();
 void                        EmitMeshes( const entity_t& e );
 void                        EmitFogs();
 void						EmitModels();
+void						EmitStubs();
 
 void                        BeginModel( const entity_t& e );
 void                        EndModel( const entity_t& e, node_t *headnode );
@@ -2100,7 +2102,42 @@ inline std::vector<bspEntityPartitions_t> bspEntityPartitions;
 
 inline std::vector<bspModel_t_new> bspModels_new;
 
+/* Stubs */
+inline std::vector<char> bspEntities_stub;
 
+inline std::vector<uint8_t> bspPlanes_stub;
+
+inline std::vector<uint8_t> bspTextureData_stub;
+
+inline std::vector<uint8_t> bspTextureDataStringData_stub;
+
+inline std::vector<uint8_t> bspTextureDataStringTable_stub;
+
+inline std::vector<uint8_t> bspWorldLights_stub;
+
+inline std::vector<uint8_t> bspTricollTris_stub;
+
+inline std::vector<uint8_t> bspTricollNodes_stub;
+
+inline std::vector<uint8_t> bspTricollHeaders_stub;
+
+inline std::vector<uint8_t> bspMaterialSort_stub;
+
+inline std::vector<uint8_t> bspLightMapHeaders_stub;
+
+inline std::vector<uint8_t> bspCMGrid_stub;
+
+inline std::vector<uint8_t> bspCMGridCells_stub;
+
+inline std::vector<uint8_t> bspCMGridSets_stub;
+
+inline std::vector<uint8_t> bspCMGeoSetBounds_stub;
+
+inline std::vector<uint8_t> bspCMPrimitives_stub;
+
+inline std::vector<uint8_t> bspCMPrimitiveBounds_stub;
+
+inline std::vector<uint8_t> bspCMUniqueContents_stub;
 
 /* Old lumps, these need to go */
 

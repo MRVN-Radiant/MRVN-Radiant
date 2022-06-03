@@ -59,7 +59,7 @@
 #define LUMP_LIGHTMAP_HEADERS					0x53
 #define LUMP_CM_GRID							0x55
 #define LUMP_CM_GRID_CELLS						0x56
-#define LUMP_CM_GEO_SETS						0x57
+#define LUMP_CM_GRID_SETS						0x57
 #define LUMP_CM_GEO_SET_BOUNDS					0x58
 #define LUMP_CM_PRIMITIVES						0x59
 #define LUMP_CM_PRIMITIVE_BOUNDS				0x5A
@@ -195,15 +195,56 @@ void WriteR2BSPFile(const char* filename)
 		SafeWrite(file, &message, sizeof(message));
 	}
 	/* Write lumps */
+	AddLump(file, header.lumps[LUMP_ENTITIES], bspEntities_stub);
+	AddLump(file, header.lumps[LUMP_PLANES], bspPlanes_stub);
+	AddLump(file, header.lumps[LUMP_TEXTURE_DATA], bspTextureData_stub);
 	AddLump(file, header.lumps[LUMP_VERTICES], bspVertices);
+	AddLump(file, header.lumps[LUMP_MODELS], bspModels_new);
 	AddLump(file, header.lumps[LUMP_VERTEX_NORMALS], bspVertexNormals);
-	AddLump(file, header.lumps[LUMP_VERTEX_LIT_BUMP], bspVertexLitBump);
 	AddLump(file, header.lumps[LUMP_ENTITY_PARTITIONS], bspEntityPartitions);
+	AddLump(file, header.lumps[LUMP_TEXTURE_DATA_STRING_DATA], bspTextureDataStringData_stub);
+	AddLump(file, header.lumps[LUMP_TEXTURE_DATA_STRING_TABLE], bspTextureDataStringTable_stub);
+	AddLump(file, header.lumps[LUMP_WORLD_LIGHTS], bspWorldLights_stub);
+	AddLump(file, header.lumps[LUMP_TRICOLL_TRIS], bspTricollTris_stub);
+	AddLump(file, header.lumps[LUMP_TRICOLL_NODES], bspTricollNodes_stub);
+	AddLump(file, header.lumps[LUMP_TRICOLL_HEADERS], bspTricollHeaders_stub);
+	AddLump(file, header.lumps[LUMP_VERTEX_LIT_BUMP], bspVertexLitBump);
 	AddLump(file, header.lumps[LUMP_MESH_INDICES], bspMeshIndices);
 	AddLump(file, header.lumps[LUMP_MESHES], bspMeshes);
 	AddLump(file, header.lumps[LUMP_MESH_BOUNDS], bspMeshBounds);
-	AddLump(file, header.lumps[LUMP_MODELS], bspModels_new);
-
+	AddLump(file, header.lumps[LUMP_MATERIAL_SORT], bspMaterialSort_stub);
+	AddLump(file, header.lumps[LUMP_LIGHTMAP_HEADERS], bspLightMapHeaders_stub);
+	AddLump(file, header.lumps[LUMP_CM_GRID], bspCMGrid_stub);
+	AddLump(file, header.lumps[LUMP_CM_GRID_CELLS], bspCMGridCells_stub);
+	AddLump(file, header.lumps[LUMP_CM_GRID_SETS], bspCMGridSets_stub);
+	AddLump(file, header.lumps[LUMP_CM_GEO_SET_BOUNDS], bspCMGeoSetBounds_stub);
+	AddLump(file, header.lumps[LUMP_CM_PRIMITIVES], bspCMPrimitives_stub);
+	AddLump(file, header.lumps[LUMP_CM_PRIMITIVE_BOUNDS], bspCMPrimitiveBounds_stub);
+	AddLump(file, header.lumps[LUMP_CM_UNIQUE_CONTENTS], bspCMUniqueContents_stub);
+	//AddLump(file, header.lumps[LUMP_MESH_BOUNDS], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_CM_BRUSHES], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_CM_BRUSH_SIDE_PLANE_OFFSETS], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_CM_BRUSH_SIDE_PROPS], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_CM_BRUSH_TEX_VECS], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_TRICOLL_BEVEL_STARTS], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_LIGHTMAP_DATA_SKY], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_CSM_AABB_NODES], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_CELL_BSP_NODES], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_CELLS], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_MESH_BOUNDS], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_PORTALS], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_PORTAL_VERTICES], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_PORTAL_EDGES], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_PORTAL_VERTEX_EDGES], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_PORTAL_VERTEX_REFERENCES], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_PORTAL_EDGE_REGERENCES], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_PORTAL_EDGE_INTERSECT_EDGE], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_PORTAL_EDGE_INTERSECT_AT_VERTEX], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_PORTAL_EDGE_INTERSECT_HEADER], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_CELL_AABB_NODES], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_OBJ_REFERENCES], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_OBJ_REFERENCE_BOUNDS], bspMeshBounds);
+	//AddLump(file, header.lumps[LUMP_LEVEL_INFO], bspMeshBounds);
 
 	/* emit bsp size */
 	const int size = ftell(file);
