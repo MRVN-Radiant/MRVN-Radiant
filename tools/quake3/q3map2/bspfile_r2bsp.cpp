@@ -199,11 +199,23 @@ void WriteR2BSPFile(const char* filename)
 
 
 	/* :) */
-	if (VectorCompare(Vector3(1,0,0), Vector3(1,0,0)))
 	{
 		char message[64] = "Built with love using r2radiant :)";
 		SafeWrite(file, &message, sizeof(message));
 	}
+	{
+		char message[64];
+		strncpy(message,StringOutputStream(64)("Version:        ", Q3MAP_VERSION).c_str(),64);
+		SafeWrite(file, &message, sizeof(message));
+	}
+	{
+		time_t t;
+		time(&t);
+		char message[64];
+		strncpy(message,StringOutputStream(64)("Time:           ", asctime(localtime(&t))).c_str(),64);
+		SafeWrite(file, &message, sizeof(message));
+	}
+
 	/* Write lumps */
 	AddLump(file, header.lumps[LUMP_ENTITIES],							bspEntities_stub);
 	AddLump(file, header.lumps[LUMP_PLANES],							bspPlanes_stub);
