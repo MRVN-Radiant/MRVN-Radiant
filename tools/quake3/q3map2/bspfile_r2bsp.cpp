@@ -183,6 +183,16 @@ void WriteR2BSPFile(const char* filename)
 	header.mapVersion = 30;
 	header.maxLump = 127;
 
+	/* This should be automated maybe */
+	header.lumps[0x01].lumpVer = 1;
+	header.lumps[0x02].lumpVer = 1;
+	header.lumps[0x36].lumpVer = 3;
+	header.lumps[0x42].lumpVer = 2;
+	header.lumps[0x44].lumpVer = 1;
+	header.lumps[0x45].lumpVer = 1;
+	header.lumps[0x49].lumpVer = 1;
+	header.lumps[0x53].lumpVer = 1;
+
 	/* write initial header */
 	FILE* file = SafeOpenWrite(filename);
 	SafeWrite(file, &header, sizeof(header));    /* overwritten later */
