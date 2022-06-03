@@ -320,6 +320,9 @@ static void ProcessWorldModel( entity_t& e ){
 	/* generate bsp meshes from map brushes */
 	EmitMeshes( e );
 
+	/**/
+	EmitObjReferences();
+
 	/* Generate Model lump */
 	EmitModels();
 

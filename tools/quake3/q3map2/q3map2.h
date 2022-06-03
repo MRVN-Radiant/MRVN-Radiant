@@ -281,6 +281,16 @@ struct bspModel_t_new
 	uint32_t mesh_count;
 };
 
+struct bspObjReferenceBounds_t
+{
+	Vector3 mins;
+	uint32_t zero0;
+	Vector3 maxs;
+	uint32_t zero1;
+};
+
+using bspObjReferences_t = uint16_t;
+
 // Old
 struct bspShader_t
 {
@@ -1502,6 +1512,7 @@ void                        EndBSPFile( bool do_write );
 void                        EmitBrushes( brushlist_t& brushes, int *firstBrush, int *numBrushes );
 void						EmitEntityPartitions();
 void                        EmitMeshes( const entity_t& e );
+void						EmitObjReferences();
 void                        EmitFogs();
 void						EmitModels();
 void						EmitStubs();
@@ -2102,6 +2113,10 @@ inline std::vector<bspEntityPartitions_t> bspEntityPartitions;
 
 inline std::vector<bspModel_t_new> bspModels_new;
 
+inline std::vector<bspObjReferenceBounds_t> bspObjReferenceBounds;
+
+inline std::vector<bspObjReferences_t> bspObjReferences;
+
 /* Stubs */
 inline std::vector<char> bspEntities_stub;
 
@@ -2176,10 +2191,6 @@ inline std::vector<uint8_t> bspPortalEdgeIntersectAtVertex_stub;
 inline std::vector<uint8_t> bspPortalEdgeIntersectHeader_stub;
 
 inline std::vector<uint8_t> bspCellAABBNodes_stub;
-
-inline std::vector<uint8_t> bspObjReferences_stub;
-
-inline std::vector<uint8_t> bspObjReferenceBounds_stub;
 
 inline std::vector<uint8_t> bspLevelInfo_stub;
 

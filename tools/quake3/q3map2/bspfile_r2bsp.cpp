@@ -262,8 +262,8 @@ void WriteR2BSPFile(const char* filename)
 	AddLump(file, header.lumps[LUMP_PORTAL_EDGE_INTERSECT_AT_VERTEX],	bspPortalEdgeIntersectAtVertex_stub);
 	AddLump(file, header.lumps[LUMP_PORTAL_EDGE_INTERSECT_HEADER],		bspPortalEdgeIntersectHeader_stub);
 	AddLump(file, header.lumps[LUMP_CELL_AABB_NODES],					bspCellAABBNodes_stub);
-	AddLump(file, header.lumps[LUMP_OBJ_REFERENCES],					bspObjReferences_stub);
-	AddLump(file, header.lumps[LUMP_OBJ_REFERENCE_BOUNDS],				bspObjReferenceBounds_stub);
+	AddLump(file, header.lumps[LUMP_OBJ_REFERENCES],					bspObjReferences);
+	AddLump(file, header.lumps[LUMP_OBJ_REFERENCE_BOUNDS],				bspObjReferenceBounds);
 	AddLump(file, header.lumps[LUMP_LEVEL_INFO],						bspLevelInfo_stub);
 
 	/* emit bsp size */
