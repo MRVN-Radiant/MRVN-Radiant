@@ -478,15 +478,19 @@ void EmitMeshes( const entity_t& e )
 	
 	std::vector<tempMesh_t> tempMeshes;
 	/* walk list of brushes */
+	Sys_FPrintf(SYS_VRB, "brushes\n");
 	for (const brush_t& brush : e.brushes)
 	{
 		/* loop through sides */
 		for (const side_t& side : brush.sides)
 		{
+			if (side.winding.size() == 0)
+				continue;
+			
 			if (strcmp(side.shaderInfo->shader.c_str(), "textures/common/caulk") == 0)
 				continue;
 
-
+			
 			tempMesh_t& mesh = tempMeshes.emplace_back();
 			mesh.shader = side.shaderInfo->shader;
 			/* loop through vertices */
@@ -507,7 +511,7 @@ void EmitMeshes( const entity_t& e )
 					mesh.minmax.mins.y() = vertex.y();
 				if (vertex.z() < mesh.minmax.mins.z())
 					mesh.minmax.mins.z() = vertex.z();
-
+				
 				/* Calculate it's UV */
 				/* or not */
 				Vector2 UV;
@@ -542,13 +546,13 @@ void EmitMeshes( const entity_t& e )
 				
 				
 				VectorNormalize(normal);
-
+				
 				/* save */
 				mesh.Vertices.emplace_back(vertex);
 				mesh.Normals.emplace_back(normal);
 				mesh.UVs.emplace_back(UV);
 			}
-
+			
 			/* Create triangles for side */
 			for (std::size_t i = 0; i < side.winding.size() - 2; i++)
 			{
@@ -562,8 +566,9 @@ void EmitMeshes( const entity_t& e )
 	}
 
 	/* walk list of patches */
+	Sys_FPrintf(SYS_VRB, "patches\n");
 	parseMesh_t* patch = e.patches;
-	while (patch != nullptr)
+	while (patch != NULL)
 	{
 		tempMesh_t& mesh = tempMeshes.emplace_back();
 		mesh.shader = patch->shaderInfo->shader;
@@ -607,6 +612,7 @@ void EmitMeshes( const entity_t& e )
 
 	/* Loop through meshes and combine the ones touching */
 	/* While this isn't fast, it's better than my last approach */
+	Sys_FPrintf(SYS_VRB, "combining meshes\n");
 	std::size_t index = 0;
 	std::size_t iterationsSinceCombine = 0;
 	while ( true )
@@ -774,8 +780,6 @@ void EmitMeshes( const entity_t& e )
 		bspMeshBounds_t& meshBounds = bspMeshBounds.emplace_back();
 		meshBounds.origin = (aabb.maxs + aabb.mins) / 2;
 		meshBounds.extents = (aabb.maxs - aabb.mins) / 2;
-
-		Sys_FPrintf(SYS_VRB, "mesh1: maxs: %f, %f, %f; mins: %f, %f, %f\n", aabb.maxs.x(), aabb.maxs.y(), aabb.maxs.z(), aabb.mins.x(), aabb.mins.y(), aabb.mins.z());
 	}
 }
 /*

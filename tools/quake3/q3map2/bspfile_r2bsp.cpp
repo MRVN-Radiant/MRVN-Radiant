@@ -288,7 +288,7 @@ void CompileR2BSPFile()
 			continue;
 		}
 
-		/* process the model */
+		/* process only world model */
 		if (entityNum == 0) {
 			/* */
 			EmitEntityPartitions();
