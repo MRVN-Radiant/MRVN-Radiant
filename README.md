@@ -1,17 +1,17 @@
-r2radiant
-=================
+# r2radiant
 
-The open-source, cross-platform level editor for id Tech based games.
+The open-source, cross-platform level editor for respawn souce games. hmmm i really like respawn souce wery cool yummy
 
 **r2radiant** is a fork of NetRadiant-Custom (GtkRadiant 1.4&rarr;massive rewrite&rarr;1.5&rarr;NetRadiant&rarr;NetRadiant-Custom&rarr;this)
 
 
 ## Downloads
-
-Ready-to-use packages are available in the [Releases section](/../../releases).
+one day:tm:
 
 ## Supported games
 
 Titanfall 2, we'll see how it goes
+maybe apex
 
-## [COMPILING](/COMPILING)
+## [COMPILING](/COMPILING.md)
+## [TODO](/TODO.md)
