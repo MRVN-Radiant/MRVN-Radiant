@@ -277,3 +277,39 @@ void WriteR2BSPFile(const char* filename)
 	/* close the file */
 	fclose(file);
 }
+
+void CompileR2BSPFile()
+{
+	for (size_t entityNum = 0; entityNum < entities.size(); ++entityNum)
+	{
+		/* get entity */
+		entity_t& entity = entities[entityNum];
+		if (entity.brushes.empty() && entity.patches == NULL) {
+			continue;
+		}
+
+		/* process the model */
+		if (entityNum == 0) {
+			/* */
+			EmitEntityPartitions();
+
+			/* generate bsp meshes from map brushes */
+			EmitMeshes(entity);
+
+			/**/
+			EmitObjReferences();
+
+			/* Generate Model lump */
+			EmitModels();
+
+			/* Generate unknown lumps */
+			EmitStubs();
+
+			/* Emit LevelInfo */
+			EmitLevelInfo();
+		}
+
+		/* potentially turn off the deluge of text */
+		verbose = verboseEntities;
+	}
+}

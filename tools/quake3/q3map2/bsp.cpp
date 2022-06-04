@@ -272,47 +272,47 @@ static void ProcessWorldModel( entity_t& e ){
 
 	if ( leakStatus != EFloodEntities::Empty ) { /* if no entities exist, this would accidentally the whole map, and that IS bad */
 		/* rebuild a better bsp tree using only the sides that are visible from the inside */
-		FillOutside( tree.headnode );
+		//FillOutside( tree.headnode );
 
 		/* chop the sides to the convex hull of their visible fragments, giving us the smallest polygons */
-		ClipSidesIntoTree( e, tree );
+		//ClipSidesIntoTree( e, tree );
 
 		/* build a visible face tree (same thing as the initial bsp tree but after reducing the faces) */
-		faces = MakeVisibleBSPFaceList( e.brushes );
-		FreeTree( tree );
-		tree = FaceBSP( faces );
-		MakeTreePortals( tree );
-		FilterStructuralBrushesIntoTree( e, tree );
+		//faces = MakeVisibleBSPFaceList( e.brushes );
+		//FreeTree( tree );
+		//tree = FaceBSP( faces );
+		//MakeTreePortals( tree );
+		//FilterStructuralBrushesIntoTree( e, tree );
 
 		if( g_autocaulk ){
-			autocaulk_write();
-			exit( 0 );
+		//	autocaulk_write();
+		//	exit( 0 );
 		}
 
 		/* flood again to discard portals in the void (also required for _skybox) */
-		FloodEntities( tree );
-		FillOutside( tree.headnode );
+		//FloodEntities( tree );
+		//FillOutside( tree.headnode );
 	}
 
 	/* save out information for visibility processing */
-	NumberClusters( tree );
+	//NumberClusters( tree );
 	if ( !leaked ) {
-		WritePortalFile( tree );
+		//WritePortalFile( tree );
 	}
 
 	/* flood from entities */
-	FloodAreas( tree );
+	//FloodAreas( tree );
 
 	/* create drawsurfs for triangle models */
 	if ( !debugClip ) {
-		AddTriangleModels( e );
+		//AddTriangleModels( e );
 	}
 
 	/* create drawsurfs for surface models */
-	AddEntitySurfaceModels( e );
+	//AddEntitySurfaceModels( e );
 
 	/* generate bsp brushes from map brushes */
-	EmitBrushes( e.brushes, &e.firstBrush, &e.numBrushes );
+	//EmitBrushes( e.brushes, &e.firstBrush, &e.numBrushes );
 
 	/* */
 	EmitEntityPartitions();
@@ -890,7 +890,8 @@ int BSPMain( Args& args ){
 	SetCloneModelNumbers();
 
 	/* process world and submodels */
-	ProcessModels();
+	//ProcessModels();
+	g_game->compile();
 
 	/* set light styles from targetted light entities */
 	SetLightStyles();

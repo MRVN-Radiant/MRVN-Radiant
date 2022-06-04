@@ -158,6 +158,7 @@ struct game_titanfall2 : game_t
 		false,                  /* cod-style lump len/ofs order */
 		LoadR2BSPFile,           /* bsp load function */
 		WriteR2BSPFile,          /* bsp write function */
+		CompileR2BSPFile,
 		{
 			/* name             contentFlags                contentFlagsClear           surfaceFlags                surfaceFlagsClear           compileFlags                compileFlagsClear */
 
@@ -384,6 +385,7 @@ struct game_apexlegends : game_t
 		false,                  /* cod-style lump len/ofs order */
 		LoadR5BSPFile,           /* bsp load function */
 		WriteR5BSPFile,          /* bsp write function */
+		CompileR5BSPFile,
 		{
 			/* name             contentFlags                contentFlagsClear           surfaceFlags                surfaceFlagsClear           compileFlags                compileFlagsClear */
 

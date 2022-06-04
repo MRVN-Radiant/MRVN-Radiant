@@ -104,8 +104,10 @@ struct game_t
 	const char          *bspIdent;                      /* 4-letter bsp file prefix */
 	int bspVersion;                                     /* bsp version to use */
 	bool lumpSwap;                                      /* cod-style len/ofs order */
-	typedef void ( *bspFunc )( const char * );
-	bspFunc load, write;                                /* load/write function pointers */
+	typedef void ( *bspFileFunc )( const char * );
+	bspFileFunc load, write;                                /* load/write function pointers */
+	typedef void ( *bspWriteFunc )();
+	bspWriteFunc compile;
 	std::vector<surfaceParm_t> surfaceParms;            /* surfaceparm array */
 	int brushBevelsSurfaceFlagsMask;                    /* apply only these surfaceflags to bevels to reduce extra bsp shaders amount; applying them to get correct physics at walkable brush edges and vertices */
 };
