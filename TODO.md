@@ -1,3 +1,22 @@
+- Separate r2 and r5 ( namespace this crap ? )
+- Fix patch exporter
+- Some brush sides can have 0 verts -> trace why
+- Collisions
+- Ent files
+  - Basic spawns
+  - Ziplines
+  - AI nodes
+- mdl importer
+- gamelump exporter
+- bsp importer ( hijack mbspc ? ) so we can remaster tf1 maps
+- Lightmapper :trollface:
+- some sortof r2recast support ( at least a good .obj exporter )
+- apex, one day
+- tfo :rockeyebrow:
+
+
+## Old stuff I havent sorted yet
+
 [-z-]: make rotate dialog non-modal
     
 
