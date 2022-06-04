@@ -1,6 +1,9 @@
 - Separate r2 and r5 ( namespace this crap ? )
 - Fix patch exporter
 - Some brush sides can have 0 verts -> trace why
+- Textures ( maybe same for models, haven't messed around with those yet)
+  - Remove 64 char shader path limit
+  - Folder support
 - Collisions
 - Ent files
   - Basic spawns
