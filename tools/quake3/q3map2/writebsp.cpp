@@ -484,6 +484,7 @@ void EmitMeshes( const entity_t& e )
 		/* loop through sides */
 		for (const side_t& side : brush.sides)
 		{
+			/* this isn't a fix, for some reason some sides don't get windings ?? need to investigate this now */
 			if (side.winding.size() == 0)
 				continue;
 			
