@@ -1,18 +1,29 @@
 
-developer documentation for NetRadiant-custom
+developer documentation for r2radiant
 ======================================
 
 getting the source
 ==================
 
-The latest source is available from the git repository.
-  https://github.com/Garux/netradiant-custom.git
+The latest source is available from the git repository:
+
+  - https://github.com/F1F7Y/r2radiant
+
+Libs for Windows:
+
+  - https://www.dropbox.com/s/hcgkwzzmja3m6c0/netradiant-custom-extra-win.zip
+
+Gamepacks:
+
+  - https://github.com/F1F7Y/r2radiant-game-packs
 
 The git client can be obtained from the Subversion site.
-  http://git-scm.org
+
+  - http://git-scm.org
 
 To get a copy of the source using the commandline git client:
-  Change the current directory to the desired location for the source.
+
+  - Change the current directory to the desired location for the source.
   git clone https://github.com/Garux/netradiant-custom.git
   cd netradiant-custom
 
