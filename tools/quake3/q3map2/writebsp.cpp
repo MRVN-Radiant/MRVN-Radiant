@@ -484,7 +484,7 @@ void EmitMeshes( const entity_t& e )
 		/* loop through sides */
 		for (const side_t& side : brush.sides)
 		{
-			/* this isn't a fix, for some reason some sides don't get windings ?? need to investigate this now */
+			/* this isn't a fix, for some reason some sides don't get windings ?? need to investigate this ( or later ) */
 			if (side.winding.size() == 0)
 				continue;
 			
@@ -574,6 +574,7 @@ void EmitMeshes( const entity_t& e )
 		tempMesh_t& mesh = tempMeshes.emplace_back();
 		mesh.shader = patch->shaderInfo->shader;
 
+		/* these are the in-editor editable verts, not the mesh you see in-editor ? */
 		for (std::size_t i = 0; i < sizeof(patch->mesh.verts); i ++)
 		{
 			bspDrawVert_t vert = patch->mesh.verts[i];
