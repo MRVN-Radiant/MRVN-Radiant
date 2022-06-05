@@ -300,6 +300,17 @@ struct bspLevelInfo_t
 	Vector3 unk2;
 };
 
+struct CellAABBNode_t
+{
+	Vector3 mins;
+	uint8_t child_count; // number of direct children this node has
+	uint8_t obj_ref_count; // number of obj_refs it indexes
+	uint16_t total_child_count; // nuber of children all direct children have
+	Vector3 maxs;
+	uint16_t first_child; // first child index
+	uint16_t obj_ref; // first obj_ref index
+};
+
 // Old
 struct bspShader_t
 {
@@ -2202,7 +2213,7 @@ inline std::vector<uint8_t> bspPortalEdgeIntersectAtVertex_stub;
 
 inline std::vector<uint8_t> bspPortalEdgeIntersectHeader_stub;
 
-inline std::vector<uint8_t> bspCellAABBNodes_stub;
+inline std::vector<CellAABBNode_t> bspCellAABBNodes_stub;
 
 
 /* Old lumps, these need to go */
