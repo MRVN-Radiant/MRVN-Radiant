@@ -484,8 +484,8 @@ void EmitMeshes( const entity_t& e )
 		/* loop through sides */
 		for (const side_t& side : brush.sides)
 		{
-			/* this isn't a fix, for some reason some sides don't get windings ?? need to investigate this ( or later ) */
-			if (side.winding.size() == 0)
+			/*  */
+			if (side.bevel)
 				continue;
 			
 			if (strcmp(side.shaderInfo->shader.c_str(), "textures/common/caulk") == 0)
@@ -623,7 +623,7 @@ void EmitMeshes( const entity_t& e )
 		if ( index >= tempMeshes.size() )
 			index = 0;
 
-		/* No more meshes to combine; break from teh loop */
+		/* No more meshes to combine; break from the loop */
 		if ( iterationsSinceCombine >= tempMeshes.size() )
 			break;
 
@@ -642,11 +642,11 @@ void EmitMeshes( const entity_t& e )
 			if ( strcmp( mesh1.shader.c_str(), mesh2.shader.c_str() ) != 0 )
 				continue;
 
-
 			/* Check if they're intersecting */
 			if ( !MinMaxIntersecting( mesh1.minmax, mesh2.minmax ) )
 				continue;
 			
+
 			/* Combine them */
 			/* Triangles */
 			for ( uint16_t& triIndex : mesh2.Triangles )
@@ -655,12 +655,14 @@ void EmitMeshes( const entity_t& e )
 			}
 
 			/* All these are parallel so we chillin */
-			for ( std::size_t v = 0; v < mesh2.Vertices.size(); v++ )
-			{
-				mesh1.Vertices.emplace_back(mesh2.Vertices.at(v));
-				mesh1.Normals.emplace_back(mesh2.Normals.at(v));
-				mesh1.UVs.emplace_back(mesh2.UVs.at(v));
-			}
+			
+
+			mesh1.Vertices.insert( mesh1.Vertices.end(), mesh2.Vertices.begin(), mesh2.Vertices.end() );
+
+			mesh1.Normals.insert( mesh1.Normals.end(), mesh2.Normals.begin(), mesh2.Normals.end() );
+
+			mesh1.UVs.insert( mesh1.UVs.end(), mesh2.UVs.begin(), mesh2.UVs.end() );
+			
 			/* aabb */
 			for (Vector3& vertex : mesh1.Vertices)
 			{
@@ -678,16 +680,16 @@ void EmitMeshes( const entity_t& e )
 				if (vertex.z() < mesh1.minmax.mins.z())
 					mesh1.minmax.mins.z() = vertex.z();
 			}
-
 			/* Delete mesh we combined as to not create duplicates */
 			tempMeshes.erase( tempMeshes.begin() + i );
 			iterationsSinceCombine = 0;
+			break;
 		}
 
 		iterationsSinceCombine++;
 		index++;
 	}
-
+	
 
 	/* 
 		We now have a list of meshes with matching materials.
