@@ -815,8 +815,8 @@ void EmitLevelInfo()
 {
 	bspLevelInfo_t &li = bspLevelInfo.emplace_back();
 	li.obj_ref_count = bspObjReferenceBounds.size();
-	li.unk0 = 2;
-	li.unk1 = 2;
+	li.unk0 = 1;
+	li.unk1 = 1;
 }
 
 /* I call this Right click -> copy as c++ array */
