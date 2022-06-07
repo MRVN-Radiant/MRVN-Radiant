@@ -140,6 +140,10 @@ protected:
     /** Import a CS:S/HL2 MDL file (not fully implemented)
     */
     void InternReadFile_HL2( );
+    // -------------------------------------------------------------------
+    /** Import a Titanfall2 MDL file
+    */
+    void InternReadFile_Titanfall2( );
 
     // -------------------------------------------------------------------
     /** Check whether a given position is inside the valid range

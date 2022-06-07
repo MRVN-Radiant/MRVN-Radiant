@@ -200,7 +200,6 @@ void MDLImporter::InternReadFile(const std::string &pFile,
 
         // Determine the file subtype and call the appropriate member function
         bool is_half_life = false;
-
         // Original Quake1 format
         if (AI_MDL_MAGIC_NUMBER_BE == iMagicWord || AI_MDL_MAGIC_NUMBER_LE == iMagicWord) {
             ASSIMP_LOG_DEBUG("MDL subtype: Quake 1, magic word is IDPO");
@@ -236,6 +235,12 @@ void MDLImporter::InternReadFile(const std::string &pFile,
             ASSIMP_LOG_DEBUG("MDL subtype: 3D GameStudio A7, magic word is MDL7");
             iGSFileVersion = 7;
             InternReadFile_3DGS_MDL7();
+        }
+        // Titanfall 2 MDL v53
+        else if (AI_MDL_MAGIC_NUMBER_BE_TF2 == iMagicWord || AI_MDL_MAGIC_NUMBER_LE_TF2 == iMagicWord) {
+            ASSIMP_LOG_DEBUG("MDL subtype: Titanfall2 MDL");
+            //iGSFileVersion = AI_MDL_VERSION_TF2;
+            InternReadFile_Titanfall2();
         }
         // IDST/IDSQ Format (CS:S/HL^2, etc ...)
         else if (AI_MDL_MAGIC_NUMBER_BE_HL2a == iMagicWord || AI_MDL_MAGIC_NUMBER_LE_HL2a == iMagicWord ||
@@ -1976,6 +1981,14 @@ void MDLImporter::InternReadFile_HL1(const std::string &pFile, const uint32_t iM
 void MDLImporter::InternReadFile_HL2() {
     //const MDL::Header_HL2* pcHeader = (const MDL::Header_HL2*)this->mBuffer;
     throw DeadlyImportError("HL2 MDLs are not implemented");
+}
+
+// ------------------------------------------------------------------------------------------------
+// Read a Titanfall 2 MDL
+void MDLImporter::InternReadFile_Titanfall2() {
+    // Read header and check version here
+    // Make this a generic respawn mdl reader?
+    throw DeadlyImportError("Titanfall2 mdl :rockeyebrow:");
 }
 
 #endif // !! ASSIMP_BUILD_NO_MDL_IMPORTER
