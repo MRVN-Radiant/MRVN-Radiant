@@ -311,6 +311,43 @@ struct CellAABBNode_t
 	uint16_t obj_ref; // first obj_ref index
 };
 
+struct GameLump_Path
+{
+	char path[128];
+};
+
+struct GameLump_Prop
+{
+	Vector3 Origin;
+	Vector3 Angles;
+	float scale;
+	uint16_t model_name;
+	uint8_t solid_mode;
+	uint8_t flags;
+	int8_t unk[4];
+	float fade_scale;
+	Vector3 lighting_origin;
+	int8_t cpu_level[2];
+	int8_t gpu_level[2];
+	int8_t diffuse_modulation[4];
+	uint16_t collision_flags[2];
+};
+
+struct GameLump_t
+{
+	uint32_t version; // 1
+	char magic[4]; // "prps"
+	uint32_t const0; // always 851968
+	uint32_t offset; // offset to path_count
+	uint32_t length;
+	uint32_t path_count;
+	std::vector<GameLump_Path> paths;
+	uint32_t prop_count;
+	uint32_t unk3; // From testing can be same as prop_count
+	uint32_t unk4; // Same for this one
+	std::vector<GameLump_Prop> props;
+};
+
 // Old
 struct bspShader_t
 {
@@ -1533,9 +1570,10 @@ void                        EmitBrushes( brushlist_t& brushes, int *firstBrush, 
 void						EmitEntityPartitions();
 void                        EmitMeshes( const entity_t& e );
 void						EmitObjReferences();
-void                        EmitFogs();
 void						EmitModels();
 void						EmitLevelInfo();
+void						SetUpGameLump();
+void						EmitProp( const entity_t &e );
 void						EmitStubs();
 
 void                        BeginModel( const entity_t& e );
@@ -2215,6 +2253,7 @@ inline std::vector<uint8_t> bspPortalEdgeIntersectHeader_stub;
 
 inline std::vector<CellAABBNode_t> bspCellAABBNodes_stub;
 
+inline GameLump_t GameLump;
 
 /* Old lumps, these need to go */
 

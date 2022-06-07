@@ -792,6 +792,7 @@ void EmitMeshes( const entity_t& e )
  */
 void EmitObjReferences()
 {
+	/* Meshes */
 	for ( uint16_t i = 0; i < bspMeshBounds.size(); i++ )
 	{
 		bspMeshBounds_t mesh = bspMeshBounds.at( i );
@@ -802,6 +803,17 @@ void EmitObjReferences()
 
 		bspObjReferences_t& ref = bspObjReferences.emplace_back();
 		ref = i;
+	}
+
+	/* Props */
+	for (uint16_t i = 0; i < GameLump.prop_count; i++)
+	{
+		bspObjReferenceBounds_t& refBounds = bspObjReferenceBounds.emplace_back();
+		refBounds.mins = Vector3(-1000,-1000,-1000);
+		refBounds.maxs = Vector3(1000,1000,1000);
+
+		bspObjReferences_t& ref = bspObjReferences.emplace_back();
+		ref = bspMeshBounds.size() + i;
 	}
 }
 
@@ -817,6 +829,57 @@ void EmitLevelInfo()
 	li.obj_ref_count = bspObjReferenceBounds.size();
 	li.unk0 = 1;
 	li.unk1 = 1;
+	li.prop_count = GameLump.prop_count;
+}
+
+void SetUpGameLump()
+{
+	GameLump.version = 1;
+	memcpy( GameLump.magic, "prps", 4 );
+	GameLump.const0 = 851968;
+}
+
+void EmitProp( const entity_t &e )
+{
+	const char* p;
+	e.read_keyvalue(p, "model");
+	char path[128];
+	strncpy(path, p, 128);
+
+	uint16_t index = 0;
+	bool found = false;
+	for ( uint32_t i = 0; i < GameLump.path_count; i++ )
+	{
+		if ( strncmp(GameLump.paths.at(i).path, path, 128) == 0 )
+		{
+			found = true;
+			break;
+		}
+
+		index++;
+	}
+
+	if ( !found )
+	{
+		index = GameLump.paths.size();
+		GameLump.path_count++;
+		GameLump_Path newPath;
+		strncpy(newPath.path, path,128);
+		GameLump.paths.emplace_back(newPath);
+	}
+
+	GameLump.prop_count++;
+	GameLump_Prop& prop = GameLump.props.emplace_back();
+	prop.scale = 1;
+	prop.fade_scale = -1;
+	prop.flags = 84;
+	prop.solid_mode = 6;
+	prop.cpu_level[0] = -1;
+	prop.cpu_level[1] = -1;
+	prop.gpu_level[0] = -1;
+	prop.gpu_level[1] = -1;
+	prop.model_name = index;
+
 }
 
 /* I call this Right click -> copy as c++ array */

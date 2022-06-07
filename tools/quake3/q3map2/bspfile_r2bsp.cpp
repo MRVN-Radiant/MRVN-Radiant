@@ -326,7 +326,7 @@ void WriteR2BSPFile(const char* filename)
 		strncpy(message,StringOutputStream(64)("Time:           ", asctime(localtime(&t))).c_str(),64);
 		SafeWrite(file, &message, sizeof(message));
 	}
-
+	
 	/* Write lumps */
 	AddLump(file, header.lumps[LUMP_ENTITIES],							bspEntities_stub);
 	AddLump(file, header.lumps[LUMP_PLANES],							bspPlanes_stub);
@@ -335,6 +335,25 @@ void WriteR2BSPFile(const char* filename)
 	AddLump(file, header.lumps[LUMP_MODELS],							bspModels_new);
 	AddLump(file, header.lumps[LUMP_VERTEX_NORMALS],					bspVertexNormals);
 	AddLump(file, header.lumps[LUMP_ENTITY_PARTITIONS],					bspEntityPartitions);
+	/* Game Lump */
+	{
+		std::size_t start = ftell(file);
+		header.lumps[LUMP_GAME_LUMP].offset = start;
+		header.lumps[LUMP_GAME_LUMP].length = 36 + GameLump.path_count * sizeof(GameLump_Path) + GameLump.prop_count * sizeof(GameLump_Prop);
+		GameLump.offset = start + 20;
+		GameLump.length = 16 + GameLump.path_count * sizeof(GameLump_Path) + GameLump.prop_count * sizeof(GameLump_Prop);
+		SafeWrite(file, &GameLump, sizeof(GameLump));
+		/* need to write vectors separately */
+		/* paths */
+		fseek(file, start + 24, SEEK_SET);
+		SafeWrite(file, GameLump.paths.data(), 128 * GameLump.path_count);
+		/* :) */
+		SafeWrite(file, &GameLump.prop_count, 4);
+		SafeWrite(file, &GameLump.prop_count, 4);
+		SafeWrite(file, &GameLump.prop_count, 4);
+		/* props */
+		SafeWrite(file, GameLump.props.data(), 64 * GameLump.prop_count);
+	}
 	AddLump(file, header.lumps[LUMP_TEXTURE_DATA_STRING_DATA],			bspTextureDataStringData_stub);
 	AddLump(file, header.lumps[LUMP_TEXTURE_DATA_STRING_TABLE],			bspTextureDataStringTable_stub);
 	AddLump(file, header.lumps[LUMP_WORLD_LIGHTS],						bspWorldLights_stub);
@@ -377,6 +396,7 @@ void WriteR2BSPFile(const char* filename)
 	AddLump(file, header.lumps[LUMP_OBJ_REFERENCE_BOUNDS],				bspObjReferenceBounds);
 	AddLump(file, header.lumps[LUMP_LEVEL_INFO],						bspLevelInfo);
 
+
 	/* emit bsp size */
 	const int size = ftell(file);
 	Sys_Printf("Wrote %.1f MB (%d bytes)\n", (float)size / (1024 * 1024), size);
@@ -397,37 +417,42 @@ void WriteR2BSPFile(const char* filename)
  */
 void CompileR2BSPFile()
 {
-	for ( size_t entityNum = 0; entityNum < entities.size(); ++entityNum )
+	SetUpGameLump();
+
+	for (size_t entityNum = 0; entityNum < entities.size(); ++entityNum)
 	{
 		/* get entity */
 		entity_t& entity = entities[entityNum];
+		const char* classname = entity.classname();
 
-		switch ( entity.classname() )
+		/* visible geo */
+		if ( strcmp( classname,"worldspawn" ) == 0 )
 		{
-			/* process world spawn */
-			case "worldspawn":
-				/* */
-				EmitEntityPartitions();
 
-				/* generate bsp meshes from map brushes */
-				EmitMeshes(entity);
+			/* generate bsp meshes from map brushes */
+			EmitMeshes(entity);
 
-				/**/
-				EmitObjReferences();
 
-				/* Generate Model lump */
-				EmitModels();
+			/* Generate Model lump */
+			EmitModels();
 
-				/* Generate unknown lumps */
-				EmitStubs();
-
-				/* Emit LevelInfo */
-				EmitLevelInfo();
-				break;
-
-			/* process misc_model */
-			case "misc_model":
-				break;
+		}
+		/* props for gamelump */
+		else if ( strcmp( classname, "misc_model" ) == 0)
+		{
+			EmitProp( entity );
 		}
 	}
+
+	/* */
+	EmitEntityPartitions();
+
+	/**/
+	EmitObjReferences();
+
+	/* Emit LevelInfo */
+	EmitLevelInfo();
+
+	/* Generate unknown lumps */
+	EmitStubs();
 }
