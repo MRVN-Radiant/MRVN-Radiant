@@ -1,16 +1,14 @@
+- Figure out LevelInfo
 - Separate r2 and r5 ( namespace this crap ? )
 - Fix patch exporter
-- Some brush sides can have 0 verts -> trace why
-- Textures ( maybe same for models, haven't messed around with those yet)
-  - Remove 64 char shader path limit
-  - Folder support
+- Export textures
 - Collisions
 - Ent files
   - Basic spawns
   - Ziplines
   - AI nodes
 - mdl importer
-- gamelump exporter
+- gamelump exporter ( Verify it works, levelinfo is needed )
 - bsp importer ( hijack mbspc ? ) so we can remaster tf1 maps
 - Lightmapper :trollface:
 - some sortof r2recast support ( at least a good .obj exporter )
@@ -27,14 +25,23 @@
 BUGS
 
 MSI: installer bug with new folders? : create custom dir, click New Folder icon, type "FOLDER\" - gets stuck
+
 GTK2: gtk2 crashes when trying to use bitmap fonts such as MS Sans Serif http://bugzilla.gnome.org/show_bug.cgi?id=142579
+
 GTK2: alt+tab while mouse button is held down: see http://bugzilla.gnome.org/show_bug.cgi?id=145156
+
 UI: changing resolution in floating-windows mode can screw up window positions.
+
 HalfLife: half-life maps saved in q1 map format are not supported - currently have to convert them to hammer map format using hammer editor. And vice versa.
+
 Entity: creating a new entity with all the brushes of another entity selected results in the latter entity having no brushes.
+
 SConscript: build fails if SETUP=1
+
 SConscript: svn.py fails if not using C locale - set LC_ALL?
+
 GUI: can't use arrow keys to navigate in camera view when capslock is enabled
+
 GUI: screensaver causes: gdkgc-win32.c: line 905 (gdk_win32_hdc_get): assertion failed: (win32_gc->hdc == NULL)
 
 
