@@ -291,25 +291,25 @@ static bool ClusterVisibleToPoint( const Vector3& point, int cluster ){
  */
 
 int ClusterForPointExt( const Vector3& point, float epsilon ){
-	/* get leaf for point */
+	/* get leaf for point 
 	const int leafNum = PointInLeafNum( point );
 	if ( leafNum < 0 ) {
 		return -1;
 	}
 	const bspLeaf_t& leaf = bspLeafs[ leafNum ];
 
-	/* get the cluster */
+	// get the cluster 
 	const int cluster = leaf.cluster;
 	if ( cluster < 0 ) {
 		return -1;
 	}
 
-	/* transparent leaf, so check point against all brushes in the leaf */
+	// transparent leaf, so check point against all brushes in the leaf 
 	const int *brushes = &bspLeafBrushes[ leaf.firstBSPLeafBrush ];
 	const int numBSPBrushes = leaf.numBSPLeafBrushes;
 	for ( int i = 0; i < numBSPBrushes; i++ )
 	{
-		/* get parts */
+		// get parts 
 		const int b = brushes[ i ];
 		if ( b > maxOpaqueBrush ) {
 			continue;
@@ -319,7 +319,7 @@ int ClusterForPointExt( const Vector3& point, float epsilon ){
 		}
 
 		const bspBrush_t& brush = bspBrushes[ b ];
-		/* check point against all planes */
+		// check point against all planes 
 		bool inside = true;
 		for ( int j = 0; j < brush.numSides && inside; j++ )
 		{
@@ -329,14 +329,15 @@ int ClusterForPointExt( const Vector3& point, float epsilon ){
 			}
 		}
 
-		/* if inside, return bogus cluster */
+		// if inside, return bogus cluster
 		if ( inside ) {
 			return -1 - b;
 		}
 	}
 
-	/* if the point made it this far, it's not inside any opaque brushes */
+	// if the point made it this far, it's not inside any opaque brushes 
 	return cluster;
+	*/
 }
 
 
@@ -379,28 +380,28 @@ static int ClusterForPointExtFilter( const Vector3& point, float epsilon, int nu
  */
 
 static int ShaderForPointInLeaf( const Vector3& point, int leafNum, float epsilon, int wantContentFlags, int wantSurfaceFlags, int *contentFlags, int *surfaceFlags ){
-	int allSurfaceFlags, allContentFlags;
+	/*int allSurfaceFlags, allContentFlags;
 
 
-	/* clear things out first */
+	// clear things out first 
 	*surfaceFlags = 0;
 	*contentFlags = 0;
 
-	/* get leaf */
+	// get leaf 
 	if ( leafNum < 0 ) {
 		return -1;
 	}
 	const bspLeaf_t& leaf = bspLeafs[ leafNum ];
 
-	/* transparent leaf, so check point against all brushes in the leaf */
+	// transparent leaf, so check point against all brushes in the leaf 
 	const int *brushes = &bspLeafBrushes[ leaf.firstBSPLeafBrush ];
 	const int numBSPBrushes = leaf.numBSPLeafBrushes;
 	for ( int i = 0; i < numBSPBrushes; i++ )
 	{
-		/* get parts */
+		// get parts 
 		const bspBrush_t& brush = bspBrushes[ brushes[ i ] ];
 
-		/* check point against all planes */
+		// check point against all planes
 		bool inside = true;
 		allSurfaceFlags = 0;
 		allContentFlags = 0;
@@ -419,9 +420,9 @@ static int ShaderForPointInLeaf( const Vector3& point, int leafNum, float epsilo
 			}
 		}
 
-		/* handle if inside */
+		// handle if inside 
 		if ( inside ) {
-			/* if there are desired flags, check for same and continue if they aren't matched */
+			// if there are desired flags, check for same and continue if they aren't matched 
 			if ( wantContentFlags && !( wantContentFlags & allContentFlags ) ) {
 				continue;
 			}
@@ -429,14 +430,14 @@ static int ShaderForPointInLeaf( const Vector3& point, int leafNum, float epsilo
 				continue;
 			}
 
-			/* store the cumulative flags and return the brush shader (which is mostly useless) */
+			// store the cumulative flags and return the brush shader (which is mostly useless) 
 			*surfaceFlags = allSurfaceFlags;
 			*contentFlags = allContentFlags;
 			return brush.shaderNum;
 		}
 	}
 
-	/* if the point made it this far, it's not inside any brushes */
+	// if the point made it this far, it's not inside any brushes */
 	return -1;
 }
 

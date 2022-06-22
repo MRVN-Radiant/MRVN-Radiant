@@ -342,8 +342,10 @@ void EndBSPFile( bool do_write ){
    writes the brush list to the bsp
  */
 
-void EmitBrushes( brushlist_t& brushes, int *firstBrush, int *numBrushes ){
-	/* set initial brush */
+void EmitBrushes( brushlist_t& brushes, int *firstBrush, int *numBrushes )
+{
+	/*
+	// set initial brush 
 	if ( firstBrush != NULL ) {
 		*firstBrush = bspBrushes.size();
 	}
@@ -351,10 +353,10 @@ void EmitBrushes( brushlist_t& brushes, int *firstBrush, int *numBrushes ){
 		*numBrushes = 0;
 	}
 
-	/* walk list of brushes */
+	// walk list of brushes 
 	for ( brush_t& b : brushes )
 	{
-		/* get bsp brush */
+		// get bsp brush 
 		b.outputNum = bspBrushes.size();
 		bspBrush_t& db = bspBrushes.emplace_back();
 		if ( numBrushes != NULL ) {
@@ -364,24 +366,24 @@ void EmitBrushes( brushlist_t& brushes, int *firstBrush, int *numBrushes ){
 		db.shaderNum = EmitShader( b.contentShader->shader, &b.contentShader->contentFlags, &b.contentShader->surfaceFlags );
 		db.firstSide = bspBrushSides.size();
 
-		/* walk sides */
+		// walk sides 
 		db.numSides = 0;
 		for ( side_t& side : b.sides )
 		{
-			/* set output number to bogus initially */
+			// set output number to bogus initially 
 			side.outputNum = -1;
 
-			/* emit side */
+			// emit side 
 			side.outputNum = bspBrushSides.size();
 			bspBrushSide_t& cp = bspBrushSides.emplace_back();
 			db.numSides++;
 			cp.planeNum = side.planenum;
 
-			/* emit shader */
+			// emit shader 
 			if ( side.shaderInfo ) {
 				cp.shaderNum = EmitShader( side.shaderInfo->shader, &side.shaderInfo->contentFlags, &side.shaderInfo->surfaceFlags );
 			}
-			else if( side.bevel ) { /* emit surfaceFlags for bevels to get correct physics at walkable brush edges and vertices */
+			else if( side.bevel ) { // emit surfaceFlags for bevels to get correct physics at walkable brush edges and vertices 
 				cp.shaderNum = EmitShader( NULL, NULL, &side.surfaceFlags );
 			}
 			else{
@@ -389,9 +391,43 @@ void EmitBrushes( brushlist_t& brushes, int *firstBrush, int *numBrushes ){
 			}
 		}
 	}
+	*/
 }
 
+/*
+   EmitTextureData()
+   writes the entitiy partitions
+ */
+/*
+void EmitTextureData(const char* texture)
+{
+	std::string tex;
+	std::size_t index;
+	tex = texture;
+	tex.erase(tex.begin(), tex.begin() + 9);
+	std::replace(tex.begin(), tex.end(), '/', '\\');
 
+	index = tex.find('\\');
+	if (index != std::string::npos)
+	{
+		std::replace(tex.begin(), tex.begin() + index, '_', '\\');
+	}
+
+	 Check if it's already saved 
+	std::string table = std::string(bspTextureDataData.begin(), bspTextureDataData.end());
+	index = table.find(tex);
+	if (index != std::string::npos)
+		return;
+
+	 Add to Table 
+	StringOutputStream data;
+	data << tex.c_str();
+	std::vector<char> str = { data.begin(), data.end() + 1 };
+
+	bspTextureDataTable.emplace_back(bspTextureDataData.size());
+	bspTextureDataData.insert(bspTextureDataData.end(), str.begin(), str.end());
+}
+*/
 
 
 /*

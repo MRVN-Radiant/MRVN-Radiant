@@ -100,18 +100,7 @@
 #define LUMP_SHADOW_MESH_ALPHA_VERTICES			0x7D
 #define LUMP_SHADOW_MESH_INDICES				0x7E
 
-#define HEADER_LUMPS 128
 
-/* types */
-struct rbspHeader_t
-{
-	char ident[4];		/* rBSP */
-	int version;		/* 37 for r2 */
-	int mapVersion;		/* 30 */
-	int maxLump;		/* 127 */
-
-	bspLump_t lumps[HEADER_LUMPS];
-};
 
 
 /* funcs */
@@ -231,17 +220,16 @@ void WriteR2EntFiles(const char* filename)
  */
 void LoadR2BSPFile(const char* filename)
 {
-	/* Taken from LOADIBSPFile(), once we completely reverse brushes I wanna get this working*/
-	/*
-	load the file
+	Sys_FPrintf(SYS_VRB, "cock\n");
+	/* load the file */
 	MemBuffer file = LoadFile(filename);
 
 	rbspHeader_t* header = file.data();
 
-	swap the header (except the first 4 bytes)
+	/* swap the header(except the first 4 bytes) */
 	SwapBlock((int*)((byte*)header + 4), sizeof(*header) - 4);
 
-	make sure it matches the format we're trying to load 
+	/* make sure it matches the format we're trying to load */
 	if (!force && memcmp(header->ident, g_game->bspIdent, 4)) {
 		Error("%s is not a %s file", filename, g_game->bspIdent);
 	}
@@ -249,7 +237,11 @@ void LoadR2BSPFile(const char* filename)
 		Error("%s is version %d, not %d", filename, header->version, g_game->bspVersion);
 	}
 
-	load/convert lumps 
+	/*
+		Load lumps
+		We only load lumps we can use for conversion to .map
+		I dont plan on supporting bsp merging, shifting, ...
+	*/
 	//CopyLump( (bspHeader_t*) header, LUMP_SHADERS, bspShaders );
 	//CopyLump( (bspHeader_t*) header, LUMP_MODELS, bspModels );
 	//CopyLump( (bspHeader_t*) header, LUMP_PLANES, bspPlanes );
@@ -257,7 +249,9 @@ void LoadR2BSPFile(const char* filename)
 	//CopyLump( (bspHeader_t*) header, LUMP_NODES, bspNodes );
 	//CopyLump( (bspHeader_t*) header, LUMP_LEAFSURFACES, bspLeafSurfaces );
 	//CopyLump( (bspHeader_t*) header, LUMP_LEAFBRUSHES, bspLeafBrushes );
-	//CopyLump( (bspHeader_t*) header, LUMP_BRUSHES, bspBrushes );
+	CopyLump( (rbspHeader_t*) header, LUMP_CM_BRUSHES, bspBrushes );
+
+	//bspBrush_t& b = bspBrushes.emplace_back();
 	//CopyLump<bspBrushSide_t, ibspBrushSide_t>( (bspHeader_t*) header, LUMP_BRUSHSIDES, bspBrushSides );
 	//CopyLump<bspDrawVert_t, ibspDrawVert_t>( (bspHeader_t*) header, LUMP_DRAWVERTS, bspDrawVerts );
 	//CopyLump<bspDrawSurface_t, ibspDrawSurface_t>( (bspHeader_t*) header, LUMP_SURFACES, bspDrawSurfaces );
@@ -267,15 +261,6 @@ void LoadR2BSPFile(const char* filename)
 	//CopyLump( (bspHeader_t*) header, LUMP_LIGHTMAPS, bspLightBytes );
 	//CopyLump( (bspHeader_t*) header, LUMP_ENTITIES, bspEntData );
 	//CopyLump<bspGridPoint_t, ibspGridPoint_t>( (bspHeader_t*) header, LUMP_LIGHTGRID, bspGridPoints );
-
-	advertisements 
-	if (header->version == 47 && strEqual(g_game->arg, "quakelive")) { // quake live's bsp version minus wolf, et, etut
-		//CopyLump( (bspHeader_t*) header, LUMP_ADVERTISEMENTS, bspAds );
-	}
-	else {
-		bspAds.clear();
-	}
-	*/
 }
 
 

@@ -363,15 +363,14 @@ int ConvertBSPMain( Args& args ){
 	{
 		path_set_extension( source, ".bsp" );
 		Sys_Printf( "Loading %s\n", source );
-		LoadBSPFile( source );
+		g_game->load( source );
 		ParseEntities();
 	}
-
+	
 	/* bsp format convert? */
 	if ( convertGame != NULL ) {
 		/* set global game */
-		g_game = convertGame;
-
+		//g_game = convertGame;
 		/* write bsp */
 		path_set_extension( source, "_c.bsp" );
 		Sys_Printf( "Writing %s\n", source );

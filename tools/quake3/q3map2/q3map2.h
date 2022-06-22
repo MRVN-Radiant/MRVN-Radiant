@@ -218,12 +218,14 @@ struct bspLump_t
 };
 
 
-struct bspHeader_t
+struct rbspHeader_t
 {
-	char ident[ 4 ];
-	int version;
+	char ident[4];		/* rBSP */
+	int version;		/* 37 for r2 */
+	int mapVersion;		/* 30 */
+	int maxLump;		/* 127 */
 
-	bspLump_t lumps[ 128 ];     /* theoretical maximum # of bsp lumps */
+	bspLump_t lumps[128];
 };
 
 using bspVertex_t = Vector3;
@@ -348,6 +350,15 @@ struct GameLump_t
 	std::vector<GameLump_Prop> props;
 };
 
+struct bspBrush_t
+{
+	Vector3 origin;
+	uint16_t unk0;
+	uint16_t index;
+	Vector3 extents;
+	uint32_t side_plane;
+};
+
 // Old
 struct bspShader_t
 {
@@ -390,14 +401,6 @@ struct bspBrushSide_t
 	int planeNum;                   /* positive plane side faces out of the leaf */
 	int shaderNum;
 	int surfaceNum;                 /* RBSP */
-};
-
-
-struct bspBrush_t
-{
-	int firstSide;
-	int numSides;
-	int shaderNum;                  /* the shader that determines the content flags */
 };
 
 

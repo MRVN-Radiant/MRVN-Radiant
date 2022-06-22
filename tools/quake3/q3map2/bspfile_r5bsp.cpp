@@ -19,18 +19,7 @@
 
 
 /* constants */
-#define HEADER_LUMPS 128
 
-/* types */
-struct rbspHeader_t
-{
-	char ident[4];		/* rBSP */
-	int version;		/* 37 for r2 */
-	int mapVersion;		/* 30 */
-	int maxLump;		/* 127 */
-
-	bspLump_t lumps[HEADER_LUMPS];
-};
 
 
 /*
