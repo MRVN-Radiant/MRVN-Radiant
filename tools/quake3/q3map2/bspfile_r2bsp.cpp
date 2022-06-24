@@ -324,8 +324,8 @@ void WriteR2BSPFile(const char* filename)
 		/* props */
 		SafeWrite(file, GameLump.props.data(), 64 * GameLump.prop_count);
 	}
-	AddLump(file, header.lumps[LUMP_TEXTURE_DATA_STRING_DATA],			bspTextureDataStringData_stub);
-	AddLump(file, header.lumps[LUMP_TEXTURE_DATA_STRING_TABLE],			bspTextureDataStringTable_stub);
+	AddLump(file, header.lumps[LUMP_TEXTURE_DATA_STRING_DATA],			bspTextureDataData);
+	AddLump(file, header.lumps[LUMP_TEXTURE_DATA_STRING_TABLE],			bspTextureDataTable);
 	AddLump(file, header.lumps[LUMP_WORLD_LIGHTS],						bspWorldLights_stub);
 	AddLump(file, header.lumps[LUMP_TRICOLL_TRIS],						bspTricollTris_stub);
 	AddLump(file, header.lumps[LUMP_TRICOLL_NODES],						bspTricollNodes_stub);

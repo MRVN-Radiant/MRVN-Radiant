@@ -358,7 +358,6 @@ void EmitBrushes( entity_t& e )
    EmitTextureData()
    writes the entitiy partitions
  */
-/*
 void EmitTextureData(const char* texture)
 {
 	std::string tex;
@@ -373,13 +372,13 @@ void EmitTextureData(const char* texture)
 		std::replace(tex.begin(), tex.begin() + index, '_', '\\');
 	}
 
-	 Check if it's already saved 
+	/* Check if it's already saved */
 	std::string table = std::string(bspTextureDataData.begin(), bspTextureDataData.end());
 	index = table.find(tex);
 	if (index != std::string::npos)
 		return;
 
-	 Add to Table 
+	/* Add to Table */
 	StringOutputStream data;
 	data << tex.c_str();
 	std::vector<char> str = { data.begin(), data.end() + 1 };
@@ -387,7 +386,6 @@ void EmitTextureData(const char* texture)
 	bspTextureDataTable.emplace_back(bspTextureDataData.size());
 	bspTextureDataData.insert(bspTextureDataData.end(), str.begin(), str.end());
 }
-*/
 
 
 /*
@@ -487,6 +485,7 @@ void EmitMeshes( const entity_t& e )
 			if (strcmp(side.shaderInfo->shader.c_str(), "textures/common/caulk") == 0)
 				continue;
 
+			EmitTextureData(side.shaderInfo->shader.c_str());
 			
 			tempMesh_t& mesh = tempMeshes.emplace_back();
 			mesh.shader = side.shaderInfo->shader;

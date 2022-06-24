@@ -2183,6 +2183,10 @@ inline std::vector<bspLevelInfo_t> bspLevelInfo;
 
 inline std::vector<uint16_t> bspBrushSidePlanes;
 
+inline std::vector<char> bspTextureDataData;
+
+inline std::vector<uint32_t> bspTextureDataTable;
+
 /* Stubs */
 inline std::vector<char> bspEntities_stub;
 
