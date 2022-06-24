@@ -353,7 +353,7 @@ struct GameLump_t
 struct bspBrush_t
 {
 	Vector3 origin;
-	uint16_t unk0;
+	uint16_t flags;
 	uint16_t index;
 	Vector3 extents;
 	uint32_t side_plane;
@@ -1569,7 +1569,7 @@ int                         EmitShader( const char *shader, const int *contentFl
 
 void                        BeginBSPFile();
 void                        EndBSPFile( bool do_write );
-void                        EmitBrushes( brushlist_t& brushes, int *firstBrush, int *numBrushes );
+void                        EmitBrushes( entity_t& e );
 void						EmitEntityPartitions();
 void                        EmitMeshes( const entity_t& e );
 void						EmitObjReferences();
@@ -2180,6 +2180,8 @@ inline std::vector<bspObjReferenceBounds_t> bspObjReferenceBounds;
 inline std::vector<bspObjReferences_t> bspObjReferences;
 
 inline std::vector<bspLevelInfo_t> bspLevelInfo;
+
+inline std::vector<uint16_t> bspBrushSidePlanes;
 
 /* Stubs */
 inline std::vector<char> bspEntities_stub;

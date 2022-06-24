@@ -242,25 +242,10 @@ void LoadR2BSPFile(const char* filename)
 		We only load lumps we can use for conversion to .map
 		I dont plan on supporting bsp merging, shifting, ...
 	*/
-	//CopyLump( (bspHeader_t*) header, LUMP_SHADERS, bspShaders );
-	//CopyLump( (bspHeader_t*) header, LUMP_MODELS, bspModels );
-	//CopyLump( (bspHeader_t*) header, LUMP_PLANES, bspPlanes );
-	//CopyLump( (bspHeader_t*) header, LUMP_LEAFS, bspLeafs );
-	//CopyLump( (bspHeader_t*) header, LUMP_NODES, bspNodes );
-	//CopyLump( (bspHeader_t*) header, LUMP_LEAFSURFACES, bspLeafSurfaces );
-	//CopyLump( (bspHeader_t*) header, LUMP_LEAFBRUSHES, bspLeafBrushes );
+	CopyLump( (rbspHeader_t*) header, LUMP_PLANES, bspPlanes );
 	CopyLump( (rbspHeader_t*) header, LUMP_CM_BRUSHES, bspBrushes );
+	CopyLump( (rbspHeader_t*) header, LUMP_CM_BRUSH_SIDE_PLANE_OFFSETS, bspBrushSidePlanes);
 
-	//bspBrush_t& b = bspBrushes.emplace_back();
-	//CopyLump<bspBrushSide_t, ibspBrushSide_t>( (bspHeader_t*) header, LUMP_BRUSHSIDES, bspBrushSides );
-	//CopyLump<bspDrawVert_t, ibspDrawVert_t>( (bspHeader_t*) header, LUMP_DRAWVERTS, bspDrawVerts );
-	//CopyLump<bspDrawSurface_t, ibspDrawSurface_t>( (bspHeader_t*) header, LUMP_SURFACES, bspDrawSurfaces );
-	//CopyLump( (bspHeader_t*) header, LUMP_FOGS, bspFogs );
-	//CopyLump( (bspHeader_t*) header, LUMP_DRAWINDEXES, bspDrawIndexes );
-	//CopyLump( (bspHeader_t*) header, LUMP_VISIBILITY, bspVisBytes );
-	//CopyLump( (bspHeader_t*) header, LUMP_LIGHTMAPS, bspLightBytes );
-	//CopyLump( (bspHeader_t*) header, LUMP_ENTITIES, bspEntData );
-	//CopyLump<bspGridPoint_t, ibspGridPoint_t>( (bspHeader_t*) header, LUMP_LIGHTGRID, bspGridPoints );
 }
 
 
@@ -417,6 +402,7 @@ void CompileR2BSPFile()
 			/* generate bsp meshes from map brushes */
 			EmitMeshes(entity);
 
+			EmitBrushes(entity);
 
 			/* Generate Model lump */
 			EmitModels();

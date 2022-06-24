@@ -342,56 +342,16 @@ void EndBSPFile( bool do_write ){
    writes the brush list to the bsp
  */
 
-void EmitBrushes( brushlist_t& brushes, int *firstBrush, int *numBrushes )
+void EmitBrushes( entity_t& e )
 {
-	/*
-	// set initial brush 
-	if ( firstBrush != NULL ) {
-		*firstBrush = bspBrushes.size();
-	}
-	if ( numBrushes != NULL ) {
-		*numBrushes = 0;
-	}
-
-	// walk list of brushes 
-	for ( brush_t& b : brushes )
+	for ( const brush_t &brush : e.brushes )
 	{
-		// get bsp brush 
-		b.outputNum = bspBrushes.size();
-		bspBrush_t& db = bspBrushes.emplace_back();
-		if ( numBrushes != NULL ) {
-			( *numBrushes )++;
-		}
-
-		db.shaderNum = EmitShader( b.contentShader->shader, &b.contentShader->contentFlags, &b.contentShader->surfaceFlags );
-		db.firstSide = bspBrushSides.size();
-
-		// walk sides 
-		db.numSides = 0;
-		for ( side_t& side : b.sides )
+		for ( const side_t &side : brush.sides )
 		{
-			// set output number to bogus initially 
-			side.outputNum = -1;
-
-			// emit side 
-			side.outputNum = bspBrushSides.size();
-			bspBrushSide_t& cp = bspBrushSides.emplace_back();
-			db.numSides++;
-			cp.planeNum = side.planenum;
-
-			// emit shader 
-			if ( side.shaderInfo ) {
-				cp.shaderNum = EmitShader( side.shaderInfo->shader, &side.shaderInfo->contentFlags, &side.shaderInfo->surfaceFlags );
-			}
-			else if( side.bevel ) { // emit surfaceFlags for bevels to get correct physics at walkable brush edges and vertices 
-				cp.shaderNum = EmitShader( NULL, NULL, &side.surfaceFlags );
-			}
-			else{
-				cp.shaderNum = EmitShader( NULL, NULL, NULL );
-			}
+			Plane3f &plane = bspPlanes.emplace_back();
+			plane = (Plane3f)side.plane;
 		}
 	}
-	*/
 }
 
 /*

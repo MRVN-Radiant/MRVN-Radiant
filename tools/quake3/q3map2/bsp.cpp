@@ -458,7 +458,7 @@ static void ProcessSubModel( entity_t& e ){
 	AddEntitySurfaceModels( e );
 
 	/* generate bsp brushes from map brushes */
-	EmitBrushes( e.brushes, &e.firstBrush, &e.numBrushes );
+	//EmitBrushes( e.brushes, &e.firstBrush, &e.numBrushes );
 
 	/* generate bsp meshes from map brushes */
 	EmitMeshes(e);
