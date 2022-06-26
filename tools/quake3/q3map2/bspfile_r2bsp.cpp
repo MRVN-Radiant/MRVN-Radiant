@@ -334,7 +334,7 @@ void WriteR2BSPFile(const char* filename)
 	AddLump(file, header.lumps[LUMP_MESH_INDICES],						bspMeshIndices);
 	AddLump(file, header.lumps[LUMP_MESHES],							bspMeshes);
 	AddLump(file, header.lumps[LUMP_MESH_BOUNDS],						bspMeshBounds);
-	AddLump(file, header.lumps[LUMP_MATERIAL_SORT],						bspMaterialSort_stub);
+	AddLump(file, header.lumps[LUMP_MATERIAL_SORT],						bspMaterialSorts);
 	AddLump(file, header.lumps[LUMP_LIGHTMAP_HEADERS],					bspLightMapHeaders_stub);
 	AddLump(file, header.lumps[LUMP_CM_GRID],							bspCMGrid_stub);
 	AddLump(file, header.lumps[LUMP_CM_GRID_CELLS],						bspCMGridCells_stub);

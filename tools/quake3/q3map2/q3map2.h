@@ -359,6 +359,15 @@ struct bspBrush_t
 	uint32_t side_plane;
 };
 
+struct bspMaterialSort_t
+{
+	uint16_t texture_data;
+	uint16_t lightmap_header;
+	uint16_t cubemap;
+	uint16_t unk;
+	uint32_t vertex_offset;
+};
+
 // Old
 struct bspShader_t
 {
@@ -2156,8 +2165,13 @@ inline Vector3 gridSize = { 64, 64, 128 };
 
    ------------------------------------------------------------------------------- */
 
+/* helper */
 inline std::size_t numBSPEntities;
 inline std::vector<entity_t> entities;
+
+inline std::vector<std::string> savedTextures;
+
+/* bsp vectors, these are saved to disk */
 
 inline std::vector<bspVertex_t> bspVertices;
 
@@ -2186,6 +2200,8 @@ inline std::vector<uint16_t> bspBrushSidePlanes;
 inline std::vector<char> bspTextureDataData;
 
 inline std::vector<uint32_t> bspTextureDataTable;
+
+inline std::vector<bspMaterialSort_t> bspMaterialSorts;
 
 /* Stubs */
 inline std::vector<char> bspEntities_stub;

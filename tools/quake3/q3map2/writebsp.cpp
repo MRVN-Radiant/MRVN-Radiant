@@ -363,6 +363,9 @@ void EmitTextureData(const char* texture)
 	std::string tex;
 	std::size_t index;
 	tex = texture;
+
+	savedTextures.push_back( tex );
+
 	tex.erase(tex.begin(), tex.begin() + 9);
 	std::replace(tex.begin(), tex.end(), '/', '\\');
 
@@ -387,6 +390,42 @@ void EmitTextureData(const char* texture)
 	bspTextureDataData.insert(bspTextureDataData.end(), str.begin(), str.end());
 }
 
+/*
+   EmitMaterialSort()
+   Tries to create a material sort of the last texture
+ */
+uint16_t EmitMaterialSort( const char* texture )
+{
+	std::string tex = texture;
+
+	std::string textureData = { bspTextureDataData.begin(), bspTextureDataData.end() };
+
+	/* Find the texture path in the textureData lump */
+	uint16_t index = 0;
+	for ( std::string &path : savedTextures )
+	{
+		if ( path == tex )
+			break;
+
+		index++;
+	}
+	
+	/* Check if the material sort we need already exists */
+	std::size_t pos = 0;
+	for ( bspMaterialSort_t &ms : bspMaterialSorts )
+	{
+		if ( ms.texture_data == index )
+			return pos;
+
+		pos++;
+	}
+	
+	
+	bspMaterialSort_t &ms = bspMaterialSorts.emplace_back();
+	ms.texture_data = index;
+
+	return bspMaterialSorts.size() - 1;
+}
 
 /*
    EmitEntityPartitions()
@@ -485,7 +524,6 @@ void EmitMeshes( const entity_t& e )
 			if (strcmp(side.shaderInfo->shader.c_str(), "textures/common/caulk") == 0)
 				continue;
 
-			EmitTextureData(side.shaderInfo->shader.c_str());
 			
 			tempMesh_t& mesh = tempMeshes.emplace_back();
 			mesh.shader = side.shaderInfo->shader;
@@ -701,6 +739,12 @@ void EmitMeshes( const entity_t& e )
 		mesh.vertex_count = tempMesh.Vertices.size();
 		mesh.tri_offset = bspMeshIndices.size();
 		mesh.tri_count = tempMesh.Triangles.size() / 3;
+
+
+		/* Emit textrue related structs */
+		EmitTextureData( tempMesh.shader.c_str() );
+
+		mesh.material_offset = EmitMaterialSort( tempMesh.shader );
 
 		MinMax aabb;
 
