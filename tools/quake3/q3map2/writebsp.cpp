@@ -358,11 +358,11 @@ void EmitBrushes( entity_t& e )
    EmitTextureData()
    writes the entitiy partitions
  */
-void EmitTextureData(const char* texture)
+void EmitTextureData( shaderInfo_t shader )
 {
 	std::string tex;
 	std::size_t index;
-	tex = texture;
+	tex = shader.shader.c_str();
 
 	savedTextures.push_back( tex );
 
@@ -388,6 +388,14 @@ void EmitTextureData(const char* texture)
 
 	bspTextureDataTable.emplace_back(bspTextureDataData.size());
 	bspTextureDataData.insert(bspTextureDataData.end(), str.begin(), str.end());
+
+	bspTextureData_t &td = bspTextureData.emplace_back();
+	td.name_index = bspTextureDataTable.size() - 1;
+	td.size_x = shader.shaderImage->width;
+	td.size_y = shader.shaderImage->height;
+	td.visible_x = shader.shaderImage->width;
+	td.visible_y = shader.shaderImage->height;
+	td.flags = 512; // idk
 }
 
 /*
@@ -409,7 +417,7 @@ uint16_t EmitMaterialSort( const char* texture )
 
 		index++;
 	}
-	
+
 	/* Check if the material sort we need already exists */
 	std::size_t pos = 0;
 	for ( bspMaterialSort_t &ms : bspMaterialSorts )
@@ -451,7 +459,7 @@ bool VertexLarger( Vector3 a, Vector3 b )
 struct tempMesh_t
 {
 	MinMax minmax;
-	String64 shader;
+	shaderInfo_t* shaderInfo;
 	/* Parallel */
 	std::vector<Vector3> Vertices;
 	std::vector<Vector3> Normals;
@@ -526,7 +534,7 @@ void EmitMeshes( const entity_t& e )
 
 			
 			tempMesh_t& mesh = tempMeshes.emplace_back();
-			mesh.shader = side.shaderInfo->shader;
+			mesh.shaderInfo = side.shaderInfo;
 			/* loop through vertices */
 			for (const Vector3& vertex : side.winding)
 			{
@@ -605,7 +613,7 @@ void EmitMeshes( const entity_t& e )
 	while (patch != NULL)
 	{
 		tempMesh_t& mesh = tempMeshes.emplace_back();
-		mesh.shader = patch->shaderInfo->shader;
+		mesh.shaderInfo = patch->shaderInfo;
 
 		/* these are the in-editor editable verts, not the mesh you see in-editor ? */
 		for (std::size_t i = 0; i < sizeof(patch->mesh.verts); i ++)
@@ -672,7 +680,7 @@ void EmitMeshes( const entity_t& e )
 			tempMesh_t &mesh2 = tempMeshes.at(i);
 
 			/* check if they have the same shader */
-			if ( strcmp( mesh1.shader.c_str(), mesh2.shader.c_str() ) != 0 )
+			if ( strcmp( mesh1.shaderInfo->shader.c_str(), mesh2.shaderInfo->shader.c_str() ) != 0 )
 				continue;
 
 			/* Check if they're intersecting */
@@ -742,9 +750,9 @@ void EmitMeshes( const entity_t& e )
 
 
 		/* Emit textrue related structs */
-		EmitTextureData( tempMesh.shader.c_str() );
+		EmitTextureData( *tempMesh.shaderInfo );
 
-		mesh.material_offset = EmitMaterialSort( tempMesh.shader );
+		mesh.material_offset = EmitMaterialSort( tempMesh.shaderInfo->shader.c_str() );
 
 		MinMax aabb;
 
@@ -971,27 +979,6 @@ void EmitStubs()
 			0x10, 0x06, 0x00, 0x00
 		};
 		bspTextureData_stub = { data.begin(), data.end() };
-	}
-	/* Texture Data String Data */
-	{
-		constexpr std::array<uint8_t, 103> data = {
-			0x54, 0x4F, 0x4F, 0x4C, 0x53, 0x5C, 0x54, 0x4F, 0x4F, 0x4C, 0x53, 0x53, 0x4B, 0x59, 0x42, 0x4F,
-			0x58, 0x00, 0x57, 0x4F, 0x52, 0x4C, 0x44, 0x5C, 0x44, 0x45, 0x56, 0x5C, 0x44, 0x45, 0x56, 0x5F,
-			0x47, 0x52, 0x41, 0x59, 0x5F, 0x35, 0x31, 0x32, 0x00, 0x54, 0x4F, 0x4F, 0x4C, 0x53, 0x5C, 0x54,
-			0x4F, 0x4F, 0x4C, 0x53, 0x4E, 0x4F, 0x44, 0x52, 0x41, 0x57, 0x00, 0x54, 0x4F, 0x4F, 0x4C, 0x53,
-			0x5C, 0x54, 0x4F, 0x4F, 0x4C, 0x53, 0x43, 0x4C, 0x49, 0x50, 0x00, 0x54, 0x4F, 0x4F, 0x4C, 0x53,
-			0x5C, 0x54, 0x4F, 0x4F, 0x4C, 0x53, 0x4C, 0x49, 0x47, 0x48, 0x54, 0x50, 0x52, 0x4F, 0x42, 0x45,
-			0x56, 0x4F, 0x4C, 0x55, 0x4D, 0x45, 0x00
-		};
-		bspTextureDataStringData_stub = { data.begin(), data.end() };
-	}
-	/* Texture Data String Table */
-	{
-		constexpr std::array<uint8_t, 20> data = {
-			0x00, 0x00, 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x3B, 0x00, 0x00, 0x00,
-			0x4B, 0x00, 0x00, 0x00
-		};
-		bspTextureDataStringTable_stub = { data.begin(), data.end() };
 	}
 	/* World Lights */
 	{
@@ -1233,15 +1220,6 @@ void EmitStubs()
 			0x00, 0x00, 0x00, 0x00
 		};
 		bspTricollHeaders_stub = { data.begin(), data.end() };
-	}
-	/* Material Sort */
-	{
-		constexpr std::array<uint8_t, 36> data = {
-			0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0xFF, 0xFF,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x17, 0x00,
-			0x00, 0x00, 0x00, 0x00
-		};
-		bspMaterialSort_stub = { data.begin(), data.end() };
 	}
 	/* LightMap Headers */
 	{

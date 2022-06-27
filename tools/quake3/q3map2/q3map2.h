@@ -368,6 +368,17 @@ struct bspMaterialSort_t
 	uint32_t vertex_offset;
 };
 
+struct bspTextureData_t
+{
+	Vector3 reflectivity;
+	uint32_t name_index;
+	uint32_t size_x;
+	uint32_t size_y;
+	uint32_t visible_x;
+	uint32_t visible_y;
+	uint32_t flags;
+};
+
 // Old
 struct bspShader_t
 {
@@ -2173,6 +2184,8 @@ inline std::vector<std::string> savedTextures;
 
 /* bsp vectors, these are saved to disk */
 
+inline std::vector<bspTextureData_t> bspTextureData;
+
 inline std::vector<bspVertex_t> bspVertices;
 
 inline std::vector<bspVertexNormal_t> bspVertexNormals;
@@ -2210,10 +2223,6 @@ inline std::vector<uint8_t> bspPlanes_stub;
 
 inline std::vector<uint8_t> bspTextureData_stub;
 
-inline std::vector<uint8_t> bspTextureDataStringData_stub;
-
-inline std::vector<uint8_t> bspTextureDataStringTable_stub;
-
 inline std::vector<uint8_t> bspWorldLights_stub;
 
 inline std::vector<uint8_t> bspTricollTris_stub;
@@ -2221,8 +2230,6 @@ inline std::vector<uint8_t> bspTricollTris_stub;
 inline std::vector<uint8_t> bspTricollNodes_stub;
 
 inline std::vector<uint8_t> bspTricollHeaders_stub;
-
-inline std::vector<uint8_t> bspMaterialSort_stub;
 
 inline std::vector<uint8_t> bspLightMapHeaders_stub;
 

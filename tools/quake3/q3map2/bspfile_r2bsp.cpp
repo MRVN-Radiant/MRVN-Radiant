@@ -300,7 +300,7 @@ void WriteR2BSPFile(const char* filename)
 	/* Write lumps */
 	AddLump(file, header.lumps[LUMP_ENTITIES],							bspEntities_stub);
 	AddLump(file, header.lumps[LUMP_PLANES],							bspPlanes_stub);
-	AddLump(file, header.lumps[LUMP_TEXTURE_DATA],						bspTextureData_stub);
+	AddLump(file, header.lumps[LUMP_TEXTURE_DATA],						bspTextureData);
 	AddLump(file, header.lumps[LUMP_VERTICES],							bspVertices);
 	AddLump(file, header.lumps[LUMP_MODELS],							bspModels_new);
 	AddLump(file, header.lumps[LUMP_VERTEX_NORMALS],					bspVertexNormals);
