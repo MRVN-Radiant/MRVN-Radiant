@@ -32,7 +32,8 @@
 - [ ] some sortof r2recast support ( at least a good .obj exporter )
 
 ### Nice to haves ( low priority )
-- [ ] 
+- [ ] vpk tool that takes a `.map` as an input and only packs used assets ? ( call it revpk :trollface: )
+- [ ] repak or a bootleg version of repak for minimaps and loadscreens, maybe materials, same as above and other tools regarding input
 
 ## Old stuff I havent sorted yet
 
