@@ -432,29 +432,7 @@ binaries-radiant-core: \
 
 .PHONY: binaries-tools
 binaries-tools: \
-	binaries-tools-quake2 \
 	binaries-tools-quake3 \
-
-.PHONY: binaries-tools-quake2
-binaries-tools-quake2: \
-	binaries-q2map \
-	binaries-qdata3 \
-	binaries-h2data \
-
-.PHONY: binaries-q2map
-binaries-q2map: \
-	$(INSTALLDIR)/q2map.$(EXE) \
-	$(INSTALLDIR)/q2map \
-
-.PHONY: binaries-qdata3
-binaries-qdata3: \
-	$(INSTALLDIR)/qdata3.$(EXE) \
-	$(INSTALLDIR)/qdata3 \
-
-.PHONY: binaries-h2data
-binaries-h2data: \
-	$(INSTALLDIR)/h2data.$(EXE) \
-	$(INSTALLDIR)/h2data \
 
 .PHONY: binaries-tools-quake3
 binaries-tools-quake3: \
@@ -1141,67 +1119,6 @@ $(INSTALLDIR)/plugins/sunplug.$(DLL): CPPFLAGS_EXTRA := $(CPPFLAGS_GLIB) $(CPPFL
 $(INSTALLDIR)/plugins/sunplug.$(DLL): \
 	contrib/sunplug/sunplug.o \
 
-$(INSTALLDIR)/qdata3.$(EXE): LIBS_EXTRA := $(LIBS_XML)
-$(INSTALLDIR)/qdata3.$(EXE): CPPFLAGS_EXTRA := $(CPPFLAGS_XML) -Itools/quake2/common -Ilibs -Iinclude
-$(INSTALLDIR)/qdata3.$(EXE): \
-	tools/quake2/common/bspfile.o \
-	tools/quake2/common/cmdlib.o \
-	tools/quake2/common/inout.o \
-	tools/quake2/common/l3dslib.o \
-	tools/quake2/common/lbmlib.o \
-	tools/quake2/common/mathlib.o \
-	tools/quake2/common/md4.o \
-	tools/quake2/common/path_init.o \
-	tools/quake2/common/polylib.o \
-	tools/quake2/common/scriplib.o \
-	tools/quake2/common/threads.o \
-	tools/quake2/common/trilib.o \
-	tools/quake2/qdata/images.o \
-	tools/quake2/qdata/models.o \
-	tools/quake2/qdata/qdata.o \
-	tools/quake2/qdata/sprites.o \
-	tools/quake2/qdata/tables.o \
-	tools/quake2/qdata/video.o \
-	libl_net.$(A) \
-	$(if $(findstring Win32,$(OS)),icons/qdata3.o,) \
-
-$(INSTALLDIR)/q2map.$(EXE): LIBS_EXTRA := $(LIBS_XML)
-$(INSTALLDIR)/q2map.$(EXE): CPPFLAGS_EXTRA := $(CPPFLAGS_XML) -Itools/quake2/common -Ilibs -Iinclude
-$(INSTALLDIR)/q2map.$(EXE): \
-	tools/quake2/common/bspfile.o \
-	tools/quake2/common/cmdlib.o \
-	tools/quake2/common/inout.o \
-	tools/quake2/common/l3dslib.o \
-	tools/quake2/common/lbmlib.o \
-	tools/quake2/common/mathlib.o \
-	tools/quake2/common/md4.o \
-	tools/quake2/common/path_init.o \
-	tools/quake2/common/polylib.o \
-	tools/quake2/common/scriplib.o \
-	tools/quake2/common/threads.o \
-	tools/quake2/common/trilib.o \
-	tools/quake2/q2map/brushbsp.o \
-	tools/quake2/q2map/csg.o \
-	tools/quake2/q2map/faces.o \
-	tools/quake2/q2map/flow.o \
-	tools/quake2/q2map/glfile.o \
-	tools/quake2/q2map/leakfile.o \
-	tools/quake2/q2map/lightmap.o \
-	tools/quake2/q2map/main.o \
-	tools/quake2/q2map/map.o \
-	tools/quake2/q2map/nodraw.o \
-	tools/quake2/q2map/patches.o \
-	tools/quake2/q2map/portals.o \
-	tools/quake2/q2map/prtfile.o \
-	tools/quake2/q2map/qbsp.o \
-	tools/quake2/q2map/qrad.o \
-	tools/quake2/q2map/qvis.o \
-	tools/quake2/q2map/textures.o \
-	tools/quake2/q2map/trace.o \
-	tools/quake2/q2map/tree.o \
-	tools/quake2/q2map/writebsp.o \
-	libl_net.$(A) \
-	$(if $(findstring Win32,$(OS)),icons/q2map.o,) \
 
 $(INSTALLDIR)/plugins/ufoaiplug.$(DLL): LIBS_EXTRA := $(LIBS_GLIB) $(LIBS_GTK)
 $(INSTALLDIR)/plugins/ufoaiplug.$(DLL): CPPFLAGS_EXTRA := $(CPPFLAGS_GLIB) $(CPPFLAGS_GTK) -Ilibs -Iinclude
@@ -1235,41 +1152,7 @@ $(INSTALLDIR)/plugins/bkgrnd2d.$(DLL): \
 	contrib/bkgrnd2d/dialog.o \
 	contrib/bkgrnd2d/plugin.o \
 
-$(INSTALLDIR)/h2data.$(EXE): LIBS_EXTRA := $(LIBS_XML)
-$(INSTALLDIR)/h2data.$(EXE): CPPFLAGS_EXTRA := $(CPPFLAGS_XML) -Itools/quake2/qdata_heretic2/common -Itools/quake2/qdata_heretic2/qcommon -Itools/quake2/qdata_heretic2 -Itools/quake2/common -Ilibs -Iinclude
-$(INSTALLDIR)/h2data.$(EXE): \
-	tools/quake2/qdata_heretic2/common/bspfile.o \
-	tools/quake2/qdata_heretic2/common/cmdlib.o \
-	tools/quake2/qdata_heretic2/common/inout.o \
-	tools/quake2/qdata_heretic2/common/l3dslib.o \
-	tools/quake2/qdata_heretic2/common/lbmlib.o \
-	tools/quake2/qdata_heretic2/common/mathlib.o \
-	tools/quake2/qdata_heretic2/common/md4.o \
-	tools/quake2/qdata_heretic2/common/path_init.o \
-	tools/quake2/qdata_heretic2/common/qfiles.o \
-	tools/quake2/qdata_heretic2/common/scriplib.o \
-	tools/quake2/qdata_heretic2/common/threads.o \
-	tools/quake2/qdata_heretic2/common/token.o \
-	tools/quake2/qdata_heretic2/common/trilib.o \
-	tools/quake2/qdata_heretic2/qcommon/reference.o \
-	tools/quake2/qdata_heretic2/qcommon/resourcemanager.o \
-	tools/quake2/qdata_heretic2/qcommon/skeletons.o \
-	tools/quake2/qdata_heretic2/animcomp.o \
-	tools/quake2/qdata_heretic2/book.o \
-	tools/quake2/qdata_heretic2/fmodels.o \
-	tools/quake2/qdata_heretic2/images.o \
-	tools/quake2/qdata_heretic2/jointed.o \
-	tools/quake2/qdata_heretic2/models.o \
-	tools/quake2/qdata_heretic2/pics.o \
-	tools/quake2/qdata_heretic2/qdata.o \
-	tools/quake2/qdata_heretic2/qd_skeletons.o \
-	tools/quake2/qdata_heretic2/sprites.o \
-	tools/quake2/qdata_heretic2/svdcmp.o \
-	tools/quake2/qdata_heretic2/tables.o \
-	tools/quake2/qdata_heretic2/tmix.o \
-	tools/quake2/qdata_heretic2/video.o \
-	libl_net.$(A) \
-	$(if $(findstring Win32,$(OS)),icons/h2data.o,) \
+
 
 .PHONY: install-data
 install-data: binaries
