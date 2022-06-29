@@ -245,7 +245,7 @@ void LoadR2BSPFile(const char* filename)
 	*/
 	CopyLump( (rbspHeader_t*) header, R2_LUMP_PLANES, bspPlanes );
 	CopyLump( (rbspHeader_t*) header, R2_LUMP_CM_BRUSHES, bspBrushes );
-	CopyLump( (rbspHeader_t*) header, R2_LUMP_CM_BRUSH_SIDE_PLANE_OFFSETS, bspBrushSidePlanes);
+	CopyLump( (rbspHeader_t*) header, R2_LUMP_CM_BRUSH_SIDE_PLANES, bspBrushSidePlanes);
 
 }
 
