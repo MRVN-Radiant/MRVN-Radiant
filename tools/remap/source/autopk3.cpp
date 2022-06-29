@@ -27,7 +27,7 @@
    ------------------------------------------------------------------------------- */
 
 
-#include "q3map2.h"
+#include "remap.h"
 #include "autopk3.h"
 #include "shaders.h"
 #include <map>

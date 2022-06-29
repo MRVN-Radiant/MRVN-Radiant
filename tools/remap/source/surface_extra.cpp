@@ -29,7 +29,7 @@
 
 
 /* dependencies */
-#include "q3map2.h"
+#include "remap.h"
 #include "surface_extra.h"
 
 

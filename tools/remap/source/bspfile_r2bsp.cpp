@@ -13,7 +13,7 @@
 
 
 /* dependencies */
-#include "q3map2.h"
+#include "remap.h"
 #include "bspfile_abstract.h"
 #include <ctime>
 

@@ -29,7 +29,7 @@
 
 
 /* dependencies */
-#include "q3map2.h"
+#include "remap.h"
 
 
 #define MAX_NODE_ITEMS          5

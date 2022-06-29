@@ -29,7 +29,7 @@
 
 
 /* dependencies */
-#include "q3map2.h"
+#include "remap.h"
 #include "bspfile_rbsp.h"
 #include "surface_extra.h"
 #include "timer.h"

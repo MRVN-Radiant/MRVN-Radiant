@@ -29,7 +29,7 @@
 
 
 /* dependencies */
-#include "q3map2.h"
+#include "remap.h"
 #define RAPIDJSON_WRITE_DEFAULT_FLAGS kWriteNanAndInfFlag
 #define RAPIDJSON_PARSE_DEFAULT_FLAGS ( kParseCommentsFlag | kParseTrailingCommasFlag | kParseNanAndInfFlag )
 #include "rapidjson/document.h"
