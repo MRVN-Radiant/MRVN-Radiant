@@ -432,16 +432,16 @@ binaries-radiant-core: \
 
 .PHONY: binaries-tools
 binaries-tools: \
-	binaries-tools-quake3 \
+	binaries-tools-remap \
 
-.PHONY: binaries-tools-quake3
-binaries-tools-quake3: \
-	binaries-q3map2 \
+.PHONY: binaries-tools-remap
+binaries-tools-remap: \
+	binaries-remap \
 
-.PHONY: binaries-q3map2
-binaries-q3map2: \
-	$(INSTALLDIR)/q3map2.$(EXE) \
-	$(INSTALLDIR)/q3map2 \
+.PHONY: binaries-remap
+binaries-remap: \
+	$(INSTALLDIR)/remap.$(EXE) \
+	$(INSTALLDIR)/remap \
 
 
 
@@ -484,77 +484,77 @@ endif
 
 ifeq ($(OS),Win32)
 ifeq ($(shell ARCH),i686)
-$(INSTALLDIR)/q3map2.$(EXE): LDFLAGS_EXTRA := -Wl,--large-address-aware,--stack,4194304
+$(INSTALLDIR)/remap.$(EXE): LDFLAGS_EXTRA := -Wl,--large-address-aware,--stack,4194304
 else
-$(INSTALLDIR)/q3map2.$(EXE): LDFLAGS_EXTRA := -Wl,--stack,4194304
+$(INSTALLDIR)/remap.$(EXE): LDFLAGS_EXTRA := -Wl,--stack,4194304
 endif
 endif
 ifneq ($(OS),Win32)
-$(INSTALLDIR)/q3map2.$(EXE): LDFLAGS_EXTRA += -Wl,-rpath '-Wl,$$ORIGIN'
+$(INSTALLDIR)/remap.$(EXE): LDFLAGS_EXTRA += -Wl,-rpath '-Wl,$$ORIGIN'
 endif
-$(INSTALLDIR)/q3map2.$(EXE): LIBS_EXTRA := $(LIBS_XML) $(LIBS_GLIB) $(LIBS_PNG) $(LIBS_JPEG) $(LIBS_ZLIB) -lassimp_ -L$(INSTALLDIR)
-$(INSTALLDIR)/q3map2.$(EXE): CPPFLAGS_EXTRA := $(CPPFLAGS_XML) $(CPPFLAGS_GLIB) $(CPPFLAGS_PNG) $(CPPFLAGS_JPEG) -Itools/quake3/common -Ilibs -Iinclude -Ilibs/assimp/include
-$(INSTALLDIR)/q3map2.$(EXE): \
-	tools/quake3/common/cmdlib.o \
-	tools/quake3/common/qimagelib.o \
-	tools/quake3/common/inout.o \
-	tools/quake3/common/jpeg.o \
-	tools/quake3/common/md4.o \
-	tools/quake3/common/mutex.o \
-	tools/quake3/common/polylib.o \
-	tools/quake3/common/scriplib.o \
-	tools/quake3/common/threads.o \
-	tools/quake3/common/unzip.o \
-	tools/quake3/common/vfs.o \
-	tools/quake3/common/miniz.o \
-	tools/quake3/q3map2/autopk3.o \
-	tools/quake3/q3map2/brush.o \
-	tools/quake3/q3map2/bspfile_abstract.o \
-	tools/quake3/q3map2/bspfile_r1bsp.o \
-	tools/quake3/q3map2/bspfile_r2bsp.o \
-	tools/quake3/q3map2/bspfile_r5bsp.o \
-	tools/quake3/q3map2/bsp.o \
-	tools/quake3/q3map2/convert_bsp.o \
-	tools/quake3/q3map2/convert_json.o \
-	tools/quake3/q3map2/convert_map.o \
-	tools/quake3/q3map2/convert_obj.o \
-	tools/quake3/q3map2/decals.o \
-	tools/quake3/q3map2/exportents.o \
-	tools/quake3/q3map2/facebsp.o \
-	tools/quake3/q3map2/fog.o \
-	tools/quake3/q3map2/games.o \
-	tools/quake3/q3map2/help.o \
-	tools/quake3/q3map2/image.o \
-	tools/quake3/q3map2/leakfile.o \
-	tools/quake3/q3map2/light_bounce.o \
-	tools/quake3/q3map2/lightmaps_ydnar.o \
-	tools/quake3/q3map2/light.o \
-	tools/quake3/q3map2/light_trace.o \
-	tools/quake3/q3map2/light_ydnar.o \
-	tools/quake3/q3map2/main.o \
-	tools/quake3/q3map2/map.o \
-	tools/quake3/q3map2/mesh.o \
-	tools/quake3/q3map2/model.o \
-	tools/quake3/q3map2/patch.o \
-	tools/quake3/q3map2/path_init.o \
-	tools/quake3/q3map2/portals.o \
-	tools/quake3/q3map2/prtfile.o \
-	tools/quake3/q3map2/shaders.o \
-	tools/quake3/q3map2/surface_extra.o \
-	tools/quake3/q3map2/surface_foliage.o \
-	tools/quake3/q3map2/surface_fur.o \
-	tools/quake3/q3map2/surface_meta.o \
-	tools/quake3/q3map2/surface.o \
-	tools/quake3/q3map2/tjunction.o \
-	tools/quake3/q3map2/tree.o \
-	tools/quake3/q3map2/visflow.o \
-	tools/quake3/q3map2/vis.o \
-	tools/quake3/q3map2/writebsp.o \
+$(INSTALLDIR)/remap.$(EXE): LIBS_EXTRA := $(LIBS_XML) $(LIBS_GLIB) $(LIBS_PNG) $(LIBS_JPEG) $(LIBS_ZLIB) -lassimp_ -L$(INSTALLDIR)
+$(INSTALLDIR)/remap.$(EXE): CPPFLAGS_EXTRA := $(CPPFLAGS_XML) $(CPPFLAGS_GLIB) $(CPPFLAGS_PNG) $(CPPFLAGS_JPEG) -Itools/remap/common -Ilibs -Iinclude -Ilibs/assimp/include
+$(INSTALLDIR)/remap.$(EXE): \
+	tools/remap/common/cmdlib.o \
+	tools/remap/common/qimagelib.o \
+	tools/remap/common/inout.o \
+	tools/remap/common/jpeg.o \
+	tools/remap/common/md4.o \
+	tools/remap/common/mutex.o \
+	tools/remap/common/polylib.o \
+	tools/remap/common/scriplib.o \
+	tools/remap/common/threads.o \
+	tools/remap/common/unzip.o \
+	tools/remap/common/vfs.o \
+	tools/remap/common/miniz.o \
+	tools/remap/source/autopk3.o \
+	tools/remap/source/brush.o \
+	tools/remap/source/bspfile_abstract.o \
+	tools/remap/source/bspfile_r1bsp.o \
+	tools/remap/source/bspfile_r2bsp.o \
+	tools/remap/source/bspfile_r5bsp.o \
+	tools/remap/source/bsp.o \
+	tools/remap/source/convert_bsp.o \
+	tools/remap/source/convert_json.o \
+	tools/remap/source/convert_map.o \
+	tools/remap/source/convert_obj.o \
+	tools/remap/source/decals.o \
+	tools/remap/source/exportents.o \
+	tools/remap/source/facebsp.o \
+	tools/remap/source/fog.o \
+	tools/remap/source/games.o \
+	tools/remap/source/help.o \
+	tools/remap/source/image.o \
+	tools/remap/source/leakfile.o \
+	tools/remap/source/light_bounce.o \
+	tools/remap/source/lightmaps_ydnar.o \
+	tools/remap/source/light.o \
+	tools/remap/source/light_trace.o \
+	tools/remap/source/light_ydnar.o \
+	tools/remap/source/main.o \
+	tools/remap/source/map.o \
+	tools/remap/source/mesh.o \
+	tools/remap/source/model.o \
+	tools/remap/source/patch.o \
+	tools/remap/source/path_init.o \
+	tools/remap/source/portals.o \
+	tools/remap/source/prtfile.o \
+	tools/remap/source/shaders.o \
+	tools/remap/source/surface_extra.o \
+	tools/remap/source/surface_foliage.o \
+	tools/remap/source/surface_fur.o \
+	tools/remap/source/surface_meta.o \
+	tools/remap/source/surface.o \
+	tools/remap/source/tjunction.o \
+	tools/remap/source/tree.o \
+	tools/remap/source/visflow.o \
+	tools/remap/source/vis.o \
+	tools/remap/source/writebsp.o \
 	libddslib.$(A) \
 	libetclib.$(A) \
 	libfilematch.$(A) \
 	libl_net.$(A) \
-	$(if $(findstring Win32,$(OS)),icons/q3map2.o,) \
+	$(if $(findstring Win32,$(OS)),icons/remap.o,) \
 	| $(INSTALLDIR)/libassimp_.$(DLL) \
 
 libmathlib.$(A): CPPFLAGS_EXTRA := -Ilibs
