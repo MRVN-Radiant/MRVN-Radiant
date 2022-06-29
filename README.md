@@ -14,8 +14,14 @@ The open-source, cross-platform level editor for respawn source games.
 one day:tm:
 
 ## Supported games
+Titanfall 1
+- nothing ( soon:tm: )
 
-Titanfall 2 so far
+Titanfall 2
+- only basic visuals
+
+Apex legends ( season 3 ( r5realoded ) )
+- nothing
 
 ## [COMPILING](/COMPILING.md)
 ## [TODO](/TODO.md)
