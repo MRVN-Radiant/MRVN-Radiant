@@ -539,6 +539,7 @@ $(INSTALLDIR)/q3map2.$(EXE): \
 	tools/quake3/q3map2/bspfile_abstract.o \
 	tools/quake3/q3map2/bspfile_ibsp.o \
 	tools/quake3/q3map2/bspfile_rbsp.o \
+	tools/quake3/q3map2/bspfile_r1bsp.o \
 	tools/quake3/q3map2/bspfile_r2bsp.o \
 	tools/quake3/q3map2/bspfile_r5bsp.o \
 	tools/quake3/q3map2/bsp.o \
