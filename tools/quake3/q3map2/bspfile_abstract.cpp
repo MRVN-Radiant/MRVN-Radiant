@@ -30,7 +30,6 @@
 
 /* dependencies */
 #include "q3map2.h"
-#include "bspfile_ibsp.h"
 #include <ctime>
 
 
@@ -123,8 +122,8 @@ void LoadBSPFilePartially( const char *filename ){
 
 	/* load it, then byte swap the in-memory version */
 	//g_game->load( filename );
-	LoadIBSPorRBSPFilePartially( filename );
-	SwapBSPFile();
+	//LoadIBSPorRBSPFilePartially( filename );
+	//SwapBSPFile();
 }
 
 /*
