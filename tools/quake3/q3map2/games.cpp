@@ -380,7 +380,7 @@ struct game_apexlegends : game_t
 		EMiniMapMode::Gray,     /* minimap mode */
 		"%s.tga",               /* minimap name format */
 		"rBSP",                 /* bsp file prefix */
-		37,                      /* bsp file version */
+		47,                      /* bsp file version */
 		false,                  /* cod-style lump len/ofs order */
 		LoadR5BSPFile,           /* bsp load function */
 		WriteR5BSPFile,          /* bsp write function */
