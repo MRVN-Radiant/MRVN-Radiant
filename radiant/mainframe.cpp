@@ -413,7 +413,7 @@ const char* GameToolsPath_get(){
 
 
 void Paths_constructPreferences( PreferencesPage& page ){
-	page.appendPathEntry( "Engine Path", true,
+	page.appendPathEntry( "Resources Path", true,
 	                      StringImportCallback( EnginePathImportCaller( g_strEnginePath ) ),
 	                      StringExportCallback( StringExportCaller( g_strEnginePath ) )
 	                    );
@@ -452,7 +452,7 @@ public:
 #error "unsupported platform"
 #endif
 		StringOutputStream text( 256 );
-		text << "Select directory, where game executable sits (typically \"" << engine << "\")\n";
+		text << "Select the directory where you want to save maps and map resources\n";
 		GtkLabel* label = GTK_LABEL( gtk_label_new( text.c_str() ) );
 		gtk_widget_show( GTK_WIDGET( label ) );
 		gtk_container_add( GTK_CONTAINER( vbox2 ), GTK_WIDGET( label ) );
@@ -462,7 +462,7 @@ public:
 			Paths_constructPreferences( preferencesPage );
 		}
 
-		return create_simple_modal_dialog_window( "Engine Path Configuration", m_modal, GTK_WIDGET( frame ) );
+		return create_simple_modal_dialog_window( "Resources Path Configuration", m_modal, GTK_WIDGET( frame ) );
 	}
 };
 
