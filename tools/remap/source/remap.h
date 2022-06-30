@@ -19,10 +19,15 @@
    along with GtkRadiant; if not, write to the Free Software
    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-   ----------------------------------------------------------------------------------
+   -------------------------------------------------------------------------------
 
    This code has been altered significantly from its original form, to support
    several games based on the Quake III Arena engine, in the form of "Q3Map2."
+
+   -------------------------------------------------------------------------------
+
+   "Q3Map2" has been significantly modified in the form of "remap" to support
+   Respawn Entertainment games.
 
    ------------------------------------------------------------------------------- */
 
