@@ -111,8 +111,8 @@ namespace r2
 
 	struct GameLump_Prop
 	{
-		Vector3 Origin;
-		Vector3 Angles;
+		Vector3 origin;
+		Vector3 angles;
 		float scale;
 		uint16_t modelName;
 		uint8_t solidMode;
