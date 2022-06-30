@@ -29,10 +29,10 @@ namespace r2
 
 	struct bspVertexLitBump_t
 	{
-		uint32_t vertex_index;
-		uint32_t normal_index;
+		uint32_t vertexIndex;
+		uint32_t normalIndex;
 		Vector2 uv0;
-		int32_t minus_one;
+		int32_t minusOne;
 		Vector2 uv1;
 		uint32_t unk[4];
 	};
@@ -40,16 +40,16 @@ namespace r2
 
 	struct bspMesh_t
 	{
-		uint32_t tri_offset;
-		uint16_t tri_count;
-		uint16_t first_vertex;
-		uint16_t vertex_count;
+		uint32_t triOffset;
+		uint16_t triCount;
+		uint16_t firstVertex;
+		uint16_t vertexCount;
 		uint16_t unk0;
 		uint32_t const0;
 		uint16_t unk1;
 		uint16_t unk2;
 		uint16_t unk3;
-		uint16_t material_offset;
+		uint16_t materialOffset;
 		uint32_t flags;
 	};
 
@@ -67,11 +67,11 @@ namespace r2
 		char partitions[27];
 	};
 
-	struct bspModel_t_new
+	struct bspModel_t
 	{
 		MinMax minmax;
-		uint32_t first_mesh;
-		uint32_t mesh_count;
+		uint32_t firstMesh;
+		uint32_t meshCount;
 	};
 
 	struct bspObjReferenceBounds_t
@@ -89,19 +89,19 @@ namespace r2
 		uint32_t unk0;
 		uint32_t unk1;
 		uint32_t unk3;
-		uint32_t prop_count;
+		uint32_t propCount;
 		Vector3 unk2;
 	};
 
 	struct CellAABBNode_t
 	{
 		Vector3 mins;
-		uint8_t child_count; // number of direct children this node has
-		uint8_t obj_ref_count; // number of obj_refs it indexes
-		uint16_t total_child_count; // nuber of children all direct children have
+		uint8_t childCount; // number of direct children this node has
+		uint8_t objRefCount; // number of obj_refs it indexes
+		uint16_t totalChildCount; // nuber of children all direct children have
 		Vector3 maxs;
-		uint16_t first_child; // first child index
-		uint16_t obj_ref; // first obj_ref index
+		uint16_t firstChild; // first child index
+		uint16_t objRef; // first obj_ref index
 	};
 
 	struct GameLump_Path
@@ -114,16 +114,16 @@ namespace r2
 		Vector3 Origin;
 		Vector3 Angles;
 		float scale;
-		uint16_t model_name;
-		uint8_t solid_mode;
+		uint16_t modelName;
+		uint8_t solidMode;
 		uint8_t flags;
 		int8_t unk[4];
-		float fade_scale;
-		Vector3 lighting_origin;
-		int8_t cpu_level[2];
-		int8_t gpu_level[2];
-		int8_t diffuse_modulation[4];
-		uint16_t collision_flags[2];
+		float fadeScale;
+		Vector3 lightingOrigin;
+		int8_t cpuLevel[2];
+		int8_t gpuLevel[2];
+		int8_t diffuseModulation[4];
+		uint16_t collisionFlags[2];
 	};
 
 	struct GameLump_t
@@ -133,9 +133,9 @@ namespace r2
 		uint32_t const0; // always 851968
 		uint32_t offset; // offset to path_count
 		uint32_t length;
-		uint32_t path_count;
+		uint32_t pathCount;
 		std::vector<GameLump_Path> paths;
-		uint32_t prop_count;
+		uint32_t propCount;
 		uint32_t unk3; // From testing can be same as prop_count
 		uint32_t unk4; // Same for this one
 		std::vector<GameLump_Prop> props;
@@ -147,26 +147,26 @@ namespace r2
 		uint16_t flags;
 		uint16_t index;
 		Vector3 extents;
-		uint32_t side_plane;
+		uint32_t sidePlane;
 	};
 
 	struct bspMaterialSort_t
 	{
-		uint16_t texture_data;
-		uint16_t lightmap_header;
+		uint16_t textureData;
+		uint16_t lightmapHeader;
 		uint16_t cubemap;
 		uint16_t unk;
-		uint32_t vertex_offset;
+		uint32_t vertexOffset;
 	};
 
 	struct bspTextureData_t
 	{
 		Vector3 reflectivity;
 		uint32_t name_index;
-		uint32_t size_x;
-		uint32_t size_y;
-		uint32_t visible_x;
-		uint32_t visible_y;
+		uint32_t sizeX;
+		uint32_t sizeY;
+		uint32_t visibleX;
+		uint32_t visibleY;
 		uint32_t flags;
 	};
 
@@ -187,7 +187,7 @@ namespace r2
 
 	inline std::vector<bspEntityPartitions_t> bspEntityPartitions;
 
-	inline std::vector<bspModel_t_new> bspModels_new;
+	inline std::vector<bspModel_t> bspModels;
 
 	inline std::vector<bspObjReferenceBounds_t> bspObjReferenceBounds;
 

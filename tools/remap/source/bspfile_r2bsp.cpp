@@ -304,7 +304,7 @@ void WriteR2BSPFile(const char* filename)
 	AddLump(file, header.lumps[R2_LUMP_PLANES],								r2::bspPlanes_stub);
 	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA],						r2::bspTextureData);
 	AddLump(file, header.lumps[R2_LUMP_VERTICES],							r2::bspVertices);
-	AddLump(file, header.lumps[R2_LUMP_MODELS],								r2::bspModels_new);
+	AddLump(file, header.lumps[R2_LUMP_MODELS],								r2::bspModels);
 	AddLump(file, header.lumps[R2_LUMP_VERTEX_NORMALS],						r2::bspVertexNormals);
 	AddLump(file, header.lumps[R2_LUMP_ENTITY_PARTITIONS],					r2::bspEntityPartitions);
 	/* Game Lump */

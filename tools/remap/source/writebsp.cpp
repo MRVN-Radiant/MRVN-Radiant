@@ -394,10 +394,10 @@ void EmitTextureData( shaderInfo_t shader )
 
 	r2::bspTextureData_t &td = r2::bspTextureData.emplace_back();
 	td.name_index = r2::bspTextureDataTable.size() - 1;
-	td.size_x = shader.shaderImage->width;
-	td.size_y = shader.shaderImage->height;
-	td.visible_x = shader.shaderImage->width;
-	td.visible_y = shader.shaderImage->height;
+	td.sizeX = shader.shaderImage->width;
+	td.sizeY = shader.shaderImage->height;
+	td.visibleX = shader.shaderImage->width;
+	td.visibleY = shader.shaderImage->height;
 	td.flags = 512; // idk
 }
 
@@ -425,7 +425,7 @@ uint16_t EmitMaterialSort( const char* texture )
 	std::size_t pos = 0;
 	for ( r2::bspMaterialSort_t &ms : r2::bspMaterialSorts )
 	{
-		if ( ms.texture_data == index )
+		if ( ms.textureData == index )
 			return pos;
 
 		pos++;
@@ -433,7 +433,7 @@ uint16_t EmitMaterialSort( const char* texture )
 	
 	
 	r2::bspMaterialSort_t &ms = r2::bspMaterialSorts.emplace_back();
-	ms.texture_data = index;
+	ms.textureData = index;
 
 	return r2::bspMaterialSorts.size() - 1;
 }
@@ -746,16 +746,16 @@ void EmitMeshes( const entity_t& e )
 		r2::bspMesh_t& mesh = r2::bspMeshes.emplace_back();
 		mesh.const0 = 4294967040; // :)
 		mesh.flags = 1051136;
-		mesh.first_vertex = r2::bspVertexLitBump.size();
-		mesh.vertex_count = tempMesh.Vertices.size();
-		mesh.tri_offset = r2::bspMeshIndices.size();
-		mesh.tri_count = tempMesh.Triangles.size() / 3;
+		mesh.firstVertex = r2::bspVertexLitBump.size();
+		mesh.vertexCount = tempMesh.Vertices.size();
+		mesh.triOffset = r2::bspMeshIndices.size();
+		mesh.triCount = tempMesh.Triangles.size() / 3;
 
 
 		/* Emit textrue related structs */
 		EmitTextureData( *tempMesh.shaderInfo );
 
-		mesh.material_offset = EmitMaterialSort( tempMesh.shaderInfo->shader.c_str() );
+		mesh.materialOffset = EmitMaterialSort( tempMesh.shaderInfo->shader.c_str() );
 
 		MinMax aabb;
 
@@ -779,38 +779,38 @@ void EmitMeshes( const entity_t& e )
 				aabb.mins.z() = vertex.z();
 
 			r2::bspVertexLitBump_t& litVertex = r2::bspVertexLitBump.emplace_back();
-			litVertex.minus_one = -1;
+			litVertex.minusOne = -1;
 			litVertex.uv0 = tempMesh.UVs.at(i);
 
 			/* Save vert */
-			for (uint16_t j = 0; j < r2::bspVertices.size(); j++)
+			for ( uint16_t j = 0; j < r2::bspVertices.size(); j++ )
 			{
-				if (VectorCompare(vertex, r2::bspVertices.at(j)))
+				if ( VectorCompare( vertex, r2::bspVertices.at( j ) ) )
 				{
-					litVertex.vertex_index = j;
+					litVertex.vertexIndex = j;
 					goto normal;
 				}
 			}
 
 			{
-				litVertex.vertex_index = r2::bspVertices.size();
-				r2::bspVertices.emplace_back(tempMesh.Vertices.at(i));
+				litVertex.vertexIndex = r2::bspVertices.size();
+				r2::bspVertices.emplace_back( tempMesh.Vertices.at(i) );
 			}
 
 			normal:;
 
-			for (uint16_t j = 0; j < r2::bspVertexNormals.size(); j++)
+			for ( uint16_t j = 0; j < r2::bspVertexNormals.size(); j++ )
 			{
-				if (VectorCompare(tempMesh.Normals.at(i), r2::bspVertexNormals.at(j)))
+				if ( VectorCompare( tempMesh.Normals.at( i ), r2::bspVertexNormals.at( j ) ) )
 				{
-					litVertex.normal_index = j;
+					litVertex.normalIndex = j;
 					goto end;
 				}
 			}
 
 			{
-				litVertex.normal_index = r2::bspVertexNormals.size();
-				r2::bspVertexNormals.emplace_back(tempMesh.Normals.at(i));
+				litVertex.normalIndex = r2::bspVertexNormals.size();
+				r2::bspVertexNormals.emplace_back( tempMesh.Normals.at( i ) );
 			}
 
 			end:;
@@ -821,7 +821,7 @@ void EmitMeshes( const entity_t& e )
 		{
 			for (uint32_t j = 0; j < r2::bspVertexLitBump.size(); j++)
 			{
-				if (VectorCompare(r2::bspVertices.at(r2::bspVertexLitBump.at(j).vertex_index),tempMesh.Vertices.at(triangle)))
+				if (VectorCompare(r2::bspVertices.at(r2::bspVertexLitBump.at(j).vertexIndex),tempMesh.Vertices.at(triangle)))
 				{
 					r2::bspMeshIndex_t& index = r2::bspMeshIndices.emplace_back();
 					index = j;
@@ -856,7 +856,7 @@ void EmitObjReferences()
 	}
 
 	/* Props */
-	for ( uint16_t i = 0; i < r2::GameLump.prop_count; i++ )
+	for ( uint16_t i = 0; i < r2::GameLump.propCount; i++ )
 	{
 		r2::bspObjReferenceBounds_t& refBounds = r2::bspObjReferenceBounds.emplace_back();
 		refBounds.mins = Vector3(-1000,-1000,-1000);
@@ -869,8 +869,8 @@ void EmitObjReferences()
 
 void EmitModels()
 {
-	r2::bspModel_t_new &m = r2::bspModels_new.emplace_back();
-	m.mesh_count = r2::bspMeshes.size();
+	r2::bspModel_t &m = r2::bspModels.emplace_back();
+	m.meshCount = r2::bspMeshes.size();
 }
 
 void EmitLevelInfo()
@@ -880,7 +880,7 @@ void EmitLevelInfo()
 	li.unk0 = r2::bspObjReferenceBounds.size();
 	li.unk1 = r2::bspObjReferenceBounds.size();
 	li.unk3 = r2::bspObjReferenceBounds.size();
-	li.prop_count = r2::GameLump.prop_count;
+	li.propCount = r2::GameLump.propCount;
 }
 
 void SetUpGameLump()
@@ -899,7 +899,7 @@ void EmitProp( const entity_t &e )
 
 	uint16_t index = 0;
 	bool found = false;
-	for ( uint32_t i = 0; i < r2::GameLump.path_count; i++ )
+	for ( uint32_t i = 0; i < r2::GameLump.pathCount; i++ )
 	{
 		if ( strncmp( r2::GameLump.paths.at(i).path, path, 128) == 0 )
 		{
@@ -913,23 +913,23 @@ void EmitProp( const entity_t &e )
 	if ( !found )
 	{
 		index = r2::GameLump.paths.size();
-		r2::GameLump.path_count++;
+		r2::GameLump.pathCount++;
 		r2::GameLump_Path newPath;
 		strncpy(newPath.path, path,128);
 		r2::GameLump.paths.emplace_back(newPath);
 	}
 
-	r2::GameLump.prop_count++;
+	r2::GameLump.propCount++;
 	r2::GameLump_Prop& prop = r2::GameLump.props.emplace_back();
 	prop.scale = 1;
-	prop.fade_scale = -1;
+	prop.fadeScale = -1;
 	prop.flags = 84;
-	prop.solid_mode = 6;
-	prop.cpu_level[0] = -1;
-	prop.cpu_level[1] = -1;
-	prop.gpu_level[0] = -1;
-	prop.gpu_level[1] = -1;
-	prop.model_name = index;
+	prop.solidMode = 6;
+	prop.cpuLevel[0] = -1;
+	prop.cpuLevel[1] = -1;
+	prop.gpuLevel[0] = -1;
+	prop.gpuLevel[1] = -1;
+	prop.modelName = index;
 
 }
 
@@ -1627,7 +1627,7 @@ void EmitStubs()
 		r2::CellAABBNode_t &node = r2::bspCellAABBNodes_stub.emplace_back();
 		node.mins = Vector3(-3000, -3000, -3000);
 		node.maxs = Vector3(3000, 3000, 3000);
-		node.obj_ref_count = r2::bspObjReferences.size() > 255 ? 255 : r2::bspObjReferences.size();
+		node.objRefCount = r2::bspObjReferences.size() > 255 ? 255 : r2::bspObjReferences.size();
 	}
 }
 /*
