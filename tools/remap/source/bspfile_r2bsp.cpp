@@ -243,9 +243,9 @@ void LoadR2BSPFile(const char* filename)
 		We only load lumps we can use for conversion to .map
 		I dont plan on supporting bsp merging, shifting, ...
 	*/
-	CopyLump( (rbspHeader_t*) header, R2_LUMP_PLANES, bspPlanes );
-	CopyLump( (rbspHeader_t*) header, R2_LUMP_CM_BRUSHES, bspBrushes );
-	CopyLump( (rbspHeader_t*) header, R2_LUMP_CM_BRUSH_SIDE_PLANES, bspBrushSidePlanes);
+	CopyLump( (rbspHeader_t*) header, R2_LUMP_PLANES,				r2::bspPlanes );
+	CopyLump( (rbspHeader_t*) header, R2_LUMP_CM_BRUSHES,			r2::bspBrushes );
+	CopyLump( (rbspHeader_t*) header, R2_LUMP_CM_BRUSH_SIDE_PLANES, r2::bspBrushSidePlanes);
 
 }
 
@@ -299,73 +299,74 @@ void WriteR2BSPFile(const char* filename)
 	}
 	
 	/* Write lumps */
-	AddLump(file, header.lumps[R2_LUMP_ENTITIES],							bspEntities_stub);
-	AddLump(file, header.lumps[R2_LUMP_PLANES],								bspPlanes_stub);
-	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA],						bspTextureData);
-	AddLump(file, header.lumps[R2_LUMP_VERTICES],							bspVertices);
-	AddLump(file, header.lumps[R2_LUMP_MODELS],								bspModels_new);
-	AddLump(file, header.lumps[R2_LUMP_VERTEX_NORMALS],						bspVertexNormals);
-	AddLump(file, header.lumps[R2_LUMP_ENTITY_PARTITIONS],					bspEntityPartitions);
+	
+	AddLump(file, header.lumps[R2_LUMP_ENTITIES],							r2::bspEntities_stub);
+	AddLump(file, header.lumps[R2_LUMP_PLANES],								r2::bspPlanes_stub);
+	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA],						r2::bspTextureData);
+	AddLump(file, header.lumps[R2_LUMP_VERTICES],							r2::bspVertices);
+	AddLump(file, header.lumps[R2_LUMP_MODELS],								r2::bspModels_new);
+	AddLump(file, header.lumps[R2_LUMP_VERTEX_NORMALS],						r2::bspVertexNormals);
+	AddLump(file, header.lumps[R2_LUMP_ENTITY_PARTITIONS],					r2::bspEntityPartitions);
 	/* Game Lump */
 	{
 		std::size_t start = ftell(file);
 		header.lumps[R2_LUMP_GAME_LUMP].offset = start;
-		header.lumps[R2_LUMP_GAME_LUMP].length = 36 + GameLump.path_count * sizeof(GameLump_Path) + GameLump.prop_count * sizeof(GameLump_Prop);
-		GameLump.offset = start + 20;
-		GameLump.length = 16 + GameLump.path_count * sizeof(GameLump_Path) + GameLump.prop_count * sizeof(GameLump_Prop);
-		SafeWrite(file, &GameLump, sizeof(GameLump));
+		header.lumps[R2_LUMP_GAME_LUMP].length = 36 + r2::GameLump.path_count * sizeof(r2::GameLump_Path) + r2::GameLump.prop_count * sizeof(r2::GameLump_Prop);
+		r2::GameLump.offset = start + 20;
+		r2::GameLump.length = 16 + r2::GameLump.path_count * sizeof(r2::GameLump_Path) + r2::GameLump.prop_count * sizeof(r2::GameLump_Prop);
+		SafeWrite(file, &r2::GameLump, sizeof(r2::GameLump));
 		/* need to write vectors separately */
 		/* paths */
 		fseek(file, start + 24, SEEK_SET);
-		SafeWrite(file, GameLump.paths.data(), 128 * GameLump.path_count);
+		SafeWrite(file, r2::GameLump.paths.data(), 128 * r2::GameLump.path_count);
 		/* :) */
-		SafeWrite(file, &GameLump.prop_count, 4);
-		SafeWrite(file, &GameLump.prop_count, 4);
-		SafeWrite(file, &GameLump.prop_count, 4);
+		SafeWrite(file, &r2::GameLump.prop_count, 4);
+		SafeWrite(file, &r2::GameLump.prop_count, 4);
+		SafeWrite(file, &r2::GameLump.prop_count, 4);
 		/* props */
-		SafeWrite(file, GameLump.props.data(), 64 * GameLump.prop_count);
+		SafeWrite(file, r2::GameLump.props.data(), 64 * r2::GameLump.prop_count);
 	}
-	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_DATA],			bspTextureDataData);
-	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_TABLE],			bspTextureDataTable);
-	AddLump(file, header.lumps[R2_LUMP_WORLD_LIGHTS],						bspWorldLights_stub);
-	AddLump(file, header.lumps[R2_LUMP_TRICOLL_TRIS],						bspTricollTris_stub);
-	AddLump(file, header.lumps[R2_LUMP_TRICOLL_NODES],						bspTricollNodes_stub);
-	AddLump(file, header.lumps[R2_LUMP_TRICOLL_HEADERS],					bspTricollHeaders_stub);
-	AddLump(file, header.lumps[R2_LUMP_VERTEX_LIT_BUMP],					bspVertexLitBump);
-	AddLump(file, header.lumps[R2_LUMP_MESH_INDICES],						bspMeshIndices);
-	AddLump(file, header.lumps[R2_LUMP_MESHES],								bspMeshes);
-	AddLump(file, header.lumps[R2_LUMP_MESH_BOUNDS],						bspMeshBounds);
-	AddLump(file, header.lumps[R2_LUMP_MATERIAL_SORT],						bspMaterialSorts);
-	AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_HEADERS],					bspLightMapHeaders_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_GRID],							bspCMGrid_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_GRID_CELLS],						bspCMGridCells_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_GRID_SETS],						bspCMGridSets_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_GEO_SET_BOUNDS],					bspCMGeoSetBounds_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVES],						bspCMPrimitives_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVE_BOUNDS],				bspCMPrimitiveBounds_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_UNIQUE_CONTENTS],					bspCMUniqueContents_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_BRUSHES],							bspCMBrushes_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PLANES],		bspCMBrushSidePlaneOffsets_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PROPS],				bspCMBrushSideProps_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_TEX_VECS],					bspCMBrushTexVecs_stub);
-	AddLump(file, header.lumps[R2_LUMP_TRICOLL_BEVEL_STARTS],				bspTricollBevelStarts_stub);
-	AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_DATA_SKY],					bspLightMapDataSky_stub);
-	AddLump(file, header.lumps[R2_LUMP_CSM_AABB_NODES],						bspCSMAABBNodes_stub);
-	AddLump(file, header.lumps[R2_LUMP_CELL_BSP_NODES],						bspCellBSPNodes_stub);
-	AddLump(file, header.lumps[R2_LUMP_CELLS],								bspCells_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTALS],							bspPortals_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTAL_VERTICES],					bspPortalVertices_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGES],						bspPortalEdges_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTAL_VERTEX_EDGES],				bspPortalVertexEdges_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTAL_VERTEX_REFERENCES],			bspPortalVertexReferences_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGE_REGERENCES],				bspPortalEdgeReferences_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGE_INTERSECT_EDGE],			bspPortalEdgeIntersectEdge_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGE_INTERSECT_AT_VERTEX],	bspPortalEdgeIntersectAtVertex_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGE_INTERSECT_HEADER],		bspPortalEdgeIntersectHeader_stub);
-	AddLump(file, header.lumps[R2_LUMP_CELL_AABB_NODES],					bspCellAABBNodes_stub);
-	AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCES],						bspObjReferences);
-	AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCE_BOUNDS],				bspObjReferenceBounds);
-	AddLump(file, header.lumps[R2_LUMP_LEVEL_INFO],							bspLevelInfo);
+	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_DATA],			r2::bspTextureDataData);
+	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_TABLE],			r2::bspTextureDataTable);
+	AddLump(file, header.lumps[R2_LUMP_WORLD_LIGHTS],						r2::bspWorldLights_stub);
+	AddLump(file, header.lumps[R2_LUMP_TRICOLL_TRIS],						r2::bspTricollTris_stub);
+	AddLump(file, header.lumps[R2_LUMP_TRICOLL_NODES],						r2::bspTricollNodes_stub);
+	AddLump(file, header.lumps[R2_LUMP_TRICOLL_HEADERS],					r2::bspTricollHeaders_stub);
+	AddLump(file, header.lumps[R2_LUMP_VERTEX_LIT_BUMP],					r2::bspVertexLitBump);
+	AddLump(file, header.lumps[R2_LUMP_MESH_INDICES],						r2::bspMeshIndices);
+	AddLump(file, header.lumps[R2_LUMP_MESHES],								r2::bspMeshes);
+	AddLump(file, header.lumps[R2_LUMP_MESH_BOUNDS],						r2::bspMeshBounds);
+	AddLump(file, header.lumps[R2_LUMP_MATERIAL_SORT],						r2::bspMaterialSorts);
+	AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_HEADERS],					r2::bspLightMapHeaders_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_GRID],							r2::bspCMGrid_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_GRID_CELLS],						r2::bspCMGridCells_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_GRID_SETS],						r2::bspCMGridSets_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_GEO_SET_BOUNDS],					r2::bspCMGeoSetBounds_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVES],						r2::bspCMPrimitives_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVE_BOUNDS],				r2::bspCMPrimitiveBounds_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_UNIQUE_CONTENTS],					r2::bspCMUniqueContents_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_BRUSHES],							r2::bspCMBrushes_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PLANES],				r2::bspCMBrushSidePlaneOffsets_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PROPS],				r2::bspCMBrushSideProps_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_TEX_VECS],					r2::bspCMBrushTexVecs_stub);
+	AddLump(file, header.lumps[R2_LUMP_TRICOLL_BEVEL_STARTS],				r2::bspTricollBevelStarts_stub);
+	AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_DATA_SKY],					r2::bspLightMapDataSky_stub);
+	AddLump(file, header.lumps[R2_LUMP_CSM_AABB_NODES],						r2::bspCSMAABBNodes_stub);
+	AddLump(file, header.lumps[R2_LUMP_CELL_BSP_NODES],						r2::bspCellBSPNodes_stub);
+	AddLump(file, header.lumps[R2_LUMP_CELLS],								r2::bspCells_stub);
+	AddLump(file, header.lumps[R2_LUMP_PORTALS],							r2::bspPortals_stub);
+	AddLump(file, header.lumps[R2_LUMP_PORTAL_VERTICES],					r2::bspPortalVertices_stub);
+	AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGES],						r2::bspPortalEdges_stub);
+	AddLump(file, header.lumps[R2_LUMP_PORTAL_VERTEX_EDGES],				r2::bspPortalVertexEdges_stub);
+	AddLump(file, header.lumps[R2_LUMP_PORTAL_VERTEX_REFERENCES],			r2::bspPortalVertexReferences_stub);
+	AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGE_REGERENCES],				r2::bspPortalEdgeReferences_stub);
+	AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGE_INTERSECT_EDGE],			r2::bspPortalEdgeIntersectEdge_stub);
+	AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGE_INTERSECT_AT_VERTEX],	r2::bspPortalEdgeIntersectAtVertex_stub);
+	AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGE_INTERSECT_HEADER],		r2::bspPortalEdgeIntersectHeader_stub);
+	AddLump(file, header.lumps[R2_LUMP_CELL_AABB_NODES],					r2::bspCellAABBNodes_stub);
+	AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCES],						r2::bspObjReferences);
+	AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCE_BOUNDS],				r2::bspObjReferenceBounds);
+	AddLump(file, header.lumps[R2_LUMP_LEVEL_INFO],							r2::bspLevelInfo);
 
 
 	/* emit bsp size */

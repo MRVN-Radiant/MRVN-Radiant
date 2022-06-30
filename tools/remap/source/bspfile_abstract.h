@@ -25,6 +25,9 @@
 
 /* dependencies */
 #include "remap.h"
+#include "bspfile_r1bsp.h"
+#include "bspfile_r2bsp.h"
+#include "bspfile_r5bsp.h"
 
 /*
    AddLump()

@@ -30,6 +30,7 @@
 
 /* dependencies */
 #include "remap.h"
+#include "bspfile_abstract.h"
 
 
 /*
@@ -344,6 +345,7 @@ void EndBSPFile( bool do_write ){
 
 void EmitBrushes( entity_t& e )
 {
+	/*
 	for ( const brush_t &brush : e.brushes )
 	{
 		for ( const side_t &side : brush.sides )
@@ -352,6 +354,7 @@ void EmitBrushes( entity_t& e )
 			plane = (Plane3f)side.plane;
 		}
 	}
+	*/
 }
 
 /*
@@ -376,7 +379,7 @@ void EmitTextureData( shaderInfo_t shader )
 	}
 
 	/* Check if it's already saved */
-	std::string table = std::string(bspTextureDataData.begin(), bspTextureDataData.end());
+	std::string table = std::string( r2::bspTextureDataData.begin(), r2::bspTextureDataData.end() );
 	index = table.find(tex);
 	if (index != std::string::npos)
 		return;
@@ -386,11 +389,11 @@ void EmitTextureData( shaderInfo_t shader )
 	data << tex.c_str();
 	std::vector<char> str = { data.begin(), data.end() + 1 };
 
-	bspTextureDataTable.emplace_back(bspTextureDataData.size());
-	bspTextureDataData.insert(bspTextureDataData.end(), str.begin(), str.end());
+	r2::bspTextureDataTable.emplace_back( r2::bspTextureDataData.size() );
+	r2::bspTextureDataData.insert( r2::bspTextureDataData.end(), str.begin(), str.end() );
 
-	bspTextureData_t &td = bspTextureData.emplace_back();
-	td.name_index = bspTextureDataTable.size() - 1;
+	r2::bspTextureData_t &td = r2::bspTextureData.emplace_back();
+	td.name_index = r2::bspTextureDataTable.size() - 1;
 	td.size_x = shader.shaderImage->width;
 	td.size_y = shader.shaderImage->height;
 	td.visible_x = shader.shaderImage->width;
@@ -406,7 +409,7 @@ uint16_t EmitMaterialSort( const char* texture )
 {
 	std::string tex = texture;
 
-	std::string textureData = { bspTextureDataData.begin(), bspTextureDataData.end() };
+	std::string textureData = { r2::bspTextureDataData.begin(), r2::bspTextureDataData.end() };
 
 	/* Find the texture path in the textureData lump */
 	uint16_t index = 0;
@@ -420,7 +423,7 @@ uint16_t EmitMaterialSort( const char* texture )
 
 	/* Check if the material sort we need already exists */
 	std::size_t pos = 0;
-	for ( bspMaterialSort_t &ms : bspMaterialSorts )
+	for ( r2::bspMaterialSort_t &ms : r2::bspMaterialSorts )
 	{
 		if ( ms.texture_data == index )
 			return pos;
@@ -429,10 +432,10 @@ uint16_t EmitMaterialSort( const char* texture )
 	}
 	
 	
-	bspMaterialSort_t &ms = bspMaterialSorts.emplace_back();
+	r2::bspMaterialSort_t &ms = r2::bspMaterialSorts.emplace_back();
 	ms.texture_data = index;
 
-	return bspMaterialSorts.size() - 1;
+	return r2::bspMaterialSorts.size() - 1;
 }
 
 /*
@@ -441,8 +444,8 @@ uint16_t EmitMaterialSort( const char* texture )
  */
 void EmitEntityPartitions()
 {
-	bspEntityPartitions_t& p = bspEntityPartitions.emplace_back();
-	memcpy(p.partitions, "01* env fx script snd spawn", 27);
+	r2::bspEntityPartitions_t& p = r2::bspEntityPartitions.emplace_back();
+	memcpy( p.partitions, "01* env fx script snd spawn", 27 );
 }
 
 /* helpers */
@@ -740,12 +743,12 @@ void EmitMeshes( const entity_t& e )
 	Sys_FPrintf(SYS_VRB, "pain suffering\n");
 	for (const tempMesh_t& tempMesh : tempMeshes)
 	{
-		bspMesh_t& mesh = bspMeshes.emplace_back();
+		r2::bspMesh_t& mesh = r2::bspMeshes.emplace_back();
 		mesh.const0 = 4294967040; // :)
 		mesh.flags = 1051136;
-		mesh.first_vertex = bspVertexLitBump.size();
+		mesh.first_vertex = r2::bspVertexLitBump.size();
 		mesh.vertex_count = tempMesh.Vertices.size();
-		mesh.tri_offset = bspMeshIndices.size();
+		mesh.tri_offset = r2::bspMeshIndices.size();
 		mesh.tri_count = tempMesh.Triangles.size() / 3;
 
 
@@ -775,14 +778,14 @@ void EmitMeshes( const entity_t& e )
 			if (vertex.z() < aabb.mins.z())
 				aabb.mins.z() = vertex.z();
 
-			bspVertexLitBump_t& litVertex = bspVertexLitBump.emplace_back();
+			r2::bspVertexLitBump_t& litVertex = r2::bspVertexLitBump.emplace_back();
 			litVertex.minus_one = -1;
 			litVertex.uv0 = tempMesh.UVs.at(i);
 
 			/* Save vert */
-			for (uint16_t j = 0; j < bspVertices.size(); j++)
+			for (uint16_t j = 0; j < r2::bspVertices.size(); j++)
 			{
-				if (VectorCompare(vertex, bspVertices.at(j)))
+				if (VectorCompare(vertex, r2::bspVertices.at(j)))
 				{
 					litVertex.vertex_index = j;
 					goto normal;
@@ -790,15 +793,15 @@ void EmitMeshes( const entity_t& e )
 			}
 
 			{
-				litVertex.vertex_index = bspVertices.size();
-				bspVertices.emplace_back(tempMesh.Vertices.at(i));
+				litVertex.vertex_index = r2::bspVertices.size();
+				r2::bspVertices.emplace_back(tempMesh.Vertices.at(i));
 			}
 
 			normal:;
 
-			for (uint16_t j = 0; j < bspVertexNormals.size(); j++)
+			for (uint16_t j = 0; j < r2::bspVertexNormals.size(); j++)
 			{
-				if (VectorCompare(tempMesh.Normals.at(i), bspVertexNormals.at(j)))
+				if (VectorCompare(tempMesh.Normals.at(i), r2::bspVertexNormals.at(j)))
 				{
 					litVertex.normal_index = j;
 					goto end;
@@ -806,8 +809,8 @@ void EmitMeshes( const entity_t& e )
 			}
 
 			{
-				litVertex.normal_index = bspVertexNormals.size();
-				bspVertexNormals.emplace_back(tempMesh.Normals.at(i));
+				litVertex.normal_index = r2::bspVertexNormals.size();
+				r2::bspVertexNormals.emplace_back(tempMesh.Normals.at(i));
 			}
 
 			end:;
@@ -816,11 +819,11 @@ void EmitMeshes( const entity_t& e )
 		/* Save triangles */
 		for (uint16_t triangle : tempMesh.Triangles)
 		{
-			for (uint32_t j = 0; j < bspVertexLitBump.size(); j++)
+			for (uint32_t j = 0; j < r2::bspVertexLitBump.size(); j++)
 			{
-				if (VectorCompare(bspVertices.at(bspVertexLitBump.at(j).vertex_index),tempMesh.Vertices.at(triangle)))
+				if (VectorCompare(r2::bspVertices.at(r2::bspVertexLitBump.at(j).vertex_index),tempMesh.Vertices.at(triangle)))
 				{
-					bspMeshIndex_t& index = bspMeshIndices.emplace_back();
+					r2::bspMeshIndex_t& index = r2::bspMeshIndices.emplace_back();
 					index = j;
 					break;
 				}
@@ -828,7 +831,7 @@ void EmitMeshes( const entity_t& e )
 		}
 
 		/* Save MeshBounds */
-		bspMeshBounds_t& meshBounds = bspMeshBounds.emplace_back();
+		r2::bspMeshBounds_t& meshBounds = r2::bspMeshBounds.emplace_back();
 		meshBounds.origin = (aabb.maxs + aabb.mins) / 2;
 		meshBounds.extents = (aabb.maxs - aabb.mins) / 2;
 	}
@@ -840,50 +843,50 @@ void EmitMeshes( const entity_t& e )
 void EmitObjReferences()
 {
 	/* Meshes */
-	for ( uint16_t i = 0; i < bspMeshBounds.size(); i++ )
+	for ( uint16_t i = 0; i < r2::bspMeshBounds.size(); i++ )
 	{
-		bspMeshBounds_t mesh = bspMeshBounds.at( i );
+		r2::bspMeshBounds_t mesh = r2::bspMeshBounds.at( i );
 
-		bspObjReferenceBounds_t& refBounds = bspObjReferenceBounds.emplace_back();
+		r2::bspObjReferenceBounds_t& refBounds = r2::bspObjReferenceBounds.emplace_back();
 		refBounds.mins = mesh.origin - mesh.extents;
 		refBounds.maxs = mesh.origin + mesh.extents;
 
-		bspObjReferences_t& ref = bspObjReferences.emplace_back();
+		r2::bspObjReferences_t& ref = r2::bspObjReferences.emplace_back();
 		ref = i;
 	}
 
 	/* Props */
-	for (uint16_t i = 0; i < GameLump.prop_count; i++)
+	for ( uint16_t i = 0; i < r2::GameLump.prop_count; i++ )
 	{
-		bspObjReferenceBounds_t& refBounds = bspObjReferenceBounds.emplace_back();
+		r2::bspObjReferenceBounds_t& refBounds = r2::bspObjReferenceBounds.emplace_back();
 		refBounds.mins = Vector3(-1000,-1000,-1000);
 		refBounds.maxs = Vector3(1000,1000,1000);
 
-		bspObjReferences_t& ref = bspObjReferences.emplace_back();
-		ref = bspMeshBounds.size() + i;
+		r2::bspObjReferences_t& ref = r2::bspObjReferences.emplace_back();
+		ref = r2::bspMeshBounds.size() + i;
 	}
 }
 
 void EmitModels()
 {
-	bspModel_t_new &m = bspModels_new.emplace_back();
-	m.mesh_count = bspMeshes.size();
+	r2::bspModel_t_new &m = r2::bspModels_new.emplace_back();
+	m.mesh_count = r2::bspMeshes.size();
 }
 
 void EmitLevelInfo()
 {
-	bspLevelInfo_t &li = bspLevelInfo.emplace_back();
-	li.obj_ref_count = bspObjReferenceBounds.size();
+	r2::bspLevelInfo_t &li = r2::bspLevelInfo.emplace_back();
 	li.unk0 = 1;
 	li.unk1 = 1;
-	li.prop_count = GameLump.prop_count;
+	li.unk3 = 1;
+	li.prop_count = r2::GameLump.prop_count;
 }
 
 void SetUpGameLump()
 {
-	GameLump.version = 1;
-	memcpy( GameLump.magic, "prps", 4 );
-	GameLump.const0 = 851968;
+	r2::GameLump.version = 1;
+	memcpy(r2::GameLump.magic, "prps", 4 );
+	r2::GameLump.const0 = 851968;
 }
 
 void EmitProp( const entity_t &e )
@@ -895,9 +898,9 @@ void EmitProp( const entity_t &e )
 
 	uint16_t index = 0;
 	bool found = false;
-	for ( uint32_t i = 0; i < GameLump.path_count; i++ )
+	for ( uint32_t i = 0; i < r2::GameLump.path_count; i++ )
 	{
-		if ( strncmp(GameLump.paths.at(i).path, path, 128) == 0 )
+		if ( strncmp( r2::GameLump.paths.at(i).path, path, 128) == 0 )
 		{
 			found = true;
 			break;
@@ -908,15 +911,15 @@ void EmitProp( const entity_t &e )
 
 	if ( !found )
 	{
-		index = GameLump.paths.size();
-		GameLump.path_count++;
-		GameLump_Path newPath;
+		index = r2::GameLump.paths.size();
+		r2::GameLump.path_count++;
+		r2::GameLump_Path newPath;
 		strncpy(newPath.path, path,128);
-		GameLump.paths.emplace_back(newPath);
+		r2::GameLump.paths.emplace_back(newPath);
 	}
 
-	GameLump.prop_count++;
-	GameLump_Prop& prop = GameLump.props.emplace_back();
+	r2::GameLump.prop_count++;
+	r2::GameLump_Prop& prop = r2::GameLump.props.emplace_back();
 	prop.scale = 1;
 	prop.fade_scale = -1;
 	prop.flags = 84;
@@ -936,7 +939,7 @@ void EmitStubs()
 	{
 		StringOutputStream data;
 		data << "{\n\"world_maxs\" \"3072 3072 -3008\"\n\"world_mins\" \"-3072 -3072 -3072\"\n\"spawnclass\" \"idWorldspawn\"\n\"name\" \"world\"\n\"classname\" \"worldspawn\"\n\"musicpostfix\" \"Waterfront\"\n\"mapversion\" \"30\"}\n";
-		bspEntities_stub = { data.begin(), data.end() + 1 };
+		r2::bspEntities_stub = { data.begin(), data.end() + 1 };
 	}
 	/* Planes */
 	{
@@ -960,7 +963,7 @@ void EmitStubs()
 			0xF3, 0x04, 0x35, 0x3F, 0xF3, 0x04, 0x35, 0xBF, 0x00, 0x00, 0x00, 0x00, 0xB6, 0xC3, 0x87, 0x45,
 			0xF3, 0x04, 0x35, 0x3F, 0xF3, 0x04, 0x35, 0x3F, 0x00, 0x00, 0x00, 0x00, 0xB6, 0xC3, 0x87, 0x45
 		};
-		bspPlanes_stub = { data.begin(), data.end() };
+		r2::bspPlanes_stub = { data.begin(), data.end() };
 	}
 	/* Texture Data */
 	{
@@ -978,7 +981,7 @@ void EmitStubs()
 			0x80, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x10, 0x06, 0x00, 0x00
 		};
-		bspTextureData_stub = { data.begin(), data.end() };
+		r2::bspTextureData_stub = { data.begin(), data.end() };
 	}
 	/* World Lights */
 	{
@@ -1047,7 +1050,7 @@ void EmitStubs()
 			0x94, 0xEB, 0x60, 0xB9, 0xB5, 0x1A, 0xA2, 0xB7, 0x38, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x3F
 		};
-		bspWorldLights_stub = { data.begin(), data.end() };
+		r2::bspWorldLights_stub = { data.begin(), data.end() };
 	}
 	/* Tricoll tris */
 	{
@@ -1077,7 +1080,7 @@ void EmitStubs()
 			0x01, 0x14, 0x0C, 0x40, 0x01, 0x10, 0x0A, 0x40, 0x00, 0x10, 0x04, 0x40, 0x00, 0x0C, 0x08, 0x40,
 			0x03, 0x10, 0x02, 0x50, 0x04, 0x0C, 0x04, 0x10, 0x00, 0x08, 0x02, 0x40, 0x01, 0x04, 0x04, 0x40
 		};
-		bspTricollTris_stub = { data.begin(), data.end() };
+		r2::bspTricollTris_stub = { data.begin(), data.end() };
 	}
 	/* Tricoll Nodes */
 	{
@@ -1127,7 +1130,7 @@ void EmitStubs()
 			0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x80, 0x01, 0x10, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x80, 0x01, 0x10, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00
 		};
-		bspTricollNodes_stub = { data.begin(), data.end() };
+		r2::bspTricollNodes_stub = { data.begin(), data.end() };
 	}
 	/* Tricoll Headers */
 	{
@@ -1219,14 +1222,14 @@ void EmitStubs()
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00
 		};
-		bspTricollHeaders_stub = { data.begin(), data.end() };
+		r2::bspTricollHeaders_stub = { data.begin(), data.end() };
 	}
 	/* LightMap Headers */
 	{
 		constexpr std::array<uint8_t, 8> data = {
 			0x01, 0x00, 0x00, 0x00, 0x00, 0x02, 0x80, 0x00
 		};
-		bspLightMapHeaders_stub = { data.begin(), data.end() };
+		r2::bspLightMapHeaders_stub = { data.begin(), data.end() };
 	}
 	/* CM Grid */
 	{
@@ -1234,7 +1237,7 @@ void EmitStubs()
 			0x00, 0x00, 0x30, 0x44, 0xFB, 0xFF, 0xFF, 0xFF, 0xFB, 0xFF, 0xFF, 0xFF, 0x0A, 0x00, 0x00, 0x00,
 			0x0A, 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00
 		};
-		bspCMGrid_stub = { data.begin(), data.end() };
+		r2::bspCMGrid_stub = { data.begin(), data.end() };
 	}
 	/* CM Grid Cells */
 	{
@@ -1266,7 +1269,7 @@ void EmitStubs()
 			0x0D, 0x00, 0x00, 0x00, 0x0D, 0x00, 0x00, 0x00, 0x0D, 0x00, 0x00, 0x00, 0x07, 0x00, 0x01, 0x00,
 			0x08, 0x00, 0x05, 0x00
 		};
-		bspCMGridCells_stub = { data.begin(), data.end() };
+		r2::bspCMGridCells_stub = { data.begin(), data.end() };
 	}
 	/* CM Grid Sets */
 	{
@@ -1279,7 +1282,7 @@ void EmitStubs()
 			0x00, 0x00, 0x04, 0x00, 0x01, 0x12, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x01, 0x16, 0x00, 0x00,
 			0x00, 0x00, 0x06, 0x00, 0x02, 0x1A, 0x00, 0x00
 		};
-		bspCMGridSets_stub = { data.begin(), data.end() };
+		r2::bspCMGridSets_stub = { data.begin(), data.end() };
 	}
 	/* CM Geo Set Bounds */
 	{
@@ -1298,7 +1301,7 @@ void EmitStubs()
 			0xC0, 0xF3, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x41, 0x00, 0x01, 0x0C, 0x80, 0x0C, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x20, 0xF4, 0x00, 0x80, 0x01, 0x0C, 0x01, 0x0C, 0x20, 0x00, 0x00, 0x00
 		};
-		bspCMGeoSetBounds_stub = { data.begin(), data.end() };
+		r2::bspCMGeoSetBounds_stub = { data.begin(), data.end() };
 	}
 	/* CM Primitives */
 	{
@@ -1312,7 +1315,7 @@ void EmitStubs()
 			0x01, 0x12, 0x00, 0x40, 0x01, 0x11, 0x00, 0x40, 0x02, 0x1E, 0x00, 0x40, 0x02, 0x1B, 0x00, 0x40,
 			0x02, 0x1A, 0x00, 0x40, 0x02, 0x19, 0x00, 0x40, 0x02, 0x18, 0x00, 0x40, 0x02, 0x17, 0x00, 0x40
 		};
-		bspCMPrimitives_stub = { data.begin(), data.end() };
+		r2::bspCMPrimitives_stub = { data.begin(), data.end() };
 	}
 	/* CM Primitive Bounds */
 	{
@@ -1350,14 +1353,14 @@ void EmitStubs()
 			0x00, 0x00, 0x00, 0x0C, 0x20, 0xF4, 0x00, 0x80, 0x01, 0x0C, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0xF4, 0x20, 0xF4, 0x00, 0x80, 0x01, 0x0C, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00
 		};
-		bspCMPrimitiveBounds_stub = { data.begin(), data.end() };
+		r2::bspCMPrimitiveBounds_stub = { data.begin(), data.end() };
 	}
 	/* CM Unique Contents */
 	{
 		constexpr std::array<uint8_t, 12> data = {
 			0x00, 0x00, 0xA3, 0x00, 0x80, 0x02, 0xFB, 0x00, 0x80, 0x02, 0xEB, 0x00
 		};
-		bspCMUniqueContents_stub = { data.begin(), data.end() };
+		r2::bspCMUniqueContents_stub = { data.begin(), data.end() };
 	}
 	/* CM Brushes */
 	{
@@ -1369,7 +1372,7 @@ void EmitStubs()
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x02, 0x00,
 			0x00, 0x00, 0x40, 0x45, 0x00, 0x00, 0x40, 0x45, 0x00, 0x00, 0x40, 0x45, 0x08, 0x00, 0x00, 0x00
 		};
-		bspCMBrushes_stub = { data.begin(), data.end() };
+		r2::bspCMBrushes_stub = { data.begin(), data.end() };
 	}
 	/* CM Brush Side Plane Offsets */
 	{
@@ -1377,7 +1380,7 @@ void EmitStubs()
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		};
-		bspCMBrushSidePlaneOffsets_stub = { data.begin(), data.end() };
+		r2::bspCMBrushSidePlaneOffsets_stub = { data.begin(), data.end() };
 	}
 	/* CM Brush Side Props */
 	{
@@ -1387,7 +1390,7 @@ void EmitStubs()
 			0x03, 0x40, 0x03, 0x40, 0x03, 0x40, 0x03, 0x40, 0x04, 0x00, 0x04, 0x00, 0x04, 0x00, 0x04, 0x00,
 			0x04, 0x00, 0x04, 0x00, 0x04, 0x40, 0x04, 0x40, 0x04, 0x40, 0x04, 0x40
 		};
-		bspCMBrushSideProps_stub = { data.begin(), data.end() };
+		r2::bspCMBrushSideProps_stub = { data.begin(), data.end() };
 	}
 	/* CM Brush Tex Vecs */
 	{
@@ -1453,7 +1456,7 @@ void EmitStubs()
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x49, 0x46,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xC1, 0x00, 0x00, 0x19, 0x46
 		};
-		bspCMBrushTexVecs_stub = { data.begin(), data.end() };
+		r2::bspCMBrushTexVecs_stub = { data.begin(), data.end() };
 	}
 	/* Tricoll Bevel Starts */
 	{
@@ -1471,13 +1474,13 @@ void EmitStubs()
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		};
-		bspTricollBevelStarts_stub = { data.begin(), data.end() };
+		r2::bspTricollBevelStarts_stub = { data.begin(), data.end() };
 	}
 	/* LightMap Data Sky */
 	{
 		for (std::size_t i = 0; i < 524288; i++)
 		{
-			bspLightMapDataSky_stub.emplace_back(0);
+			r2::bspLightMapDataSky_stub.emplace_back(0);
 		}
 	}
 	/* CSM AABB Nodes */
@@ -1488,21 +1491,21 @@ void EmitStubs()
 			0xFF, 0xFF, 0x7F, 0x7F, 0xFF, 0xFF, 0x7F, 0x7F, 0xFF, 0xFF, 0x7F, 0x7F, 0x00, 0x00, 0x00, 0x00,
 			0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0x00, 0x00, 0x00, 0x00
 		};
-		bspCSMAABBNodes_stub = { data.begin(), data.end() };
+		r2::bspCSMAABBNodes_stub = { data.begin(), data.end() };
 	}
 	/* Cell BSP Nodes */
 	{
 		constexpr std::array<uint8_t, 8> data = {
 			0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00
 		};
-		bspCellBSPNodes_stub = { data.begin(), data.end() };
+		r2::bspCellBSPNodes_stub = { data.begin(), data.end() };
 	}
 	/* Cells */
 	{
 		constexpr std::array<uint8_t, 8> data = {
 			0x06, 0x00, 0x00, 0x00, 0x05, 0x00, 0xFF, 0xFF
 		};
-		bspCells_stub = { data.begin(), data.end() };
+		r2::bspCells_stub = { data.begin(), data.end() };
 	}
 	/* Portals */
 	{
@@ -1513,7 +1516,7 @@ void EmitStubs()
 			0x00, 0x01, 0x04, 0x00, 0x10, 0x00, 0x02, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x01, 0x04, 0x00,
 			0x14, 0x00, 0x02, 0x00, 0x05, 0x00, 0x00, 0x00
 		};
-		bspPortals_stub = { data.begin(), data.end() };
+		r2::bspPortals_stub = { data.begin(), data.end() };
 	}
 	/* Portal Vertices */
 	{
@@ -1526,7 +1529,7 @@ void EmitStubs()
 			0x00, 0x00, 0x40, 0xC5, 0x00, 0x00, 0x40, 0xC5, 0x00, 0x00, 0x40, 0xC5, 0x00, 0x00, 0x40, 0xC5,
 			0x00, 0x00, 0x40, 0xC5, 0x00, 0x00, 0x40, 0xC5, 0x00, 0x00, 0x40, 0x45
 		};
-		bspPortalVertices_stub = { data.begin(), data.end() };
+		r2::bspPortalVertices_stub = { data.begin(), data.end() };
 	}
 	/* Portal Edges */
 	{
@@ -1535,7 +1538,7 @@ void EmitStubs()
 			0x06, 0x00, 0x05, 0x00, 0x05, 0x00, 0x02, 0x00, 0x01, 0x00, 0x06, 0x00, 0x08, 0x00, 0x07, 0x00,
 			0x07, 0x00, 0x04, 0x00, 0x03, 0x00, 0x08, 0x00, 0x05, 0x00, 0x08, 0x00, 0x07, 0x00, 0x06, 0x00
 		};
-		bspPortalEdges_stub = { data.begin(), data.end() };
+		r2::bspPortalEdges_stub = { data.begin(), data.end() };
 	}
 	/* Portal Vertex Edges */
 	{
@@ -1550,7 +1553,7 @@ void EmitStubs()
 			0x07, 0x00, 0x08, 0x00, 0x0B, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 			0x07, 0x00, 0x09, 0x00, 0x0A, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 		};
-		bspPortalVertexEdges_stub = { data.begin(), data.end() };
+		r2::bspPortalVertexEdges_stub = { data.begin(), data.end() };
 	}
 	/* Portal Vertex References */
 	{
@@ -1559,7 +1562,7 @@ void EmitStubs()
 			0x07, 0x00, 0x04, 0x00, 0x03, 0x00, 0x08, 0x00, 0x03, 0x00, 0x02, 0x00, 0x05, 0x00, 0x08, 0x00,
 			0x06, 0x00, 0x01, 0x00, 0x04, 0x00, 0x07, 0x00, 0x08, 0x00, 0x05, 0x00, 0x06, 0x00, 0x07, 0x00
 		};
-		bspPortalVertexReferences_stub = { data.begin(), data.end() };
+		r2::bspPortalVertexReferences_stub = { data.begin(), data.end() };
 	}
 	/* Portal Edge References */
 	{
@@ -1568,7 +1571,7 @@ void EmitStubs()
 			0x0E, 0x00, 0x10, 0x00, 0x07, 0x00, 0x12, 0x00, 0x13, 0x00, 0x05, 0x00, 0x0B, 0x00, 0x14, 0x00,
 			0x16, 0x00, 0x0D, 0x00, 0x01, 0x00, 0x11, 0x00, 0x0F, 0x00, 0x15, 0x00, 0x09, 0x00, 0x17, 0x00
 		};
-		bspPortalEdgeReferences_stub = { data.begin(), data.end() };
+		r2::bspPortalEdgeReferences_stub = { data.begin(), data.end() };
 	}
 	/* Portal Edge Intersect Edge */
 	{
@@ -1586,7 +1589,7 @@ void EmitStubs()
 			0x04, 0x00, 0x05, 0x00, 0x07, 0x00, 0x09, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 			0x04, 0x00, 0x06, 0x00, 0x07, 0x00, 0x08, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 		};
-		bspPortalEdgeIntersectEdge_stub = { data.begin(), data.end() };
+		r2::bspPortalEdgeIntersectEdge_stub = { data.begin(), data.end() };
 	}
 	/* Portal Edge Intersect At Vertex */
 	{
@@ -1604,7 +1607,7 @@ void EmitStubs()
 			0x05, 0x00, 0x05, 0x00, 0x08, 0x00, 0x08, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 			0x06, 0x00, 0x06, 0x00, 0x07, 0x00, 0x07, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 		};
-		bspPortalEdgeIntersectAtVertex_stub = { data.begin(), data.end() };
+		r2::bspPortalEdgeIntersectAtVertex_stub = { data.begin(), data.end() };
 	}
 	/* Portal Edge Intersect Header */
 	{
@@ -1616,14 +1619,14 @@ void EmitStubs()
 			0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
 			0x0A, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00
 		};
-		bspPortalEdgeIntersectHeader_stub = { data.begin(), data.end() };
+		r2::bspPortalEdgeIntersectHeader_stub = { data.begin(), data.end() };
 	}
 	/* Cell AABB Nodes */
 	{
-		CellAABBNode_t &node = bspCellAABBNodes_stub.emplace_back();
+		r2::CellAABBNode_t &node = r2::bspCellAABBNodes_stub.emplace_back();
 		node.mins = Vector3(-3000, -3000, -3000);
 		node.maxs = Vector3(3000, 3000, 3000);
-		node.obj_ref_count = bspObjReferences.size() > 255 ? 255 : bspObjReferences.size();
+		node.obj_ref_count = r2::bspObjReferences.size() > 255 ? 255 : r2::bspObjReferences.size();
 	}
 }
 /*
