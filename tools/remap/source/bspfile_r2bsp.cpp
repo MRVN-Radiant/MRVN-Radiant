@@ -243,9 +243,9 @@ void LoadR2BSPFile(const char* filename)
 		We only load lumps we can use for conversion to .map
 		I dont plan on supporting bsp merging, shifting, ...
 	*/
-	CopyLump( (rbspHeader_t*) header, R2_LUMP_PLANES,				r2::bspPlanes );
-	CopyLump( (rbspHeader_t*) header, R2_LUMP_CM_BRUSHES,			r2::bspBrushes );
-	CopyLump( (rbspHeader_t*) header, R2_LUMP_CM_BRUSH_SIDE_PLANES, r2::bspBrushSidePlanes);
+	CopyLump( (rbspHeader_t*) header, R2_LUMP_PLANES,				bspPlanes );
+	CopyLump( (rbspHeader_t*) header, R2_LUMP_CM_BRUSHES,			bspBrushes );
+	//CopyLump( (rbspHeader_t*) header, R2_LUMP_CM_BRUSH_SIDE_PLANES, r2::bspBrushSidePlanes);
 
 }
 
@@ -308,24 +308,24 @@ void WriteR2BSPFile(const char* filename)
 	AddLump(file, header.lumps[R2_LUMP_VERTEX_NORMALS],						r2::bspVertexNormals);
 	AddLump(file, header.lumps[R2_LUMP_ENTITY_PARTITIONS],					r2::bspEntityPartitions);
 	/* Game Lump */
-	{
-		std::size_t start = ftell(file);
-		header.lumps[R2_LUMP_GAME_LUMP].offset = start;
-		header.lumps[R2_LUMP_GAME_LUMP].length = 36 + r2::GameLump.path_count * sizeof(r2::GameLump_Path) + r2::GameLump.prop_count * sizeof(r2::GameLump_Prop);
-		r2::GameLump.offset = start + 20;
-		r2::GameLump.length = 16 + r2::GameLump.path_count * sizeof(r2::GameLump_Path) + r2::GameLump.prop_count * sizeof(r2::GameLump_Prop);
-		SafeWrite(file, &r2::GameLump, sizeof(r2::GameLump));
-		/* need to write vectors separately */
-		/* paths */
-		fseek(file, start + 24, SEEK_SET);
-		SafeWrite(file, r2::GameLump.paths.data(), 128 * r2::GameLump.path_count);
-		/* :) */
-		SafeWrite(file, &r2::GameLump.prop_count, 4);
-		SafeWrite(file, &r2::GameLump.prop_count, 4);
-		SafeWrite(file, &r2::GameLump.prop_count, 4);
-		/* props */
-		SafeWrite(file, r2::GameLump.props.data(), 64 * r2::GameLump.prop_count);
-	}
+	//{
+	//	std::size_t start = ftell(file);
+	//	header.lumps[R2_LUMP_GAME_LUMP].offset = start;
+	//	header.lumps[R2_LUMP_GAME_LUMP].length = 36 + r2::GameLump.path_count * sizeof(r2::GameLump_Path) + r2::GameLump.prop_count * sizeof(r2::GameLump_Prop);
+	//	r2::GameLump.offset = start + 20;
+	//	r2::GameLump.length = 16 + r2::GameLump.path_count * sizeof(r2::GameLump_Path) + r2::GameLump.prop_count * sizeof(r2::GameLump_Prop);
+	//	SafeWrite(file, &r2::GameLump, sizeof(r2::GameLump));
+	//	/* need to write vectors separately */
+	//	/* paths */
+	//	fseek(file, start + 24, SEEK_SET);
+	//	SafeWrite(file, r2::GameLump.paths.data(), 128 * r2::GameLump.path_count);
+	//	/* :) */
+	//	SafeWrite(file, &r2::GameLump.prop_count, 4);
+	//	SafeWrite(file, &r2::GameLump.prop_count, 4);
+	//	SafeWrite(file, &r2::GameLump.prop_count, 4);
+	//	/* props */
+	//	SafeWrite(file, r2::GameLump.props.data(), 64 * r2::GameLump.prop_count);
+	//}
 	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_DATA],			r2::bspTextureDataData);
 	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_TABLE],			r2::bspTextureDataTable);
 	AddLump(file, header.lumps[R2_LUMP_WORLD_LIGHTS],						r2::bspWorldLights_stub);

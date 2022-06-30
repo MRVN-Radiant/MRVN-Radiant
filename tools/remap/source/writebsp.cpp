@@ -876,9 +876,10 @@ void EmitModels()
 void EmitLevelInfo()
 {
 	r2::bspLevelInfo_t &li = r2::bspLevelInfo.emplace_back();
-	li.unk0 = 1;
-	li.unk1 = 1;
-	li.unk3 = 1;
+	// These work on small maps, larger maps still crash
+	li.unk0 = r2::bspObjReferenceBounds.size();
+	li.unk1 = r2::bspObjReferenceBounds.size();
+	li.unk3 = r2::bspObjReferenceBounds.size();
 	li.prop_count = r2::GameLump.prop_count;
 }
 
