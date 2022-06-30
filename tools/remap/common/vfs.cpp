@@ -70,7 +70,6 @@
 #include "stream/stringstream.h"
 #include "stream/textstream.h"
 #include <forward_list>
-#include <vector>
 
 struct VFS_PAK
 {

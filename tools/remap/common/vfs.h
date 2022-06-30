@@ -29,6 +29,7 @@
  */
 
 #pragma once
+#include <vector>
 
 void vfsInitDirectory( const char *path );
 void vfsShutdown();
