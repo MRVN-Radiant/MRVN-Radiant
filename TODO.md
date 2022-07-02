@@ -25,7 +25,7 @@
 ### Decompiler
 - [ ] bsp importer so we can remaster tf1 maps
   - [ ] improve importer
-  - [ ] add tf1 game profile
+  - [x] add tf1 game profile
 
 ### Editor
 - [ ] mdl importer
