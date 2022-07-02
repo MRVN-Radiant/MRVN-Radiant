@@ -29,8 +29,16 @@
 
 ### Editor
 - [ ] mdl importer
+- [ ] recursive folder support
+  - currently to use a texture the game has at `textures/models/vistas/rise` your radiant path would need to be at `textures/models_vistas/rise` which isn't very user friendly
+- [ ] basic vmt/ vtf support
 - [ ] some sortof r2recast support ( at least a good .obj exporter )
-
+- [ ] generally improve the editor
+  - delete unused features
+  - clean up
+  - the editor very rarely freezes for a couple seconds -> why?
+  - themes ?
+- [ ] edit flags in the surface menu ?
 ### Nice to haves ( low priority )
 - [ ] vpk tool that takes a `.map` as an input and only packs used assets ? ( call it revpk :trollface: )
 - [ ] repak or a bootleg version of repak for minimaps and loadscreens, maybe materials, same as above and other tools regarding input
