@@ -39,7 +39,7 @@ jobs:
 
     - name: Build
       run: |
-        make MAKEFILE_CONF=msys2-Makefile.conf DOWNLOAD_GAMEPACKS=no BUILD=release -j$(nproc)
+        make --debug=j MAKEFILE_CONF=msys2-Makefile.conf DOWNLOAD_GAMEPACKS=no BUILD=release -j$(nproc)
         wget https://github.com/F1F7Y/r2radiant-game-packs/releases/download/test/gamepacks.zip
         unzip -o gamepacks.zip -d "install"
         wget https://www.dropbox.com/s/hcgkwzzmja3m6c0/netradiant-custom-extra-win.zip
