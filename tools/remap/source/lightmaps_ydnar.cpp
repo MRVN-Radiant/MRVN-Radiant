@@ -30,7 +30,6 @@
 
 /* dependencies */
 #include "remap.h"
-#include "bspfile_rbsp.h"
 #include "surface_extra.h"
 #include "timer.h"
 
@@ -1329,7 +1328,7 @@ static void FindOutLightmaps( rawLightmap_t *lm, bool fastAllocate ){
 		}
 
 		/* if this is a style-using lightmap, it must be exported */
-		if ( lightmapNum > 0 && g_game->load != LoadRBSPFile ) {
+		if ( lightmapNum > 0 /* && g_game->load != LoadRBSPFile */) {
 			olm->extLightmapNum = 0;
 		}
 
