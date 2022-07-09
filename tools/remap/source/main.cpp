@@ -30,7 +30,6 @@
 
 /* dependencies */
 #include "remap.h"
-#include "autopk3.h"
 #include "timer.h"
 
 
@@ -191,16 +190,6 @@ int main( int argc, char **argv ){
 	/* bsp shifting */
 	else if ( args.takeFront( "-shift" ) ) {
 		r = ShiftBSPMain( args );
-	}
-
-	/* autopacking */
-	else if ( args.takeFront( "-pk3" ) ) {
-		r = pk3BSPMain( args );
-	}
-
-	/* repacker */
-	else if ( args.takeFront( "-repack" ) ) {
-		r = repackBSPMain( args );
 	}
 
 	/* ydnar: bsp conversion */

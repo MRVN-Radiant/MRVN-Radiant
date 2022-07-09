@@ -507,7 +507,6 @@ $(INSTALLDIR)/remap.$(EXE): \
 	tools/remap/common/unzip.o \
 	tools/remap/common/vfs.o \
 	tools/remap/common/miniz.o \
-	tools/remap/source/autopk3.o \
 	tools/remap/source/brush.o \
 	tools/remap/source/bspfile_abstract.o \
 	tools/remap/source/bspfile_r1bsp.o \
