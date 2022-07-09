@@ -96,7 +96,7 @@ build:
 - Start respective mingw shell
 - Switch to the directory with NetRadiant-custom source
 - Typical release build:
-  make MAKEFILE_CONF=msys2-Makefile.conf BUILD=release -j$(nproc)
+  `make MAKEFILE_CONF=msys2-Makefile.conf BUILD=release -j$(nproc)`
 - Typical developer's build:
   `make MAKEFILE_CONF=msys2-Makefile.conf DEPENDENCIES_CHECK=off DOWNLOAD_GAMEPACKS=no INSTALL_DLLS=no BUILD=debug RADIANT_ABOUTMSG="NetRadiant custom dev build" -j$(nproc)`
 - run:
