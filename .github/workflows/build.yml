@@ -5,7 +5,7 @@ on: [workflow_dispatch]
 jobs:
   windows-msys:
     name: ${{ matrix.config }} Windows ${{ matrix.arch }}
-    runs-on: windows-2019
+    runs-on: windows-2022
     strategy:
       fail-fast: false
       matrix:
@@ -39,8 +39,8 @@ jobs:
 
     - name: Build
       run: |
-        make --debug=j MAKEFILE_CONF=msys2-Makefile.conf DOWNLOAD_GAMEPACKS=no BUILD=release -j$(nproc)
-        wget https://github.com/F1F7Y/r2radiant-game-packs/releases/download/test/gamepacks.zip
+        make DOWNLOAD_GAMEPACKS=no MAKEFILE_CONF=msys2-Makefile.conf BUILD=release -j$(nproc) CXXFLAGS="-Wno-deprecated-declarations" 2> windows-warn-${{ matrix.arch }}.log
+        wget https://github.com/F1F7Y/spyglass-game-packs/releases/download/test/gamepacks.zip
         unzip -o gamepacks.zip -d "install"
         wget https://www.dropbox.com/s/hcgkwzzmja3m6c0/netradiant-custom-extra-win.zip
         unzip -o netradiant-custom-extra-win.zip -d "install"
