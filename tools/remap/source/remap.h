@@ -1456,6 +1456,7 @@ void                        BeginBSPFile();
 void                        EndBSPFile( bool do_write );
 void                        EmitBrushes( entity_t& e );
 void						EmitEntityPartitions();
+void						EmitEntity( const entity_t& e );
 void                        EmitMeshes( const entity_t& e );
 void						EmitObjReferences();
 void						EmitModels();

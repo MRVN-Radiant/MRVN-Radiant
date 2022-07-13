@@ -171,6 +171,8 @@ namespace r2
 		uint32_t flags;
 	};
 	
+	inline std::vector<char> bspEntities;
+
 	inline std::vector<bspTextureData_t> bspTextureData;
 
 	inline std::vector<bspVertex_t> bspVertices;

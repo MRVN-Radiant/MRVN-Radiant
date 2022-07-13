@@ -488,7 +488,7 @@ struct game_apexlegends : game_t
 	}{}
 };
 
-struct game_titanfall1 : game_t
+struct game_titanfallonline : game_t
 {
 	/* thanks to the gracious fellows at raven */
 	static const int S_CONT_SOLID = 0x00000001;  /* Default setting. An eye is never valid in a solid */
@@ -570,9 +570,9 @@ struct game_titanfall1 : game_t
 	static const int S_MAT_LAST = 32;          /* number of materials */
 
 	/* most of this is copied over, just want to et vis tree injected first */
-	game_titanfall1() : game_t
+	game_titanfallonline() : game_t
 	{
-		"titanfall1",          /* -game x */
+		"titanfallonline",          /* -game x */
 		"assets",               /* default base game data dir */
 		".assets",              /* unix home sub-dir */
 		"soldier",              /* magic path word */
@@ -716,6 +716,6 @@ struct game_titanfall1 : game_t
 
 const std::vector<game_t> g_games = { game_titanfall2(),
 									  game_apexlegends(),
-									  game_titanfall1()
+									  game_titanfallonline()
 									};
 const game_t *g_game = &g_games[0];

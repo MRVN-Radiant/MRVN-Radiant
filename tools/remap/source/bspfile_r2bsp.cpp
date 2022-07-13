@@ -394,7 +394,7 @@ void WriteR2BSPFile(const char* filename)
 	
 	/* Write lumps */
 	
-	AddLump(file, header.lumps[R2_LUMP_ENTITIES],							r2::bspEntities_stub);
+	AddLump(file, header.lumps[R2_LUMP_ENTITIES],							r2::bspEntities);
 	AddLump(file, header.lumps[R2_LUMP_PLANES],								r2::bspPlanes_stub);
 	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA],						r2::bspTextureData);
 	AddLump(file, header.lumps[R2_LUMP_VERTICES],							r2::bspVertices);
@@ -491,6 +491,9 @@ void CompileR2BSPFile()
 		/* get entity */
 		entity_t& entity = entities[entityNum];
 		const char* classname = entity.classname();
+
+		EmitEntity( entity );
+
 
 		/* visible geo */
 		if ( striEqual( classname,"worldspawn" ) )

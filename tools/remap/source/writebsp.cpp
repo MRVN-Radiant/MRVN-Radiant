@@ -448,6 +448,26 @@ void EmitEntityPartitions()
 	memcpy( p.partitions, "01* env fx script snd spawn", 27 );
 }
 
+/*
+   EmitEntity()
+   Saves an entity into it's corresponding .ent file or the lump the the .bsp
+ */
+void EmitEntity( const entity_t &e )
+{
+	StringOutputStream data;
+	data << "{\n";
+	for ( const epair_t &pair : e.epairs)
+	{
+		data << "\"" << pair.key.c_str() << "\" \"" << pair.value.c_str() << "\"\n";
+	}
+	data << "}\n";
+
+
+	std::vector<char> str = { data.begin(), data.end() };
+	r2::bspEntities.insert(r2::bspEntities.end(), str.begin(), str.end());
+
+}
+
 /* helpers */
 bool VertexLarger( Vector3 a, Vector3 b )
 {
