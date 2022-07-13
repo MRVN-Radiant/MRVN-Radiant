@@ -243,10 +243,104 @@ void LoadR2BSPFile(const char* filename)
 		We only load lumps we can use for conversion to .map
 		I dont plan on supporting bsp merging, shifting, ...
 	*/
+	CopyLump( (rbspHeader_t*) header, R2_LUMP_ENTITIES,				bspEntities );
 	CopyLump( (rbspHeader_t*) header, R2_LUMP_PLANES,				bspPlanes );
 	CopyLump( (rbspHeader_t*) header, R2_LUMP_CM_BRUSHES,			bspBrushes );
 	//CopyLump( (rbspHeader_t*) header, R2_LUMP_CM_BRUSH_SIDE_PLANES, r2::bspBrushSidePlanes);
+	
 
+	/*
+		Check if bsp references .ent files, theoratically it can reference whatever it wants
+		but we only read the ones respawn uses
+	*/
+	if ( header->lumps[0x18].length )
+	{
+		/* Spawn */
+		{
+			auto name = StringOutputStream(256)(PathExtensionless(filename), "_spawn.ent");
+			LoadEntFile( name.c_str(), bspEntities );
+		}
+		/* Snd */
+		{
+			auto name = StringOutputStream(256)(PathExtensionless(filename), "_snd.ent");
+			LoadEntFile( name.c_str(), bspEntities );
+		}
+		/* Script */
+		{
+			auto name = StringOutputStream(256)(PathExtensionless(filename), "_script.ent");
+			LoadEntFile(name.c_str(), bspEntities);
+		}
+		/* Fx */
+		{
+			auto name = StringOutputStream(256)(PathExtensionless(filename), "_fx.ent");
+			LoadEntFile(name.c_str(), bspEntities);
+		}
+		/* Env */
+		{
+			auto name = StringOutputStream(256)(PathExtensionless(filename), "_env.ent");
+			LoadEntFile(name.c_str(), bspEntities);
+		}
+	}
+
+
+	/*
+		Load Entities
+	*/
+	ParseEntities();
+
+	/*
+		Convert loaded lumps into the entities vector
+	*/
+	if ( entities.size() == 0 )
+		Error( "No entities" );
+
+	for (std::size_t i = 0; i < bspBrushes.size(); i++)
+	{
+		bspBrush_t& bspBrush = bspBrushes.at(i);
+
+
+		Vector3 mins = bspBrush.origin - bspBrush.extents;
+		Vector3 maxs = bspBrush.origin + bspBrush.extents;
+
+		/* Create the base 6 planes from the brush AABB */
+		std::vector<Plane3> planes;
+
+		{
+			Vector3 vertices[8];
+			vertices[0] = maxs;
+			vertices[1] = Vector3(maxs.x(), maxs.y(), mins.z());
+			vertices[2] = Vector3(maxs.x(), mins.y(), maxs.z());
+			vertices[3] = Vector3(mins.x(), maxs.y(), maxs.z());
+			vertices[4] = mins;
+			vertices[5] = Vector3(mins.x(), mins.y(), maxs.z());
+			vertices[6] = Vector3(mins.x(), maxs.y(), mins.z());
+			vertices[7] = Vector3(maxs.x(), mins.y(), mins.z());
+
+
+			Plane3& plane0 = planes.emplace_back();
+			PlaneFromPoints(plane0, vertices[0], vertices[1], vertices[2]);
+			Plane3& plane1 = planes.emplace_back();
+			PlaneFromPoints(plane1, vertices[0], vertices[2], vertices[3]);
+			Plane3& plane2 = planes.emplace_back();
+			PlaneFromPoints(plane2, vertices[0], vertices[3], vertices[1]);
+			Plane3& plane3 = planes.emplace_back();
+			PlaneFromPoints(plane3, vertices[6], vertices[5], vertices[4]);
+			Plane3& plane4 = planes.emplace_back();
+			PlaneFromPoints(plane4, vertices[7], vertices[6], vertices[4]);
+			Plane3& plane5 = planes.emplace_back();
+			PlaneFromPoints(plane5, vertices[5], vertices[7], vertices[4]);
+		}
+
+		/* Make brush and fiil it with sides */
+
+		brush_t &brush = entities.data()[0].brushes.emplace_back();
+
+		for ( Plane3 plane : planes )
+		{
+			side_t& side = brush.sides.emplace_back();
+			side.plane = plane;
+		}
+	}
 }
 
 
@@ -308,24 +402,25 @@ void WriteR2BSPFile(const char* filename)
 	AddLump(file, header.lumps[R2_LUMP_VERTEX_NORMALS],						r2::bspVertexNormals);
 	AddLump(file, header.lumps[R2_LUMP_ENTITY_PARTITIONS],					r2::bspEntityPartitions);
 	/* Game Lump */
-	//{
-	//	std::size_t start = ftell(file);
-	//	header.lumps[R2_LUMP_GAME_LUMP].offset = start;
-	//	header.lumps[R2_LUMP_GAME_LUMP].length = 36 + r2::GameLump.path_count * sizeof(r2::GameLump_Path) + r2::GameLump.prop_count * sizeof(r2::GameLump_Prop);
-	//	r2::GameLump.offset = start + 20;
-	//	r2::GameLump.length = 16 + r2::GameLump.path_count * sizeof(r2::GameLump_Path) + r2::GameLump.prop_count * sizeof(r2::GameLump_Prop);
-	//	SafeWrite(file, &r2::GameLump, sizeof(r2::GameLump));
-	//	/* need to write vectors separately */
-	//	/* paths */
-	//	fseek(file, start + 24, SEEK_SET);
-	//	SafeWrite(file, r2::GameLump.paths.data(), 128 * r2::GameLump.path_count);
-	//	/* :) */
-	//	SafeWrite(file, &r2::GameLump.prop_count, 4);
-	//	SafeWrite(file, &r2::GameLump.prop_count, 4);
-	//	SafeWrite(file, &r2::GameLump.prop_count, 4);
-	//	/* props */
-	//	SafeWrite(file, r2::GameLump.props.data(), 64 * r2::GameLump.prop_count);
-	//}
+	{
+		std::size_t start = ftell(file);
+		header.lumps[R2_LUMP_GAME_LUMP].offset = start;
+		header.lumps[R2_LUMP_GAME_LUMP].length = 36 + r2::GameLump.pathCount * sizeof(r2::GameLump_Path) + r2::GameLump.propCount * sizeof(r2::GameLump_Prop);
+		r2::GameLump.offset = start + 20;
+		r2::GameLump.length = 16 + r2::GameLump.pathCount * sizeof(r2::GameLump_Path) + r2::GameLump.propCount * sizeof(r2::GameLump_Prop);
+		SafeWrite(file, &r2::GameLump, sizeof(r2::GameLump));
+		/* need to write vectors separately */
+		/* paths */
+		fseek(file, start + 24, SEEK_SET);
+		SafeWrite(file, r2::GameLump.paths.data(), 128 * r2::GameLump.pathCount);
+		/* :) */
+		SafeWrite(file, &r2::GameLump.propCount, 4);
+		SafeWrite(file, &r2::GameLump.propCount, 4);
+		SafeWrite(file, &r2::GameLump.propCount, 4);
+		/* props */
+		SafeWrite(file, r2::GameLump.props.data(), 64 * r2::GameLump.propCount);
+		SafeWrite(file, &r2::GameLump.unk5, 4);
+	}
 	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_DATA],			r2::bspTextureDataData);
 	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_TABLE],			r2::bspTextureDataTable);
 	AddLump(file, header.lumps[R2_LUMP_WORLD_LIGHTS],						r2::bspWorldLights_stub);
@@ -398,7 +493,7 @@ void CompileR2BSPFile()
 		const char* classname = entity.classname();
 
 		/* visible geo */
-		if ( strcmp( classname,"worldspawn" ) == 0 )
+		if ( striEqual( classname,"worldspawn" ) )
 		{
 
 			/* generate bsp meshes from map brushes */
@@ -411,7 +506,7 @@ void CompileR2BSPFile()
 
 		}
 		/* props for gamelump */
-		else if ( strcmp( classname, "misc_model" ) == 0)
+		else if ( striEqual( classname, "misc_model" ) )
 		{
 			EmitProp( entity );
 		}

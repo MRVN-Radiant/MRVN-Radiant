@@ -364,7 +364,7 @@ int ConvertBSPMain( Args& args ){
 		path_set_extension( source, ".bsp" );
 		Sys_Printf( "Loading %s\n", source );
 		g_game->load( source );
-		ParseEntities();
+		//ParseEntities();
 	}
 	
 	/* bsp format convert? */

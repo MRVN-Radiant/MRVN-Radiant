@@ -139,6 +139,7 @@ namespace r2
 		uint32_t unk3; // From testing can be same as prop_count
 		uint32_t unk4; // Same for this one
 		std::vector<GameLump_Prop> props;
+		uint32_t unk5;
 	};
 
 	struct bspBrush_t
@@ -169,7 +170,6 @@ namespace r2
 		uint32_t visibleY;
 		uint32_t flags;
 	};
-
 	
 	inline std::vector<bspTextureData_t> bspTextureData;
 

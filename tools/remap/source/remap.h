@@ -1657,6 +1657,8 @@ shaderInfo_t                *ShaderInfoForShaderNull( const char *shader );
 /* bspfile_abstract.c */
 void                        SwapBlock( int *block, int size );
 
+void						LoadEntFile( const char* filename, std::vector<char>& ents );
+
 void                        LoadBSPFile( const char *filename );
 void                        LoadBSPFilePartially( const char *filename );
 void                        WriteBSPFile( const char *filename );
@@ -2047,6 +2049,8 @@ inline std::vector<entity_t> entities;
 
 inline std::vector<std::string> savedTextures;
 
+/* Used only for loading, when saving each game has it's own vectors */
+inline std::vector<char> bspEntities;
 
 /* Old lumps, these need to go */
 

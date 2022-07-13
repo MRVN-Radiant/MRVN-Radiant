@@ -92,6 +92,21 @@ static void SwapBSPFile(){
 	
 }
 
+/*
+   LoadEntFile()
+   loads an ent file
+ */
+
+void LoadEntFile( const char* filename, std::vector<char> &ents )
+{
+	if ( !FileExists( filename ) )
+		return;
+	/* Open it */
+	MemBuffer f = LoadFile( filename );
+	/* Add to bspEntities */
+	std::vector<char> ent = { (char*)((byte*)f.data() + 10), (char*)((byte*)f.data() + f.size()) };
+	ents.insert(bspEntities.end(), ent.begin(), ent.end());
+}
 
 /*
    LoadBSPFile()
@@ -253,7 +268,7 @@ static bool ParseEntity(){
 
 void ParseEntities(){
 	entities.clear();
-	ParseFromMemory( bspEntData.data(), bspEntData.size() );
+	ParseFromMemory( bspEntities.data(), bspEntities.size() );
 	while ( ParseEntity() ){};
 
 	/* ydnar: set number of bsp entities in case a map is loaded on top */
