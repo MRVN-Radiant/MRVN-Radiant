@@ -491,39 +491,6 @@ struct tempMesh_t
 	std::vector<uint16_t> Triangles;
 };
 
-bool FloatLargerEqual( float a, float b )
-{
-	return ( a > b ) || fabs( a - b ) < EQUAL_EPSILON;
-}
-
-bool FloatSmallerEqual( float a, float b )
-{
-	return ( a < b ) || fabs( a - b ) < EQUAL_EPSILON;
-}
-
-// I do indeed hate this
-// This crap is funny as hell
-bool MinMaxIntersecting( MinMax a, MinMax b)
-{
-	return	( FloatLargerEqual( a.maxs.x(), b.mins.x() ) && FloatSmallerEqual( a.maxs.x(), b.maxs.x() ) ) ||
-			( FloatLargerEqual( a.mins.x(), b.mins.x() ) && FloatSmallerEqual( a.mins.x(), b.maxs.x() ) ) ||
-			( FloatLargerEqual( a.maxs.y(), b.mins.y() ) && FloatSmallerEqual( a.maxs.y(), b.maxs.y() ) ) ||
-			( FloatLargerEqual( a.mins.y(), b.mins.y() ) && FloatSmallerEqual( a.mins.y(), b.maxs.y() ) ) || 
-			( FloatLargerEqual( a.maxs.z(), b.mins.z() ) && FloatSmallerEqual( a.maxs.z(), b.maxs.z() ) ) ||
-			( FloatLargerEqual( a.mins.z(), b.mins.z() ) && FloatSmallerEqual( a.mins.z(), b.maxs.z() ) );
-}
-
-bool VectorsEqual( Vector3 a, Vector3 b )
-{
-	return	(fabs(a.x() - b.x()) < EQUAL_EPSILON) &&
-			(fabs(a.y() - b.y()) < EQUAL_EPSILON) &&
-			(fabs(a.z() - b.z()) < EQUAL_EPSILON);
-
-}
-
-float VectorDotProduct(Vector3 v1, Vector3 v2) {
-	return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
-}
 
 /*
    EmitMeshes()
@@ -561,27 +528,14 @@ void EmitMeshes( const entity_t& e )
 			/* loop through vertices */
 			for (const Vector3& vertex : side.winding)
 			{
-				/* Check against aabb */
-				/* Very cool piece of code I'm really proud of :) */
-				if (vertex.x() > mesh.minmax.maxs.x())
-					mesh.minmax.maxs.x() = vertex.x();
-				if (vertex.y() > mesh.minmax.maxs.y())
-					mesh.minmax.maxs.y() = vertex.y();
-				if (vertex.z() > mesh.minmax.maxs.z())
-					mesh.minmax.maxs.z() = vertex.z();
-				
-				if (vertex.x() < mesh.minmax.mins.x())
-					mesh.minmax.mins.x() = vertex.x();
-				if (vertex.y() < mesh.minmax.mins.y())
-					mesh.minmax.mins.y() = vertex.y();
-				if (vertex.z() < mesh.minmax.mins.z())
-					mesh.minmax.mins.z() = vertex.z();
+				/* Update AABB */
+				mesh.minmax.extend( vertex );
 				
 				/* Calculate it's UV */
 				/* or not */
 				Vector2 UV;
-				UV.x() = VectorDotProduct( vertex, side.texMat[0] );
-				UV.y() = VectorDotProduct( vertex, side.texMat[1] );
+				UV.x() = vector3_dot( vertex, side.texMat[0] );
+				UV.y() = vector3_dot( vertex, side.texMat[1] );
 
 				//UV.x() /= mesh.minmax.maxs.x() - mesh.minmax.mins.x();
 				//UV.y() /= mesh.minmax.maxs.z() - mesh.minmax.mins.z();
@@ -639,7 +593,7 @@ void EmitMeshes( const entity_t& e )
 		mesh.shaderInfo = patch->shaderInfo;
 
 		/* these are the in-editor editable verts, not the mesh you see in-editor ? */
-		for (std::size_t i = 0; i < sizeof(patch->mesh.verts); i ++)
+		for ( std::size_t i = 0; i < sizeof(patch->mesh.verts); i++ )
 		{
 			bspDrawVert_t vert = patch->mesh.verts[i];
 			mesh.Vertices.emplace_back(vert.xyz);
@@ -648,28 +602,14 @@ void EmitMeshes( const entity_t& e )
 		}
 		
 		
-		for (uint16_t i = 0; i < mesh.Vertices.size() - 2; i++)
+		for ( uint16_t i = 0; i < mesh.Vertices.size() - 2; i++ )
 		{
 			mesh.Triangles.emplace_back(i);
 		}
 
-		for (Vector3& vertex : mesh.Vertices)
-		{
-			
-			if (vertex.x() > mesh.minmax.maxs.x())
-				mesh.minmax.maxs.x() = vertex.x();
-			if (vertex.y() > mesh.minmax.maxs.y())
-				mesh.minmax.maxs.y() = vertex.y();
-			if (vertex.z() > mesh.minmax.maxs.z())
-				mesh.minmax.maxs.z() = vertex.z();
-
-			if (vertex.x() < mesh.minmax.mins.x())
-				mesh.minmax.mins.x() = vertex.x();
-			if (vertex.y() < mesh.minmax.mins.y())
-				mesh.minmax.mins.y() = vertex.y();
-			if (vertex.z() < mesh.minmax.mins.z())
-				mesh.minmax.mins.z() = vertex.z();
-		}
+		for ( Vector3& vertex : mesh.Vertices )
+			mesh.minmax.extend( vertex );
+		
 		
 
 		patch = patch->next;
@@ -707,7 +647,7 @@ void EmitMeshes( const entity_t& e )
 				continue;
 
 			/* Check if they're intersecting */
-			if ( !MinMaxIntersecting( mesh1.minmax, mesh2.minmax ) )
+			if ( !mesh1.minmax.test(mesh2.minmax) )
 				continue;
 			
 
@@ -722,28 +662,13 @@ void EmitMeshes( const entity_t& e )
 			
 
 			mesh1.Vertices.insert( mesh1.Vertices.end(), mesh2.Vertices.begin(), mesh2.Vertices.end() );
-
 			mesh1.Normals.insert( mesh1.Normals.end(), mesh2.Normals.begin(), mesh2.Normals.end() );
-
 			mesh1.UVs.insert( mesh1.UVs.end(), mesh2.UVs.begin(), mesh2.UVs.end() );
 			
 			/* aabb */
 			for (Vector3& vertex : mesh1.Vertices)
-			{
-				if (vertex.x() > mesh1.minmax.maxs.x())
-					mesh1.minmax.maxs.x() = vertex.x();
-				if (vertex.y() > mesh1.minmax.maxs.y())
-					mesh1.minmax.maxs.y() = vertex.y();
-				if (vertex.z() > mesh1.minmax.maxs.z())
-					mesh1.minmax.maxs.z() = vertex.z();
+				mesh1.minmax.extend( vertex );
 
-				if (vertex.x() < mesh1.minmax.mins.x())
-					mesh1.minmax.mins.x() = vertex.x();
-				if (vertex.y() < mesh1.minmax.mins.y())
-					mesh1.minmax.mins.y() = vertex.y();
-				if (vertex.z() < mesh1.minmax.mins.z())
-					mesh1.minmax.mins.z() = vertex.z();
-			}
 			/* Delete mesh we combined as to not create duplicates */
 			tempMeshes.erase( tempMeshes.begin() + i );
 			iterationsSinceCombine = 0;
@@ -784,19 +709,7 @@ void EmitMeshes( const entity_t& e )
 		{
 			Vector3 vertex = tempMesh.Vertices.at(i);
 			/* Check against aabb */
-			if (vertex.x() > aabb.maxs.x())
-				aabb.maxs.x() = vertex.x();
-			if (vertex.y() > aabb.maxs.y())
-				aabb.maxs.y() = vertex.y();
-			if (vertex.z() > aabb.maxs.z())
-				aabb.maxs.z() = vertex.z();
-
-			if (vertex.x() < aabb.mins.x())
-				aabb.mins.x() = vertex.x();
-			if (vertex.y() < aabb.mins.y())
-				aabb.mins.y() = vertex.y();
-			if (vertex.z() < aabb.mins.z())
-				aabb.mins.z() = vertex.z();
+			aabb.extend( vertex );
 
 			r2::bspVertexLitBump_t& litVertex = r2::bspVertexLitBump.emplace_back();
 			litVertex.minusOne = -1;
