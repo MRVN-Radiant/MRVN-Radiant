@@ -258,24 +258,6 @@ namespace r2
 
 	inline std::vector<uint8_t> bspCells_stub;
 
-	inline std::vector<uint8_t> bspPortals_stub;
-
-	inline std::vector<uint8_t> bspPortalVertices_stub;
-
-	inline std::vector<uint8_t> bspPortalEdges_stub;
-
-	inline std::vector<uint8_t> bspPortalVertexEdges_stub;
-
-	inline std::vector<uint8_t> bspPortalVertexReferences_stub;
-
-	inline std::vector<uint8_t> bspPortalEdgeReferences_stub;
-
-	inline std::vector<uint8_t> bspPortalEdgeIntersectEdge_stub;
-
-	inline std::vector<uint8_t> bspPortalEdgeIntersectAtVertex_stub;
-
-	inline std::vector<uint8_t> bspPortalEdgeIntersectHeader_stub;
-
 	inline std::vector<CellAABBNode_t> bspCellAABBNodes_stub;
 
 	inline GameLump_t GameLump;

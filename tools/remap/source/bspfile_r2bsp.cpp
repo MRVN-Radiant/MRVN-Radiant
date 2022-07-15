@@ -443,21 +443,11 @@ void WriteR2BSPFile(const char* filename)
 	AddLump(file, header.lumps[R2_LUMP_CM_BRUSHES],							r2::bspCMBrushes_stub);
 	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PLANES],				r2::bspCMBrushSidePlaneOffsets_stub);
 	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PROPS],				r2::bspCMBrushSideProps_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_TEX_VECS],					r2::bspCMBrushTexVecs_stub);
 	AddLump(file, header.lumps[R2_LUMP_TRICOLL_BEVEL_STARTS],				r2::bspTricollBevelStarts_stub);
 	AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_DATA_SKY],					r2::bspLightMapDataSky_stub);
 	AddLump(file, header.lumps[R2_LUMP_CSM_AABB_NODES],						r2::bspCSMAABBNodes_stub);
 	AddLump(file, header.lumps[R2_LUMP_CELL_BSP_NODES],						r2::bspCellBSPNodes_stub);
 	AddLump(file, header.lumps[R2_LUMP_CELLS],								r2::bspCells_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTALS],							r2::bspPortals_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTAL_VERTICES],					r2::bspPortalVertices_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGES],						r2::bspPortalEdges_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTAL_VERTEX_EDGES],				r2::bspPortalVertexEdges_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTAL_VERTEX_REFERENCES],			r2::bspPortalVertexReferences_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGE_REGERENCES],				r2::bspPortalEdgeReferences_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGE_INTERSECT_EDGE],			r2::bspPortalEdgeIntersectEdge_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGE_INTERSECT_AT_VERTEX],	r2::bspPortalEdgeIntersectAtVertex_stub);
-	AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGE_INTERSECT_HEADER],		r2::bspPortalEdgeIntersectHeader_stub);
 	AddLump(file, header.lumps[R2_LUMP_CELL_AABB_NODES],					r2::bspCellAABBNodes_stub);
 	AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCES],						r2::bspObjReferences);
 	AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCE_BOUNDS],				r2::bspObjReferenceBounds);
@@ -494,12 +484,12 @@ void CompileR2BSPFile()
 
 		EmitEntity( entity );
 
-
 		/* visible geo */
 		if ( striEqual( classname,"worldspawn" ) )
 		{
 
 			/* generate bsp meshes from map brushes */
+			shared::EmitMeshes(entity);
 			EmitMeshes(entity);
 
 			EmitBrushes(entity);

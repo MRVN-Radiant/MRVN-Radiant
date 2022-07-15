@@ -128,6 +128,11 @@ int main( int argc, char **argv ){
 	Sys_Printf( "NetRadiant    - v" RADIANT_VERSION " " __DATE__ " " __TIME__ "\n" );
 	Sys_Printf( "%s\n", Q3MAP_MOTD );
 	Sys_Printf( "%s\n", args.getArg0() );
+	Sys_Printf("    ________  ____ ___  ____  ____ \n");
+	Sys_Printf("   / ___/ _ \\/ __ `__ \\/ __ `/ __ \\\n");
+	Sys_Printf("  / /  /  __/ / / / / / /_/ / /_/ /\n");
+	Sys_Printf(" /_/   \\___/_/ /_/ /_/\\__,_/ .___/\n");
+	Sys_Printf("                          /_/\n");
 
 	/* ydnar: new path initialization */
 	InitPaths( args );

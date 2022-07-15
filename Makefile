@@ -509,6 +509,7 @@ $(INSTALLDIR)/remap.$(EXE): \
 	tools/remap/common/miniz.o \
 	tools/remap/source/brush.o \
 	tools/remap/source/bspfile_abstract.o \
+	tools/remap/source/bspfile_shared.o \
 	tools/remap/source/bspfile_r1bsp.o \
 	tools/remap/source/bspfile_r2bsp.o \
 	tools/remap/source/bspfile_r5bsp.o \
