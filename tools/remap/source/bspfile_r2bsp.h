@@ -210,11 +210,6 @@ namespace r2
 	inline std::vector<bspBrush_t> bspBrushes;
 
 	/* Stubs */
-	inline std::vector<char> bspEntities_stub;
-
-	inline std::vector<uint8_t> bspPlanes_stub;
-
-	inline std::vector<uint8_t> bspTextureData_stub;
 
 	inline std::vector<uint8_t> bspWorldLights_stub;
 
