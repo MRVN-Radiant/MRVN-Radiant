@@ -440,7 +440,6 @@ void WriteR2BSPFile(const char* filename)
 	AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVE_BOUNDS],				r2::bspCMPrimitiveBounds_stub);
 	AddLump(file, header.lumps[R2_LUMP_CM_UNIQUE_CONTENTS],					r2::bspCMUniqueContents_stub);
 	AddLump(file, header.lumps[R2_LUMP_CM_BRUSHES],							r2::bspCMBrushes_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PLANES],				r2::bspCMBrushSidePlaneOffsets_stub);
 	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PROPS],				r2::bspCMBrushSideProps_stub);
 	AddLump(file, header.lumps[R2_LUMP_TRICOLL_BEVEL_STARTS],				r2::bspTricollBevelStarts_stub);
 	AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_DATA_SKY],					r2::bspLightMapDataSky_stub);

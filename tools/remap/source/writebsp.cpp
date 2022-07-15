@@ -1073,14 +1073,6 @@ void EmitStubs()
 		};
 		r2::bspCMBrushes_stub = { data.begin(), data.end() };
 	}
-	/* CM Brush Side Plane Offsets */
-	{
-		constexpr std::array<uint8_t, 24> data = {
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-		};
-		r2::bspCMBrushSidePlaneOffsets_stub = { data.begin(), data.end() };
-	}
 	/* CM Brush Side Props */
 	{
 		constexpr std::array<uint8_t, 60> data = {

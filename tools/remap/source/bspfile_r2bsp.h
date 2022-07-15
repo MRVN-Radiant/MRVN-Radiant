@@ -237,8 +237,6 @@ namespace r2
 
 	inline std::vector<uint8_t> bspCMBrushes_stub;
 
-	inline std::vector<uint8_t> bspCMBrushSidePlaneOffsets_stub;
-
 	inline std::vector<uint8_t> bspCMBrushSideProps_stub;
 
 	inline std::vector<uint8_t> bspCMBrushTexVecs_stub;
