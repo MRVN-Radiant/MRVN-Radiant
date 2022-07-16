@@ -27,7 +27,7 @@ void shared::EmitMeshes( const entity_t &e )
 				continue;
 
 			/* This should check flags, but those dont work rn */
-			if ( striEqual( side.shaderInfo->shader.c_str(), "textures/common/caulk" ) )
+			if ( striEqual( side.shaderInfo->shader.c_str(), "textures/tools/toolsnodraw" ) )
 				continue;
 			
 			shared::mesh_t &mesh = shared::meshes.emplace_back();
