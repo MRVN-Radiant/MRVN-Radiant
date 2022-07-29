@@ -4,12 +4,45 @@
 
 
 
+float CalculateSAH( std::vector<shared::visRef_t> &refs, int axis, float pos )
+{
+	MinMax left;
+	std::size_t leftCount = 0;
+	MinMax right;
+	std::size_t rightCount = 0;
+
+	for ( shared::visRef_t &ref : refs )
+	{
+		float refPos = ref.minmax.maxs[axis];
+		if ( refPos < pos )
+		{
+			leftCount++;
+			left.extend( ref.minmax );
+		}
+		else
+		{
+			rightCount++;
+			right.extend( ref.minmax );
+		}
+	}
+
+	float cost = 0;
+	if ( leftCount != 0 )
+		cost += leftCount * left.area();
+	if ( rightCount != 0 )
+		cost += rightCount * right.area();
+
+	return cost;
+}
+
+
+
 
 /*
 	EmitMeshes()
 	Emits shared meshes for a given entity
 */
-void shared::EmitMeshes( const entity_t &e )
+void shared::MakeMeshes( const entity_t &e )
 {
 	/* Multiple entities can have meshes, make sure we clear before making new meshes */
 	shared::meshes.clear();
@@ -150,4 +183,127 @@ void shared::EmitMeshes( const entity_t &e )
 	}
 
 	Sys_Printf("Made: %i meshes\n", shared::meshes.size());
+}
+
+void shared::MakeVisReferences()
+{
+	/* Meshes */
+	for ( std::size_t i = 0; i < shared::meshes.size(); i++ )
+	{
+		shared::mesh_t &mesh = shared::meshes.at( i );
+		shared::visRef_t &ref = shared::visRefs.emplace_back();
+
+		ref.minmax = mesh.minmax;
+		ref.index = i;
+
+		Sys_Printf("Index: %i\n",i);
+	}
+
+	/* Models */
+
+
+	Sys_Printf("Made: %i vis references\n", shared::visRefs.size());
+}
+
+shared::visNode_t shared::MakeVisTree( std::vector<shared::visRef_t> refs, float parentCost )
+{
+	shared::visNode_t node;
+
+	/* Make minmax of refs */
+	MinMax minmax;
+	for ( shared::visRef_t &ref : refs )
+		minmax.extend( ref.minmax );
+
+	node.minmax = minmax;
+
+	{
+		
+		std::vector<shared::visRef_t> visRefs = refs;
+		refs.clear();
+
+		for ( shared::visRef_t &ref : visRefs )
+		{
+			//Sys_Printf("amonsus %i\n", ref.index);
+			if ( ref.minmax.area() / minmax.area() > 0.7 )
+				node.refs.emplace_back( ref );
+			else
+				refs.emplace_back( ref );
+		}
+		
+		/*
+		std::size_t i = 0;
+		for (shared::visRef_t& ref : refs)
+		{
+			Sys_Printf("amonsus %i\n", ref.index);
+			if (ref.minmax.area() / minmax.area() > 0.7)
+			{
+				refs.erase(refs.begin() + i);
+				node.refs.emplace_back(ref);
+				i--;
+			}
+			i++;
+		}
+		*/
+	}
+
+
+	float bestCost, bestPos = 0;
+	int bestAxis = 0;
+
+	bestCost = 1e30f;
+
+	/* Loop through each axis and test possible splits */
+	for ( int axis = 0; axis < 3; axis++ )
+	{
+		for ( shared::visRef_t &ref : refs )
+		{
+			float pos = ref.minmax.mins[axis];
+			float cost = CalculateSAH( refs, axis, pos );
+			
+			if ( cost < bestCost )
+			{
+				bestCost = cost;
+				bestPos = pos;
+				bestAxis = axis;//Sys_Printf("bestCost: %f; bestPos: %f; bestAxis: %i\n", bestCost, bestPos, bestAxis);
+			}
+		}
+	}
+	
+	if ( bestCost >= parentCost )
+	{
+		for ( shared::visRef_t &ref : refs )
+			node.refs.emplace_back( ref );
+
+		return node;
+	}
+
+	MinMax left = minmax;
+	MinMax right = minmax;
+
+	std::vector<shared::visRef_t> leftRefs;
+	std::vector<shared::visRef_t> rightRefs;
+
+	left.mins[bestAxis] = bestPos;
+	right.maxs[bestAxis] = bestPos;
+
+
+	for ( shared::visRef_t &ref : refs )
+	{
+		if ( ref.minmax.test( left ) )
+		{
+			leftRefs.emplace_back( ref );
+			continue;
+		}
+
+		if ( ref.minmax.test( right ) )
+			rightRefs.emplace_back( ref );
+	}
+	
+
+	if( leftRefs.size() != 0 )
+		node.children.emplace_back( shared::MakeVisTree( leftRefs, bestCost ) );
+	if( rightRefs.size() != 0 )
+		node.children.emplace_back( shared::MakeVisTree( rightRefs, bestCost ) );
+
+	return node;
 }

@@ -58,6 +58,13 @@ struct MinMax___
 			}
 		}
 	}
+	T area() const {
+		T x, y, z;
+		x = maxs.x() - mins.x();
+		y = maxs.y() - mins.y();
+		z = maxs.z() - mins.z();
+		return x + y + z;
+	}
 	template<typename U>
 	void extend( const MinMax___<U>& other ){
 		extend( other.mins );

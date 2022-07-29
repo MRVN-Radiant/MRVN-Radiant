@@ -209,6 +209,8 @@ namespace r2
 
 	inline std::vector<bspBrush_t> bspBrushes;
 
+	inline std::vector<CellAABBNode_t> bspCellAABBNodes;
+
 	/* Stubs */
 
 	inline std::vector<uint8_t> bspWorldLights_stub;

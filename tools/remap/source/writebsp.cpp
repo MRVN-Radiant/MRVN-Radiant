@@ -602,7 +602,7 @@ void EmitObjReferences()
 	}
 
 	/* Props */
-	for ( uint16_t i = 0; i < r2::GameLump.propCount; i++ )
+	/*for (uint16_t i = 0; i < r2::GameLump.propCount; i++)
 	{
 		r2::bspObjReferenceBounds_t& refBounds = r2::bspObjReferenceBounds.emplace_back();
 		refBounds.mins = Vector3(-1000,-1000,-1000);
@@ -610,7 +610,103 @@ void EmitObjReferences()
 
 		r2::bspObjReferences_t& ref = r2::bspObjReferences.emplace_back();
 		ref = r2::bspMeshBounds.size() + i;
+	}*/
+}
+
+std::size_t EmitObjReferences( shared::visNode_t &node )
+{
+	//Sys_Printf("amongus\n");
+	/*for (std::size_t i = 0; i < r2::bspObjReferences.size(); i++)
+		if ( r2::bspObjReferences.at( i ) == ref.index )
+			return i;
+			*/
+	for ( shared::visRef_t &ref : node.refs )
+	{
+		r2::bspObjReferenceBounds_t& rb = r2::bspObjReferenceBounds.emplace_back();
+		rb.maxs = ref.minmax.maxs;
+		rb.mins = ref.minmax.mins;
+
+		r2::bspObjReferences.emplace_back( ref.index );
 	}
+
+	return r2::bspObjReferences.size() - node.refs.size();
+}
+
+uint16_t GetTotalVisNodeCount( shared::visNode_t node )
+{
+	// I think
+	uint16_t count = node.refs.size() == 0 ? 1 : node.refs.size();
+
+	for ( shared::visNode_t& n : node.children )
+		count += GetTotalVisNodeCount( n );
+
+	return count;
+}
+
+void EmitVisTreeNode( shared::visNode_t node )
+{
+	//Sys_Printf("VisTreeNode\n");
+	/* Emit children */
+	for ( std::size_t i = 0; i < node.children.size(); i++ )
+	{
+		shared::visNode_t &n = node.children.at( i );
+
+		r2::CellAABBNode_t &bn = r2::bspCellAABBNodes.emplace_back();
+		bn.maxs = n.minmax.maxs;
+		bn.mins = n.minmax.mins;
+
+		uint16_t offset = 0;
+		for ( uint16_t j = 0; j < node.children.size(); j++ )
+		{
+			if ( j == i )
+				continue;
+
+			// i = 1
+			// j = 
+			if ( j > i )
+				offset++;
+			else
+				offset += GetTotalVisNodeCount( node.children.at( j ) ) - 1;
+
+			Sys_Printf("VisTreeNode_%i: i=%i; j=%i; offset=%i\n", r2::bspCellAABBNodes.size() - 1, i, j, offset);
+		}
+
+		bn.firstChild = r2::bspCellAABBNodes.size() + offset;
+
+
+		bn.childCount = n.children.size();
+		bn.totalChildCount = GetTotalVisNodeCount( n );
+		
+		if ( n.refs.size() )
+		{
+			bn.objRef = EmitObjReferences( n );
+			bn.objRefCount = n.refs.size();
+		}
+	}
+
+	/* Loop through children */
+	for ( shared::visNode_t &n : node.children )
+		EmitVisTreeNode( n );
+}
+
+
+void EmitVisTree()
+{
+	shared::visNode_t &node = shared::visRoot;
+
+	r2::CellAABBNode_t &bn = r2::bspCellAABBNodes.emplace_back();
+	bn.maxs = node.minmax.maxs;
+	bn.mins = node.minmax.mins;
+	bn.firstChild = r2::bspCellAABBNodes.size();
+	bn.childCount = node.children.size();
+	bn.totalChildCount = GetTotalVisNodeCount( node );
+	if ( node.refs.size() )
+	{
+		bn.objRef = EmitObjReferences( node );
+		bn.objRefCount = node.refs.size();
+	}
+
+	EmitVisTreeNode( shared::visRoot );
 }
 
 void EmitModels()
@@ -622,10 +718,10 @@ void EmitModels()
 void EmitLevelInfo()
 {
 	r2::bspLevelInfo_t &li = r2::bspLevelInfo.emplace_back();
-	// These work on small maps, larger maps still crash
-	li.unk0 = r2::bspObjReferenceBounds.size();
-	li.unk1 = r2::bspObjReferenceBounds.size();
-	li.unk3 = r2::bspObjReferenceBounds.size();
+	// These are mesh flag counts
+	li.unk0 = r2::bspMeshes.size();
+	li.unk1 = r2::bspMeshes.size();
+	li.unk3 = r2::bspMeshes.size();
 	li.propCount = r2::GameLump.propCount;
 }
 

@@ -1459,6 +1459,8 @@ void						EmitEntityPartitions();
 void						EmitEntity( const entity_t& e );
 void                        EmitMeshes( const entity_t& e );
 void						EmitObjReferences();
+void						EmitVisTree();
+//void						EmitObjReference( shared::visRef_t ref );
 void						EmitModels();
 void						EmitLevelInfo();
 void						SetUpGameLump();

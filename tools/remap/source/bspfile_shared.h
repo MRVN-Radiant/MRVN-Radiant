@@ -25,8 +25,25 @@ namespace shared
 		std::vector<uint16_t> triangles;
 	};
 
+	struct visRef_t
+	{
+		MinMax minmax;
+		uint16_t index; // index to mesh / model
+	};
+
+	struct visNode_t
+	{
+		MinMax minmax;
+		std::vector<visNode_t> children;
+		std::vector<visRef_t> refs;
+	};
+
 	/* Vectors */
 	inline std::vector<mesh_t> meshes;
+	inline std::vector<visRef_t> visRefs;
+	inline visNode_t visRoot;
 	/* Functions */
-	void EmitMeshes( const entity_t &e );
+	void MakeMeshes( const entity_t &e );
+	void MakeVisReferences();
+	visNode_t MakeVisTree( std::vector<shared::visRef_t> refs, float parentCost );
 }

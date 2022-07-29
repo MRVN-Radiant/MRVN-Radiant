@@ -446,7 +446,7 @@ void WriteR2BSPFile(const char* filename)
 	AddLump(file, header.lumps[R2_LUMP_CSM_AABB_NODES],						r2::bspCSMAABBNodes_stub);
 	AddLump(file, header.lumps[R2_LUMP_CELL_BSP_NODES],						r2::bspCellBSPNodes_stub);
 	AddLump(file, header.lumps[R2_LUMP_CELLS],								r2::bspCells_stub);
-	AddLump(file, header.lumps[R2_LUMP_CELL_AABB_NODES],					r2::bspCellAABBNodes_stub);
+	AddLump(file, header.lumps[R2_LUMP_CELL_AABB_NODES],					r2::bspCellAABBNodes);
 	AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCES],						r2::bspObjReferences);
 	AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCE_BOUNDS],				r2::bspObjReferenceBounds);
 	AddLump(file, header.lumps[R2_LUMP_LEVEL_INFO],							r2::bspLevelInfo);
@@ -487,7 +487,7 @@ void CompileR2BSPFile()
 		{
 
 			/* generate bsp meshes from map brushes */
-			shared::EmitMeshes(entity);
+			shared::MakeMeshes(entity);
 			EmitMeshes(entity);
 
 			EmitBrushes(entity);
@@ -507,7 +507,9 @@ void CompileR2BSPFile()
 	EmitEntityPartitions();
 
 	/**/
-	EmitObjReferences();
+	shared::MakeVisReferences();
+	shared::visRoot = shared::MakeVisTree( shared::visRefs, 1e30f );
+	EmitVisTree();
 
 	/* Emit LevelInfo */
 	EmitLevelInfo();
