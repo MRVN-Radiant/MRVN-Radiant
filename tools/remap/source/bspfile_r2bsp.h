@@ -98,7 +98,7 @@ namespace r2
 		Vector3 mins;
 		uint8_t childCount; // number of direct children this node has
 		uint8_t objRefCount; // number of obj_refs it indexes
-		uint16_t totalChildCount; // nuber of children all direct children have
+		uint16_t totalRefCount; // Amount of refs referenced by this node + it's children
 		Vector3 maxs;
 		uint16_t firstChild; // first child index
 		uint16_t objRef; // first obj_ref index

@@ -634,8 +634,7 @@ std::size_t EmitObjReferences( shared::visNode_t &node )
 
 uint16_t GetTotalVisNodeCount( shared::visNode_t node )
 {
-	// I think
-	uint16_t count = node.refs.size() == 0 ? 1 : node.refs.size();
+	uint16_t count = node.refs.size();
 
 	for ( shared::visNode_t& n : node.children )
 		count += GetTotalVisNodeCount( n );
@@ -675,7 +674,7 @@ void EmitVisTreeNode( shared::visNode_t node )
 
 
 		bn.childCount = n.children.size();
-		bn.totalChildCount = GetTotalVisNodeCount( n );
+		bn.totalRefCount = GetTotalVisNodeCount( n );
 		
 		if ( n.refs.size() )
 		{
@@ -699,7 +698,7 @@ void EmitVisTree()
 	bn.mins = node.minmax.mins;
 	bn.firstChild = r2::bspCellAABBNodes.size();
 	bn.childCount = node.children.size();
-	bn.totalChildCount = GetTotalVisNodeCount( node );
+	bn.totalRefCount = GetTotalVisNodeCount( node );
 	if ( node.refs.size() )
 	{
 		bn.objRef = EmitObjReferences( node );
