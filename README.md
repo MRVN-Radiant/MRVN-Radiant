@@ -1,27 +1,18 @@
-# SPYGLASS-RADIANT
-<p align="center">
-  <img src="https://github.com/F1F7Y/r2radiant/actions/workflows/build.yml/badge.svg">
-  <img src="https://img.shields.io/github/issues/F1F7Y/r2radiant">
-  <img src="https://img.shields.io/github/issues-pr/F1F7Y/r2radiant">
-</p>
+# MRVN-Radiant
 
-The open-source, cross-platform level editor for respawn source games.
+The open-source, cross-platform level editor for Reswapn Entertainment Source based games.
 
-**r2radiant** is a fork of NetRadiant-Custom (GtkRadiant 1.4&rarr;massive rewrite&rarr;1.5&rarr;NetRadiant&rarr;NetRadiant-Custom&rarr;this)
+MRVN-Radiant is a fork of NetRadiant-custom (GtkRadiant 1.4&rarr;massive rewrite&rarr;1.5&rarr;NetRadiant&rarr;NetRadiant-custom&rarr;this)
 
-
-## Downloads
-one day:tm:
 
 ## Supported games
-Titanfall 1
-- nothing ( soon:tm: )
+- Titanfall Online ( Titanfall Online Revival )
+- Titanfall 2 ( [Northstar](https://northstar.tf) )
+- Apex Legends ( R5Reloaded )
 
-Titanfall 2
-- only basic visuals
-
-Apex legends ( season 3 ( r5realoded ) )
-- nothing
-
-## [COMPILING](/COMPILING.md)
-## [TODO](/TODO.md)
+## Status
+| Game | Coverage | Note |
+|------|----------|------|
+| Titanfall Online | 0% | Nothing |
+| Titanfall 2 | 20% | No collision, no lighting, vis tree crash on more complex maps |
+| Apex Legends | 0% | Nothing |
