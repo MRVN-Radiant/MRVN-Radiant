@@ -22,6 +22,8 @@
 #pragma once
 
 #include "qmath.h"
+#include <vector>
+#include <string>
 
 using winding_t = std::vector<Vector3>;
 
