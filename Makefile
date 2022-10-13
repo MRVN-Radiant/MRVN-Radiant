@@ -449,7 +449,6 @@ binaries-remap: \
 clean:
 	$(FIND) . \( -name \*.o -o -name \*.d -o -name \*.$(DLL) -o -name \*.$(A) -o -name \*.$(EXE) \) -exec $(RM) {} \;
 	$(RM_R) $(INSTALLDIR_BASE)/
-	$(RM) icons/*.rc
 
 %.$(EXE):
 	file=$@; $(MKDIR) $${file%/*}
