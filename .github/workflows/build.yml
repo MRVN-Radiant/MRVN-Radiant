@@ -1,6 +1,6 @@
 name: build
 
-on: [push, workflow_dispatch]
+on: [push,pull_request,workflow_dispatch]
 
 jobs:
   windows-msys:
@@ -39,7 +39,7 @@ jobs:
 
     - name: Build
       run: |
-        make MAKEFILE_CONF=msys2-Makefile.conf BUILD=release -j$(nproc) 
+        make MAKEFILE_CONF=msys2-Makefile.conf BUILD=release -j$(nproc) CXXFLAGS="-Wno-deprecated-declarations" 2> windows-warn-${{ matrix.arch }}.log
         wget https://www.dropbox.com/s/hcgkwzzmja3m6c0/netradiant-custom-extra-win.zip
         unzip -o netradiant-custom-extra-win.zip -d "install"
 
