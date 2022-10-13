@@ -444,12 +444,6 @@ binaries-remap: \
 	$(INSTALLDIR)/remap \
 
 
-
-.PHONY: clean
-clean:
-	$(FIND) . \( -name \*.o -o -name \*.d -o -name \*.$(DLL) -o -name \*.$(A) -o -name \*.$(EXE) \) -exec $(RM) {} \;
-	$(RM_R) $(INSTALLDIR_BASE)/
-
 %.$(EXE):
 	file=$@; $(MKDIR) $${file%/*}
 	$(CXX) $^ $(LDFLAGS) $(LDFLAGS_COMMON) $(LDFLAGS_EXTRA) $(LIBS_EXTRA) $(LIBS_COMMON) $(LIBS) -o $@
