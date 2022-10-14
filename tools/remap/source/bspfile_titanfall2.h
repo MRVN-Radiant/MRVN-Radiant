@@ -16,7 +16,7 @@ void						CompileR2BSPFile();
 
    ------------------------------------------------------------------------------- */
 
-namespace r2
+namespace Titanfall2
 {
 	using bspVertex_t = Vector3;
 

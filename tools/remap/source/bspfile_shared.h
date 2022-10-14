@@ -7,7 +7,7 @@
 	If it starts with "ent" it gets saved in a .ent
 	The rest are just helpers and dont get saved
 */
-namespace shared
+namespace Shared
 {
 	/* Structs */
 	struct vertex_t
@@ -45,5 +45,5 @@ namespace shared
 	/* Functions */
 	void MakeMeshes( const entity_t &e );
 	void MakeVisReferences();
-	visNode_t MakeVisTree( std::vector<shared::visRef_t> refs, float parentCost );
+	visNode_t MakeVisTree( std::vector<Shared::visRef_t> refs, float parentCost );
 }

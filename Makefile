@@ -510,9 +510,9 @@ $(INSTALLDIR)/remap.$(EXE): \
 	tools/remap/source/brush.o \
 	tools/remap/source/bspfile_abstract.o \
 	tools/remap/source/bspfile_shared.o \
-	tools/remap/source/bspfile_r1bsp.o \
-	tools/remap/source/bspfile_r2bsp.o \
-	tools/remap/source/bspfile_r5bsp.o \
+	tools/remap/source/bspfile_titanfall.o \
+	tools/remap/source/bspfile_titanfall2.o \
+	tools/remap/source/bspfile_apex_legends.o \
 	tools/remap/source/bsp.o \
 	tools/remap/source/convert_bsp.o \
 	tools/remap/source/convert_json.o \

@@ -246,7 +246,7 @@ void LoadR2BSPFile(const char* filename)
 	CopyLump( (rbspHeader_t*) header, R2_LUMP_ENTITIES,				bspEntities );
 	CopyLump( (rbspHeader_t*) header, R2_LUMP_PLANES,				bspPlanes );
 	CopyLump( (rbspHeader_t*) header, R2_LUMP_CM_BRUSHES,			bspBrushes );
-	//CopyLump( (rbspHeader_t*) header, R2_LUMP_CM_BRUSH_SIDE_PLANES, r2::bspBrushSidePlanes);
+	//CopyLump( (rbspHeader_t*) header, R2_LUMP_CM_BRUSH_SIDE_PLANES, Titanfall2::bspBrushSidePlanes);
 	
 
 	/*
@@ -394,62 +394,62 @@ void WriteR2BSPFile(const char* filename)
 	
 	/* Write lumps */
 	
-	AddLump(file, header.lumps[R2_LUMP_ENTITIES],							r2::bspEntities);
-	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA],						r2::bspTextureData);
-	AddLump(file, header.lumps[R2_LUMP_VERTICES],							r2::bspVertices);
-	AddLump(file, header.lumps[R2_LUMP_MODELS],								r2::bspModels);
-	AddLump(file, header.lumps[R2_LUMP_VERTEX_NORMALS],						r2::bspVertexNormals);
-	AddLump(file, header.lumps[R2_LUMP_ENTITY_PARTITIONS],					r2::bspEntityPartitions);
+	AddLump(file, header.lumps[R2_LUMP_ENTITIES],							Titanfall2::bspEntities);
+	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA],						Titanfall2::bspTextureData);
+	AddLump(file, header.lumps[R2_LUMP_VERTICES],							Titanfall2::bspVertices);
+	AddLump(file, header.lumps[R2_LUMP_MODELS],								Titanfall2::bspModels);
+	AddLump(file, header.lumps[R2_LUMP_VERTEX_NORMALS],						Titanfall2::bspVertexNormals);
+	AddLump(file, header.lumps[R2_LUMP_ENTITY_PARTITIONS],					Titanfall2::bspEntityPartitions);
 	/* Game Lump */
 	{
 		std::size_t start = ftell(file);
 		header.lumps[R2_LUMP_GAME_LUMP].offset = start;
-		header.lumps[R2_LUMP_GAME_LUMP].length = 36 + r2::GameLump.pathCount * sizeof(r2::GameLump_Path) + r2::GameLump.propCount * sizeof(r2::GameLump_Prop);
-		r2::GameLump.offset = start + 20;
-		r2::GameLump.length = 16 + r2::GameLump.pathCount * sizeof(r2::GameLump_Path) + r2::GameLump.propCount * sizeof(r2::GameLump_Prop);
-		SafeWrite(file, &r2::GameLump, sizeof(r2::GameLump));
+		header.lumps[R2_LUMP_GAME_LUMP].length = 36 + Titanfall2::GameLump.pathCount * sizeof(Titanfall2::GameLump_Path) + Titanfall2::GameLump.propCount * sizeof(Titanfall2::GameLump_Prop);
+		Titanfall2::GameLump.offset = start + 20;
+		Titanfall2::GameLump.length = 16 + Titanfall2::GameLump.pathCount * sizeof(Titanfall2::GameLump_Path) + Titanfall2::GameLump.propCount * sizeof(Titanfall2::GameLump_Prop);
+		SafeWrite(file, &Titanfall2::GameLump, sizeof(Titanfall2::GameLump));
 		/* need to write vectors separately */
 		/* paths */
 		fseek(file, start + 24, SEEK_SET);
-		SafeWrite(file, r2::GameLump.paths.data(), 128 * r2::GameLump.pathCount);
+		SafeWrite(file, Titanfall2::GameLump.paths.data(), 128 * Titanfall2::GameLump.pathCount);
 		/* :) */
-		SafeWrite(file, &r2::GameLump.propCount, 4);
-		SafeWrite(file, &r2::GameLump.propCount, 4);
-		SafeWrite(file, &r2::GameLump.propCount, 4);
+		SafeWrite(file, &Titanfall2::GameLump.propCount, 4);
+		SafeWrite(file, &Titanfall2::GameLump.propCount, 4);
+		SafeWrite(file, &Titanfall2::GameLump.propCount, 4);
 		/* props */
-		SafeWrite(file, r2::GameLump.props.data(), 64 * r2::GameLump.propCount);
-		SafeWrite(file, &r2::GameLump.unk5, 4);
+		SafeWrite(file, Titanfall2::GameLump.props.data(), 64 * Titanfall2::GameLump.propCount);
+		SafeWrite(file, &Titanfall2::GameLump.unk5, 4);
 	}
-	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_DATA],			r2::bspTextureDataData);
-	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_TABLE],			r2::bspTextureDataTable);
-	AddLump(file, header.lumps[R2_LUMP_WORLD_LIGHTS],						r2::bspWorldLights_stub);
-	AddLump(file, header.lumps[R2_LUMP_TRICOLL_TRIS],						r2::bspTricollTris_stub);
-	AddLump(file, header.lumps[R2_LUMP_TRICOLL_NODES],						r2::bspTricollNodes_stub);
-	AddLump(file, header.lumps[R2_LUMP_TRICOLL_HEADERS],					r2::bspTricollHeaders_stub);
-	AddLump(file, header.lumps[R2_LUMP_VERTEX_LIT_BUMP],					r2::bspVertexLitBump);
-	AddLump(file, header.lumps[R2_LUMP_MESH_INDICES],						r2::bspMeshIndices);
-	AddLump(file, header.lumps[R2_LUMP_MESHES],								r2::bspMeshes);
-	AddLump(file, header.lumps[R2_LUMP_MESH_BOUNDS],						r2::bspMeshBounds);
-	AddLump(file, header.lumps[R2_LUMP_MATERIAL_SORT],						r2::bspMaterialSorts);
-	AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_HEADERS],					r2::bspLightMapHeaders_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_GRID],							r2::bspCMGrid_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_GRID_CELLS],						r2::bspCMGridCells_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_GRID_SETS],						r2::bspCMGridSets_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_GEO_SET_BOUNDS],					r2::bspCMGeoSetBounds_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVES],						r2::bspCMPrimitives_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVE_BOUNDS],				r2::bspCMPrimitiveBounds_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_UNIQUE_CONTENTS],					r2::bspCMUniqueContents_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_BRUSHES],							r2::bspCMBrushes_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PROPS],				r2::bspCMBrushSideProps_stub);
-	AddLump(file, header.lumps[R2_LUMP_TRICOLL_BEVEL_STARTS],				r2::bspTricollBevelStarts_stub);
-	AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_DATA_SKY],					r2::bspLightMapDataSky_stub);
-	AddLump(file, header.lumps[R2_LUMP_CSM_AABB_NODES],						r2::bspCSMAABBNodes_stub);
-	AddLump(file, header.lumps[R2_LUMP_CELL_BSP_NODES],						r2::bspCellBSPNodes_stub);
-	AddLump(file, header.lumps[R2_LUMP_CELLS],								r2::bspCells_stub);
-	AddLump(file, header.lumps[R2_LUMP_CELL_AABB_NODES],					r2::bspCellAABBNodes);
-	AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCES],						r2::bspObjReferences);
-	AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCE_BOUNDS],				r2::bspObjReferenceBounds);
-	AddLump(file, header.lumps[R2_LUMP_LEVEL_INFO],							r2::bspLevelInfo);
+	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_DATA],			Titanfall2::bspTextureDataData);
+	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_TABLE],			Titanfall2::bspTextureDataTable);
+	AddLump(file, header.lumps[R2_LUMP_WORLD_LIGHTS],						Titanfall2::bspWorldLights_stub);
+	AddLump(file, header.lumps[R2_LUMP_TRICOLL_TRIS],						Titanfall2::bspTricollTris_stub);
+	AddLump(file, header.lumps[R2_LUMP_TRICOLL_NODES],						Titanfall2::bspTricollNodes_stub);
+	AddLump(file, header.lumps[R2_LUMP_TRICOLL_HEADERS],					Titanfall2::bspTricollHeaders_stub);
+	AddLump(file, header.lumps[R2_LUMP_VERTEX_LIT_BUMP],					Titanfall2::bspVertexLitBump);
+	AddLump(file, header.lumps[R2_LUMP_MESH_INDICES],						Titanfall2::bspMeshIndices);
+	AddLump(file, header.lumps[R2_LUMP_MESHES],								Titanfall2::bspMeshes);
+	AddLump(file, header.lumps[R2_LUMP_MESH_BOUNDS],						Titanfall2::bspMeshBounds);
+	AddLump(file, header.lumps[R2_LUMP_MATERIAL_SORT],						Titanfall2::bspMaterialSorts);
+	AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_HEADERS],					Titanfall2::bspLightMapHeaders_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_GRID],							Titanfall2::bspCMGrid_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_GRID_CELLS],						Titanfall2::bspCMGridCells_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_GRID_SETS],						Titanfall2::bspCMGridSets_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_GEO_SET_BOUNDS],					Titanfall2::bspCMGeoSetBounds_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVES],						Titanfall2::bspCMPrimitives_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVE_BOUNDS],				Titanfall2::bspCMPrimitiveBounds_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_UNIQUE_CONTENTS],					Titanfall2::bspCMUniqueContents_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_BRUSHES],							Titanfall2::bspCMBrushes_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PROPS],				Titanfall2::bspCMBrushSideProps_stub);
+	AddLump(file, header.lumps[R2_LUMP_TRICOLL_BEVEL_STARTS],				Titanfall2::bspTricollBevelStarts_stub);
+	AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_DATA_SKY],					Titanfall2::bspLightMapDataSky_stub);
+	AddLump(file, header.lumps[R2_LUMP_CSM_AABB_NODES],						Titanfall2::bspCSMAABBNodes_stub);
+	AddLump(file, header.lumps[R2_LUMP_CELL_BSP_NODES],						Titanfall2::bspCellBSPNodes_stub);
+	AddLump(file, header.lumps[R2_LUMP_CELLS],								Titanfall2::bspCells_stub);
+	AddLump(file, header.lumps[R2_LUMP_CELL_AABB_NODES],					Titanfall2::bspCellAABBNodes);
+	AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCES],						Titanfall2::bspObjReferences);
+	AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCE_BOUNDS],				Titanfall2::bspObjReferenceBounds);
+	AddLump(file, header.lumps[R2_LUMP_LEVEL_INFO],							Titanfall2::bspLevelInfo);
 
 
 	/* emit bsp size */
@@ -487,7 +487,7 @@ void CompileR2BSPFile()
 		{
 
 			/* generate bsp meshes from map brushes */
-			shared::MakeMeshes(entity);
+			Shared::MakeMeshes(entity);
 			EmitMeshes(entity);
 
 			EmitBrushes(entity);
@@ -507,8 +507,8 @@ void CompileR2BSPFile()
 	EmitEntityPartitions();
 
 	/**/
-	shared::MakeVisReferences();
-	shared::visRoot = shared::MakeVisTree( shared::visRefs, 1e30f );
+	Shared::MakeVisReferences();
+	Shared::visRoot = Shared::MakeVisTree( Shared::visRefs, 1e30f );
 	EmitVisTree();
 
 	/* Emit LevelInfo */

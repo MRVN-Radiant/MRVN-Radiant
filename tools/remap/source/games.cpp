@@ -27,9 +27,9 @@
    ------------------------------------------------------------------------------- */
 
 #include "games.h"
-#include "bspfile_r1bsp.h"
-#include "bspfile_r2bsp.h"
-#include "bspfile_r5bsp.h"
+#include "bspfile_titanfall.h"
+#include "bspfile_titanfall2.h"
+#include "bspfile_apex_legends.h"
 #include "qstringops.h"
 #include "inout.h"
 
