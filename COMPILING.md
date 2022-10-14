@@ -1,31 +1,17 @@
 
-developer documentation for r2radiant
+Developer documentation for MRVN-radiant
 ======================================
 
-getting the source
+Getting the source
 ==================
 
 The latest source is available from the git repository:
 
-  - https://github.com/F1F7Y/r2radiant
+  - https://github.com/F1F7Y/MRVN-radiant
 
 Libs for Windows:
 
   - https://www.dropbox.com/s/hcgkwzzmja3m6c0/netradiant-custom-extra-win.zip
-
-Gamepacks:
-
-  - https://github.com/F1F7Y/r2radiant-game-packs
-
-The git client can be obtained from the Subversion site.
-
-  - http://git-scm.org
-
-To get a copy of the source using the commandline git client:
-
-  - Change the current directory to the desired location for the source.
-  git clone https://github.com/Garux/netradiant-custom.git
-  cd netradiant-custom
 
 
 
@@ -51,33 +37,6 @@ run:
 Execute 'install/radiant.x86'
 
 
-OSX(using X-windows)
-====================
-
-environment:
-- OS X 10.5 or 10.6
-- Xcode developer tools installed (OSX DVD)
-- X11 (from the OS X DVD)
-- MacPorts or fink or homebrew installed
-- the following packages installed:
-  Macports (reported as working in 10.15.3):
-    gtkglext pkgconfig glib2-devel libxml2 gtk2 pango atk gettext wget
-  Fink:
-    gtkglext1 pkgconfig glib2-dev libxml2 gtk+2 gtk+2-dev pango1-xft2-ft219-dev atk1 gettext-dev wget
-  homebrew (does not work due to X11->Quartz switch, requires patched gtkglext):
-    gtk+ gtkglext
-
-build:
-run 'make'
-
-homebrew build:
-run 'export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
-make'
-
-run:
-Switch into the install folder, and run NetRadiant.app
-
-
 Win32 (using MSYS2)(recommended)
 ==================
 
@@ -98,7 +57,7 @@ build:
 - Typical release build:
   `make MAKEFILE_CONF=msys2-Makefile.conf BUILD=release -j$(nproc)`
 - Typical developer's build:
-  `make MAKEFILE_CONF=msys2-Makefile.conf DEPENDENCIES_CHECK=off DOWNLOAD_GAMEPACKS=no INSTALL_DLLS=no BUILD=debug RADIANT_ABOUTMSG="NetRadiant custom dev build" -j$(nproc)`
+  `make MAKEFILE_CONF=msys2-Makefile.conf DEPENDENCIES_CHECK=off INSTALL_DLLS=no BUILD=debug RADIANT_ABOUTMSG="MRVN-radiant dev build" -j$(nproc)`
 - run:
 - in the "install" directory, double click radiant.exe
 
@@ -129,3 +88,30 @@ run:
 - in the "install" directory, double click radiant.exe
 - if you get a DLL not found error, copy the DLL from either c:\mingw\bin or
   from c:\mingw\msys\1.0\bin to the "install" directory
+
+
+OSX(using X-windows)(UNTESTED)
+====================
+
+environment:
+- OS X 10.5 or 10.6
+- Xcode developer tools installed (OSX DVD)
+- X11 (from the OS X DVD)
+- MacPorts or fink or homebrew installed
+- the following packages installed:
+Macports (reported as working in 10.15.3):
+  gtkglext pkgconfig glib2-devel libxml2 gtk2 pango atk gettext wget
+Fink:
+  gtkglext1 pkgconfig glib2-dev libxml2 gtk+2 gtk+2-dev pango1-xft2-ft219-dev atk1 gettext-dev wget
+homebrew (does not work due to X11->Quartz switch, requires patched gtkglext):
+  gtk+ gtkglext
+
+build:
+run 'make'
+
+homebrew build:
+run 'export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
+make'
+
+run:
+Switch into the install folder, and run NetRadiant.app
