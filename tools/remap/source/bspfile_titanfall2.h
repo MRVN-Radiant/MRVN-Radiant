@@ -171,7 +171,6 @@ namespace Titanfall2
 		uint32_t flags;
 	};
 	
-	inline std::vector<char> bspEntities;
 
 	inline std::vector<bspTextureData_t> bspTextureData;
 

@@ -37,9 +37,6 @@ namespace ApexLegends {
 		uint32_t flags;
 	};
 
-	inline std::vector<Vertex_t> vertices;
-	inline std::vector<VertexNormal_t> vertexNormals;
 	inline std::vector<VertexLitBump_t> vertexLitBumpVertices;
 	inline std::vector<Mesh_t> meshes;
-	inline std::vector<MeshIndex_t> meshIndices;
 }

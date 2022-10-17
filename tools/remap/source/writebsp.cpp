@@ -464,7 +464,7 @@ void EmitEntity( const entity_t &e )
 
 
 	std::vector<char> str = { data.begin(), data.end() };
-	Titanfall2::bspEntities.insert(Titanfall2::bspEntities.end(), str.begin(), str.end());
+	Titanfall::Bsp::entities.insert(Titanfall::Bsp::entities.end(), str.begin(), str.end());
 
 }
 
@@ -506,7 +506,7 @@ void EmitMeshes( const entity_t& e )
 		bm.flags = 1051136;
 		bm.firstVertex = Titanfall2::bspVertexLitBump.size();
 		bm.vertexCount = mesh.vertices.size();
-		bm.triOffset = Titanfall2::bspMeshIndices.size();
+		bm.triOffset = Titanfall::Bsp::meshIndices.size();
 		bm.triCount = mesh.triangles.size() / 3;
 
 
@@ -529,9 +529,9 @@ void EmitMeshes( const entity_t& e )
 			lv.uv0 = mesh.vertices.at(i).st;
 
 			/* Save vert */
-			for ( uint16_t j = 0; j < Titanfall2::bspVertices.size(); j++ )
+			for ( uint16_t j = 0; j < Titanfall::Bsp::vertices.size(); j++ )
 			{
-				if ( VectorCompare( vertex, Titanfall2::bspVertices.at( j ) ) )
+				if ( VectorCompare( vertex, Titanfall::Bsp::vertices.at( j ) ) )
 				{
 					lv.vertexIndex = j;
 					goto normal;
@@ -539,15 +539,15 @@ void EmitMeshes( const entity_t& e )
 			}
 
 			{
-				lv.vertexIndex = Titanfall2::bspVertices.size();
-				Titanfall2::bspVertices.emplace_back( mesh.vertices.at(i).xyz );
+				lv.vertexIndex = Titanfall::Bsp::vertices.size();
+				Titanfall::Bsp::vertices.emplace_back( mesh.vertices.at(i).xyz );
 			}
 
 			normal:;
 
-			for ( uint16_t j = 0; j < Titanfall2::bspVertexNormals.size(); j++ )
+			for ( uint16_t j = 0; j < Titanfall::Bsp::vertexNormals.size(); j++ )
 			{
-				if ( VectorCompare( mesh.vertices.at( i ).normal, Titanfall2::bspVertexNormals.at( j ) ) )
+				if ( VectorCompare( mesh.vertices.at( i ).normal, Titanfall::Bsp::vertexNormals.at( j ) ) )
 				{
 					lv.normalIndex = j;
 					goto end;
@@ -555,8 +555,8 @@ void EmitMeshes( const entity_t& e )
 			}
 
 			{
-				lv.normalIndex = Titanfall2::bspVertexNormals.size();
-				Titanfall2::bspVertexNormals.emplace_back( mesh.vertices.at( i ).normal );
+				lv.normalIndex = Titanfall::Bsp::vertexNormals.size();
+				Titanfall::Bsp::vertexNormals.emplace_back( mesh.vertices.at( i ).normal );
 			}
 
 			end:;
@@ -567,9 +567,9 @@ void EmitMeshes( const entity_t& e )
 		{
 			for ( uint32_t j = 0; j < Titanfall2::bspVertexLitBump.size(); j++ )
 			{
-				if ( VectorCompare( Titanfall2::bspVertices.at( Titanfall2::bspVertexLitBump.at( j ).vertexIndex ),mesh.vertices.at( triangle ).xyz ) )
+				if ( VectorCompare( Titanfall::Bsp::vertices.at( Titanfall2::bspVertexLitBump.at( j ).vertexIndex ),mesh.vertices.at( triangle ).xyz ) )
 				{
-					Titanfall2::bspMeshIndex_t& index = Titanfall2::bspMeshIndices.emplace_back();
+					Titanfall2::bspMeshIndex_t& index = Titanfall::Bsp::meshIndices.emplace_back();
 					index = j;
 					break;
 				}
