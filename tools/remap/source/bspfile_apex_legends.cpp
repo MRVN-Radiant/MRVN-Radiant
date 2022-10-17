@@ -105,9 +105,146 @@ void LoadR5BSPFile(const char* filename)
  */
 void WriteR5BSPFile(const char* filename)
 {
+	rbspHeader_t header{};
+
+	/* set up header */
+	memcpy(header.ident, g_game->bspIdent, 4);
+	header.version = LittleLong(g_game->bspVersion);
+	header.mapVersion = 30;
+	header.maxLump = 127;
+
+	/* write initial header */
+	FILE* file = SafeOpenWrite(filename);
+	SafeWrite(file, &header, sizeof(header));    /* overwritten later */
+
+
+	/* :) */
+	{
+		char message[64] = "Built with love using MRVN-radiant :)";
+		SafeWrite(file, &message, sizeof(message));
+	}
+	{
+		char message[64];
+		strncpy(message,StringOutputStream(64)("Version:        ", Q3MAP_VERSION).c_str(),64);
+		SafeWrite(file, &message, sizeof(message));
+	}
+	{
+		time_t t;
+		time(&t);
+		char message[64];
+		strncpy(message,StringOutputStream(64)("Time:           ", asctime(localtime(&t))).c_str(),64);
+		SafeWrite(file, &message, sizeof(message));
+	}
+	
+	/* Write lumps */
+	AddLump(file, header.lumps[R5_LUMP_ENTITIES],			Titanfall2::bspEntities);
+	AddLump(file, header.lumps[R5_LUMP_VERTICES],			ApexLegends::vertices);
+	AddLump(file, header.lumps[R5_LUMP_VERTEX_NORMALS],		ApexLegends::vertexNormals);
+	AddLump(file, header.lumps[R5_LUMP_VERTEX_LIT_BUMP],	ApexLegends::vertexLitBumpVertices);
+	AddLump(file, header.lumps[R5_LUMP_MESHES],				ApexLegends::meshes);
+	AddLump(file, header.lumps[R5_LUMP_MESH_INDICES],		ApexLegends::meshIndices);
+
+
+	/* emit bsp size */
+	const int size = ftell(file);
+	Sys_Printf("Wrote %.1f MB (%d bytes)\n", (float)size / (1024 * 1024), size);
+
+	/* write the completed header */
+	fseek(file, 0, SEEK_SET);
+	SafeWrite(file, &header, sizeof(header));
+
+	/* close the file */
+	fclose(file);
 }
 
+/*
+   CompileR5BSPFile()
+   Compiles a v47 bsp file
+*/
 void CompileR5BSPFile()
 {
+	for (size_t entityNum = 0; entityNum < entities.size(); ++entityNum)
+	{
+		/* get entity */
+		entity_t& entity = entities[entityNum];
+		const char* classname = entity.classname();
 
+		EmitEntity( entity );
+
+		/* visible geo */
+		if ( striEqual( classname,"worldspawn" ) )
+		{
+			/* generate bsp meshes from map brushes */
+			Shared::MakeMeshes(entity);
+			ApexLegends::EmitMeshes(entity);
+		}
+	}
+}
+
+namespace ApexLegends {
+	void EmitMeshes( const entity_t& e ) {
+		for ( const Shared::mesh_t &mesh : Shared::meshes ) {
+			ApexLegends::Mesh_t &bm = ApexLegends::meshes.emplace_back();
+			bm.flags = 0x200;
+			bm.triangleOffset = ApexLegends::meshIndices.size();
+			bm.triangleCount = mesh.triangles.size() / 3;
+
+
+			// Save vertices and vertexnormals
+			for ( std::size_t i = 0; i < mesh.vertices.size(); i++ )
+			{
+				Vector3 vertex = mesh.vertices.at( i ).xyz;
+
+				ApexLegends::VertexLitBump_t &lv = ApexLegends::vertexLitBumpVertices.emplace_back();
+				lv.uv0 = mesh.vertices.at(i).st;
+
+				// Save vert
+				for ( uint16_t j = 0; j < ApexLegends::vertices.size(); j++ )
+				{
+					if ( VectorCompare( vertex, ApexLegends::vertices.at( j ) ) )
+					{
+						lv.vertexIndex = j;
+						goto normal;
+					}
+				}
+
+				{
+					lv.vertexIndex = ApexLegends::vertices.size();
+					ApexLegends::vertices.emplace_back( mesh.vertices.at(i).xyz );
+				}
+
+				normal:;
+
+				for ( uint16_t j = 0; j < ApexLegends::vertexNormals.size(); j++ )
+				{
+					if ( VectorCompare( mesh.vertices.at( i ).normal, ApexLegends::vertexNormals.at( j ) ) )
+					{
+						lv.normalIndex = j;
+						goto end;
+					}
+				}
+
+				{
+					lv.normalIndex = ApexLegends::vertexNormals.size();
+					ApexLegends::vertexNormals.emplace_back( mesh.vertices.at( i ).normal );
+				}
+
+				end:;
+			}
+
+			// Save triangles
+			for ( uint16_t triangle : mesh.triangles )
+			{
+				for ( uint32_t j = 0; j < ApexLegends::vertexLitBumpVertices.size(); j++ )
+				{
+					if ( VectorCompare( ApexLegends::vertices.at( ApexLegends::vertexLitBumpVertices.at( j ).vertexIndex ),mesh.vertices.at( triangle ).xyz ) )
+					{
+						ApexLegends::MeshIndex_t& index = ApexLegends::meshIndices.emplace_back();
+						index = j;
+						break;
+					}
+				}
+			}
+		}
+	}
 }

@@ -376,7 +376,7 @@ void WriteR2BSPFile(const char* filename)
 
 	/* :) */
 	{
-		char message[64] = "Built with love using spyglass-radiant :)";
+		char message[64] = "Built with love using MRVN-radiant :)";
 		SafeWrite(file, &message, sizeof(message));
 	}
 	{
