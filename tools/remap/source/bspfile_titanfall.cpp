@@ -110,13 +110,84 @@ void LoadR1BSPFile(const char* filename)
    WriteR2BSPFile()
    writes a r1 bsp file
  */
-void WriteR1BSPFile(const char* filename)
-{
+void WriteR1BSPFile( const char* filename ) {
+	rbspHeader_t header{};
+
+	// Set up header
+	memcpy( header.ident, g_game->bspIdent, 4 );
+	header.version = LittleLong( g_game->bspVersion );
+	header.mapVersion = 30;
+	header.maxLump = 127;
+
+	// write initial header
+	FILE* file = SafeOpenWrite( filename );
+	SafeWrite( file, &header, sizeof(header) );
+
+
+	/* :) */
+	{
+		char message[64] = "Built with love using MRVN-radiant :)";
+		SafeWrite( file, &message, sizeof(message) );
+	}
+	{
+		char message[64];
+		strncpy( message,StringOutputStream(64)("Version:        ", Q3MAP_VERSION).c_str(), 64 );
+		SafeWrite( file, &message, sizeof(message) );
+	}
+	{
+		time_t t;
+		time( &t );
+		char message[64];
+		strncpy( message,StringOutputStream(64)("Time:           ", asctime(localtime(&t))).c_str(), 64 );
+		SafeWrite( file, &message, sizeof(message) );
+	}
+	
+	/* Write lumps */
+	AddLump(file, header.lumps[R1_LUMP_ENTITIES],							Titanfall::Bsp::entities);
+	AddLump(file, header.lumps[R1_LUMP_VERTICES],							Titanfall::Bsp::vertices);
+	AddLump(file, header.lumps[R1_LUMP_VERTEX_NORMALS],						Titanfall::Bsp::vertexNormals);
+	AddLump(file, header.lumps[R1_LUMP_TEXTURE_DATA_STRING_DATA],			Titanfall::Bsp::textureDataData);
+	AddLump(file, header.lumps[R1_LUMP_TEXTURE_DATA_STRING_TABLE],			Titanfall::Bsp::textureDataTable);
+	AddLump(file, header.lumps[R1_LUMP_VERTEX_LIT_BUMP],					Titanfall::Bsp::vertexLitBumpVertices);
+	AddLump(file, header.lumps[R1_LUMP_MESH_INDICES],						Titanfall::Bsp::meshIndices);
+	AddLump(file, header.lumps[R1_LUMP_MESHES],								Titanfall::Bsp::meshes);
+	AddLump(file, header.lumps[R1_LUMP_MESH_BOUNDS],						Titanfall::Bsp::meshBounds);
+	AddLump(file, header.lumps[R1_LUMP_MATERIAL_SORT],						Titanfall::Bsp::materialSorts);
+
+
+	/* emit bsp size */
+	const int size = ftell(file);
+	Sys_Printf("Wrote %.1f MB (%d bytes)\n", (float)size / (1024 * 1024), size);
+
+	/* write the completed header */
+	fseek(file, 0, SEEK_SET);
+	SafeWrite(file, &header, sizeof(header));
+
+	/* close the file */
+	fclose(file);
 }
 
-void CompileR1BSPFile()
-{
+/*
+	CompileR1BSPFile
+	Compiles a v29 bsp file
+*/
+void CompileR1BSPFile() {
+	for ( std::size_t entityNum = 0; entityNum < entities.size(); ++entityNum )
+	{
+		// Get entity
+		entity_t& entity = entities[entityNum];
+		const char* classname = entity.classname();
 
+		EmitEntity( entity );
+
+		// Visible geo
+		if ( striEqual( classname,"worldspawn" ) )
+		{
+			// Generate bsp meshes from map brushes
+			Shared::MakeMeshes( entity );
+			Titanfall::EmitMeshes( entity );
+		}
+	}
 }
 
 namespace Titanfall {

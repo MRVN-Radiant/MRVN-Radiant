@@ -103,8 +103,7 @@ void LoadR5BSPFile(const char* filename)
    WriteR2BSPFile()
    writes a apex bsp file
  */
-void WriteR5BSPFile(const char* filename)
-{
+void WriteR5BSPFile(const char* filename) {
 	rbspHeader_t header{};
 
 	/* set up header */
@@ -161,8 +160,7 @@ void WriteR5BSPFile(const char* filename)
    CompileR5BSPFile()
    Compiles a v47 bsp file
 */
-void CompileR5BSPFile()
-{
+void CompileR5BSPFile() {
 	for (size_t entityNum = 0; entityNum < entities.size(); ++entityNum)
 	{
 		/* get entity */
