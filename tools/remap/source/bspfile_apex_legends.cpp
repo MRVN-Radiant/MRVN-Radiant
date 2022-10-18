@@ -193,15 +193,15 @@ namespace ApexLegends {
 			// Save vertices and vertexnormals
 			for ( std::size_t i = 0; i < mesh.vertices.size(); i++ )
 			{
-				Vector3 vertex = mesh.vertices.at( i ).xyz;
+				Shared::vertex_t vertex = mesh.vertices.at( i );
 
 				ApexLegends::VertexLitBump_t &lv = ApexLegends::vertexLitBumpVertices.emplace_back();
-				lv.uv0 = mesh.vertices.at(i).st;
+				lv.uv0 = vertex.st;
 
 				// Save vert
 				for ( uint16_t j = 0; j < Titanfall::Bsp::vertices.size(); j++ )
 				{
-					if ( VectorCompare( vertex, Titanfall::Bsp::vertices.at( j ) ) )
+					if ( VectorCompare( vertex.xyz, Titanfall::Bsp::vertices.at( j ) ) )
 					{
 						lv.vertexIndex = j;
 						goto normal;
@@ -210,14 +210,14 @@ namespace ApexLegends {
 
 				{
 					lv.vertexIndex = Titanfall::Bsp::vertices.size();
-					Titanfall::Bsp::vertices.emplace_back( mesh.vertices.at(i).xyz );
+					Titanfall::Bsp::vertices.emplace_back( vertex.xyz );
 				}
 
 				normal:;
 
 				for ( uint16_t j = 0; j < Titanfall::Bsp::vertexNormals.size(); j++ )
 				{
-					if ( VectorCompare( mesh.vertices.at( i ).normal, Titanfall::Bsp::vertexNormals.at( j ) ) )
+					if ( VectorCompare( vertex.normal, Titanfall::Bsp::vertexNormals.at( j ) ) )
 					{
 						lv.normalIndex = j;
 						goto end;
@@ -226,7 +226,7 @@ namespace ApexLegends {
 
 				{
 					lv.normalIndex = Titanfall::Bsp::vertexNormals.size();
-					Titanfall::Bsp::vertexNormals.emplace_back( mesh.vertices.at( i ).normal );
+					Titanfall::Bsp::vertexNormals.emplace_back( vertex.normal );
 				}
 
 				end:;
@@ -237,11 +237,14 @@ namespace ApexLegends {
 			{
 				for ( uint32_t j = 0; j < ApexLegends::vertexLitBumpVertices.size(); j++ )
 				{
-					if ( VectorCompare( Titanfall::Bsp::vertices.at( ApexLegends::vertexLitBumpVertices.at( j ).vertexIndex ),mesh.vertices.at( triangle ).xyz ) )
+					if ( VectorCompare( Titanfall::Bsp::vertices.at( ApexLegends::vertexLitBumpVertices.at( j ).vertexIndex ), mesh.vertices.at( triangle ).xyz ) )
 					{
-						ApexLegends::MeshIndex_t& index = Titanfall::Bsp::meshIndices.emplace_back();
-						index = j;
-						break;
+						if ( VectorCompare( Titanfall::Bsp::vertexNormals.at( ApexLegends::vertexLitBumpVertices.at( j ).normalIndex ), mesh.vertices.at( triangle ).normal ) )
+						{
+							ApexLegends::MeshIndex_t& index = Titanfall::Bsp::meshIndices.emplace_back();
+							index = j;
+							break;
+						}
 					}
 				}
 			}

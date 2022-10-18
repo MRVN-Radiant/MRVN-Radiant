@@ -66,6 +66,8 @@ void Shared::MakeMeshes( const entity_t &e )
 			Shared::mesh_t &mesh = Shared::meshes.emplace_back();
 			mesh.shaderInfo = side.shaderInfo;
 
+			Vector3 normal = side.plane.normal();//Vector3(0.0f,0.0f,1.0f);
+
 			/* Loop through vertices */
 			for ( const Vector3 &vertex : side.winding )
 			{
@@ -84,29 +86,7 @@ void Shared::MakeMeshes( const entity_t &e )
 				st[0] = side.texMat[0][0] * x + side.texMat[0][1] * y + side.texMat[0][2];
 				st[1] = side.texMat[1][0] * x + side.texMat[1][1] * y + side.texMat[1][2];
 
-				/* Normal */
-				Vector3 normal;
-				std::vector<Vector3> sideNormals;
-				/* Find neighbouring sides and save their normals */
-				for ( const side_t &s : brush.sides )
-				{
-					for ( const Vector3 &v : s.winding )
-					{
-						if ( VectorCompare( vertex, v ) )
-						{
-							sideNormals.push_back( s.plane.normal() );
-							break;
-						}
-					}
-				}
-
-				/* Add up normals, then normalize them */
-				for ( const Vector3 &n : sideNormals )
-					normal += n;
-
-				VectorNormalize(normal);
-
-				/* Add vertex to mesh */
+				
 				Shared::vertex_t &sv = mesh.vertices.emplace_back();
 				sv.xyz = vertex;
 				sv.st = st;
