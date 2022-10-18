@@ -487,8 +487,8 @@ void CompileR2BSPFile()
 		{
 
 			/* generate bsp meshes from map brushes */
-			Shared::MakeMeshes(entity);
-			EmitMeshes(entity);
+			Shared::MakeMeshes( entity );
+			Titanfall::EmitMeshes( entity );
 
 			EmitBrushes(entity);
 

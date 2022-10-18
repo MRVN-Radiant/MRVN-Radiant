@@ -191,21 +191,19 @@ namespace ApexLegends {
 
 
 			// Save vertices and vertexnormals
-			for ( std::size_t i = 0; i < mesh.vertices.size(); i++ )
-			{
+			for ( std::size_t i = 0; i < mesh.vertices.size(); i++ ) {
 				Shared::vertex_t vertex = mesh.vertices.at( i );
 
 				ApexLegends::VertexLitBump_t &lv = ApexLegends::Bsp::vertexLitBumpVertices.emplace_back();
 				lv.uv0 = vertex.st;
+				lv.negativeOne = -1;
 				lv.vertexIndex = Titanfall::EmitVertex( vertex.xyz );
 				lv.normalIndex = Titanfall::EmitVertexNormal( vertex.normal );
 			}
 
 			// Save triangles
-			for ( uint16_t triangle : mesh.triangles )
-			{
-				for ( uint32_t j = 0; j < ApexLegends::Bsp::vertexLitBumpVertices.size(); j++ )
-				{
+			for ( uint16_t triangle : mesh.triangles ) {
+				for ( uint32_t j = 0; j < ApexLegends::Bsp::vertexLitBumpVertices.size(); j++ ) {
 					if ( !VectorCompare( Titanfall::Bsp::vertices.at( ApexLegends::Bsp::vertexLitBumpVertices.at( j ).vertexIndex ), mesh.vertices.at( triangle ).xyz ) )
 						continue;
 					
@@ -213,7 +211,7 @@ namespace ApexLegends {
 						continue;
 
 
-					ApexLegends::MeshIndex_t& index = Titanfall::Bsp::meshIndices.emplace_back();
+					uint16_t& index = Titanfall::Bsp::meshIndices.emplace_back();
 					index = j;
 					break;
 				}

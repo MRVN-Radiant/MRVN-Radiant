@@ -120,41 +120,174 @@ void CompileR1BSPFile()
 }
 
 namespace Titanfall {
-   /*
-	  EmitVertex
-	  Saves a vertex into Titanfall::vertices and returns its index
-   */
-   uint32_t EmitVertex( Vector3 &vertex ) {
-	  for( uint32_t i = 0; i < (uint32_t)Titanfall::Bsp::vertices.size(); i++ ) {
-		 if( VectorCompare( vertex, Titanfall::Bsp::vertices.at( i ) ) )
-			return i;
-	  }
+	/*
+		EmitTextureData()
+		writes the entitiy partitions
+	*/
+	void EmitTextureData( shaderInfo_t shader ) {
+		std::string tex;
+		std::size_t index;
+		tex = shader.shader.c_str();
 
-	  Titanfall::Bsp::vertices.emplace_back( vertex );
-	  return (uint32_t)Titanfall::Bsp::vertices.size() - 1;
-   }
+		savedTextures.push_back( tex );
 
-   /*
-	  EmitVertexNormal
-	  Saves a vertex normal into Titanfall::vertexNormals and returns its index
-   */
-   uint32_t EmitVertexNormal( Vector3 &normal ) {
-	  for( uint32_t i = 0; i < (uint32_t)Titanfall::Bsp::vertexNormals.size(); i++ ) {
-		 if( VectorCompare( normal, Titanfall::Bsp::vertexNormals.at( i ) ) )
-			return i;
-	  }
+		tex.erase(tex.begin(), tex.begin() + 9);
+		std::replace(tex.begin(), tex.end(), '/', '\\');
 
-	  Titanfall::Bsp::vertexNormals.emplace_back( normal );
-	  return (uint32_t)Titanfall::Bsp::vertexNormals.size() - 1;
-   }
+		index = tex.find('\\');
+		if (index != std::string::npos)
+		{
+			std::replace(tex.begin(), tex.begin() + index, '_', '\\');
+		}
+
+		/* Check if it's already saved */
+		std::string table = std::string( Titanfall::Bsp::textureDataData.begin(), Titanfall::Bsp::textureDataData.end() );
+		index = table.find(tex);
+		if (index != std::string::npos)
+			return;
+
+		/* Add to Table */
+		StringOutputStream data;
+		data << tex.c_str();
+		std::vector<char> str = { data.begin(), data.end() + 1 };
+
+		Titanfall::Bsp::textureDataTable.emplace_back( Titanfall::Bsp::textureDataData.size() );
+		Titanfall::Bsp::textureDataData.insert( Titanfall::Bsp::textureDataData.end(), str.begin(), str.end() );
+
+		Titanfall::TextureData_t &td = Titanfall::Bsp::textureData.emplace_back();
+		td.name_index = Titanfall::Bsp::textureDataTable.size() - 1;
+		td.sizeX = shader.shaderImage->width;
+		td.sizeY = shader.shaderImage->height;
+		td.visibleX = shader.shaderImage->width;
+		td.visibleY = shader.shaderImage->height;
+		td.flags = 512; // This should be the same as the mesh indexing this textureData
+	}
+
+	/*
+		EmitVertex
+		Saves a vertex into Titanfall::vertices and returns its index
+	*/
+	uint32_t EmitVertex( Vector3 &vertex ) {
+		for( uint32_t i = 0; i < (uint32_t)Titanfall::Bsp::vertices.size(); i++ ) {
+			if( VectorCompare( vertex, Titanfall::Bsp::vertices.at( i ) ) )
+				return i;
+		}
+
+		Titanfall::Bsp::vertices.emplace_back( vertex );
+		return (uint32_t)Titanfall::Bsp::vertices.size() - 1;
+	}
+
+	/*
+		EmitVertexNormal
+		Saves a vertex normal into Titanfall::vertexNormals and returns its index
+	*/
+	uint32_t EmitVertexNormal( Vector3 &normal ) {
+		for( uint32_t i = 0; i < (uint32_t)Titanfall::Bsp::vertexNormals.size(); i++ ) {
+			if( VectorCompare( normal, Titanfall::Bsp::vertexNormals.at( i ) ) )
+				return i;
+		}
+
+		Titanfall::Bsp::vertexNormals.emplace_back( normal );
+		return (uint32_t)Titanfall::Bsp::vertexNormals.size() - 1;
+	}
 
 	/*
 		EmitEntityPartitions()
 		Writes entitiy partitions respawn uses
 	*/
-	void EmitEntityPartitions()
-	{
+	void EmitEntityPartitions() {
 		std::string partitions = "01* env fx script snd spawn";
 		Titanfall::Bsp::entityPartitions = { partitions.begin(), partitions.end() };
+	}
+
+	/*
+		EmitMeshes()
+		writes the mesh list to the bsp
+	*/
+	void EmitMeshes( const entity_t &e ) {
+		for ( const Shared::mesh_t &mesh : Shared::meshes ) {
+			Titanfall::Mesh_t &bm = Titanfall::Bsp::meshes.emplace_back();
+			bm.const0 = 4294967040; // :)
+			bm.flags = 1051136;
+			bm.firstVertex = Titanfall::Bsp::vertexLitBumpVertices.size();
+			bm.vertexCount = mesh.vertices.size();
+			bm.triOffset = Titanfall::Bsp::meshIndices.size();
+			bm.triCount = mesh.triangles.size() / 3;
+
+
+			// Emit textrue related structs
+			Titanfall::EmitTextureData( *mesh.shaderInfo );
+
+			bm.materialOffset = Titanfall::EmitMaterialSort( mesh.shaderInfo->shader.c_str() );
+
+			MinMax aabb;
+
+			// Save vertices and vertexnormals
+			for ( std::size_t i = 0; i < mesh.vertices.size(); i++ ) {
+				Shared::vertex_t vertex = mesh.vertices.at( i );
+				// Check against aabb
+				aabb.extend( vertex.xyz );
+
+				Titanfall::VertexLitBump_t &lv = Titanfall::Bsp::vertexLitBumpVertices.emplace_back();
+				lv.uv0 = vertex.st;
+				lv.negativeOne = -1;
+				lv.vertexIndex = Titanfall::EmitVertex( vertex.xyz );
+				lv.normalIndex = Titanfall::EmitVertexNormal( vertex.normal );
+			}
+
+			// Save triangles
+			for ( uint16_t triangle : mesh.triangles ) {
+				for ( uint32_t j = 0; j < Titanfall::Bsp::vertexLitBumpVertices.size(); j++ ) {
+					if ( !VectorCompare( Titanfall::Bsp::vertices.at( Titanfall::Bsp::vertexLitBumpVertices.at( j ).vertexIndex ),mesh.vertices.at( triangle ).xyz ) )
+						continue;
+					
+					if ( !VectorCompare( Titanfall::Bsp::vertexNormals.at( Titanfall::Bsp::vertexLitBumpVertices.at( j ).normalIndex ), mesh.vertices.at( triangle ).normal ) )
+						continue;
+					
+					uint16_t& index = Titanfall::Bsp::meshIndices.emplace_back();
+					index = j;
+					break;
+				}
+			}
+
+			// Save MeshBounds
+			Titanfall::MeshBounds_t& mb = Titanfall::Bsp::meshBounds.emplace_back();
+			mb.origin = ( aabb.maxs + aabb.mins ) / 2;
+			mb.extents = ( aabb.maxs - aabb.mins ) / 2;
+		}
+	}
+
+	/*
+		EmitMaterialSort()
+		Tries to create a material sort of the last texture
+	*/
+	uint16_t EmitMaterialSort( const char* texture ) {
+		std::string tex = texture;
+
+		std::string textureData = { Titanfall::Bsp::textureDataData.begin(), Titanfall::Bsp::textureDataData.end() };
+
+		/* Find the texture path in the textureData lump */
+		uint16_t index = 0;
+		for ( std::string &path : savedTextures ) {
+			if ( path == tex )
+				break;
+
+			index++;
+		}
+
+		/* Check if the material sort we need already exists */
+		std::size_t pos = 0;
+		for ( Titanfall::MaterialSort_t &ms : Titanfall::Bsp::materialSorts ) {
+			if ( ms.textureData == index )
+				return pos;
+
+			pos++;
+		}
+		
+		
+		Titanfall::MaterialSort_t &ms = Titanfall::Bsp::materialSorts.emplace_back();
+		ms.textureData = index;
+
+		return Titanfall::Bsp::materialSorts.size() - 1;
 	}
 }
