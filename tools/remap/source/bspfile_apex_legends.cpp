@@ -140,8 +140,8 @@ void WriteR5BSPFile(const char* filename)
 	AddLump(file, header.lumps[R5_LUMP_ENTITIES],			Titanfall::Bsp::entities);
 	AddLump(file, header.lumps[R5_LUMP_VERTICES],			Titanfall::Bsp::vertices);
 	AddLump(file, header.lumps[R5_LUMP_VERTEX_NORMALS],		Titanfall::Bsp::vertexNormals);
-	AddLump(file, header.lumps[R5_LUMP_VERTEX_LIT_BUMP],	ApexLegends::vertexLitBumpVertices);
-	AddLump(file, header.lumps[R5_LUMP_MESHES],				ApexLegends::meshes);
+	AddLump(file, header.lumps[R5_LUMP_VERTEX_LIT_BUMP],	ApexLegends::Bsp::vertexLitBumpVertices);
+	AddLump(file, header.lumps[R5_LUMP_MESHES],				ApexLegends::Bsp::meshes);
 	AddLump(file, header.lumps[R5_LUMP_MESH_INDICES],		Titanfall::Bsp::meshIndices);
 
 
@@ -184,7 +184,7 @@ void CompileR5BSPFile()
 namespace ApexLegends {
 	void EmitMeshes( const entity_t& e ) {
 		for ( const Shared::mesh_t &mesh : Shared::meshes ) {
-			ApexLegends::Mesh_t &bm = ApexLegends::meshes.emplace_back();
+			ApexLegends::Mesh_t &bm = ApexLegends::Bsp::meshes.emplace_back();
 			bm.flags = 0x200;
 			bm.triangleOffset = Titanfall::Bsp::meshIndices.size();
 			bm.triangleCount = mesh.triangles.size() / 3;
@@ -195,57 +195,27 @@ namespace ApexLegends {
 			{
 				Shared::vertex_t vertex = mesh.vertices.at( i );
 
-				ApexLegends::VertexLitBump_t &lv = ApexLegends::vertexLitBumpVertices.emplace_back();
+				ApexLegends::VertexLitBump_t &lv = ApexLegends::Bsp::vertexLitBumpVertices.emplace_back();
 				lv.uv0 = vertex.st;
-
-				// Save vert
-				for ( uint16_t j = 0; j < Titanfall::Bsp::vertices.size(); j++ )
-				{
-					if ( VectorCompare( vertex.xyz, Titanfall::Bsp::vertices.at( j ) ) )
-					{
-						lv.vertexIndex = j;
-						goto normal;
-					}
-				}
-
-				{
-					lv.vertexIndex = Titanfall::Bsp::vertices.size();
-					Titanfall::Bsp::vertices.emplace_back( vertex.xyz );
-				}
-
-				normal:;
-
-				for ( uint16_t j = 0; j < Titanfall::Bsp::vertexNormals.size(); j++ )
-				{
-					if ( VectorCompare( vertex.normal, Titanfall::Bsp::vertexNormals.at( j ) ) )
-					{
-						lv.normalIndex = j;
-						goto end;
-					}
-				}
-
-				{
-					lv.normalIndex = Titanfall::Bsp::vertexNormals.size();
-					Titanfall::Bsp::vertexNormals.emplace_back( vertex.normal );
-				}
-
-				end:;
+				lv.vertexIndex = Titanfall::EmitVertex( vertex.xyz );
+				lv.normalIndex = Titanfall::EmitVertexNormal( vertex.normal );
 			}
 
 			// Save triangles
 			for ( uint16_t triangle : mesh.triangles )
 			{
-				for ( uint32_t j = 0; j < ApexLegends::vertexLitBumpVertices.size(); j++ )
+				for ( uint32_t j = 0; j < ApexLegends::Bsp::vertexLitBumpVertices.size(); j++ )
 				{
-					if ( VectorCompare( Titanfall::Bsp::vertices.at( ApexLegends::vertexLitBumpVertices.at( j ).vertexIndex ), mesh.vertices.at( triangle ).xyz ) )
-					{
-						if ( VectorCompare( Titanfall::Bsp::vertexNormals.at( ApexLegends::vertexLitBumpVertices.at( j ).normalIndex ), mesh.vertices.at( triangle ).normal ) )
-						{
-							ApexLegends::MeshIndex_t& index = Titanfall::Bsp::meshIndices.emplace_back();
-							index = j;
-							break;
-						}
-					}
+					if ( !VectorCompare( Titanfall::Bsp::vertices.at( ApexLegends::Bsp::vertexLitBumpVertices.at( j ).vertexIndex ), mesh.vertices.at( triangle ).xyz ) )
+						continue;
+					
+					if ( !VectorCompare( Titanfall::Bsp::vertexNormals.at( ApexLegends::Bsp::vertexLitBumpVertices.at( j ).normalIndex ), mesh.vertices.at( triangle ).normal ) )
+						continue;
+
+
+					ApexLegends::MeshIndex_t& index = Titanfall::Bsp::meshIndices.emplace_back();
+					index = j;
+					break;
 				}
 			}
 		}

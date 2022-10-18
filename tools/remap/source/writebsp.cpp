@@ -392,7 +392,7 @@ void EmitTextureData( shaderInfo_t shader )
 	Titanfall2::bspTextureDataTable.emplace_back( Titanfall2::bspTextureDataData.size() );
 	Titanfall2::bspTextureDataData.insert( Titanfall2::bspTextureDataData.end(), str.begin(), str.end() );
 
-	Titanfall2::bspTextureData_t &td = Titanfall2::bspTextureData.emplace_back();
+	Titanfall::TextureData_t &td = Titanfall::Bsp::textureData.emplace_back();
 	td.name_index = Titanfall2::bspTextureDataTable.size() - 1;
 	td.sizeX = shader.shaderImage->width;
 	td.sizeY = shader.shaderImage->height;
@@ -501,10 +501,10 @@ void EmitMeshes( const entity_t& e )
 	Sys_FPrintf(SYS_VRB, "pain suffering\n");
 	for ( const Shared::mesh_t &mesh : Shared::meshes )
 	{
-		Titanfall2::bspMesh_t &bm = Titanfall2::bspMeshes.emplace_back();
+		Titanfall::Mesh_t &bm = Titanfall::Bsp::meshes.emplace_back();
 		bm.const0 = 4294967040; // :)
 		bm.flags = 1051136;
-		bm.firstVertex = Titanfall2::bspVertexLitBump.size();
+		bm.firstVertex = Titanfall::Bsp::vertexLitBumpVertices.size();
 		bm.vertexCount = mesh.vertices.size();
 		bm.triOffset = Titanfall::Bsp::meshIndices.size();
 		bm.triCount = mesh.triangles.size() / 3;
@@ -524,8 +524,8 @@ void EmitMeshes( const entity_t& e )
 			/* Check against aabb */
 			aabb.extend( vertex );
 
-			Titanfall2::bspVertexLitBump_t &lv = Titanfall2::bspVertexLitBump.emplace_back();
-			lv.minusOne = -1;
+			Titanfall::VertexLitBump_t &lv = Titanfall::Bsp::vertexLitBumpVertices.emplace_back();
+			lv.negativeOne = -1;
 			lv.uv0 = mesh.vertices.at(i).st;
 
 			/* Save vert */
@@ -565,11 +565,11 @@ void EmitMeshes( const entity_t& e )
 		/* Save triangles */
 		for ( uint16_t triangle : mesh.triangles )
 		{
-			for ( uint32_t j = 0; j < Titanfall2::bspVertexLitBump.size(); j++ )
+			for ( uint32_t j = 0; j < Titanfall::Bsp::vertexLitBumpVertices.size(); j++ )
 			{
-				if ( VectorCompare( Titanfall::Bsp::vertices.at( Titanfall2::bspVertexLitBump.at( j ).vertexIndex ),mesh.vertices.at( triangle ).xyz ) )
+				if ( VectorCompare( Titanfall::Bsp::vertices.at( Titanfall::Bsp::vertexLitBumpVertices.at( j ).vertexIndex ),mesh.vertices.at( triangle ).xyz ) )
 				{
-					Titanfall2::bspMeshIndex_t& index = Titanfall::Bsp::meshIndices.emplace_back();
+					uint16_t& index = Titanfall::Bsp::meshIndices.emplace_back();
 					index = j;
 					break;
 				}
@@ -710,17 +710,17 @@ void EmitVisTree()
 
 void EmitModels()
 {
-	Titanfall2::bspModel_t &m = Titanfall2::bspModels.emplace_back();
-	m.meshCount = Titanfall2::bspMeshes.size();
+	Titanfall::Model_t &m = Titanfall::Bsp::models.emplace_back();
+	m.meshCount = Titanfall::Bsp::meshes.size();
 }
 
 void EmitLevelInfo()
 {
 	Titanfall2::bspLevelInfo_t &li = Titanfall2::bspLevelInfo.emplace_back();
 	// These are mesh flag counts
-	li.unk0 = Titanfall2::bspMeshes.size();
-	li.unk1 = Titanfall2::bspMeshes.size();
-	li.unk3 = Titanfall2::bspMeshes.size();
+	li.unk0 = Titanfall::Bsp::meshes.size();
+	li.unk1 = Titanfall::Bsp::meshes.size();
+	li.unk3 = Titanfall::Bsp::meshes.size();
 	li.propCount = Titanfall2::GameLump.propCount;
 }
 

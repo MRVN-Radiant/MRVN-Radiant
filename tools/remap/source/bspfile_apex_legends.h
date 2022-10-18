@@ -23,7 +23,7 @@ namespace ApexLegends {
 		uint32_t vertexIndex;
 		uint32_t normalIndex;
 		Vector2 uv0;
-		uint32_t negativeOne;
+		int32_t negativeOne;
 		Vector2 uv1;
 		char color[4];
 	};
@@ -37,6 +37,8 @@ namespace ApexLegends {
 		uint32_t flags;
 	};
 
-	inline std::vector<VertexLitBump_t> vertexLitBumpVertices;
-	inline std::vector<Mesh_t> meshes;
+	namespace Bsp {
+		inline std::vector<VertexLitBump_t> vertexLitBumpVertices;
+		inline std::vector<Mesh_t> meshes;
+	}
 }

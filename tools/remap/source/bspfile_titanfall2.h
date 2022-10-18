@@ -18,40 +18,8 @@ void						CompileR2BSPFile();
 
 namespace Titanfall2
 {
-	using bspVertex_t = Vector3;
-
-	using bspVertexNormal_t = Vector3;
-
-	using bspMeshIndex_t = uint16_t;
-
-	using bspPlane_t = Plane3f;
 
 
-	struct bspVertexLitBump_t
-	{
-		uint32_t vertexIndex;
-		uint32_t normalIndex;
-		Vector2 uv0;
-		int32_t minusOne;
-		Vector2 uv1;
-		uint32_t unk[4];
-	};
-
-
-	struct bspMesh_t
-	{
-		uint32_t triOffset;
-		uint16_t triCount;
-		uint16_t firstVertex;
-		uint16_t vertexCount;
-		uint16_t unk0;
-		uint32_t const0;
-		uint16_t unk1;
-		uint16_t unk2;
-		uint16_t unk3;
-		uint16_t materialOffset;
-		uint32_t flags;
-	};
 
 	/* From testing on r2 the whole lump can be zeroed as long as its parallel with bspMeshes */
 	struct bspMeshBounds_t
@@ -65,13 +33,6 @@ namespace Titanfall2
 	struct bspEntityPartitions_t
 	{
 		char partitions[27];
-	};
-
-	struct bspModel_t
-	{
-		MinMax minmax;
-		uint32_t firstMesh;
-		uint32_t meshCount;
 	};
 
 	struct bspObjReferenceBounds_t
@@ -159,36 +120,11 @@ namespace Titanfall2
 		uint16_t unk;
 		uint32_t vertexOffset;
 	};
-
-	struct bspTextureData_t
-	{
-		Vector3 reflectivity;
-		uint32_t name_index;
-		uint32_t sizeX;
-		uint32_t sizeY;
-		uint32_t visibleX;
-		uint32_t visibleY;
-		uint32_t flags;
-	};
 	
-
-	inline std::vector<bspTextureData_t> bspTextureData;
-
-	inline std::vector<bspVertex_t> bspVertices;
-
-	inline std::vector<bspVertexNormal_t> bspVertexNormals;
-
-	inline std::vector<bspVertexLitBump_t> bspVertexLitBump;
-
-	inline std::vector<bspMeshIndex_t> bspMeshIndices;
-
-	inline std::vector<bspMesh_t> bspMeshes;
 
 	inline std::vector<bspMeshBounds_t> bspMeshBounds;
 
 	inline std::vector<bspEntityPartitions_t> bspEntityPartitions;
-
-	inline std::vector<bspModel_t> bspModels;
 
 	inline std::vector<bspObjReferenceBounds_t> bspObjReferenceBounds;
 
@@ -203,8 +139,6 @@ namespace Titanfall2
 	inline std::vector<uint32_t> bspTextureDataTable;
 
 	inline std::vector<bspMaterialSort_t> bspMaterialSorts;
-
-	inline std::vector<bspPlane_t> bspPlanes;
 
 	inline std::vector<bspBrush_t> bspBrushes;
 

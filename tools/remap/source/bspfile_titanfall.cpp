@@ -118,3 +118,33 @@ void CompileR1BSPFile()
 {
 
 }
+
+namespace Titanfall {
+   /*
+	  EmitVertex
+	  Saves a vertex into Titanfall::vertices and returns its index
+   */
+   uint32_t EmitVertex( Vector3 &vertex ) {
+	  for( uint32_t i = 0; i < (uint32_t)Titanfall::Bsp::vertices.size(); i++ ) {
+		 if( VectorCompare( vertex, Titanfall::Bsp::vertices.at( i ) ) )
+			return i;
+	  }
+
+	  Titanfall::Bsp::vertices.emplace_back( vertex );
+	  return (uint32_t)Titanfall::Bsp::vertices.size() - 1;
+   }
+
+   /*
+	  EmitVertexNormal
+	  Saves a vertex normal into Titanfall::vertexNormals and returns its index
+   */
+   uint32_t EmitVertexNormal( Vector3 &normal ) {
+	  for( uint32_t i = 0; i < (uint32_t)Titanfall::Bsp::vertexNormals.size(); i++ ) {
+		 if( VectorCompare( normal, Titanfall::Bsp::vertexNormals.at( i ) ) )
+			return i;
+	  }
+
+	  Titanfall::Bsp::vertexNormals.emplace_back( normal );
+	  return (uint32_t)Titanfall::Bsp::vertexNormals.size() - 1;
+   }
+}
