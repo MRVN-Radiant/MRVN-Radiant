@@ -379,7 +379,7 @@ void EmitTextureData( shaderInfo_t shader )
 	}
 
 	/* Check if it's already saved */
-	std::string table = std::string( Titanfall2::bspTextureDataData.begin(), Titanfall2::bspTextureDataData.end() );
+	std::string table = std::string( Titanfall::Bsp::textureDataData.begin(), Titanfall::Bsp::textureDataData.end() );
 	index = table.find(tex);
 	if (index != std::string::npos)
 		return;
@@ -389,11 +389,11 @@ void EmitTextureData( shaderInfo_t shader )
 	data << tex.c_str();
 	std::vector<char> str = { data.begin(), data.end() + 1 };
 
-	Titanfall2::bspTextureDataTable.emplace_back( Titanfall2::bspTextureDataData.size() );
-	Titanfall2::bspTextureDataData.insert( Titanfall2::bspTextureDataData.end(), str.begin(), str.end() );
+	Titanfall::Bsp::textureDataTable.emplace_back( Titanfall::Bsp::textureDataData.size() );
+	Titanfall::Bsp::textureDataData.insert( Titanfall::Bsp::textureDataData.end(), str.begin(), str.end() );
 
 	Titanfall::TextureData_t &td = Titanfall::Bsp::textureData.emplace_back();
-	td.name_index = Titanfall2::bspTextureDataTable.size() - 1;
+	td.name_index = Titanfall::Bsp::textureDataTable.size() - 1;
 	td.sizeX = shader.shaderImage->width;
 	td.sizeY = shader.shaderImage->height;
 	td.visibleX = shader.shaderImage->width;
@@ -409,7 +409,7 @@ uint16_t EmitMaterialSort( const char* texture )
 {
 	std::string tex = texture;
 
-	std::string textureData = { Titanfall2::bspTextureDataData.begin(), Titanfall2::bspTextureDataData.end() };
+	std::string textureData = { Titanfall::Bsp::textureDataData.begin(), Titanfall::Bsp::textureDataData.end() };
 
 	/* Find the texture path in the textureData lump */
 	uint16_t index = 0;
@@ -423,7 +423,7 @@ uint16_t EmitMaterialSort( const char* texture )
 
 	/* Check if the material sort we need already exists */
 	std::size_t pos = 0;
-	for ( Titanfall2::bspMaterialSort_t &ms : Titanfall2::bspMaterialSorts )
+	for ( Titanfall::MaterialSort_t &ms : Titanfall::Bsp::materialSorts )
 	{
 		if ( ms.textureData == index )
 			return pos;
@@ -432,20 +432,10 @@ uint16_t EmitMaterialSort( const char* texture )
 	}
 	
 	
-	Titanfall2::bspMaterialSort_t &ms = Titanfall2::bspMaterialSorts.emplace_back();
+	Titanfall::MaterialSort_t &ms = Titanfall::Bsp::materialSorts.emplace_back();
 	ms.textureData = index;
 
-	return Titanfall2::bspMaterialSorts.size() - 1;
-}
-
-/*
-   EmitEntityPartitions()
-   writes the entitiy partitions
- */
-void EmitEntityPartitions()
-{
-	Titanfall2::bspEntityPartitions_t& p = Titanfall2::bspEntityPartitions.emplace_back();
-	memcpy( p.partitions, "01* env fx script snd spawn", 27 );
+	return Titanfall::Bsp::materialSorts.size() - 1;
 }
 
 /*
@@ -577,7 +567,7 @@ void EmitMeshes( const entity_t& e )
 		}
 
 		/* Save MeshBounds */
-		Titanfall2::bspMeshBounds_t& mb = Titanfall2::bspMeshBounds.emplace_back();
+		Titanfall::MeshBounds_t& mb = Titanfall::Bsp::meshBounds.emplace_back();
 		mb.origin = ( aabb.maxs + aabb.mins ) / 2;
 		mb.extents = ( aabb.maxs - aabb.mins ) / 2;
 	}
@@ -589,47 +579,47 @@ void EmitMeshes( const entity_t& e )
 void EmitObjReferences()
 {
 	/* Meshes */
-	for ( uint16_t i = 0; i < Titanfall2::bspMeshBounds.size(); i++ )
+	for ( uint16_t i = 0; i < Titanfall::Bsp::meshBounds.size(); i++ )
 	{
-		Titanfall2::bspMeshBounds_t mesh = Titanfall2::bspMeshBounds.at( i );
+		Titanfall::MeshBounds_t mesh = Titanfall::Bsp::meshBounds.at( i );
 
-		Titanfall2::bspObjReferenceBounds_t& refBounds = Titanfall2::bspObjReferenceBounds.emplace_back();
+		Titanfall::ObjReferenceBounds_t& refBounds = Titanfall::Bsp::objReferenceBounds.emplace_back();
 		refBounds.mins = mesh.origin - mesh.extents;
 		refBounds.maxs = mesh.origin + mesh.extents;
 
-		Titanfall2::bspObjReferences_t& ref = Titanfall2::bspObjReferences.emplace_back();
+		uint16_t& ref = Titanfall::Bsp::objReferences.emplace_back();
 		ref = i;
 	}
 
 	/* Props */
 	/*for (uint16_t i = 0; i < Titanfall2GameLump.propCount; i++)
 	{
-		Titanfall2::bspObjReferenceBounds_t& refBounds = Titanfall2::bspObjReferenceBounds.emplace_back();
+		Titanfall::ObjReferenceBounds_t& refBounds = Titanfall::Bsp::objReferenceBounds.emplace_back();
 		refBounds.mins = Vector3(-1000,-1000,-1000);
 		refBounds.maxs = Vector3(1000,1000,1000);
 
-		Titanfall2::bspObjReferences_t& ref = Titanfall2::bspObjReferences.emplace_back();
-		ref = Titanfall2::bspMeshBounds.size() + i;
+		uint16_t& ref = Titanfall::Bsp::objReferences.emplace_back();
+		ref = Titanfall::Bsp::meshBounds.size() + i;
 	}*/
 }
 
 std::size_t EmitObjReferences( Shared::visNode_t &node )
 {
 	//Sys_Printf("amongus\n");
-	/*for (std::size_t i = 0; i < Titanfall2::bspObjReferences.size(); i++)
-		if ( Titanfall2::bspObjReferences.at( i ) == ref.index )
+	/*for (std::size_t i = 0; i < Titanfall::Bsp::objReferences.size(); i++)
+		if ( Titanfall::Bsp::objReferences.at( i ) == ref.index )
 			return i;
 			*/
 	for ( Shared::visRef_t &ref : node.refs )
 	{
-		Titanfall2::bspObjReferenceBounds_t& rb = Titanfall2::bspObjReferenceBounds.emplace_back();
+		Titanfall::ObjReferenceBounds_t& rb = Titanfall::Bsp::objReferenceBounds.emplace_back();
 		rb.maxs = ref.minmax.maxs;
 		rb.mins = ref.minmax.mins;
 
-		Titanfall2::bspObjReferences.emplace_back( ref.index );
+		Titanfall::Bsp::objReferences.emplace_back( ref.index );
 	}
 
-	return Titanfall2::bspObjReferences.size() - node.refs.size();
+	return Titanfall::Bsp::objReferences.size() - node.refs.size();
 }
 
 uint16_t GetTotalVisNodeCount( Shared::visNode_t node )
@@ -650,7 +640,7 @@ void EmitVisTreeNode( Shared::visNode_t node )
 	{
 		Shared::visNode_t &n = node.children.at( i );
 
-		Titanfall2::CellAABBNode_t &bn = Titanfall2::bspCellAABBNodes.emplace_back();
+		Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
 		bn.maxs = n.minmax.maxs;
 		bn.mins = n.minmax.mins;
 
@@ -667,10 +657,10 @@ void EmitVisTreeNode( Shared::visNode_t node )
 			else
 				offset += GetTotalVisNodeCount( node.children.at( j ) ) - 1;
 
-			Sys_Printf("VisTreeNode_%i: i=%i; j=%i; offset=%i\n", Titanfall2::bspCellAABBNodes.size() - 1, i, j, offset);
+			Sys_Printf("VisTreeNode_%i: i=%i; j=%i; offset=%i\n", Titanfall::Bsp::cellAABBNodes.size() - 1, i, j, offset);
 		}
 
-		bn.firstChild = Titanfall2::bspCellAABBNodes.size() + offset;
+		bn.firstChild = Titanfall::Bsp::cellAABBNodes.size() + offset;
 
 
 		bn.childCount = n.children.size();
@@ -693,10 +683,10 @@ void EmitVisTree()
 {
 	Shared::visNode_t &node = Shared::visRoot;
 
-	Titanfall2::CellAABBNode_t &bn = Titanfall2::bspCellAABBNodes.emplace_back();
+	Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
 	bn.maxs = node.minmax.maxs;
 	bn.mins = node.minmax.mins;
-	bn.firstChild = Titanfall2::bspCellAABBNodes.size();
+	bn.firstChild = Titanfall::Bsp::cellAABBNodes.size();
 	bn.childCount = node.children.size();
 	bn.totalRefCount = GetTotalVisNodeCount( node );
 	if ( node.refs.size() )
@@ -716,7 +706,7 @@ void EmitModels()
 
 void EmitLevelInfo()
 {
-	Titanfall2::bspLevelInfo_t &li = Titanfall2::bspLevelInfo.emplace_back();
+	Titanfall::LevelInfo_t &li = Titanfall::Bsp::levelInfo.emplace_back();
 	// These are mesh flag counts
 	li.unk0 = Titanfall::Bsp::meshes.size();
 	li.unk1 = Titanfall::Bsp::meshes.size();
@@ -1228,12 +1218,12 @@ void EmitStubs()
 		Titanfall2::bspCells_stub = { data.begin(), data.end() };
 	}
 	/* Cell AABB Nodes */
-	{
-		Titanfall2::CellAABBNode_t &node = Titanfall2::bspCellAABBNodes_stub.emplace_back();
+	/*{
+		Titanfall::CellAABBNode_t &node = Titanfall::Bsp::cellAABBNodes_stub.emplace_back();
 		node.mins = Vector3(-3000, -3000, -3000);
 		node.maxs = Vector3(3000, 3000, 3000);
-		node.objRefCount = Titanfall2::bspObjReferences.size() > 255 ? 255 : Titanfall2::bspObjReferences.size();
-	}
+		node.objRefCount = Titanfall::Bsp::objReferences.size() > 255 ? 255 : Titanfall::Bsp::objReferences.size();
+	}*/
 }
 /*
    BeginModel()

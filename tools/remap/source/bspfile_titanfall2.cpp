@@ -399,7 +399,7 @@ void WriteR2BSPFile(const char* filename)
 	AddLump(file, header.lumps[R2_LUMP_VERTICES],							Titanfall::Bsp::vertices);
 	AddLump(file, header.lumps[R2_LUMP_MODELS],								Titanfall::Bsp::models);
 	AddLump(file, header.lumps[R2_LUMP_VERTEX_NORMALS],						Titanfall::Bsp::vertexNormals);
-	AddLump(file, header.lumps[R2_LUMP_ENTITY_PARTITIONS],					Titanfall2::bspEntityPartitions);
+	AddLump(file, header.lumps[R2_LUMP_ENTITY_PARTITIONS],					Titanfall::Bsp::entityPartitions);
 	/* Game Lump */
 	{
 		std::size_t start = ftell(file);
@@ -420,8 +420,8 @@ void WriteR2BSPFile(const char* filename)
 		SafeWrite(file, Titanfall2::GameLump.props.data(), 64 * Titanfall2::GameLump.propCount);
 		SafeWrite(file, &Titanfall2::GameLump.unk5, 4);
 	}
-	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_DATA],			Titanfall2::bspTextureDataData);
-	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_TABLE],			Titanfall2::bspTextureDataTable);
+	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_DATA],			Titanfall::Bsp::textureDataData);
+	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_TABLE],			Titanfall::Bsp::textureDataTable);
 	AddLump(file, header.lumps[R2_LUMP_WORLD_LIGHTS],						Titanfall2::bspWorldLights_stub);
 	AddLump(file, header.lumps[R2_LUMP_TRICOLL_TRIS],						Titanfall2::bspTricollTris_stub);
 	AddLump(file, header.lumps[R2_LUMP_TRICOLL_NODES],						Titanfall2::bspTricollNodes_stub);
@@ -429,8 +429,8 @@ void WriteR2BSPFile(const char* filename)
 	AddLump(file, header.lumps[R2_LUMP_VERTEX_LIT_BUMP],					Titanfall::Bsp::vertexLitBumpVertices);
 	AddLump(file, header.lumps[R2_LUMP_MESH_INDICES],						Titanfall::Bsp::meshIndices);
 	AddLump(file, header.lumps[R2_LUMP_MESHES],								Titanfall::Bsp::meshes);
-	AddLump(file, header.lumps[R2_LUMP_MESH_BOUNDS],						Titanfall2::bspMeshBounds);
-	AddLump(file, header.lumps[R2_LUMP_MATERIAL_SORT],						Titanfall2::bspMaterialSorts);
+	AddLump(file, header.lumps[R2_LUMP_MESH_BOUNDS],						Titanfall::Bsp::meshBounds);
+	AddLump(file, header.lumps[R2_LUMP_MATERIAL_SORT],						Titanfall::Bsp::materialSorts);
 	AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_HEADERS],					Titanfall2::bspLightMapHeaders_stub);
 	AddLump(file, header.lumps[R2_LUMP_CM_GRID],							Titanfall2::bspCMGrid_stub);
 	AddLump(file, header.lumps[R2_LUMP_CM_GRID_CELLS],						Titanfall2::bspCMGridCells_stub);
@@ -446,10 +446,10 @@ void WriteR2BSPFile(const char* filename)
 	AddLump(file, header.lumps[R2_LUMP_CSM_AABB_NODES],						Titanfall2::bspCSMAABBNodes_stub);
 	AddLump(file, header.lumps[R2_LUMP_CELL_BSP_NODES],						Titanfall2::bspCellBSPNodes_stub);
 	AddLump(file, header.lumps[R2_LUMP_CELLS],								Titanfall2::bspCells_stub);
-	AddLump(file, header.lumps[R2_LUMP_CELL_AABB_NODES],					Titanfall2::bspCellAABBNodes);
-	AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCES],						Titanfall2::bspObjReferences);
-	AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCE_BOUNDS],				Titanfall2::bspObjReferenceBounds);
-	AddLump(file, header.lumps[R2_LUMP_LEVEL_INFO],							Titanfall2::bspLevelInfo);
+	AddLump(file, header.lumps[R2_LUMP_CELL_AABB_NODES],					Titanfall::Bsp::cellAABBNodes);
+	AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCES],						Titanfall::Bsp::objReferences);
+	AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCE_BOUNDS],				Titanfall::Bsp::objReferenceBounds);
+	AddLump(file, header.lumps[R2_LUMP_LEVEL_INFO],							Titanfall::Bsp::levelInfo);
 
 
 	/* emit bsp size */
@@ -504,7 +504,7 @@ void CompileR2BSPFile()
 	}
 
 	/* */
-	EmitEntityPartitions();
+	Titanfall::EmitEntityPartitions();
 
 	/**/
 	Shared::MakeVisReferences();

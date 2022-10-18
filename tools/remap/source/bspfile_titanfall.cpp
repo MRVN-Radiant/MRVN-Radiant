@@ -147,4 +147,14 @@ namespace Titanfall {
 	  Titanfall::Bsp::vertexNormals.emplace_back( normal );
 	  return (uint32_t)Titanfall::Bsp::vertexNormals.size() - 1;
    }
+
+	/*
+		EmitEntityPartitions()
+		Writes entitiy partitions respawn uses
+	*/
+	void EmitEntityPartitions()
+	{
+		std::string partitions = "01* env fx script snd spawn";
+		Titanfall::Bsp::entityPartitions = { partitions.begin(), partitions.end() };
+	}
 }
