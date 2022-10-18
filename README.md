@@ -16,3 +16,9 @@ MRVN-Radiant is a fork of NetRadiant-custom (GtkRadiant 1.4&rarr;massive rewrite
 | Titanfall Online | 0% | Nothing |
 | Titanfall 2 | 20% | No collision, no lighting, vis tree crash on more complex maps |
 | Apex Legends | 0% | Nothing |
+
+## Other tools
+- [bsp_tool](https://github.com/snake-biscuits/bsp_tool)
+    - A Python library for analyzing .bsp files
+- [rbsp-explorer](https://gitlab.com/F1FTY/rbsp-explorer)
+    - OpenGL / ImGui respawn bsp explorer
