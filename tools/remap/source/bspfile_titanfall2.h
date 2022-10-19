@@ -18,6 +18,8 @@ void						CompileR2BSPFile();
 
 namespace Titanfall2
 {
+	void EmitStubs();
+
 	struct GameLump_Path
 	{
 		char path[128];

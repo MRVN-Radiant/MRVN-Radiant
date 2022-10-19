@@ -13,9 +13,12 @@ namespace Titanfall {
 	void EmitTextureData( shaderInfo_t shader );
 	uint32_t EmitVertex( Vector3 &vertex );
 	uint32_t EmitVertexNormal( Vector3 &normal );
+	void BeginModel();
+	void EndModel();
 	void EmitEntityPartitions();
 	void EmitMeshes( const entity_t &e );
 	uint16_t EmitMaterialSort( const char* texture );
+	void EmitLevelInfo();
 
 	// 0x02
 	struct TextureData_t {

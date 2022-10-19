@@ -146,6 +146,7 @@ void WriteR1BSPFile( const char* filename ) {
 	AddLump(file, header.lumps[R1_LUMP_ENTITIES],							Titanfall::Bsp::entities);
 	AddLump(file, header.lumps[R1_LUMP_VERTICES],							Titanfall::Bsp::vertices);
 	AddLump(file, header.lumps[R1_LUMP_VERTEX_NORMALS],						Titanfall::Bsp::vertexNormals);
+	AddLump(file, header.lumps[R1_LUMP_MODELS],								Titanfall::Bsp::models);
 	AddLump(file, header.lumps[R1_LUMP_TEXTURE_DATA_STRING_DATA],			Titanfall::Bsp::textureDataData);
 	AddLump(file, header.lumps[R1_LUMP_TEXTURE_DATA_STRING_TABLE],			Titanfall::Bsp::textureDataTable);
 	AddLump(file, header.lumps[R1_LUMP_VERTEX_LIT_BUMP],					Titanfall::Bsp::vertexLitBumpVertices);
@@ -172,8 +173,7 @@ void WriteR1BSPFile( const char* filename ) {
 	Compiles a v29 bsp file
 */
 void CompileR1BSPFile() {
-	for ( std::size_t entityNum = 0; entityNum < entities.size(); ++entityNum )
-	{
+	for ( std::size_t entityNum = 0; entityNum < entities.size(); ++entityNum ) {
 		// Get entity
 		entity_t& entity = entities[entityNum];
 		const char* classname = entity.classname();
@@ -181,13 +181,20 @@ void CompileR1BSPFile() {
 		EmitEntity( entity );
 
 		// Visible geo
-		if ( striEqual( classname,"worldspawn" ) )
+		if ( striEqual( classname, "worldspawn" ) )
 		{
+			Titanfall::BeginModel();
 			// Generate bsp meshes from map brushes
 			Shared::MakeMeshes( entity );
 			Titanfall::EmitMeshes( entity );
+
+			Titanfall::EndModel();
 		}
 	}
+
+	Titanfall::EmitEntityPartitions();
+
+	Titanfall::EmitLevelInfo();
 }
 
 /*
@@ -259,6 +266,29 @@ uint32_t Titanfall::EmitVertexNormal( Vector3 &normal ) {
 
 	Titanfall::Bsp::vertexNormals.emplace_back( normal );
 	return (uint32_t)Titanfall::Bsp::vertexNormals.size() - 1;
+}
+
+/*
+	BeginModel()
+	Creates a new model entry
+*/
+void Titanfall::BeginModel() {
+	Titanfall::Model_t &model = Titanfall::Bsp::models.emplace_back();
+	model.firstMesh = (uint32_t)Titanfall::Bsp::meshes.size();
+}
+
+/*
+	EndModel()
+	Fills the last model entry
+*/
+void Titanfall::EndModel() {
+	Titanfall::Model_t &model = Titanfall::Bsp::models.back();
+	model.meshCount = (uint32_t)Titanfall::Bsp::meshes.size() - model.firstMesh;
+
+	for( Titanfall::MeshBounds_t &meshBounds : Titanfall::Bsp::meshBounds ) {
+		model.minmax.extend( meshBounds.origin - meshBounds.extents );
+		model.minmax.extend( meshBounds.origin + meshBounds.extents );
+	}		
 }
 
 /*
@@ -359,4 +389,14 @@ uint16_t Titanfall::EmitMaterialSort( const char* texture ) {
 	ms.textureData = index;
 
 	return Titanfall::Bsp::materialSorts.size() - 1;
+}
+
+void Titanfall::EmitLevelInfo()
+{
+	Titanfall::LevelInfo_t &li = Titanfall::Bsp::levelInfo.emplace_back();
+	// Something related to counting mesh flags
+	li.unk0 = Titanfall::Bsp::meshes.size();
+	li.unk1 = Titanfall::Bsp::meshes.size();
+	li.unk3 = Titanfall::Bsp::meshes.size();
+	li.propCount = Titanfall2::GameLump.propCount;
 }
