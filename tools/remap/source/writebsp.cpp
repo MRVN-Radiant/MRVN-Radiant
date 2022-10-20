@@ -450,80 +450,73 @@ std::size_t EmitObjReferences( Shared::visNode_t &node )
 	return Titanfall::Bsp::objReferences.size() - node.refs.size();
 }
 
-uint16_t GetTotalVisNodeCount( Shared::visNode_t node )
+uint16_t GetTotalVisRefCount( Shared::visNode_t node )
 {
 	uint16_t count = node.refs.size();
 
 	for ( Shared::visNode_t& n : node.children )
-		count += GetTotalVisNodeCount( n );
+		count += GetTotalVisRefCount( n );
 
 	return count;
 }
 
-void EmitVisTreeNode( Shared::visNode_t node )
+uint16_t GetTotalVisNodeChildCount( Shared::visNode_t node )
 {
-	//Sys_Printf("VisTreeNode\n");
-	/* Emit children */
-	for ( std::size_t i = 0; i < node.children.size(); i++ )
-	{
+	uint16_t count = node.children.size();
+
+	for ( Shared::visNode_t& n : node.children )
+		count += GetTotalVisNodeChildCount( n );
+
+	return count;
+}
+
+void EmitVisChildrenOfTreeNode( Shared::visNode_t node )
+{
+	// Emit children into bsp
+	for ( std::size_t i = 0; i < node.children.size(); i++ ) {
 		Shared::visNode_t &n = node.children.at( i );
 
 		Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
 		bn.maxs = n.minmax.maxs;
 		bn.mins = n.minmax.mins;
-
-		uint16_t offset = 0;
-		for ( uint16_t j = 0; j < node.children.size(); j++ )
-		{
-			if ( j == i )
-				continue;
-
-			// i = 1
-			// j = 
-			if ( j > i )
-				offset++;
-			else
-				offset += GetTotalVisNodeCount( node.children.at( j ) ) - 1;
-
-			Sys_Printf("VisTreeNode_%i: i=%i; j=%i; offset=%i\n", Titanfall::Bsp::cellAABBNodes.size() - 1, i, j, offset);
-		}
-
-		bn.firstChild = Titanfall::Bsp::cellAABBNodes.size() + offset;
-
-
 		bn.childCount = n.children.size();
-		bn.totalRefCount = GetTotalVisNodeCount( n );
-		
+		bn.totalRefCount = GetTotalVisRefCount( n );
+
 		if ( n.refs.size() )
 		{
 			bn.objRef = EmitObjReferences( n );
 			bn.objRefCount = n.refs.size();
 		}
+
+		bn.firstChild = Titanfall::Bsp::cellAABBNodes.size() + 1;
+
+		if( i != 0 )
+			bn.firstChild += GetTotalVisNodeChildCount( node.children.at( i - 1 ) ) - 1;
 	}
 
-	/* Loop through children */
-	for ( Shared::visNode_t &n : node.children )
-		EmitVisTreeNode( n );
+	// Loop through children 
+	for( Shared::visNode_t &n : node.children )
+		EmitVisChildrenOfTreeNode( n );
 }
 
 
 void EmitVisTree()
 {
-	Shared::visNode_t &node = Shared::visRoot;
+	Shared::visNode_t &root = Shared::visRoot;
 
 	Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
-	bn.maxs = node.minmax.maxs;
-	bn.mins = node.minmax.mins;
+	bn.maxs = root.minmax.maxs;
+	bn.mins = root.minmax.mins;
 	bn.firstChild = Titanfall::Bsp::cellAABBNodes.size();
-	bn.childCount = node.children.size();
-	bn.totalRefCount = GetTotalVisNodeCount( node );
-	if ( node.refs.size() )
+	bn.childCount = root.children.size();
+	bn.totalRefCount = GetTotalVisRefCount( root );
+	if ( root.refs.size() )
 	{
-		bn.objRef = EmitObjReferences( node );
-		bn.objRefCount = node.refs.size();
+		bn.objRef = EmitObjReferences( root );
+		bn.objRefCount = root.refs.size();
 	}
 
-	EmitVisTreeNode( Shared::visRoot );
+	EmitVisChildrenOfTreeNode( Shared::visRoot );
 }
 
 void SetUpGameLump()
