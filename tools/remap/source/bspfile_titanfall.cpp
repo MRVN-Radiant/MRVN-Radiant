@@ -199,9 +199,9 @@ void CompileR1BSPFile() {
 
 /*
 	EmitTextureData()
-	writes the entitiy partitions
+	
 */
-void Titanfall::EmitTextureData( shaderInfo_t shader ) {
+uint32_t Titanfall::EmitTextureData( shaderInfo_t shader ) {
 	std::string tex;
 	std::size_t index;
 	tex = shader.shader.c_str();
@@ -220,8 +220,19 @@ void Titanfall::EmitTextureData( shaderInfo_t shader ) {
 	/* Check if it's already saved */
 	std::string table = std::string( Titanfall::Bsp::textureDataData.begin(), Titanfall::Bsp::textureDataData.end() );
 	index = table.find(tex);
-	if (index != std::string::npos)
-		return;
+	if (index != std::string::npos) {
+		// Is already saved, find the index of its textureData
+
+		for (std::size_t i = 0; i < Titanfall::Bsp::textureData.size(); i++) {
+			Titanfall::TextureData_t &td = Titanfall::Bsp::textureData.at(i);
+			uint32_t &tdt = Titanfall::Bsp::textureDataTable.at(td.name_index);
+
+			if (tdt == index)
+				return i;
+		}
+	}
+
+	index = Titanfall::Bsp::textureData.size();
 
 	/* Add to Table */
 	StringOutputStream data;
@@ -238,6 +249,8 @@ void Titanfall::EmitTextureData( shaderInfo_t shader ) {
 	td.visibleX = shader.shaderImage->width;
 	td.visibleY = shader.shaderImage->height;
 	td.flags = 512; // This should be the same as the mesh indexing this textureData
+
+	return index;
 }
 
 /*
@@ -316,9 +329,9 @@ void Titanfall::EmitMeshes( const entity_t &e ) {
 
 
 		// Emit textrue related structs
-		Titanfall::EmitTextureData( *mesh.shaderInfo );
+		uint32_t textureIndex = Titanfall::EmitTextureData( *mesh.shaderInfo );
 
-		bm.materialOffset = Titanfall::EmitMaterialSort( mesh.shaderInfo->shader.c_str() );
+		bm.materialOffset = Titanfall::EmitMaterialSort( textureIndex );
 
 		MinMax aabb;
 
@@ -361,19 +374,7 @@ void Titanfall::EmitMeshes( const entity_t &e ) {
 	EmitMaterialSort()
 	Tries to create a material sort of the last texture
 */
-uint16_t Titanfall::EmitMaterialSort( const char* texture ) {
-	std::string tex = texture;
-
-	std::string textureData = { Titanfall::Bsp::textureDataData.begin(), Titanfall::Bsp::textureDataData.end() };
-
-	/* Find the texture path in the textureData lump */
-	uint16_t index = 0;
-	for ( std::string &path : savedTextures ) {
-		if ( path == tex )
-			break;
-
-		index++;
-	}
+uint16_t Titanfall::EmitMaterialSort( uint32_t index ) {
 
 	/* Check if the material sort we need already exists */
 	std::size_t pos = 0;
@@ -388,7 +389,7 @@ uint16_t Titanfall::EmitMaterialSort( const char* texture ) {
 	Titanfall::MaterialSort_t &ms = Titanfall::Bsp::materialSorts.emplace_back();
 	ms.textureData = index;
 
-	return Titanfall::Bsp::materialSorts.size() - 1;
+	return pos;
 }
 
 void Titanfall::EmitLevelInfo()
