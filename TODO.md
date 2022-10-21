@@ -2,7 +2,8 @@
 
 - [ ] New looks
   - [ ] New icon
-  - [ ] Cooler readme
+    - Includes splashscreen
+  - [x] Cooler readme
 - [ ] Improve `COMPILING.md`
 
 ### Compiler
@@ -37,7 +38,6 @@
   - delete unused features
   - clean up
   - the editor very rarely freezes for a couple seconds -> why?
-  - themes ?
 - [ ] edit flags in the surface menu ?
 ### Nice to haves ( low priority )
 - [ ] vpk tool that takes a `.map` as an input and only packs used assets ? ( call it revpk :trollface: )
