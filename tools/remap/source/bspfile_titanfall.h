@@ -19,6 +19,7 @@ namespace Titanfall {
 	void EmitMeshes( const entity_t &e );
 	uint16_t EmitMaterialSort( uint32_t index );
 	void EmitLevelInfo();
+	void EmitStubs();
 
 	// 0x02
 	struct TextureData_t {
@@ -118,6 +119,16 @@ namespace Titanfall {
 	};
 
 
+	// Gamelump Stub
+	struct GameLump_Stub_t {
+		uint32_t version = 1;
+		char magic[4];
+		uint32_t const0 = 786432;
+		uint32_t offset;
+		uint32_t length = 20;
+		uint32_t zeros[5] = {0,0,0,0,0};
+	};
+
 	namespace Bsp {
 		inline std::vector<char> entities;
 		inline std::vector<Plane3f> planes;
@@ -139,5 +150,24 @@ namespace Titanfall {
 		inline std::vector<ObjReferenceBounds_t> objReferenceBounds;
 		// Only one entry! used a vector to keep load / save code simple
 		inline std::vector<LevelInfo_t> levelInfo;
+
+		// Stubs
+		inline std::vector<uint8_t> entities_stub;
+		inline std::vector<uint8_t> physicsCollide_stub;
+		inline std::vector<uint8_t> gameLump_stub;
+		inline std::vector<uint8_t> worldLights_stub;
+		inline std::vector<uint8_t> lightmapHeaders_stub;
+		inline std::vector<uint8_t> cmGrid_stub;
+		inline std::vector<uint8_t> cmGridCells_stub;
+		inline std::vector<uint8_t> cmGridSets_stub;
+		inline std::vector<uint8_t> cmGeoSetBounds_stub;
+		inline std::vector<uint8_t> cmUniqueContents_stub;
+		inline std::vector<uint8_t> cmBrushes_stub;
+		inline std::vector<uint8_t> cmBrushSideProps_stub;
+		inline std::vector<uint8_t> cmBrushTexVecs_stub;
+		inline std::vector<uint8_t> lightMapDataSky_stub;
+		inline std::vector<uint8_t> csmAABBNodes_stub;
+		inline std::vector<uint8_t> cellBSPNodes_stub;
+		inline std::vector<uint8_t> cells_stub;
 	}
 }

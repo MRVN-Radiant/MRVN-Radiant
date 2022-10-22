@@ -249,7 +249,7 @@ Shared::visNode_t Shared::MakeVisTree( std::vector<Shared::visRef_t> refs, float
 		}
 	}
 	
-	if ( bestCost >= parentCost )
+	if ( bestCost >= parentCost || refs.size() < 5 )
 	{
 		for ( Shared::visRef_t &ref : refs )
 			node.refs.emplace_back( ref );
