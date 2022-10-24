@@ -1,6 +1,6 @@
 # MRVN-Radiant
 
-The open-source, cross-platform level editor for Reswapn Entertainment Source based games.
+The open-source, cross-platform level editor for Respawn Entertainment Source based games.
 
 MRVN-Radiant is a fork of NetRadiant-custom (GtkRadiant 1.4&rarr;massive rewrite&rarr;1.5&rarr;NetRadiant&rarr;NetRadiant-custom&rarr;this)
 
