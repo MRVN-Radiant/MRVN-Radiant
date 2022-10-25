@@ -30,6 +30,7 @@
 
 /* dependencies */
 #include "remap.h"
+#include "bspfile_titanfall.h"
 #include <ctime>
 
 
@@ -268,7 +269,7 @@ static bool ParseEntity(){
 
 void ParseEntities(){
 	entities.clear();
-	ParseFromMemory( bspEntities.data(), bspEntities.size() );
+	ParseFromMemory( Titanfall::Bsp::entities.data(), Titanfall::Bsp::entities.size() );
 	while ( ParseEntity() ){};
 
 	/* ydnar: set number of bsp entities in case a map is loaded on top */

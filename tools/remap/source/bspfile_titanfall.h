@@ -81,13 +81,25 @@ namespace Titanfall {
 		uint32_t vertexOffset;
 	};
 
+	// 0x55
+	struct CMGrid_t {
+		float offset;
+		int32_t unknown0;
+		int32_t unknown1;
+		uint32_t xMax;
+		uint32_t yMax;
+		uint32_t unknown3;
+		uint32_t brushPlaneOffset;
+	};
+
 	// 0x5C
-	struct Brush_t {
+	struct CMBrush_t {
 		Vector3 origin;
-		uint16_t flags;
+		uint8_t unknown;
+		uint8_t planeCount;
 		uint16_t index;
 		Vector3 extents;
-		uint32_t sidePlane;
+		uint32_t sidePlaneIndex;
 	};
 
 	// 0x77
@@ -144,7 +156,11 @@ namespace Titanfall {
 		inline std::vector<Mesh_t> meshes;
 		inline std::vector<MeshBounds_t> meshBounds;
 		inline std::vector<MaterialSort_t> materialSorts;
-		inline std::vector<Brush_t> cmBrushes;
+		// Just like level info there's only one entry
+		inline std::vector<CMGrid_t> cmGrid;
+		inline std::vector<CMBrush_t> cmBrushes;
+		inline std::vector<uint16_t> cmBrushSidePlaneOffsets;
+		inline std::vector<uint16_t> cmBrushSideProperties;
 		inline std::vector<CellAABBNode_t> cellAABBNodes;
 		inline std::vector<uint16_t> objReferences;
 		inline std::vector<ObjReferenceBounds_t> objReferenceBounds;

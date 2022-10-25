@@ -280,7 +280,7 @@ static int ConvertBSPToMap_Ext( char *bspName, bool brushPrimitives )
 					(int)pts[2][0], (int)pts[2][1], (int)pts[2][2],
 					1.0f / 32.0f, 0.0f, 0.0f,
 					0.0f, 1.0f / 32.0f, 0.0f,
-					"NULL",
+					side.shaderInfo->shader.c_str(),
 					0
 				);
 			}
