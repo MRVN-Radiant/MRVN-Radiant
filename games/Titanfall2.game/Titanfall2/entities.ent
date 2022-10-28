@@ -162,9 +162,12 @@ Used for spawning player when match starts.
 
 <point name="move_rope" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
 -------- KEYS --------
-<targetname key="targetname" name="Target Name">The target name of the zipline</targetname>
-<targetname key="NextKey" name="Next Key">The second poin of the zipline</targetname>
+<targetname key="targetname" name="Target Name" value="move_rope_">The target name of the zipline</targetname>
+<targetname key="NextKey" name="Next Key" value="move_rope_">The second point of the zipline</targetname>
 <boolean key="Zipline" name="Zipline">Set this to 1</boolean>
+<integer key="Subdiv" name="Subdivisions" value="0">Number of subdivisions</integer>
+<integer key="Slack" name="Slack">Slack</integer>
+<integer key="MoveSpeed" name="Move Speed" value="64">Move Speed</integer>
 -------- NOTES --------
 </point>
 
