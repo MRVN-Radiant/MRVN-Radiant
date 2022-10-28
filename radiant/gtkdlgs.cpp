@@ -492,10 +492,9 @@ void DoAbout(){
 			}
 
 			{
-				GtkLabel* label = GTK_LABEL( gtk_label_new( "NetRadiant " RADIANT_VERSION "\n"
+				GtkLabel* label = GTK_LABEL( gtk_label_new( "MRVN-radiant " RADIANT_VERSION "\n"
 				                                            __DATE__ "\n\n"
 				                                            RADIANT_ABOUTMSG "\n\n"
-				                                            "By alientrap.org\n\n"
 				                                            "This program is free software\n"
 				                                            "licensed under the GNU GPL.\n"
 				                                          ) );

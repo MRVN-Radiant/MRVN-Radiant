@@ -123,9 +123,8 @@ int main( int argc, char **argv ){
 	/* we print out two versions, q3map's main version (since it evolves a bit out of GtkRadiant)
 	   and we put the GtkRadiant version to make it easy to track with what version of Radiant it was built with */
 
-	Sys_Printf( "Q3Map         - v1.0r (c) 1999 Id Software Inc.\n" );
-	Sys_Printf( "Q3Map (ydnar) - v" Q3MAP_VERSION "\n" );
-	Sys_Printf( "NetRadiant    - v" RADIANT_VERSION " " __DATE__ " " __TIME__ "\n" );
+	Sys_Printf( "remap - v" Q3MAP_VERSION "\n" );
+	Sys_Printf( "MRVN-radiant - v" RADIANT_VERSION " " __DATE__ " " __TIME__ "\n" );
 	Sys_Printf( "%s\n", Q3MAP_MOTD );
 	Sys_Printf( "%s\n", args.getArg0() );
 	Sys_Printf("    ________  ____ ___  ____  ____ \n");

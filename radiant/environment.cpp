@@ -296,7 +296,7 @@ void environment_init( int argc, char* argv[] ){
 		{
 			home << PathCleaned( appdata );
 		}
-		home << "/NetRadiantSettings/";
+		home << "/MRVN-radiantSettings/";
 		Q_mkdir( home.c_str() );
 		home_path = home.c_str();
 	}

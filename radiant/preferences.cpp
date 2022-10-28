@@ -647,7 +647,7 @@ public:
 GtkWindow* PrefsDlg::BuildDialog(){
 	PreferencesDialog_addInterfacePreferences( FreeCaller1<PreferencesPage&, Interface_constructPreferences>() );
 
-	GtkWindow* dialog = create_floating_window( "NetRadiant Preferences", m_parent );
+	GtkWindow* dialog = create_floating_window( "MRVN-radiant Preferences", m_parent );
 
 	GtkAccelGroup* accel = gtk_accel_group_new();
 	gtk_window_add_accel_group( dialog, accel );
