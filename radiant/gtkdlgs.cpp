@@ -466,7 +466,7 @@ void DoAbout(){
 	ModalDialog dialog;
 	ModalDialogButton ok_button( dialog, eIDOK );
 
-	GtkWindow* window = create_modal_dialog_window( MainFrame_getWindow(), "About NetRadiant", dialog );
+	GtkWindow* window = create_modal_dialog_window( MainFrame_getWindow(), "About MRVN-radiant", dialog );
 
 	{
 		GtkVBox* vbox = create_dialog_vbox( 4, 4 );
