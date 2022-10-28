@@ -430,25 +430,25 @@ void WriteR2BSPFile(const char* filename)
 	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_DATA],			Titanfall::Bsp::textureDataData);
 	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_TABLE],			Titanfall::Bsp::textureDataTable);
 	AddLump(file, header.lumps[R2_LUMP_WORLD_LIGHTS],						Titanfall2::bspWorldLights_stub);
-	AddLump(file, header.lumps[R2_LUMP_TRICOLL_TRIS],						Titanfall2::bspTricollTris_stub);
-	AddLump(file, header.lumps[R2_LUMP_TRICOLL_NODES],						Titanfall2::bspTricollNodes_stub);
-	AddLump(file, header.lumps[R2_LUMP_TRICOLL_HEADERS],					Titanfall2::bspTricollHeaders_stub);
+	//AddLump(file, header.lumps[R2_LUMP_TRICOLL_TRIS],						Titanfall2::bspTricollTris_stub);
+	//AddLump(file, header.lumps[R2_LUMP_TRICOLL_NODES],						Titanfall2::bspTricollNodes_stub);
+	//AddLump(file, header.lumps[R2_LUMP_TRICOLL_HEADERS],					Titanfall2::bspTricollHeaders_stub);
 	AddLump(file, header.lumps[R2_LUMP_VERTEX_LIT_BUMP],					Titanfall::Bsp::vertexLitBumpVertices);
 	AddLump(file, header.lumps[R2_LUMP_MESH_INDICES],						Titanfall::Bsp::meshIndices);
 	AddLump(file, header.lumps[R2_LUMP_MESHES],								Titanfall::Bsp::meshes);
 	AddLump(file, header.lumps[R2_LUMP_MESH_BOUNDS],						Titanfall::Bsp::meshBounds);
 	AddLump(file, header.lumps[R2_LUMP_MATERIAL_SORT],						Titanfall::Bsp::materialSorts);
 	AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_HEADERS],					Titanfall2::bspLightMapHeaders_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_GRID],							Titanfall2::bspCMGrid_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_GRID_CELLS],						Titanfall2::bspCMGridCells_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_GRID_SETS],						Titanfall2::bspCMGridSets_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_GEO_SET_BOUNDS],					Titanfall2::bspCMGeoSetBounds_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVES],						Titanfall2::bspCMPrimitives_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVE_BOUNDS],				Titanfall2::bspCMPrimitiveBounds_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_UNIQUE_CONTENTS],					Titanfall2::bspCMUniqueContents_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_BRUSHES],							Titanfall2::bspCMBrushes_stub);
-	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PROPS],				Titanfall2::bspCMBrushSideProps_stub);
-	AddLump(file, header.lumps[R2_LUMP_TRICOLL_BEVEL_STARTS],				Titanfall2::bspTricollBevelStarts_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_GRID],							Titanfall::Bsp::cmGrid);
+	AddLump(file, header.lumps[R2_LUMP_CM_GRID_CELLS],						Titanfall::Bsp::cmGridCells);
+	AddLump(file, header.lumps[R2_LUMP_CM_GRID_SETS],						Titanfall::Bsp::cmGeoSets);
+	AddLump(file, header.lumps[R2_LUMP_CM_GEO_SET_BOUNDS],					Titanfall::Bsp::cmGeoSetBounds);
+	//AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVES],						Titanfall::Bsp::cmPrimitives_stub);
+	//AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVE_BOUNDS],				Titanfall::Bsp::cmPrimitiveBounds_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_UNIQUE_CONTENTS],					Titanfall::Bsp::cmUniqueContents_stub);
+	AddLump(file, header.lumps[R2_LUMP_CM_BRUSHES],							Titanfall::Bsp::cmBrushes);
+	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PROPS],				Titanfall::Bsp::cmBrushSideProperties);
+	//AddLump(file, header.lumps[R2_LUMP_TRICOLL_BEVEL_STARTS],				Titanfall2::bspTricollBevelStarts_stub);
 	AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_DATA_SKY],					Titanfall2::bspLightMapDataSky_stub);
 	AddLump(file, header.lumps[R2_LUMP_CSM_AABB_NODES],						Titanfall2::bspCSMAABBNodes_stub);
 	AddLump(file, header.lumps[R2_LUMP_CELL_BSP_NODES],						Titanfall2::bspCellBSPNodes_stub);
@@ -496,6 +496,8 @@ void CompileR2BSPFile()
 			/* generate bsp meshes from map brushes */
 			Shared::MakeMeshes( entity );
 			Titanfall::EmitMeshes( entity );
+			
+			Titanfall::EmitBrushes( entity );
 
 			Titanfall::EndModel();
 		}
@@ -509,6 +511,8 @@ void CompileR2BSPFile()
 	/* */
 	Titanfall::EmitEntityPartitions();
 
+	Titanfall::EmitCollisionGrid();
+
 	/**/
 	Shared::MakeVisReferences();
 	Shared::visRoot = Shared::MakeVisTree( Shared::visRefs, 1e30f );
@@ -519,6 +523,7 @@ void CompileR2BSPFile()
 
 	/* Generate unknown lumps */
 	Titanfall2::EmitStubs();
+	Titanfall::EmitStubs();
 }
 
 /*
