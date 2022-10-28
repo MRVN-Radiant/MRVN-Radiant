@@ -171,17 +171,20 @@ void WriteBSPFile( const char *filename ){
 	rename( tempname, filename );
 }
 
-
-
 /*
-   PrintBSPFileSizes()
-   dumps info about current file
- */
-
-void PrintBSPFileSizes(){
-	
+	WriteEntFiles()
+	Writes .ent files used by .bsp
+*/
+void WriteEntFiles( const char *path ) {
+	if ( Titanfall::Ent::spawn.size() ) {
+		auto name = StringOutputStream(1024)(PathExtensionless(path), "_spawn.ent");
+		FILE* file = SafeOpenWrite(name);
+		char message[] = "ENTITIES01\n";
+		SafeWrite(file, &message, sizeof(message) - 1);
+		SafeWrite(file, Titanfall::Ent::spawn.data(), Titanfall::Ent::spawn.size());
+		fclose(file);
+	}
 }
-
 
 
 /* -------------------------------------------------------------------------------

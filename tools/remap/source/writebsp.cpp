@@ -333,72 +333,10 @@ void EndBSPFile( bool do_write ){
 		auto path = StringOutputStream( 256 )( source, ".bsp" );
 		Sys_Printf( "Writing %s\n", path.c_str() );
 		WriteBSPFile( path );
+		WriteEntFiles( source );
 	}
 }
 
-
-
-/*
-   EmitBrushes()
-   writes the brush list to the bsp
- */
-
-void EmitBrushes( entity_t& e )
-{
-	/*
-	for ( const brush_t &brush : e.brushes )
-	{
-		for ( const side_t &side : brush.sides )
-		{
-			Plane3f &plane = bspPlanes.emplace_back();
-			plane = (Plane3f)side.plane;
-		}
-	}
-	*/
-}
-
-/*
-   EmitEntity()
-   Saves an entity into it's corresponding .ent file or the lump the the .bsp
- */
-void EmitEntity( const entity_t &e )
-{
-	StringOutputStream data;
-	data << "{\n";
-	for ( const epair_t &pair : e.epairs)
-	{
-		data << "\"" << pair.key.c_str() << "\" \"" << pair.value.c_str() << "\"\n";
-	}
-	data << "}\n";
-
-
-	std::vector<char> str = { data.begin(), data.end() };
-	Titanfall::Bsp::entities.insert(Titanfall::Bsp::entities.end(), str.begin(), str.end());
-
-}
-
-/* helpers */
-bool VertexLarger( Vector3 a, Vector3 b )
-{
-	if (a.x() > b.x())
-		if (a.y() > b.y())
-			if (a.z() > b.z())
-				return true;
-
-	return false;
-}
-
-struct tempMesh_t
-{
-	MinMax minmax;
-	shaderInfo_t* shaderInfo;
-	/* Parallel */
-	std::vector<Vector3> Vertices;
-	std::vector<Vector3> Normals;
-	std::vector<Vector2> UVs;
-
-	std::vector<uint16_t> Triangles;
-};
 
 /*
    EmitObjReferences()

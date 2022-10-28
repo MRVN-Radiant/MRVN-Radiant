@@ -167,7 +167,7 @@ void CompileR5BSPFile() {
 		entity_t& entity = entities[entityNum];
 		const char* classname = entity.classname();
 
-		EmitEntity( entity );
+		//EmitEntity( entity );
 
 		/* visible geo */
 		if ( striEqual( classname,"worldspawn" ) )

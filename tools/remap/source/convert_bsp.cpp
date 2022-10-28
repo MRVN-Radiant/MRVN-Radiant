@@ -152,7 +152,7 @@ int BSPInfo( Args& args ){
 		/* load the bsp file and print lump sizes */
 		Sys_Printf( "%s\n", source );
 		LoadBSPFile( source );
-		PrintBSPFileSizes();
+		//PrintBSPFileSizes();
 
 		/* print sizes */
 		Sys_Printf( "\n" );

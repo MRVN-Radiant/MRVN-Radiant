@@ -1665,7 +1665,7 @@ void						LoadEntFile( const char* filename, std::vector<char>& ents );
 void                        LoadBSPFile( const char *filename );
 void                        LoadBSPFilePartially( const char *filename );
 void                        WriteBSPFile( const char *filename );
-void                        PrintBSPFileSizes();
+void                        WriteEntFiles( const char *path );
 
 void                        ParseEPair( std::list<epair_t>& epairs );
 void                        ParseEntities();

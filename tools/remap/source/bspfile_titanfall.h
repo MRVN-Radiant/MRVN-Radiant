@@ -10,6 +10,7 @@ void						CompileR1BSPFile();
 
 
 namespace Titanfall {
+	void EmitEntity( const entity_t &e );
 	uint32_t EmitTextureData( shaderInfo_t shader );
 	uint32_t EmitVertex( Vector3 &vertex );
 	uint32_t EmitVertexNormal( Vector3 &normal );
@@ -167,6 +168,10 @@ namespace Titanfall {
 		uint32_t length = 20;
 		uint32_t zeros[5] = {0,0,0,0,0};
 	};
+
+	namespace Ent {
+		inline std::vector<char> spawn;
+	}
 
 	namespace Bsp {
 		inline std::vector<char> entities;

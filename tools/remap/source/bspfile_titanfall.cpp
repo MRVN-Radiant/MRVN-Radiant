@@ -220,7 +220,7 @@ void CompileR1BSPFile() {
 		entity_t& entity = entities[entityNum];
 		const char* classname = entity.classname();
 
-		EmitEntity( entity );
+		Titanfall::EmitEntity( entity );
 
 		// Visible geo
 		if ( striEqual( classname, "worldspawn" ) )
@@ -247,6 +247,31 @@ void CompileR1BSPFile() {
 	Titanfall::EmitCollisionGrid();
 
 	Titanfall::EmitStubs();
+}
+
+/*
+   EmitEntity()
+   Saves an entity into it's corresponding .ent file or the lump in the .bsp
+ */
+void Titanfall::EmitEntity( const entity_t &e )
+{
+	StringOutputStream data;
+	data << "{\n";
+	for (const epair_t& pair : e.epairs)
+	{
+		data << "\"" << pair.key.c_str() << "\" \"" << pair.value.c_str() << "\"\n";
+	}
+	data << "}\n";
+
+
+	std::vector<char> str = { data.begin(), data.end() };
+
+	if( striEqualPrefix( e.valueForKey( "classname" ), "info_" ) ) {
+		Titanfall::Ent::spawn.insert( Titanfall::Ent::spawn.end(), str.begin(), str.end() );
+	}
+	else {
+		Titanfall::Bsp::entities.insert( Titanfall::Bsp::entities.end(), str.begin(), str.end() );
+	}
 }
 
 /*
@@ -361,7 +386,10 @@ void Titanfall::EndModel() {
 	Writes entitiy partitions respawn uses
 */
 void Titanfall::EmitEntityPartitions() {
-	std::string partitions = "01* env fx script snd spawn";
+	std::string partitions = "01* ";
+	if( Titanfall::Ent::spawn.size() )
+		partitions += "spawn";
+	
 	Titanfall::Bsp::entityPartitions = { partitions.begin(), partitions.end() + 1 };
 }
 
