@@ -474,7 +474,7 @@ void Titanfall::EmitCollisionGrid() {
 
 			// Check brushes
 			uint32_t index = 0;
-			for ( Titanfall::Brush_t &brush : Titanfall::Bsp::cmBrushes ) {
+			for ( Titanfall::CMBrush_t &brush : Titanfall::Bsp::cmBrushes ) {
 				MinMax brushMinmax;
 				brushMinmax.mins = brush.origin - brush.extents;
 				brushMinmax.maxs = brush.origin + brush.extents;
@@ -515,7 +515,7 @@ void Titanfall::EmitCollisionGrid() {
 void Titanfall::EmitBrushes(const entity_t& e) {
 	uint16_t index = 0;
 	for (const brush_t& brush : e.brushes) {
-		Titanfall::Brush_t& b = Titanfall::Bsp::cmBrushes.emplace_back();
+		Titanfall::CMBrush_t& b = Titanfall::Bsp::cmBrushes.emplace_back();
 
 		b.extents = ( brush.minmax.maxs - brush.minmax.mins ) / 2;
 		b.origin = brush.minmax.maxs - b.extents;

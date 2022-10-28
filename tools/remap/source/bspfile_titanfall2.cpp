@@ -326,11 +326,11 @@ void LoadR2BSPFile(const char* filename)
 		// NOTE: This doesnt work :)
 		// Add extra planes to brush
 		for( uint16_t i = 0; i < bspBrush.planeCount; i++ ) {
-			if ( bspBrush.sidePlaneIndex + Titanfall::Bsp::cmBrushSidePlaneOffsets.at( bspBrush.sidePlaneIndex ) + Titanfall::Bsp::cmGrid[0].brushPlaneOffset > 72 )
+			if ( bspBrush.sidePlaneIndex + Titanfall::Bsp::cmBrushSidePlaneOffsets.at( bspBrush.sidePlaneIndex ) + Titanfall::Bsp::cmGrid[0].brushSidePlaneOffset > 72 )
 				break;
 			
 			Plane3 &plane = planes.emplace_back();
-			plane = Plane3( Titanfall::Bsp::planes.at( bspBrush.sidePlaneIndex + Titanfall::Bsp::cmBrushSidePlaneOffsets.at( bspBrush.sidePlaneIndex ) + Titanfall::Bsp::cmGrid[0].brushPlaneOffset ) );
+			plane = Plane3( Titanfall::Bsp::planes.at( bspBrush.sidePlaneIndex + Titanfall::Bsp::cmBrushSidePlaneOffsets.at( bspBrush.sidePlaneIndex ) + Titanfall::Bsp::cmGrid[0].brushSidePlaneOffset ) );
 		}
 
 		// Make brush and fill it with sides

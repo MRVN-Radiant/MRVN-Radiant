@@ -120,12 +120,13 @@ namespace Titanfall {
 	};
 
 	// 0x5C
-	struct Brush_t {
+	struct CMBrush_t {
 		Vector3 origin;
-		uint16_t flags;
+		uint8_t unknown;
+		uint8_t planeCount;
 		uint16_t index;
 		Vector3 extents;
-		uint32_t sidePlane;
+		uint32_t sidePlaneIndex;
 	};
 
 	// 0x77
@@ -187,7 +188,8 @@ namespace Titanfall {
 		inline std::vector<CMGeoSet_t> cmGeoSets;
 		inline std::vector<CMBound_t> cmGeoSetBounds;
 		inline std::vector<uint16_t> cmBrushSideProperties;
-		inline std::vector<Brush_t> cmBrushes;
+		inline std::vector<CMBrush_t> cmBrushes;
+		inline std::vector<uint16_t> cmBrushSidePlaneOffsets;
 		inline std::vector<CellAABBNode_t> cellAABBNodes;
 		inline std::vector<uint16_t> objReferences;
 		inline std::vector<ObjReferenceBounds_t> objReferenceBounds;
