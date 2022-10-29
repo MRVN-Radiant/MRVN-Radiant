@@ -90,8 +90,8 @@ namespace Titanfall {
 		float scale;
 		int32_t xOffset;
 		int32_t yOffset;
-		uint32_t xCount;
-		uint32_t yCount;
+		int32_t xCount;
+		int32_t yCount;
 		int32_t unk2;
 		uint32_t brushSidePlaneOffset;
 	};

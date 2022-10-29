@@ -494,15 +494,18 @@ void Titanfall::EmitCollisionGrid() {
 	grid.brushSidePlaneOffset = 0;
 
 	// Make GridCells
-	for( uint32_t x = 0; x < grid.xCount; x++ ) {
-		for( uint32_t y = 0; y < grid.yCount; y++ ) {
+	for( int32_t x = 0; x < grid.xCount; x++ ) {
+		for( int32_t y = 0; y < grid.yCount; y++ ) {
 			MinMax cellMinmax;
-			cellMinmax.mins = Vector3(	( x - grid.xOffset ) * grid.scale,
-										( y - grid.yOffset ) * grid.scale,
-										-32768 );
-			cellMinmax.maxs = Vector3(	( x - grid.xOffset + 1 ) * grid.scale,
-										( y - grid.yOffset + 1 ) * grid.scale,
-										32768 );
+			cellMinmax.mins = Vector3(	( y + grid.yOffset ) * grid.scale,
+										( x + grid.xOffset ) * grid.scale,
+										Titanfall::Bsp::models[0].minmax.mins.z() );
+			cellMinmax.maxs = Vector3(	( y + grid.yOffset + 1 ) * grid.scale,
+										( x + grid.xOffset + 1 ) * grid.scale,
+										Titanfall::Bsp::models[0].minmax.maxs.z() );
+
+			//Sys_Printf("Worldspawn: %f %f %f : %f %f %f\n", Titanfall::Bsp::models[0].minmax.mins.x(), Titanfall::Bsp::models[0].minmax.mins.y(), Titanfall::Bsp::models[0].minmax.mins.z(), Titanfall::Bsp::models[0].minmax.maxs.x(), Titanfall::Bsp::models[0].minmax.maxs.y(), Titanfall::Bsp::models[0].minmax.maxs.z());
+			//Sys_Printf("Cell      : %f %f %f : %f %f %f\n", cellMinmax.mins.x(), cellMinmax.mins.y(), cellMinmax.mins.z(), cellMinmax.maxs.x(), cellMinmax.maxs.y(), cellMinmax.maxs.z());
 
 			Titanfall::CMGridCell_t& cell = Titanfall::Bsp::cmGridCells.emplace_back();
 			cell.start = Titanfall::Bsp::cmGeoSets.size();
