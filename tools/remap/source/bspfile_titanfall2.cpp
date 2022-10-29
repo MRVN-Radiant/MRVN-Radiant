@@ -140,7 +140,7 @@ void LoadR2BSPFile(const char* filename)
 
 	// Load all .ent files referenced in bsp if they exist
 	// TODO: Actually do this ^
-	#if 0
+	#if 1
 	if ( header->lumps[R2_LUMP_ENTITY_PARTITIONS].length )
 	{
 		/* Spawn */
@@ -216,13 +216,13 @@ void LoadR2BSPFile(const char* filename)
 		
 		// NOTE: This doesnt work :)
 		// Add extra planes to brush
-		for( uint16_t i = 0; i < bspBrush.planeCount; i++ ) {
+		/*for (uint16_t i = 0; i < bspBrush.planeCount; i++) {
 			if ( bspBrush.sidePlaneIndex + Titanfall::Bsp::cmBrushSidePlaneOffsets.at( bspBrush.sidePlaneIndex ) + Titanfall::Bsp::cmGrid[0].brushSidePlaneOffset > 72 )
 				break;
 			
 			Plane3 &plane = planes.emplace_back();
 			plane = Plane3( Titanfall::Bsp::planes.at( bspBrush.sidePlaneIndex + Titanfall::Bsp::cmBrushSidePlaneOffsets.at( bspBrush.sidePlaneIndex ) + Titanfall::Bsp::cmGrid[0].brushSidePlaneOffset ) );
-		}
+		}*/
 
 		// Make brush and fill it with sides
 		brush_t &brush = entities.data()[0].brushes.emplace_back();
@@ -293,6 +293,7 @@ void WriteR2BSPFile(const char* filename)
 	/* Write lumps */
 	
 	AddLump(file, header.lumps[R2_LUMP_ENTITIES],							Titanfall::Bsp::entities);
+	AddLump(file, header.lumps[R2_LUMP_PLANES],								Titanfall::Bsp::planes);
 	AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA],						Titanfall::Bsp::textureData);
 	AddLump(file, header.lumps[R2_LUMP_VERTICES],							Titanfall::Bsp::vertices);
 	AddLump(file, header.lumps[R2_LUMP_MODELS],								Titanfall::Bsp::models);
@@ -339,6 +340,7 @@ void WriteR2BSPFile(const char* filename)
 	AddLump(file, header.lumps[R2_LUMP_CM_UNIQUE_CONTENTS],					Titanfall::Bsp::cmUniqueContents_stub);
 	AddLump(file, header.lumps[R2_LUMP_CM_BRUSHES],							Titanfall::Bsp::cmBrushes);
 	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PROPS],				Titanfall::Bsp::cmBrushSideProperties);
+	AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PLANES],				Titanfall::Bsp::cmBrushSidePlaneOffsets);
 	//AddLump(file, header.lumps[R2_LUMP_TRICOLL_BEVEL_STARTS],				Titanfall2::bspTricollBevelStarts_stub);
 	AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_DATA_SKY],					Titanfall2::bspLightMapDataSky_stub);
 	AddLump(file, header.lumps[R2_LUMP_CSM_AABB_NODES],						Titanfall2::bspCSMAABBNodes_stub);

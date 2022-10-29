@@ -106,7 +106,7 @@ void LoadEntFile( const char* filename, std::vector<char> &ents )
 	MemBuffer f = LoadFile( filename );
 	/* Add to bspEntities */
 	std::vector<char> ent = { (char*)((byte*)f.data() + 10), (char*)((byte*)f.data() + f.size()) };
-	ents.insert(bspEntities.end(), ent.begin(), ent.end());
+	ents.insert(ents.end(), ent.begin(), ent.end());
 }
 
 /*

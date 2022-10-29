@@ -150,7 +150,8 @@ void WriteR1BSPFile( const char* filename ) {
 	
 	
 	/* Write lumps */
-	AddLump(file, header.lumps[R1_LUMP_ENTITIES],							Titanfall::Bsp::entities_stub);
+	AddLump(file, header.lumps[R1_LUMP_ENTITIES],							Titanfall::Bsp::entities);
+	AddLump(file, header.lumps[R1_LUMP_PLANES],								Titanfall::Bsp::planes);
 	AddLump(file, header.lumps[R1_LUMP_TEXTURE_DATA], 						Titanfall::Bsp::textureData);
 	AddLump(file, header.lumps[R1_LUMP_VERTICES],							Titanfall::Bsp::vertices);
 	AddLump(file, header.lumps[R1_LUMP_MODELS],								Titanfall::Bsp::models);
@@ -188,6 +189,7 @@ void WriteR1BSPFile( const char* filename ) {
 	AddLump(file, header.lumps[R1_LUMP_CM_UNIQUE_CONTENTS],					Titanfall::Bsp::cmUniqueContents_stub);
 	AddLump(file, header.lumps[R1_LUMP_CM_BRUSHES],							Titanfall::Bsp::cmBrushes);
 	AddLump(file, header.lumps[R1_LUMP_CM_BRUSH_SIDE_PROPS],				Titanfall::Bsp::cmBrushSideProperties);
+	AddLump(file, header.lumps[R1_LUMP_CM_BRUSH_SIDE_PLANE_OFFSETS],		Titanfall::Bsp::cmBrushSidePlaneOffsets);
 	AddLump(file, header.lumps[R1_LUMP_LIGHTMAP_DATA_SKY],					Titanfall::Bsp::lightMapDataSky_stub);
 	AddLump(file, header.lumps[R1_LUMP_CSM_AABB_NODES],						Titanfall::Bsp::csmAABBNodes_stub);
 	AddLump(file, header.lumps[R1_LUMP_CELL_BSP_NODES],						Titanfall::Bsp::cellBSPNodes_stub);
@@ -489,13 +491,18 @@ void Titanfall::EmitCollisionGrid() {
 	grid.xCount = ceil( size.x() / grid.scale );
 	grid.yCount = ceil( size.y() / grid.scale );
 	grid.unk2 = Titanfall::Bsp::cmBrushes.size();
+	grid.brushSidePlaneOffset = 0;
 
 	// Make GridCells
 	for( uint32_t x = 0; x < grid.xCount; x++ ) {
 		for( uint32_t y = 0; y < grid.yCount; y++ ) {
 			MinMax cellMinmax;
-			cellMinmax.mins = Vector3( x * grid.scale, y * grid.scale, -32768 );
-			cellMinmax.maxs = Vector3( ( x + 1 ) * grid.scale, ( y + 1 ) * grid.scale, 32768 );
+			cellMinmax.mins = Vector3(	( x - grid.xOffset ) * grid.scale,
+										( y - grid.yOffset ) * grid.scale,
+										-32768 );
+			cellMinmax.maxs = Vector3(	( x - grid.xOffset + 1 ) * grid.scale,
+										( y - grid.yOffset + 1 ) * grid.scale,
+										32768 );
 
 			Titanfall::CMGridCell_t& cell = Titanfall::Bsp::cmGridCells.emplace_back();
 			cell.start = Titanfall::Bsp::cmGeoSets.size();
@@ -507,6 +514,7 @@ void Titanfall::EmitCollisionGrid() {
 				brushMinmax.mins = brush.origin - brush.extents;
 				brushMinmax.maxs = brush.origin + brush.extents;
 
+				// NOTE: Still doesnt work
 				//if( !cellMinmax.test( brushMinmax ) )
 				//	continue;
 
@@ -542,19 +550,56 @@ void Titanfall::EmitCollisionGrid() {
 */
 void Titanfall::EmitBrushes(const entity_t& e) {
 	uint16_t index = 0;
-	for (const brush_t& brush : e.brushes) {
+	for ( const brush_t& brush : e.brushes ) {
 		Titanfall::CMBrush_t& b = Titanfall::Bsp::cmBrushes.emplace_back();
 
 		b.extents = ( brush.minmax.maxs - brush.minmax.mins ) / 2;
 		b.origin = brush.minmax.maxs - b.extents;
 		b.index = index;
-		index++;
+		b.planeCount = 0;
+		b.unknown = 0;
 
+		// Emit brush side properties for AABB planes
 		for( int i = 0; i < 6; i++ )
 			Titanfall::Bsp::cmBrushSideProperties.emplace_back(1);
+		// TODO: need to figure out plane indexing properly, below code sometimes works, but is unstable
+		#if 0
+		for( const side_t &side : brush.sides ) {
+			double dot = vector3_dot(Vector3(0, 0, 1), side.plane.normal());
+			// Float comparison :nyooooo:
+			if( float_equal_epsilon( dot, -1.0, 0.001 ) || float_equal_epsilon(dot, 1.0, 0.001) || float_equal_epsilon(dot, 0.0, 0.001))
+				continue;
+
+			//Sys_Printf("Dot: %f\n", dot);
+			Titanfall::EmitPlane( side.plane );
+			b.planeCount++;
+			//b.unknown++;
+			Titanfall::Bsp::cmBrushSideProperties.emplace_back(1);
+			uint16_t& so = Titanfall::Bsp::cmBrushSidePlaneOffsets.emplace_back();
+			so = 0;
+		}
+
+		
+		if( b.planeCount ) {
+			b.sidePlaneIndex = Titanfall::Bsp::cmBrushSidePlaneOffsets.size() - b.planeCount - 1;
+			//uint16_t &so = Titanfall::Bsp::cmBrushSidePlaneOffsets.emplace_back();
+			//so = Titanfall::Bsp::planes.size() - b.planeCount;
+		}
+		#endif
+		index++;
 	}
 }
 
+/*
+	EmitPlane
+*/
+void Titanfall::EmitPlane( const Plane3 &plane ) {
+	Titanfall::Bsp::planes.emplace_back( Plane3f( plane ) );
+}
+
+/*
+	EmitLevelInfo()
+*/
 void Titanfall::EmitLevelInfo() {
 	Titanfall::LevelInfo_t &li = Titanfall::Bsp::levelInfo.emplace_back();
 	// Something related to counting mesh flags
