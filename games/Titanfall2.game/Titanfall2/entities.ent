@@ -203,15 +203,19 @@ Used to spawn the hardpoints in apmed hardpoints
 =============================================================================
 -->
 
+<list name="MenuTypes">
+    <item name="Camera" value="menu_camera_target"/>
+    <item name="Menu" value="menu_scene_ref"/>
+</list>
+
 <point name="info_target_clientside" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
 used to spawn the client menus
 -------- KEYS --------
 <targetname key="targetname" name="Target Name">The target name of the menu ent</targetname>
 <angles key="angles" name="Pitch Yaw Roll">Individual control of PITCH, YAW, and ROLL (default 0 0 0).</angles>
-<string key="script_name" name="Script Name" value="menu_scene_ref">The script name of the clientside ent</string>
+<MenuTypes key="script_name" name="Script Name" value="menu_scene_ref">The script name of the clientside ent</MenuTypes>
 -------- NOTES --------
 ent for clients
-setting script_name to diffrent names would spawn diffrent parts of the menu : menu_scene_ref or menu_camera_target
 </point>
 
 <!--
