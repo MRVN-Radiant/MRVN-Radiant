@@ -1523,87 +1523,87 @@ GtkWidget* EntityInspector_constructWindow( GtkWindow* toplevel ){
 	g_signal_connect( G_OBJECT( vbox ), "destroy", G_CALLBACK( EntityInspector_destroyWindow ), 0 );
 
 	{
-		GtkWidget* split1 = gtk_vpaned_new();
+		GtkWidget* split1 = gtk_hpaned_new();
 		gtk_box_pack_start( GTK_BOX( vbox ), split1, TRUE, TRUE, 0 );
 		gtk_widget_show( split1 );
 
 		g_entity_split1 = split1;
 
+		
+		GtkWidget* split2 = gtk_vpaned_new();
+		//gtk_paned_add1( GTK_PANED( split1 ), split2 );
+		gtk_paned_pack1( GTK_PANED( split1 ), split2, FALSE, FALSE );
+		gtk_widget_show( split2 );
+
+		g_entity_split2 = split2;
+
 		{
-			GtkWidget* split2 = gtk_vpaned_new();
-			//gtk_paned_add1( GTK_PANED( split1 ), split2 );
-			gtk_paned_pack1( GTK_PANED( split1 ), split2, FALSE, FALSE );
-			gtk_widget_show( split2 );
-
-			g_entity_split2 = split2;
-
-			{
-				// class list
-				GtkWidget* scr = gtk_scrolled_window_new( 0, 0 );
-				gtk_widget_show( scr );
-				//gtk_paned_add1( GTK_PANED( split2 ), scr );
-				gtk_paned_pack1( GTK_PANED( split2 ), scr, FALSE, FALSE );
-				gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scr ), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS );
-				gtk_scrolled_window_set_shadow_type( GTK_SCROLLED_WINDOW( scr ), GTK_SHADOW_IN );
-
-				{
-					GtkListStore* store = gtk_list_store_new( 2, G_TYPE_STRING, G_TYPE_POINTER );
-
-					GtkTreeView* view = GTK_TREE_VIEW( gtk_tree_view_new_with_model( GTK_TREE_MODEL( store ) ) );
-					//gtk_tree_view_set_enable_search( GTK_TREE_VIEW( view ), FALSE );
-					gtk_tree_view_set_headers_visible( view, FALSE );
-					g_signal_connect( G_OBJECT( view ), "button_press_event", G_CALLBACK( EntityClassList_button_press ), 0 );
-					g_signal_connect( G_OBJECT( view ), "key_press_event", G_CALLBACK( EntityClassList_keypress ), 0 );
-
-					{
-						GtkCellRenderer* renderer = gtk_cell_renderer_text_new();
-						GtkTreeViewColumn* column = gtk_tree_view_column_new_with_attributes( "Key", renderer, "text", 0, NULL );
-						gtk_tree_view_append_column( view, column );
-					}
-
-					{
-						GtkTreeSelection* selection = gtk_tree_view_get_selection( view );
-						g_signal_connect( G_OBJECT( selection ), "changed", G_CALLBACK( EntityClassList_selection_changed ), 0 );
-					}
-
-					gtk_widget_show( GTK_WIDGET( view ) );
-
-					gtk_container_add( GTK_CONTAINER( scr ), GTK_WIDGET( view ) );
-
-					g_object_unref( G_OBJECT( store ) );
-					g_entityClassList = view;
-					g_entlist_store = store;
-				}
-			}
+			// class list
+			GtkWidget* scr = gtk_scrolled_window_new( 0, 0 );
+			gtk_widget_show( scr );
+			//gtk_paned_add1( GTK_PANED( split2 ), scr );
+			gtk_paned_pack1( GTK_PANED( split2 ), scr, FALSE, FALSE );
+			gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scr ), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS );
+			gtk_scrolled_window_set_shadow_type( GTK_SCROLLED_WINDOW( scr ), GTK_SHADOW_IN );
 
 			{
-				GtkWidget* scr = gtk_scrolled_window_new( 0, 0 );
-				gtk_widget_show( scr );
-				//gtk_paned_add2( GTK_PANED( split2 ), scr );
-				gtk_paned_pack2( GTK_PANED( split2 ), scr, FALSE, FALSE );
-				gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scr ), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS );
-				gtk_scrolled_window_set_shadow_type( GTK_SCROLLED_WINDOW( scr ), GTK_SHADOW_IN );
+				GtkListStore* store = gtk_list_store_new( 2, G_TYPE_STRING, G_TYPE_POINTER );
+
+				GtkTreeView* view = GTK_TREE_VIEW( gtk_tree_view_new_with_model( GTK_TREE_MODEL( store ) ) );
+				//gtk_tree_view_set_enable_search( GTK_TREE_VIEW( view ), FALSE );
+				gtk_tree_view_set_headers_visible( view, FALSE );
+				g_signal_connect( G_OBJECT( view ), "button_press_event", G_CALLBACK( EntityClassList_button_press ), 0 );
+				g_signal_connect( G_OBJECT( view ), "key_press_event", G_CALLBACK( EntityClassList_keypress ), 0 );
 
 				{
-					GtkTextView* text = GTK_TEXT_VIEW( gtk_text_view_new() );
-					gtk_widget_set_size_request( GTK_WIDGET( text ), 0, -1 ); // allow shrinking
-					gtk_text_view_set_wrap_mode( text, GTK_WRAP_WORD );
-					gtk_text_view_set_editable( text, FALSE );
-					gtk_widget_show( GTK_WIDGET( text ) );
-					gtk_container_add( GTK_CONTAINER( scr ), GTK_WIDGET( text ) );
-					g_entityClassComment = text;
-					{
-						GtkTextBuffer *buffer = gtk_text_view_get_buffer( text );
-						gtk_text_buffer_create_tag( buffer, "bold", "weight", PANGO_WEIGHT_BOLD, NULL );
-					}
+					GtkCellRenderer* renderer = gtk_cell_renderer_text_new();
+					GtkTreeViewColumn* column = gtk_tree_view_column_new_with_attributes( "Key", renderer, "text", 0, NULL );
+					gtk_tree_view_append_column( view, column );
 				}
+
+				{
+					GtkTreeSelection* selection = gtk_tree_view_get_selection( view );
+					g_signal_connect( G_OBJECT( selection ), "changed", G_CALLBACK( EntityClassList_selection_changed ), 0 );
+				}
+
+				gtk_widget_show( GTK_WIDGET( view ) );
+
+				gtk_container_add( GTK_CONTAINER( scr ), GTK_WIDGET( view ) );
+
+				g_object_unref( G_OBJECT( store ) );
+				g_entityClassList = view;
+				g_entlist_store = store;
 			}
 		}
 
 		{
+			GtkWidget* scr = gtk_scrolled_window_new( 0, 0 );
+			gtk_widget_show( scr );
+			//gtk_paned_add2( GTK_PANED( split2 ), scr );
+			gtk_paned_pack2( GTK_PANED( split1 ), scr, FALSE, FALSE );
+			gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scr ), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS );
+			gtk_scrolled_window_set_shadow_type( GTK_SCROLLED_WINDOW( scr ), GTK_SHADOW_IN );
+
+			{
+				GtkTextView* text = GTK_TEXT_VIEW( gtk_text_view_new() );
+				gtk_widget_set_size_request( GTK_WIDGET( text ), 0, -1 ); // allow shrinking
+				gtk_text_view_set_wrap_mode( text, GTK_WRAP_WORD );
+				gtk_text_view_set_editable( text, FALSE );
+				gtk_widget_show( GTK_WIDGET( text ) );
+				gtk_container_add( GTK_CONTAINER( scr ), GTK_WIDGET( text ) );
+				g_entityClassComment = text;
+				{
+					GtkTextBuffer *buffer = gtk_text_view_get_buffer( text );
+					gtk_text_buffer_create_tag( buffer, "bold", "weight", PANGO_WEIGHT_BOLD, NULL );
+				}
+			}
+		}
+		
+
+		{
 			GtkWidget* split0 = gtk_vpaned_new();
 			//gtk_paned_add2( GTK_PANED( split1 ), split0 );
-			gtk_paned_pack2( GTK_PANED( split1 ), split0, FALSE, FALSE );
+			gtk_paned_pack2( GTK_PANED( split2 ), split0, FALSE, FALSE );
 			gtk_widget_show( split0 );
 			g_entity_split0 = split0;
 
