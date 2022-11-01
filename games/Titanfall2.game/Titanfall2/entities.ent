@@ -15,7 +15,7 @@ Used for spawning player when match starts.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
 <targetname key="targetname" name="Target Name" value="info_player_start_">UNIQUE Target name</targetname>
-<angles key="angles" name="Pitch Yaw Roll">Individual control of PITCH, YAW, and ROLL (default 0 0 0).</angles>
+<angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 <boolean key="gamemode_aitdm" name="gamemode_aitdm" value="1">Use this for Attrition?</boolean>
 <boolean key="gamemode_at" name="gamemode_at" value="1">Use this for Bounty Hunt?</boolean>
 <boolean key="gamemode_coliseum" name="gamemode_coliseum" value="1">Use this for Coliseum(The gamemode)?</boolean>
@@ -44,7 +44,7 @@ Used for respawning players.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
 <targetname key="targetname" name="Target Name" value="info_spawnpoint_human_start_">UNIQUE Target name</targetname>
-<angles key="angles" name="Pitch Yaw Roll">Individual control of PITCH, YAW, and ROLL (default 0 0 0).</angles>
+<angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 <boolean key="gamemode_aitdm" name="gamemode_aitdm" value="1">Use this for Attrition?</boolean>
 <boolean key="gamemode_at" name="gamemode_at" value="1">Use this for Bounty Hunt?</boolean>
 <boolean key="gamemode_coliseum" name="gamemode_coliseum" value="1">Use this for Coliseum(The gamemode)?</boolean>
@@ -73,7 +73,7 @@ Used for spawning player when match starts.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
 <targetname key="targetname" name="Target Name" value="info_spawnpoint_human_start_">UNIQUE Target name</targetname>
-<angles key="angles" name="Pitch Yaw Roll">Individual control of PITCH, YAW, and ROLL (default 0 0 0).</angles>
+<angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 <boolean key="gamemode_aitdm" name="gamemode_aitdm" value="1">Use this for Attrition?</boolean>
 <boolean key="gamemode_at" name="gamemode_at" value="1">Use this for Bounty Hunt?</boolean>
 <boolean key="gamemode_coliseum" name="gamemode_coliseum" value="1">Use this for Coliseum(The gamemode)?</boolean>
@@ -102,7 +102,7 @@ Used for spawning player when match starts.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
 <targetname key="targetname" name="Target Name" value="info_spawnpoint_human_start_">UNIQUE Target name</targetname>
-<angles key="angles" name="Pitch Yaw Roll">Individual control of PITCH, YAW, and ROLL (default 0 0 0).</angles>
+<angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 <boolean key="gamemode_aitdm" name="gamemode_aitdm" value="1">Use this for Attrition?</boolean>
 <boolean key="gamemode_at" name="gamemode_at" value="1">Use this for Bounty Hunt?</boolean>
 <boolean key="gamemode_coliseum" name="gamemode_coliseum" value="1">Use this for Coliseum(The gamemode)?</boolean>
@@ -131,7 +131,7 @@ Used for spawning player when match starts.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
 <targetname key="targetname" name="Target Name" value="info_spawnpoint_human_start_">UNIQUE Target name</targetname>
-<angles key="angles" name="Pitch Yaw Roll">Individual control of PITCH, YAW, and ROLL (default 0 0 0).</angles>
+<angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 <boolean key="gamemode_aitdm" name="gamemode_aitdm" value="1">Use this for Attrition?</boolean>
 <boolean key="gamemode_at" name="gamemode_at" value="1">Use this for Bounty Hunt?</boolean>
 <boolean key="gamemode_coliseum" name="gamemode_coliseum" value="1">Use this for Coliseum(The gamemode)?</boolean>
@@ -160,7 +160,7 @@ Used to spawn the flags in ctf.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
 <targetname key="targetname" name="Target Name" value="info_spawnpoint_flag_">UNIQUE Target name</targetname>
-<angles key="angles" name="Pitch Yaw Roll">Individual control of PITCH, YAW, and ROLL (default 0 0 0).</angles>
+<angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 </point>
 
 <point name="info_speedball_flag" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
@@ -168,7 +168,7 @@ Used to spawn the flag in live fire.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
 <targetname key="targetname" name="Target Name" value="info_speedball_flag_">UNIQUE Target name</targetname>
-<angles key="angles" name="Pitch Yaw Roll">Individual control of PITCH, YAW, and ROLL (default 0 0 0).</angles>
+<angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 </point>
 
 <!-- info_hardpoint needs a special class I think -->
@@ -177,7 +177,7 @@ Used to spawn the hardpoints in apmed hardpoints
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
 <targetname key="targetname" name="Target Name" value="info_speedball_flag_">UNIQUE Target name</targetname>
-<angles key="angles" name="Pitch Yaw Roll">Individual control of PITCH, YAW, and ROLL (default 0 0 0).</angles>
+<angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 <string key="hardpointGroup" name="Hardpoint Group" value="A">used to indicate the hardpoint name (A,B,C)</string>
 </point>
 
@@ -209,13 +209,15 @@ Used to spawn the hardpoints in apmed hardpoints
 </list>
 
 <point name="info_target_clientside" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
-used to spawn the client menus
+can be used to spawn the menu lobby in mp matches with the appropriate script names
+also can be used as a reference for clients
+this is basically a clientside target ent.
 -------- KEYS --------
 <targetname key="targetname" name="Target Name">The target name of the menu ent</targetname>
-<angles key="angles" name="Pitch Yaw Roll">Individual control of PITCH, YAW, and ROLL (default 0 0 0).</angles>
+<angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 <MenuTypes key="script_name" name="Script Name" value="menu_scene_ref">The script name of the clientside ent</MenuTypes>
 -------- NOTES --------
-ent for clients
+the clients have access to this target ent.
 </point>
 
 <!--
@@ -224,15 +226,17 @@ ent for clients
 =============================================================================
 -->
 
+<!-- they have much more stuff than this -->
 <point name="prop_dynamic" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
 used to spawn prop_dynamic
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
 <targetname key="targetname" name="Target Name" value="">Target name</targetname>
-<angles key="angles" name="Pitch Yaw Roll">Individual control of PITCH, YAW, and ROLL (default 0 0 0).</angles>
+<angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 <string key="model" name="Model" value="models/dev/editor_ref.mdl">The model for the entity </string>
 <integer key="solid" name="Solid" value="6">the type of collision it has : 0 = no collision, 2 = bounding box, 6 = use vPhysics, 8 = hitboxes only</integer>
 <string key="editorclass" name="Editor Class" value="">The editorclass for the entity</string>
+<real key="scale" name="Scale" value="1">Value used to scale the ents model, it doesn't scale the hitboxes.</real>
 </point>
 
 <point name="script_mover" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
@@ -240,13 +244,16 @@ used to spawn mover script
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
 <targetname key="targetname" name="Target Name" value="">Target name</targetname>
-<angles key="angles" name="Pitch Yaw Roll">Individual control of PITCH, YAW, and ROLL (default 0 0 0).</angles>
+<angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 <string key="model" name="Model" value="models/dev/editor_ref.mdl">The model for the entity </string>
 <integer key="solid" name="Solid" value="6">the type of collision it has : 0 = no collision, 2 = bounding box, 6 = use vPhysics, 8 = hitboxes only</integer>
-<boolean key="SpawnAsPhysicsMover" name="Spawn As Physics Mover" value="0">set 1 for it to become a bad physics obeject</boolean>
+<boolean key="SpawnAsPhysicsMover" name="Spawn As Physics Mover" value="0">set 1 for it to become a bad physics object</boolean>
 <integer key="path_speed" name="Path Speed" value="100">the speed at which the mover travels on its path</integer>
 <boolean key="leveledplaced" name="Leveled Placed" value="0">I think it activates its path idk</boolean>
 <string key="editorclass" name="Editor Class" value="">The editorclass for the entity</string>
+<real key="scale" name="Scale" value="1">Value used to scale the ents model, it doesn't scale the hitboxes.</real>
+-------- NOTES --------
+a teamnum of 4 wouldn't crush npcs/players when the mover is moving.
 </point>
 
 <!--
@@ -269,7 +276,7 @@ ref script
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
 <targetname key="targetname" name="Target Name" value="">Target name</targetname>
 <string key="editorclass" name="Editor Class" value="">The editorclass for the entity</string>
-<angles key="angles" name="Pitch Yaw Roll">Individual control of PITCH, YAW, and ROLL (default 0 0 0).</angles>
+<angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 </point>
 
 </classes>
