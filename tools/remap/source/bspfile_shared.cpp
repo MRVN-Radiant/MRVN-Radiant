@@ -47,7 +47,7 @@ void Shared::MakeMeshes( const entity_t &e )
 	/* Multiple entities can have meshes, make sure we clear before making new meshes */
 	Shared::meshes.clear();
 
-	Sys_FPrintf(SYS_VRB, "Making shared meshes\n");
+	Sys_FPrintf( SYS_VRB, "--- SharedMeshes ---\n" );
 
 	/* Brushes */
 	for ( const brush_t &brush : e.brushes )
@@ -162,7 +162,7 @@ void Shared::MakeMeshes( const entity_t &e )
 		index++;
 	}
 
-	Sys_Printf("Made: %i meshes\n", Shared::meshes.size());
+	Sys_Printf( "%9zu shared meshes\n", Shared::meshes.size() );
 }
 
 void Shared::MakeVisReferences()
@@ -175,14 +175,12 @@ void Shared::MakeVisReferences()
 
 		ref.minmax = mesh.minmax;
 		ref.index = i;
-
-		Sys_Printf("Index: %i\n",i);
 	}
 
-	/* Models */
+	/* Props */
 
 
-	Sys_Printf("Made: %i vis references\n", Shared::visRefs.size());
+	Sys_Printf( "%9zu shared vis references\n", Shared::visRefs.size() );
 }
 
 Shared::visNode_t Shared::MakeVisTree( std::vector<Shared::visRef_t> refs, float parentCost )

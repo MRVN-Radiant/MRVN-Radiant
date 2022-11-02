@@ -297,7 +297,7 @@ void SetLightStyles(){
 	}
 
 	/* emit some statistics */
-	Sys_FPrintf( SYS_VRB, "%9d light entities stripped\n", numStrippedLights );
+	//Sys_FPrintf( SYS_VRB, "%9d light entities stripped\n", numStrippedLights );
 }
 
 
@@ -327,11 +327,10 @@ void EndBSPFile( bool do_write ){
 
 	if ( do_write ) {
 		/* write the surface extra file */
-		WriteSurfaceExtraFile( source );
+		//WriteSurfaceExtraFile( source );
 
 		/* write the bsp */
 		auto path = StringOutputStream( 256 )( source, ".bsp" );
-		Sys_Printf( "Writing %s\n", path.c_str() );
 		WriteBSPFile( path );
 		WriteEntFiles( source );
 	}

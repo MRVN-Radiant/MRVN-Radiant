@@ -151,11 +151,15 @@ void WriteBSPFile( const char *filename ){
 	char tempname[ 1024 ];
 	time_t tm;
 
+	Sys_Printf( "Writing %s... ", filename );
 
 	/* dummy check */
 	if ( g_game == NULL || g_game->write == NULL ) {
+		Sys_Printf( "Failed!\n" );
 		Error( "WriteBSPFile: unsupported BSP file format" );
 	}
+
+	Sys_Printf( "Success!\n" );
 
 	/* make fake temp name so existing bsp file isn't damaged in case write process fails */
 	time( &tm );
@@ -178,11 +182,15 @@ void WriteBSPFile( const char *filename ){
 void WriteEntFiles( const char *path ) {
 	if ( Titanfall::Ent::spawn.size() ) {
 		auto name = StringOutputStream(1024)(PathExtensionless(path), "_spawn.ent");
+		Sys_Printf( "Writing %s... ", name.c_str() );
+
 		FILE* file = SafeOpenWrite(name);
 		char message[] = "ENTITIES01\n";
 		SafeWrite(file, &message, sizeof(message) - 1);
 		SafeWrite(file, Titanfall::Ent::spawn.data(), Titanfall::Ent::spawn.size());
 		fclose(file);
+
+		Sys_Printf( "Success!\n" );
 	}
 }
 
