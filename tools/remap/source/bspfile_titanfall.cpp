@@ -482,14 +482,23 @@ void Titanfall::EmitCollisionGrid() {
 	// Worldspawn size
 	Vector3 size = Titanfall::Bsp::models[0].minmax.maxs - Titanfall::Bsp::models[0].minmax.mins;
 
-	// TODO: grid.scale should be chosen by an algorithm
-	// so that geoset count never exceedets uint16_t max
+	// Choose scale
+	float scale = 256;
+	{
+		// 128 Is an arbitrary limit, I think there's one between 128 and 190 but havent tested much
+		float xScale = size.x() / 128;
+		float yScale = size.y() / 128;
+
+		scale = ceil( xScale > yScale ? xScale : yScale );
+		scale = scale < 256 ? 256 : scale;
+	}
+	
 	Titanfall::CMGrid_t& grid = Titanfall::Bsp::cmGrid.emplace_back();
-	grid.scale = 256;
+	grid.scale = scale;
 	grid.xOffset = floor( Titanfall::Bsp::models[0].minmax.mins.x() / grid.scale );
 	grid.yOffset = floor( Titanfall::Bsp::models[0].minmax.mins.y() / grid.scale );
-	grid.xCount = ceil( size.x() / grid.scale );
-	grid.yCount = ceil( size.y() / grid.scale );
+	grid.xCount = ceil( size.x() / grid.scale ) + 1;
+	grid.yCount = ceil( size.y() / grid.scale ) + 1;
 	grid.unk2 = Titanfall::Bsp::cmBrushes.size();
 	grid.brushSidePlaneOffset = 0;
 
@@ -511,7 +520,6 @@ void Titanfall::EmitCollisionGrid() {
 			cell.start = Titanfall::Bsp::cmGeoSets.size();
 
 			// Check brushes
-			uint32_t index = 0;
 			for ( uint32_t index = 0; index < Titanfall::Bsp::cmBrushes.size(); index++ ) {
 				Titanfall::CMBrush_t &brush = Titanfall::Bsp::cmBrushes.at( index );
 
@@ -524,7 +532,7 @@ void Titanfall::EmitCollisionGrid() {
 					continue;
 				
 				Titanfall::CMGeoSet_t& set = Titanfall::Bsp::cmGeoSets.emplace_back();
-				set.unknown0 = 1;
+				set.unknown0 = 0;
 				set.unknown1 = 1;
 				set.unknown2 = 0;
 				set.collisionShapeIndex = index;

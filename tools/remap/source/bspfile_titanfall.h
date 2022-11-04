@@ -113,10 +113,10 @@ namespace Titanfall {
 
 	// 0x58 & 0x5A
 	struct CMBound_t {
-		BasicVector3<uint16_t> origin;
+		BasicVector3<int16_t> origin;
 		uint8_t unknown0;
 		uint8_t unknown1;
-		BasicVector3<uint16_t> extents;
+		BasicVector3<int16_t> extents;
 		uint8_t unknown2;
 		uint8_t unknown3;
 	};
