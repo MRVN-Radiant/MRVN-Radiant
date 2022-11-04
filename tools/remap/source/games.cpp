@@ -123,7 +123,7 @@ struct game_titanfall2 : game_t
 		"assets",                 /* default base game data dir */
 		".assets",                /* unix home sub-dir */
 		"soldier",              /* magic path word */
-		"shaders",              /* shader directory */
+		"scripts",              /* shader directory */
 		64,                     /* max lightmapped surface verts */
 		999,                    /* max surface verts */
 		6000,                   /* max surface indexes */
@@ -350,7 +350,7 @@ struct game_apexlegends : game_t
 		"assets",               /* default base game data dir */
 		".assets",              /* unix home sub-dir */
 		"soldier",              /* magic path word */
-		"shaders",              /* shader directory */
+		"scripts",              /* shader directory */
 		64,                     /* max lightmapped surface verts */
 		999,                    /* max surface verts */
 		6000,                   /* max surface indexes */
@@ -576,7 +576,7 @@ struct game_titanfallonline : game_t
 		"assets",               /* default base game data dir */
 		".assets",              /* unix home sub-dir */
 		"soldier",              /* magic path word */
-		"shaders",              /* shader directory */
+		"scripts",              /* shader directory */
 		64,                     /* max lightmapped surface verts */
 		999,                    /* max surface verts */
 		6000,                   /* max surface indexes */

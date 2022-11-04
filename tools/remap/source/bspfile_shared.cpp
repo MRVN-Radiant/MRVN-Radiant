@@ -106,7 +106,6 @@ void Shared::MakeMeshes( const entity_t &e )
 	}
 
 	/* Patches */
-	
 	parseMesh_t *patch;
 	patch = e.patches;
 	while( patch != NULL ) {
@@ -117,18 +116,17 @@ void Shared::MakeMeshes( const entity_t &e )
 		
 		// Get vertices
 		for( int index = 0; index < ( patchMesh.width * patchMesh.height ); index++ ) {
-				Shared::Vertex_t &vertex = mesh.vertices.emplace_back();
+			Shared::Vertex_t &vertex = mesh.vertices.emplace_back();
 				
-				vertex.xyz = patchMesh.verts[ index ].xyz;
-				vertex.normal = patchMesh.verts[ index ].normal;
-				vertex.st = patchMesh.verts[ index ].st;
+			vertex.xyz = patchMesh.verts[ index ].xyz;
+			vertex.normal = patchMesh.verts[ index ].normal;
+			vertex.st = patchMesh.verts[ index ].st;
 		}
 		
 		// Make triangles
 		for( int x = 0; x < ( patchMesh.width - 1 ); x++ ) {
 			for( int y = 0; y < ( patchMesh.height - 1 ); y++ ) {
 				int index = x + y * patchMesh.width;
-				Sys_Printf( "%i : %i = %i\n",x , y, index );
 				
 				mesh.triangles.emplace_back( index );
 				mesh.triangles.emplace_back( index + patchMesh.width );
@@ -137,14 +135,8 @@ void Shared::MakeMeshes( const entity_t &e )
 				mesh.triangles.emplace_back( index );
 				mesh.triangles.emplace_back( index + patchMesh.width + 1 );
 				mesh.triangles.emplace_back( index + 1 );
-				
 			}
 		}
-
-		Sys_Printf( "Vertices: %li\n", mesh.vertices.size() );
-		Sys_Printf( "Triangles: %li\n", mesh.triangles.size() / 3 );
-		
-		
 		patch = patch->next;
 	}
 	
