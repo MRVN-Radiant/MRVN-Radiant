@@ -59,8 +59,8 @@ void Shared::MakeMeshes( const entity_t &e )
 			if ( side.bevel )
 				continue;
 
-			/* This should check flags, but those dont work rn */
-			if ( striEqual( side.shaderInfo->shader.c_str(), "textures/tools/toolsnodraw" ) )
+			/* Check flags */
+			if ( side.shaderInfo->compileFlags & C_NODRAW )
 				continue;
 			
 			Shared::Mesh_t &mesh = Shared::meshes.emplace_back();
