@@ -63,7 +63,7 @@ void Shared::MakeMeshes( const entity_t &e )
 			if ( striEqual( side.shaderInfo->shader.c_str(), "textures/tools/toolsnodraw" ) )
 				continue;
 			
-			Shared::mesh_t &mesh = Shared::meshes.emplace_back();
+			Shared::Mesh_t &mesh = Shared::meshes.emplace_back();
 			mesh.shaderInfo = side.shaderInfo;
 
 			Vector3 normal = side.plane.normal();//Vector3(0.0f,0.0f,1.0f);
@@ -87,7 +87,7 @@ void Shared::MakeMeshes( const entity_t &e )
 				st[1] = side.texMat[1][0] * x + side.texMat[1][1] * y + side.texMat[1][2];
 
 				
-				Shared::vertex_t &sv = mesh.vertices.emplace_back();
+				Shared::Vertex_t &sv = mesh.vertices.emplace_back();
 				sv.xyz = vertex;
 				sv.st = st;
 				sv.normal = normal;
@@ -106,6 +106,48 @@ void Shared::MakeMeshes( const entity_t &e )
 	}
 
 	/* Patches */
+	
+	parseMesh_t *patch;
+	patch = e.patches;
+	while( patch != NULL ) {
+		mesh_t patchMesh = patch->mesh;
+		
+		Shared::Mesh_t &mesh = Shared::meshes.emplace_back();
+		mesh.shaderInfo = patch->shaderInfo;
+		
+		// Get vertices
+		for( int index = 0; index < ( patchMesh.width * patchMesh.height ); index++ ) {
+				Shared::Vertex_t &vertex = mesh.vertices.emplace_back();
+				
+				vertex.xyz = patchMesh.verts[ index ].xyz;
+				vertex.normal = patchMesh.verts[ index ].normal;
+				vertex.st = patchMesh.verts[ index ].st;
+		}
+		
+		// Make triangles
+		for( int x = 0; x < ( patchMesh.width - 1 ); x++ ) {
+			for( int y = 0; y < ( patchMesh.height - 1 ); y++ ) {
+				int index = x + y * patchMesh.width;
+				Sys_Printf( "%i : %i = %i\n",x , y, index );
+				
+				mesh.triangles.emplace_back( index );
+				mesh.triangles.emplace_back( index + patchMesh.width );
+				mesh.triangles.emplace_back( index + patchMesh.width + 1 );
+
+				mesh.triangles.emplace_back( index );
+				mesh.triangles.emplace_back( index + patchMesh.width + 1 );
+				mesh.triangles.emplace_back( index + 1 );
+				
+			}
+		}
+
+		Sys_Printf( "Vertices: %li\n", mesh.vertices.size() );
+		Sys_Printf( "Triangles: %li\n", mesh.triangles.size() / 3 );
+		
+		
+		patch = patch->next;
+	}
+	
 
 	/* Combine */
 	std::size_t index = 0;
@@ -121,7 +163,7 @@ void Shared::MakeMeshes( const entity_t &e )
 			break;
 
 		/* Get mesh which we then compare to the rest, maybe combine, maybe not */
-		Shared::mesh_t &mesh1 = Shared::meshes.at( index );
+		Shared::Mesh_t &mesh1 = Shared::meshes.at( index );
 
 		for ( std::size_t i = 0; i < Shared::meshes.size(); i++ )
 		{
@@ -129,7 +171,7 @@ void Shared::MakeMeshes( const entity_t &e )
 			if ( index == i )
 				continue;
 
-			Shared::mesh_t &mesh2 = Shared::meshes.at( i );
+			Shared::Mesh_t &mesh2 = Shared::meshes.at( i );
 
 			/* check if they have the same shader */
 			if ( !striEqual( mesh1.shaderInfo->shader.c_str(), mesh2.shaderInfo->shader.c_str() ) )
@@ -170,7 +212,7 @@ void Shared::MakeVisReferences()
 	/* Meshes */
 	for ( std::size_t i = 0; i < Shared::meshes.size(); i++ )
 	{
-		Shared::mesh_t &mesh = Shared::meshes.at( i );
+		Shared::Mesh_t &mesh = Shared::meshes.at( i );
 		Shared::visRef_t &ref = Shared::visRefs.emplace_back();
 
 		ref.minmax = mesh.minmax;

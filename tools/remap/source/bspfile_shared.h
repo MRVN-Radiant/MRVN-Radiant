@@ -10,18 +10,18 @@
 namespace Shared
 {
 	/* Structs */
-	struct vertex_t
+	struct Vertex_t
 	{
 		Vector3 xyz;
 		Vector3 normal;
 		Vector2 st;
 	};
 
-	struct mesh_t
+	struct Mesh_t
 	{
 		MinMax minmax;
 		shaderInfo_t* shaderInfo;
-		std::vector<vertex_t> vertices;
+		std::vector<Vertex_t> vertices;
 		std::vector<uint16_t> triangles;
 	};
 
@@ -39,7 +39,7 @@ namespace Shared
 	};
 
 	/* Vectors */
-	inline std::vector<mesh_t> meshes;
+	inline std::vector<Mesh_t> meshes;
 	inline std::vector<visRef_t> visRefs;
 	inline visNode_t visRoot;
 	/* Functions */

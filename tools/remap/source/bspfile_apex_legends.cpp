@@ -180,7 +180,7 @@ void CompileR5BSPFile() {
 }
 
 void ApexLegends::EmitMeshes( const entity_t& e ) {
-	for ( const Shared::mesh_t &mesh : Shared::meshes ) {
+	for ( const Shared::Mesh_t &mesh : Shared::meshes ) {
 		ApexLegends::Mesh_t &bm = ApexLegends::Bsp::meshes.emplace_back();
 		bm.flags = 0x200;
 		bm.triangleOffset = Titanfall::Bsp::meshIndices.size();
@@ -189,7 +189,7 @@ void ApexLegends::EmitMeshes( const entity_t& e ) {
 
 		// Save vertices and vertexnormals
 		for ( std::size_t i = 0; i < mesh.vertices.size(); i++ ) {
-			Shared::vertex_t vertex = mesh.vertices.at( i );
+			Shared::Vertex_t vertex = mesh.vertices.at( i );
 
 			ApexLegends::VertexLitBump_t &lv = ApexLegends::Bsp::vertexLitBumpVertices.emplace_back();
 			lv.uv0 = vertex.st;
