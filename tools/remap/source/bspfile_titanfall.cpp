@@ -540,7 +540,8 @@ void Titanfall::EmitCollisionGrid() {
 				Titanfall::CMBound_t& bound = Titanfall::Bsp::cmGeoSetBounds.emplace_back();
 				bound.unknown1 = 128;
 				bound.origin = brush.origin;
-				bound.extents = brush.extents;
+				// The + 1.0f fixes the infinitely falling in one place while touching a floor bug
+				bound.extents = Vector3( brush.extents.x() + 1.0f, brush.extents.y() + 1.0f, brush.extents.z() + 1.0f );
 				
 			}
 
