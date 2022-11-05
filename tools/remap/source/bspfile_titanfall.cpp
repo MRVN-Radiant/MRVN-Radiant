@@ -495,10 +495,10 @@ void Titanfall::EmitCollisionGrid() {
 	
 	Titanfall::CMGrid_t& grid = Titanfall::Bsp::cmGrid.emplace_back();
 	grid.scale = scale;
-	grid.xOffset = floor( Titanfall::Bsp::models[0].minmax.mins.x() / grid.scale );
-	grid.yOffset = floor( Titanfall::Bsp::models[0].minmax.mins.y() / grid.scale );
-	grid.xCount = ceil( size.x() / grid.scale ) + 1;
-	grid.yCount = ceil( size.y() / grid.scale ) + 1;
+	grid.xOffset = floor( Titanfall::Bsp::models[0].minmax.mins.x() / grid.scale ) - 1;
+	grid.yOffset = floor( Titanfall::Bsp::models[0].minmax.mins.y() / grid.scale ) - 1;
+	grid.xCount = ceil( size.x() / grid.scale ) + 2;
+	grid.yCount = ceil( size.y() / grid.scale ) + 2;
 	grid.unk2 = Titanfall::Bsp::cmBrushes.size();
 	grid.brushSidePlaneOffset = 0;
 
