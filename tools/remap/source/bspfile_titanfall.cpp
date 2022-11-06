@@ -255,8 +255,7 @@ void CompileR1BSPFile() {
    EmitEntity()
    Saves an entity into it's corresponding .ent file or the lump in the .bsp
  */
-void Titanfall::EmitEntity( const entity_t &e )
-{
+void Titanfall::EmitEntity( const entity_t &e ) {
 	StringOutputStream data;
 	data << "{\n";
 	for (const epair_t& pair : e.epairs)
@@ -268,9 +267,29 @@ void Titanfall::EmitEntity( const entity_t &e )
 
 	std::vector<char> str = { data.begin(), data.end() };
 
+	// TODO: Unhardcode this somehow
+	// env
+	if( striEqualPrefix( e.valueForKey( "classname" ), "light" ) ||
+		striEqualPrefix( e.valueForKey( "classname" ), "color" ) ||
+		striEqualPrefix( e.valueForKey( "classname" ), "fog" ) ||
+		striEqualPrefix( e.valueForKey( "classname" ), "env" ) ) {
+			Titanfall::Ent::env.insert( Titanfall::Ent::env.end(), str.begin(), str.end() );
+	}
+	// fx
+	else if( striEqualPrefix( e.valueForKey( "classname" ), "info_particle" ) ) {
+		Titanfall::Ent::fx.insert( Titanfall::Ent::fx.end(), str.begin(), str.end() );
+	}
+	// script
+	else if( striEqualPrefix( e.valueForKey( "classname" ), "info_target" ) ||
+			 striEqualPrefix( e.valueForKey( "classname" ), "prop_dynamic" ) ) {
+				Titanfall::Ent::script.insert( Titanfall::Ent::script.end(), str.begin(), str.end() );
+	}
+	// snd
+	// spawn
 	if( striEqualPrefix( e.valueForKey( "classname" ), "info_" ) ) {
 		Titanfall::Ent::spawn.insert( Titanfall::Ent::spawn.end(), str.begin(), str.end() );
 	}
+	// bsp entity lump
 	else {
 		Titanfall::Bsp::entities.insert( Titanfall::Bsp::entities.end(), str.begin(), str.end() );
 	}
@@ -388,9 +407,18 @@ void Titanfall::EndModel() {
 	Writes entitiy partitions respawn uses
 */
 void Titanfall::EmitEntityPartitions() {
-	std::string partitions = "01* ";
+	std::string partitions = "01*";
+	
+	if( Titanfall::Ent::env.size() )
+		partitions += " env";
+	if( Titanfall::Ent::fx.size() )
+		partitions += " fx";
+	if( Titanfall::Ent::script.size() )
+		partitions += " script";
+	if( Titanfall::Ent::snd.size() )
+		partitions += " snd";
 	if( Titanfall::Ent::spawn.size() )
-		partitions += "spawn";
+		partitions += " spawn";
 	
 	Titanfall::Bsp::entityPartitions = { partitions.begin(), partitions.end() + 1 };
 }

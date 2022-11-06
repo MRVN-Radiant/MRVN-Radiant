@@ -180,6 +180,59 @@ void WriteBSPFile( const char *filename ){
 	Writes .ent files used by .bsp
 */
 void WriteEntFiles( const char *path ) {
+	// env
+	if ( Titanfall::Ent::env.size() ) {
+		auto name = StringOutputStream(1024)(PathExtensionless(path), "_env.ent");
+		Sys_Printf( "Writing %s... ", name.c_str() );
+
+		FILE* file = SafeOpenWrite(name);
+		char message[] = "ENTITIES01\n";
+		SafeWrite(file, &message, sizeof(message) - 1);
+		SafeWrite(file, Titanfall::Ent::env.data(), Titanfall::Ent::env.size());
+		fclose(file);
+
+		Sys_Printf( "Success!\n" );
+	}
+	// fx
+	if ( Titanfall::Ent::fx.size() ) {
+		auto name = StringOutputStream(1024)(PathExtensionless(path), "_fx.ent");
+		Sys_Printf( "Writing %s... ", name.c_str() );
+
+		FILE* file = SafeOpenWrite(name);
+		char message[] = "ENTITIES01\n";
+		SafeWrite(file, &message, sizeof(message) - 1);
+		SafeWrite(file, Titanfall::Ent::fx.data(), Titanfall::Ent::fx.size());
+		fclose(file);
+
+		Sys_Printf( "Success!\n" );
+	}
+	// script
+	if ( Titanfall::Ent::script.size() ) {
+		auto name = StringOutputStream(1024)(PathExtensionless(path), "_script.ent");
+		Sys_Printf( "Writing %s... ", name.c_str() );
+
+		FILE* file = SafeOpenWrite(name);
+		char message[] = "ENTITIES01\n";
+		SafeWrite(file, &message, sizeof(message) - 1);
+		SafeWrite(file, Titanfall::Ent::script.data(), Titanfall::Ent::script.size());
+		fclose(file);
+
+		Sys_Printf( "Success!\n" );
+	}
+	// snd
+	if ( Titanfall::Ent::snd.size() ) {
+		auto name = StringOutputStream(1024)(PathExtensionless(path), "_snd.ent");
+		Sys_Printf( "Writing %s... ", name.c_str() );
+
+		FILE* file = SafeOpenWrite(name);
+		char message[] = "ENTITIES01\n";
+		SafeWrite(file, &message, sizeof(message) - 1);
+		SafeWrite(file, Titanfall::Ent::snd.data(), Titanfall::Ent::snd.size());
+		fclose(file);
+
+		Sys_Printf( "Success!\n" );
+	}
+	// spawn
 	if ( Titanfall::Ent::spawn.size() ) {
 		auto name = StringOutputStream(1024)(PathExtensionless(path), "_spawn.ent");
 		Sys_Printf( "Writing %s... ", name.c_str() );

@@ -171,6 +171,10 @@ namespace Titanfall {
 	};
 
 	namespace Ent {
+		inline std::vector<char> env;
+		inline std::vector<char> fx;
+		inline std::vector<char> script;
+		inline std::vector<char> snd;
 		inline std::vector<char> spawn;
 	}
 
