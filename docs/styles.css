@@ -11,6 +11,12 @@ body {
 	background-color: #f3f3f3;
 }
 
+footer {
+	margin-top: 5rem;
+	height: 5rem;
+	background-color: #DDDDDD;
+}
+
 .title {
 	font-size: 4rem;
 	margin: auto;
@@ -67,6 +73,29 @@ body {
 	margin-bottom: 1rem;
 	color: #7F7F7F;
 	font-size: 1rem;
+}
+
+.paragraph-margin {
+	margin-top: 2rem;
+}
+
+.snippet {
+	color: #333333;
+	background-color: #DDDDDD;
+	padding: 0.1rem;
+	border-radius: 0.3rem;
+}
+
+.code-snippet {
+	color: #333333;
+	background-color: #DDDDDD;
+	padding: 0.5rem;
+	border-radius: 0.3rem;
+}
+
+.tab-offset {
+	margin-left: 2rem;
+	font-size: inherit;
 }
 
 .button {

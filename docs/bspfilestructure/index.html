@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="../styles.css">
+		<title>MRVN-radiant</title>
+	</head>
+	<body>
+		<header>
+			<div class="nav-container">
+					<h1 class="nav-title">MRVN-radiant Documentation</h1>
+					<div class="nav-buttons-container">
+						<a class="button" href="../index.html">Home</a>
+						<a class="button" href="https://github.com/MRVN-radiant" target="_blank" rel="noopener noreferrer">Github</a>
+					</div>
+			</div>
+		</header>
+		<main>
+			<div class="content-container">
+				<h1 class="article-title">Bsp file structure</h1>
+				<p class="article-path"><a href="../docs.html" class="article-path">docs</a>/bspfilestructure</p>
+				<p class="article-update-notice">Last updated by F1F7Y on 2022-11-7</p>
+				<p>Respawn <span class="snippet">.bsp</span> files are split into 128 lumps but only about half of them are used by a game.</p>
+				<p>All lumps are referenced by the header which holds their absolute offset, length and version.</p>
+				<div class="code-snippet">
+					struct Lump_t {<br>
+						<span class="tab-offset">uint32_t offset;</span><br>
+						<span class="tab-offset">uint32_t length;</span><br>
+						<span class="tab-offset">uint32_t version;</span><br>
+						<span class="tab-offset">uint32_t unused;</span><br>
+					};<br><br>
+					// Always at the begining of the file<br>
+					struct Header_t {<br>
+						<span class="tab-offset">char magic[4]; // "rBSP"</span><br>
+						<span class="tab-offset">uint32_t version; // Dependent on game</span><br>
+						<span class="tab-offset">uint32_t mapVersion;</span><br>
+						<span class="tab-offset">uint32_t maxLump; // Always 127</span><br>
+						<span class="tab-offset">Lump_t lumps[128];</span><br>
+					};
+				</div>
+			</div>
+		</main>
+		<footer></footer>
+	</body>
+</html>
