@@ -48,6 +48,27 @@ body {
 	margin-top: 6rem;
 }
 
+.content-list {
+	margin-left: 1rem;
+}
+
+.article-title {
+	margin-left: -1rem;
+	margin-bottom: -0.5rem;
+	font-size: 2rem;
+}
+
+.article-path {
+	color: #3e8b91;
+	font-size: 0.9rem;
+}
+
+.article-update-notice {
+	margin-bottom: 1rem;
+	color: #7F7F7F;
+	font-size: 1rem;
+}
+
 .button {
 	border-radius: 1rem;
 	padding: 1rem;
