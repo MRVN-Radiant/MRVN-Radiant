@@ -1,0 +1,70 @@
+* {
+	margin: 0px;
+	padding: 0px;
+	line-height: 1.6;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 1.1rem;
+	color: #3b3b3b;
+}
+
+body {
+	background-color: #f3f3f3;
+}
+
+.title {
+	font-size: 4rem;
+	margin: auto;
+}
+
+.title-text {
+	margin: auto;
+}
+
+.nav-container {
+	background-color: #DDDDDD;
+	position: sticky;
+	display: flex;
+	flex-direction: row;
+	height: fit-content;
+}
+
+.nav-title {
+	display: flex;
+	margin: auto;
+	margin-left: 1rem;
+	font-size: 1.5rem;
+}
+
+.nav-buttons-container {
+	display: flex;
+	margin-left: auto;
+}
+
+.content-container {
+	display: flex;
+	flex-direction: column;
+	width: 50rem;
+	margin: auto;
+	margin-top: 6rem;
+}
+
+.button {
+	border-radius: 1rem;
+	padding: 1rem;
+	margin: 0.4rem;
+	font-weight: bold;
+	font-size: 1rem;
+	text-decoration: none;
+}
+
+.button:hover {
+	background-color: #CCCCCC;
+}
+
+.button-download {
+	background-color: #FFFFAA;
+}
+
+.button-download:hover {
+	background-color: #FFFFCC;
+}
