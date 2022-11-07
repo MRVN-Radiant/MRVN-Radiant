@@ -1,6 +1,19 @@
 <?xml version="1.0"?>
 <!--
 	Titanfall 2 entity definitions for MRVN-radiant
+        Definitions by catornot (2022-11-2)
+        Boxes & Models by snake-biscuits (2022-11-6)
+-->
+<!-- TODO:
+    editor models (needs assimp MDL v53 support)
+    use a .ent definition file for each entity lump
+     - entities.ent for bsp internal entities
+     - env_entities.ent for *_env.ent
+     - fx_entities.ent for *_fx.ent
+     - script_entities.ent for *_script.ent
+     - snd_entities.ent for *_snd.ent
+     - spawn_entities.ent for *_spawn.ent
+    use bsp_tool_examples fgd_gen to track down more entities and sus out their use
 -->
 <classes>
 
@@ -10,7 +23,8 @@
 =============================================================================
 -->
 
-<point name="info_player_start" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
+<!-- TODO: model="models/editor/playerstart.mdl" -->
+<point name="info_player_start" color=".3 .3 1" box="-16 -16 0 16 16 72" model="models/editor/playerstart.obj">
 Used for spawning player when match starts.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
@@ -37,13 +51,16 @@ Used for spawning player when match starts.
 <boolean key="gamemode_inf" name="gamemode_inf" value="1">Use this for Infection?</boolean>
 <boolean key="gamemode_kr" name="gamemode_kr" value="1">Use this for Amped killrace?</boolean>
 <boolean key="gamemode_sns" name="gamemode_sns" value="1">Use this for Sticks and stones?</boolean>
+-------- NOTES --------
+Place slightly above the ground to avoid getting stuck in the floor.
 </point>
 
-<point name="info_spawnpoint_human" color=".3 .3 1" box="-16 -16 -16 16 16 72" model="models/powerups/ammo/machinegunam.md3">
+<!-- TODO: model="models/editor/playerstart.mdl" -->
+<point name="info_spawnpoint_human" color=".3 .3 1" box="-16 -16 0 16 16 72" model="models/editor/playerstart.obj">
 Used for respawning players.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
-<targetname key="targetname" name="Target Name" value="info_spawnpoint_human_start_">UNIQUE Target name</targetname>
+<targetname key="targetname" name="Target Name" value="info_spawnpoint_human_">UNIQUE Target name</targetname>
 <angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 <boolean key="gamemode_aitdm" name="gamemode_aitdm" value="1">Use this for Attrition?</boolean>
 <boolean key="gamemode_at" name="gamemode_at" value="1">Use this for Bounty Hunt?</boolean>
@@ -66,13 +83,15 @@ Used for respawning players.
 <boolean key="gamemode_inf" name="gamemode_inf" value="1">Use this for Infection?</boolean>
 <boolean key="gamemode_kr" name="gamemode_kr" value="1">Use this for Amped killrace?</boolean>
 <boolean key="gamemode_sns" name="gamemode_sns" value="1">Use this for Sticks and stones?</boolean>
+-------- NOTES --------
+Place slightly above the ground to avoid getting stuck in the floor.
 </point>
 
-<point name="info_spawnpoint_dropship_start" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
+<point name="info_spawnpoint_dropship_start" color=".3 .3 1" box="-16 -16 0 16 16 72" model="models/dev/mp_dropship_spawn_start.obj">
 Used for spawning player when match starts.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
-<targetname key="targetname" name="Target Name" value="info_spawnpoint_human_start_">UNIQUE Target name</targetname>
+<targetname key="targetname" name="Target Name" value="info_spawnpoint_dropship_start_">UNIQUE Target name</targetname>
 <angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 <boolean key="gamemode_aitdm" name="gamemode_aitdm" value="1">Use this for Attrition?</boolean>
 <boolean key="gamemode_at" name="gamemode_at" value="1">Use this for Bounty Hunt?</boolean>
@@ -97,11 +116,12 @@ Used for spawning player when match starts.
 <boolean key="gamemode_sns" name="gamemode_sns" value="1">Use this for Sticks and stones?</boolean>
 </point>
 
-<point name="info_spawnpoint_titan_start" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
+<!-- TODO: model="models/dev/mp_titan_spawn_start.mdl" -->
+<point name="info_spawnpoint_titan_start" color=".3 .3 1" box="-70 -48 0 70 48 224" model="models/dev/mp_titan_spawn_start.obj">
 Used for spawning player when match starts.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
-<targetname key="targetname" name="Target Name" value="info_spawnpoint_human_start_">UNIQUE Target name</targetname>
+<targetname key="targetname" name="Target Name" value="info_spawnpoint_titan_start_">UNIQUE Target name</targetname>
 <angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 <boolean key="gamemode_aitdm" name="gamemode_aitdm" value="1">Use this for Attrition?</boolean>
 <boolean key="gamemode_at" name="gamemode_at" value="1">Use this for Bounty Hunt?</boolean>
@@ -124,13 +144,16 @@ Used for spawning player when match starts.
 <boolean key="gamemode_inf" name="gamemode_inf" value="1">Use this for Infection?</boolean>
 <boolean key="gamemode_kr" name="gamemode_kr" value="1">Use this for Amped killrace?</boolean>
 <boolean key="gamemode_sns" name="gamemode_sns" value="1">Use this for Sticks and stones?</boolean>
+-------- NOTES --------
+Place slightly above the ground to avoid getting stuck in the floor.
 </point>
 
-<point name="info_spawnpoint_titan" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
+<!-- TODO: model="models/dev/mp_titan_spawn_start.mdl" -->
+<point name="info_spawnpoint_titan" color=".3 .3 1" box="-70 -40 0 70 48 224" model="models/dev/mp_titan_spawn_start.obj">
 Used for spawning player when match starts.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
-<targetname key="targetname" name="Target Name" value="info_spawnpoint_human_start_">UNIQUE Target name</targetname>
+<targetname key="targetname" name="Target Name" value="info_spawnpoint_titan_">UNIQUE Target name</targetname>
 <angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 <boolean key="gamemode_aitdm" name="gamemode_aitdm" value="1">Use this for Attrition?</boolean>
 <boolean key="gamemode_at" name="gamemode_at" value="1">Use this for Bounty Hunt?</boolean>
@@ -153,9 +176,12 @@ Used for spawning player when match starts.
 <boolean key="gamemode_inf" name="gamemode_inf" value="1">Use this for Infection?</boolean>
 <boolean key="gamemode_kr" name="gamemode_kr" value="1">Use this for Amped killrace?</boolean>
 <boolean key="gamemode_sns" name="gamemode_sns" value="1">Use this for Sticks and stones?</boolean>
+-------- NOTES --------
+Place slightly above the ground to avoid getting stuck in the floor.
 </point>
 
-<point name="info_spawnpoint_flag" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
+<!-- TODO: model="models/signs/flag_base_pole_ctf.mdl" -->
+<point name="info_spawnpoint_flag" color=".3 .3 1" box="-8 -8 0 8 8 64" model="models/signs/flag_base_pole_ctf.obj">
 Used to spawn the flags in ctf.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
@@ -163,7 +189,8 @@ Used to spawn the flags in ctf.
 <angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 </point>
 
-<point name="info_speedball_flag" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
+<!-- TODO: model="models/signs/flag_base_pole_ctf.mdl" -->
+<point name="info_speedball_flag" color=".3 .3 1" box="-8 -8 0 8 8 64" model="models/signs/flag_base_pole_ctf.obj">
 Used to spawn the flag in live fire.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
@@ -172,13 +199,27 @@ Used to spawn the flag in live fire.
 </point>
 
 <!-- info_hardpoint needs a special class I think -->
-<point name="info_hardpoint" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
-Used to spawn the hardpoints in apmed hardpoints
+<!-- NOTE: select a model from: models/communication/terminal_com_station*.mdl for r1 model -->
+<!-- or models/robots/mobile_hardpoint/mobile_hardpoint.mdl for r2 model -->
+<!-- TODO:
+    gamemode_at, cp, ffa, lh, sur, tday
+    hardpointFrontlineOverride, Yaw
+    hardpointName
+    nearTarget
+    target
+    triggerTarget
+-->
+<point name="info_hardpoint" color=".3 .3 1" box="-64 -64 0 64 64 72" model="models/robots/mobile_hardpoint/mobile_hardpoint.obj">
+Used to spawn the hardpoints in amped hardpoints
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
-<targetname key="targetname" name="Target Name" value="info_speedball_flag_">UNIQUE Target name</targetname>
+<targetname key="targetname" name="Target Name" value="info_hardpoint_">UNIQUE Target name</targetname>
 <angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 <string key="hardpointGroup" name="Hardpoint Group" value="A">used to indicate the hardpoint name (A,B,C)</string>
+<real key="scale" name="Scale" value="1">Value used to scale the ents model, hitboxes DO NOT scale.</real>
+-------- NOTES --------
+Model can be anything, including the old Titanfall 1 terminals
+Model must be set!
 </point>
 
 <!--
@@ -187,14 +228,20 @@ Used to spawn the hardpoints in apmed hardpoints
 =============================================================================
 -->
 
-<point name="move_rope" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
+<!-- TODO: model="models/editor/axis_helper_thick.mdl" -->
+<point name="move_rope" color=".3 .3 1" box="-8 -8 -8 8 8 8">
 -------- KEYS --------
 <targetname key="targetname" name="Target Name" value="move_rope_">The target name of the zipline</targetname>
 <targetname key="NextKey" name="Next Key" value="move_rope_">The second point of the zipline</targetname>
 <boolean key="Zipline" name="Zipline">Set this to 1</boolean>
-<integer key="Subdiv" name="Subdivisions" value="0">Number of subdivisions</integer>
-<integer key="Slack" name="Slack">Slack</integer>
+<integer key="Subdiv" name="Subdivisions" value="0">Number of subdivisions between each rope segment. Higher values make smoother ropes, but are slower to render.</integer>
+<integer key="Slack" name="Slack">How much extra length the rope has (by default it has the length between its two endpoints in the editor).</integer>
 <integer key="MoveSpeed" name="Move Speed" value="64">Move Speed</integer>
+-------- NOTES --------
+You can also use move_rope and keyframe_rope to make decorative cables
+Titanfall ziplines use a generic texture, unlike the Yellow texture used in Apex
+Source Engine guides recommend using one move_rope then a series of keyframe_rope for each key
+IIRC move_rope ends can be used to create loose cable ends
 </point>
 
 <!--
@@ -208,7 +255,7 @@ Used to spawn the hardpoints in apmed hardpoints
     <item name="Menu" value="menu_scene_ref"/>
 </list>
 
-<point name="info_target_clientside" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
+<point name="info_target_clientside" color=".3 .3 1" box="-8 -8 -8 8 8 8">
 can be used to spawn the menu lobby in mp matches with the appropriate script names
 also can be used as a reference for clients
 this is basically a clientside target ent.
@@ -227,7 +274,7 @@ the clients have access to this target ent.
 -->
 
 <!-- they have much more stuff than this -->
-<point name="prop_dynamic" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
+<point name="prop_dynamic" color=".3 .3 1" box="-8 -8 -8 8 8 8">
 used to spawn prop_dynamic
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
@@ -236,10 +283,10 @@ used to spawn prop_dynamic
 <string key="model" name="Model" value="models/dev/editor_ref.mdl">The model for the entity </string>
 <integer key="solid" name="Solid" value="6">the type of collision it has : 0 = no collision, 2 = bounding box, 6 = use vPhysics, 8 = hitboxes only</integer>
 <string key="editorclass" name="Editor Class" value="">The editorclass for the entity</string>
-<real key="scale" name="Scale" value="1">Value used to scale the ents model, it doesn't scale the hitboxes.</real>
+<real key="scale" name="Scale" value="1">Value used to scale the ents model, hitboxes DO NOT scale.</real>
 </point>
 
-<point name="script_mover" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
+<point name="script_mover" color=".3 .3 1" box="-8 -8 -8 8 8 8">
 used to spawn mover script
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
@@ -251,9 +298,9 @@ used to spawn mover script
 <integer key="path_speed" name="Path Speed" value="100">the speed at which the mover travels on its path</integer>
 <boolean key="leveledplaced" name="Leveled Placed" value="0">I think it activates its path idk</boolean>
 <string key="editorclass" name="Editor Class" value="">The editorclass for the entity</string>
-<real key="scale" name="Scale" value="1">Value used to scale the ents model, it doesn't scale the hitboxes.</real>
+<real key="scale" name="Scale" value="1">Value used to scale the ents model, hitboxes DO NOT scale.</real>
 -------- NOTES --------
-a teamnum of 4 wouldn't crush npcs/players when the mover is moving.
+Teamnum of 4 means no crushing of npcs/players when the mover is moving.
 </point>
 
 <!--
@@ -262,7 +309,10 @@ a teamnum of 4 wouldn't crush npcs/players when the mover is moving.
 =============================================================================
 -->
 
-<point name="info_target" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
+<!-- TODO: editorclasses:
+    weapon pickups: might require .rson targetting the script to spawn them in
+-->
+<point name="info_target" color=".3 .3 1" box="-8 -8 -8 8 8 8">
 target ent
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
@@ -270,7 +320,7 @@ target ent
 <string key="editorclass" name="Editor Class" value="">The editorclass for the entity</string>
 </point>
 
-<point name="script_ref" color=".3 .3 1" box="-16 -16 -16 16 16 16" model="models/powerups/ammo/machinegunam.md3">
+<point name="script_ref" color=".3 .3 1" box="-8 -8 -8 8 8 8">
 ref script
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
