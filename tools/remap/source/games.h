@@ -50,6 +50,9 @@ const int C_OB                   = 0x00020000;  /* skip -noob for this */
 const int C_DETAIL               = 0x08000000;  /* THIS MUST BE THE SAME AS IN RADIANT! */
 
 // Surface flags
+const int S_SKY_2D               = 0x00000002;
+const int S_SKY                  = 0x00000004;
+const int S_TRANSLUCENT          = 0x00000010;
 const int S_VERTEX_LIT_FLAT      = 0x00000000;
 const int S_VERTEX_LIT_BUMP      = 0x00000200;
 const int S_VERTEX_UNLIT_TS      = 0x00000600;
