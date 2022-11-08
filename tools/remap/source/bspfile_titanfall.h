@@ -14,14 +14,14 @@ namespace Titanfall {
 	void EmitPlane( const Plane3 &plane );
 	uint32_t EmitTextureData( shaderInfo_t shader );
 	uint32_t EmitVertex( Vector3 &vertex );
-	uint32_t EmitVertexNormal( Vector3 &normal );
 	void BeginModel();
 	void EndModel();
 	void EmitEntityPartitions();
+	uint32_t EmitVertexNormal( Vector3 &normal );
 	void EmitMeshes( const entity_t &e );
-	void EmitBrushes( const entity_t &e );
-	void EmitCollisionGrid();
 	uint16_t EmitMaterialSort( uint32_t index );
+	void EmitCollisionGrid();
+	void EmitBrushes( const entity_t &e );
 	void EmitLevelInfo();
 	void EmitStubs();
 
@@ -43,6 +43,26 @@ namespace Titanfall {
 		uint32_t meshCount;
 	};
 
+	// 0x47
+	struct VertexUnlit_t {
+		uint32_t vertexIndex;
+		uint32_t normalIndex;
+		Vector2 uv0;
+		uint32_t unknown;
+	};
+
+	// 0x48
+	struct VertexLitFlat_t {
+		uint32_t vertexIndex;
+		uint32_t normalIndex;
+		Vector2 uv0;
+		uint32_t unknown0;
+		uint32_t unknown1;
+		uint32_t unknown2;
+		uint32_t unknown3;
+		uint32_t unknown4;
+	};
+
 	// 0x49
 	struct VertexLitBump_t {
 		uint32_t vertexIndex;
@@ -51,6 +71,24 @@ namespace Titanfall {
 		int32_t negativeOne;
 		Vector2 uv1;
 		uint32_t unk[4];
+	};
+
+	// 0x4A
+	struct VertexUnlitTS_t {
+		uint32_t vertexIndex;
+		uint32_t normalIndex;
+		Vector2 uv0;
+		uint32_t unknown0;
+		uint32_t unknown1;
+		uint32_t unknown2;
+	};
+
+	// 0x4B
+	struct VertexBlinnPhong_t {
+		uint32_t vertexIndex;
+		uint32_t normalIndex;
+		uint32_t unknown0;
+		uint32_t unknown1;
 	};
 
 	// 0x50
