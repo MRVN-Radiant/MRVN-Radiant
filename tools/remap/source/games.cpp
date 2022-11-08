@@ -93,6 +93,17 @@ struct game_titanfallonline : game_t
 			{ "litbump",        0,                          0,                          S_VERTEX_LIT_BUMP,          0,                          0,                          0 },
 			{ "unlit",          0,                          0,                          S_VERTEX_UNLIT,             0,                          0,                          0 },
 			{ "unlitts",        0,                          0,                          S_VERTEX_UNLIT_TS,          0,                          0,                          0 },
+
+			// Temporary fix
+			// If a surface parameter doesnt exist the compiler errors, seems to be just quake engine limits which we can remove
+			// TODO: Investigate the above, but better :)
+			{ "nolightmap",     0,                          0,                          0,                          0,                          0,                          0 },
+			{ "nomarks",        0,                          0,                          0,                          0,                          0,                          0 },
+			{ "nonsolid",       0,                          0,                          0,                          0,                          0,                          0 },
+			{ "trans",          0,                          0,                          0,                          0,                          0,                          0 },
+			{ "noimpact",       0,                          0,                          0,                          0,                          0,                          0 },
+			{ "playerclip",     0,                          0,                          0,                          0,                          0,                          0 },
+			{ "skip",           0,                          0,                          0,                          0,                          0,                          0 },
 		},
 		0
 	}{}
@@ -158,6 +169,17 @@ struct game_titanfall2 : game_t
 			{ "litbump",        0,                          0,                          S_VERTEX_LIT_BUMP,          0,                          0,                          0 },
 			{ "unlit",          0,                          0,                          S_VERTEX_UNLIT,             0,                          0,                          0 },
 			{ "unlitts",        0,                          0,                          S_VERTEX_UNLIT_TS,          0,                          0,                          0 },
+
+			// Temporary fix
+			// If a surface parameter doesnt exist the compiler errors, seems to be just quake engine limits which we can remove
+			// TODO: Investigate the above, but better :)
+			{ "nolightmap",     0,                          0,                          0,                          0,                          0,                          0 },
+			{ "nomarks",        0,                          0,                          0,                          0,                          0,                          0 },
+			{ "nonsolid",       0,                          0,                          0,                          0,                          0,                          0 },
+			{ "trans",          0,                          0,                          0,                          0,                          0,                          0 },
+			{ "noimpact",       0,                          0,                          0,                          0,                          0,                          0 },
+			{ "playerclip",     0,                          0,                          0,                          0,                          0,                          0 },
+			{ "skip",           0,                          0,                          0,                          0,                          0,                          0 },
 		},
 		0
 	}{}
