@@ -349,7 +349,7 @@ uint32_t Titanfall::EmitTextureData( shaderInfo_t shader ) {
 	td.sizeY = shader.shaderImage->height;
 	td.visibleX = shader.shaderImage->width;
 	td.visibleY = shader.shaderImage->height;
-	td.flags = 512; // This should be the same as the mesh indexing this textureData
+	td.flags = shader.surfaceFlags;
 
 	return index;
 }
@@ -428,7 +428,7 @@ void Titanfall::EmitEntityPartitions() {
 
 /*
 	EmitVertexUnlit
-	Saves a vertex into Titanfall::Bsp::vertexLitBumpVertices
+	Saves a vertex into Titanfall::Bsp::vertexUnlitVertices
 */
 void Titanfall::EmitVertexUnlit( Shared::Vertex_t &vertex ) {
 	Titanfall::VertexUnlit_t &ul = Titanfall::Bsp::vertexUnlitVertices.emplace_back();
@@ -439,7 +439,7 @@ void Titanfall::EmitVertexUnlit( Shared::Vertex_t &vertex ) {
 
 /*
 	EmitVertexLitFlat
-	Saves a vertex into Titanfall::Bsp::vertexLitBumpVertices
+	Saves a vertex into Titanfall::Bsp::vertexLitFlatVertices
 */
 void Titanfall::EmitVertexLitFlat( Shared::Vertex_t &vertex ) {
 	Titanfall::VertexLitFlat_t &lf = Titanfall::Bsp::vertexLitFlatVertices.emplace_back();
@@ -462,7 +462,7 @@ void Titanfall::EmitVertexLitBump( Shared::Vertex_t &vertex ) {
 
 /*
 	EmitVertexUnlitTS
-	Saves a vertex into Titanfall::Bsp::vertexLitBumpVertices
+	Saves a vertex into Titanfall::Bsp::vertexUnlitTSVertices
 */
 void Titanfall::EmitVertexUnlitTS( Shared::Vertex_t &vertex ) {
 	Titanfall::VertexUnlitTS_t &ul = Titanfall::Bsp::vertexUnlitTSVertices.emplace_back();
@@ -473,7 +473,7 @@ void Titanfall::EmitVertexUnlitTS( Shared::Vertex_t &vertex ) {
 
 /*
 	EmitVertexBlinnPhong
-	Saves a vertex into Titanfall::Bsp::vertexLitBumpVertices
+	Saves a vertex into Titanfall::Bsp::vertexBlinnPhongVertices
 */
 void Titanfall::EmitVertexBlinnPhong( Shared::Vertex_t &vertex ) {
 	Titanfall::VertexBlinnPhong_t &bp = Titanfall::Bsp::vertexBlinnPhongVertices.emplace_back();
