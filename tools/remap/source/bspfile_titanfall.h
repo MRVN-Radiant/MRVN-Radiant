@@ -1,5 +1,6 @@
 #pragma once
 
+#include "bspfile_abstract.h"
 #include "qmath.h"
 #include <cstdint>
 #include "remap.h"
@@ -18,6 +19,11 @@ namespace Titanfall {
 	void EndModel();
 	void EmitEntityPartitions();
 	uint32_t EmitVertexNormal( Vector3 &normal );
+	void EmitVertexUnlit( Shared::Vertex_t &vertex );
+	void EmitVertexLitFlat( Shared::Vertex_t &vertex );
+	void EmitVertexLitBump( Shared::Vertex_t &vertex );
+	void EmitVertexUnlitTS( Shared::Vertex_t &vertex );
+	void EmitVertexBlinnPhong( Shared::Vertex_t &vertex );
 	void EmitMeshes( const entity_t &e );
 	uint16_t EmitMaterialSort( uint32_t index );
 	void EmitCollisionGrid();
@@ -226,7 +232,11 @@ namespace Titanfall {
 		inline std::vector<Vector3> vertexNormals;
 		inline std::vector<char> textureDataData;
 		inline std::vector<uint32_t> textureDataTable;
+		inline std::vector<VertexUnlit_t> vertexUnlitVertices;
+		inline std::vector<VertexLitFlat_t> vertexLitFlatVertices;
 		inline std::vector<VertexLitBump_t> vertexLitBumpVertices;
+		inline std::vector<VertexUnlitTS_t> vertexUnlitTSVertices;
+		inline std::vector<VertexBlinnPhong_t> vertexBlinnPhongVertices;
 		inline std::vector<uint16_t> meshIndices;
 		inline std::vector<Mesh_t> meshes;
 		inline std::vector<MeshBounds_t> meshBounds;

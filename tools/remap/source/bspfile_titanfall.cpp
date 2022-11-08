@@ -13,7 +13,6 @@
 
 
    /* dependencies */
-#include "remap.h"
 #include "bspfile_abstract.h"
 #include <ctime>
 
@@ -176,7 +175,11 @@ void WriteR1BSPFile( const char* filename ) {
 	AddLump(file, header.lumps[R1_LUMP_TEXTURE_DATA_STRING_DATA],			Titanfall::Bsp::textureDataData);
 	AddLump(file, header.lumps[R1_LUMP_TEXTURE_DATA_STRING_TABLE],			Titanfall::Bsp::textureDataTable);
 	AddLump(file, header.lumps[R1_LUMP_WORLD_LIGHTS],						Titanfall::Bsp::worldLights_stub);
+	AddLump(file, header.lumps[R1_LUMP_VERTEX_UNLIT],						Titanfall::Bsp::vertexUnlitVertices);
+	AddLump(file, header.lumps[R1_LUMP_VERTEX_LIT_FLAT],					Titanfall::Bsp::vertexLitFlatVertices);
 	AddLump(file, header.lumps[R1_LUMP_VERTEX_LIT_BUMP],					Titanfall::Bsp::vertexLitBumpVertices);
+	AddLump(file, header.lumps[R1_LUMP_VERTEX_UNLIT_TS],					Titanfall::Bsp::vertexUnlitTSVertices);
+	AddLump(file, header.lumps[R1_LUMP_VERTEX_BLINN_PHONG],					Titanfall::Bsp::vertexBlinnPhongVertices);
 	AddLump(file, header.lumps[R1_LUMP_MESH_INDICES],						Titanfall::Bsp::meshIndices);
 	AddLump(file, header.lumps[R1_LUMP_MESHES],								Titanfall::Bsp::meshes);
 	AddLump(file, header.lumps[R1_LUMP_MESH_BOUNDS],						Titanfall::Bsp::meshBounds);

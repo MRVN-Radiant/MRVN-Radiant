@@ -325,7 +325,11 @@ void WriteR2BSPFile(const char* filename)
 	//AddLump(file, header.lumps[R2_LUMP_TRICOLL_TRIS],						Titanfall2::bspTricollTris_stub);
 	//AddLump(file, header.lumps[R2_LUMP_TRICOLL_NODES],						Titanfall2::bspTricollNodes_stub);
 	//AddLump(file, header.lumps[R2_LUMP_TRICOLL_HEADERS],					Titanfall2::bspTricollHeaders_stub);
+	AddLump(file, header.lumps[R2_LUMP_VERTEX_UNLIT],						Titanfall::Bsp::vertexUnlitVertices);
+	AddLump(file, header.lumps[R2_LUMP_VERTEX_LIT_FLAT],					Titanfall::Bsp::vertexLitFlatVertices);
 	AddLump(file, header.lumps[R2_LUMP_VERTEX_LIT_BUMP],					Titanfall::Bsp::vertexLitBumpVertices);
+	AddLump(file, header.lumps[R2_LUMP_VERTEX_UNLIT_TS],					Titanfall::Bsp::vertexUnlitTSVertices);
+	AddLump(file, header.lumps[R2_LUMP_VERTEX_BLINN_PHONG],					Titanfall::Bsp::vertexBlinnPhongVertices);
 	AddLump(file, header.lumps[R2_LUMP_MESH_INDICES],						Titanfall::Bsp::meshIndices);
 	AddLump(file, header.lumps[R2_LUMP_MESHES],								Titanfall::Bsp::meshes);
 	AddLump(file, header.lumps[R2_LUMP_MESH_BOUNDS],						Titanfall::Bsp::meshBounds);
