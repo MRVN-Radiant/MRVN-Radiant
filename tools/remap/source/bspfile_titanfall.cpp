@@ -711,10 +711,22 @@ void Titanfall::EmitPlane( const Plane3 &plane ) {
 */
 void Titanfall::EmitLevelInfo() {
 	Titanfall::LevelInfo_t &li = Titanfall::Bsp::levelInfo.emplace_back();
+	li.unk0 = li.unk1 = li.unk3 = 0;
+	for( Titanfall::Mesh_t &mesh : Titanfall::Bsp::meshes ) {
+		if ( mesh.flags & S_VERTEX_LIT_BUMP && !( mesh.flags & S_SKY ) )
+			li.unk0++;
+
+		if ( mesh.flags & S_VERTEX_LIT_BUMP )
+			li.unk1++;
+		
+		if ( mesh.flags & S_VERTEX_LIT_BUMP )
+			li.unk3++;
+	}
+
 	// Something related to counting mesh flags
-	li.unk0 = Titanfall::Bsp::meshes.size();
-	li.unk1 = Titanfall::Bsp::meshes.size();
-	li.unk3 = Titanfall::Bsp::meshes.size();
+	//li.unk0 = Titanfall::Bsp::meshes.size();
+	//li.unk1 = Titanfall::Bsp::meshes.size();
+	//li.unk3 = Titanfall::Bsp::meshes.size();
 	li.propCount = Titanfall2::GameLump.propCount;
 }
 
