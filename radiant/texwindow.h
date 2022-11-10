@@ -24,7 +24,7 @@
 #include "generic/callbackfwd.h"
 #include "signal/signalfwd.h"
 
-#define TEX_MAX_FOLDER_DEPH 16
+#define TEX_MAX_FOLDER_DEPTH 16
 
 typedef struct _GtkWidget GtkWidget;
 
