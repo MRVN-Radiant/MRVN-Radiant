@@ -24,6 +24,8 @@
 #include "generic/callbackfwd.h"
 #include "signal/signalfwd.h"
 
+#define TEX_MAX_FOLDER_DEPH 16
+
 typedef struct _GtkWidget GtkWidget;
 
 class TextureBrowser;

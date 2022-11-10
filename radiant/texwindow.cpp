@@ -1494,7 +1494,7 @@ void TextureGroups_constructTreeView( TextureGroups& groups ){
 	{
 		// scan texture dirs and pak files only if not restricting to shaderlist
 		if ( g_pGameDescription->mGameType != "doom3" && !g_TextureBrowser_shaderlistOnly ) {
-			GlobalFileSystem().forEachDirectory( "textures/", TextureGroupsAddDirectoryCaller( groups ) );
+			GlobalFileSystem().forEachDirectory( "textures/", TextureGroupsAddDirectoryCaller( groups ), TEX_MAX_FOLDER_DEPH );
 		}
 
 		GlobalShaderSystem().foreachShaderName( TextureGroupsAddShaderCaller( groups ) );
