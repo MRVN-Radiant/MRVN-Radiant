@@ -1415,6 +1415,7 @@ inline int                  FindFloatPlane( const Vector3& normal, float dist, i
 	return FindFloatPlane( Plane3f( normal, dist ), numPoints, points );
 }
 bool                        PlaneEqual( const plane_t& p, const Plane3f& plane );
+bool					SnapNormal( Vector3& normal );
 void                        AddBrushBevels();
 
 
