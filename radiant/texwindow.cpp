@@ -1433,38 +1433,41 @@ void TextureBrowser_ToggleHideUnused(){
 	TextureBrowser_SetHideUnused( g_TextureBrowser, !g_TextureBrowser.m_hideUnused );
 }
 
-void TextureGroups_constructTreeModel( TextureGroups groups, GtkTreeStore* store ){
-	GtkTreeIter iter, child;
 
+void TextureGroups_constructTreeModel( TextureGroups groups, GtkTreeStore *store ) {
+	GtkTreeIter iter[TEX_MAX_FOLDER_DEPTH + 1];
+
+	// Loop through every path
 	TextureGroups::const_iterator i = groups.begin();
 	while ( i != groups.end() )
 	{
 		const char* dirName = ( *i ).c_str();
-		const char* firstUnderscore = strchr( dirName, '_' );
-		StringRange dirRoot( dirName, ( firstUnderscore == 0 ) ? dirName : firstUnderscore + 1 );
+		const char* separator = strchr( dirName, '/' );
+		StringRange dirRoot( dirName, ( separator == 0 ) ? dirName : separator );
 
-		TextureGroups::const_iterator next = i;
-		++next;
-		if ( firstUnderscore != 0
-		  && next != groups.end()
-		  && string_equal_start( ( *next ).c_str(), dirRoot ) ) {
-			gtk_tree_store_append( store, &iter, NULL );
-			gtk_tree_store_set( store, &iter, 0, CopiedString( StringRange( dirName, firstUnderscore ) ).c_str(), 1, "", -1 );
+		// If path is multiple nested dirs loop through them untill we only have the last dir
+		if ( separator != 0 ) {
 
-			// keep going...
-			while ( i != groups.end() && string_equal_start( ( *i ).c_str(), dirRoot ) )
-			{
-				gtk_tree_store_append( store, &child, &iter );
-				gtk_tree_store_set( store, &child, 0, ( *i ).c_str(), 1, ( *i ).c_str(), -1 );
-				++i;
+			int depth = 0;
+			CopiedString cutPath( dirName );
+			while( separator != 0 && depth < TEX_MAX_FOLDER_DEPTH + 1 ) {
+				cutPath = StringRange( path_remove_directory( cutPath.c_str() ), path_get_filename_base_end( cutPath.c_str() ) );
+				
+				separator = strchr( cutPath.c_str(), '/' );
+
+				depth++;
 			}
+
+			gtk_tree_store_append( store, &iter[depth], &iter[depth-1] );	
+			gtk_tree_store_set( store, &iter[depth], 0, cutPath.c_str(), 1, dirName, -1 );
 		}
-		else
-		{
-			gtk_tree_store_append( store, &iter, NULL );
-			gtk_tree_store_set( store, &iter, 0, dirName, 1, dirName, -1 );
-			++i;
+		// If file is a child of root dir just add it
+		else {
+			gtk_tree_store_append( store, &iter[0], NULL );
+			gtk_tree_store_set( store, &iter[0], 0, dirName, 1, dirName, -1 );
 		}
+
+		i++;
 	}
 }
 
@@ -1494,7 +1497,7 @@ void TextureGroups_constructTreeView( TextureGroups& groups ){
 	{
 		// scan texture dirs and pak files only if not restricting to shaderlist
 		if ( g_pGameDescription->mGameType != "doom3" && !g_TextureBrowser_shaderlistOnly ) {
-			GlobalFileSystem().forEachDirectory( "textures/", TextureGroupsAddDirectoryCaller( groups ) );
+			GlobalFileSystem().forEachDirectory( "textures/", TextureGroupsAddDirectoryCaller( groups ), TEX_MAX_FOLDER_DEPTH );
 		}
 
 		GlobalShaderSystem().foreachShaderName( TextureGroupsAddShaderCaller( groups ) );
