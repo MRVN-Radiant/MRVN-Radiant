@@ -136,7 +136,7 @@ static int CreateNewFloatPlane( const Plane3f& plane ){
    Returns true if and only if the normal was adjusted.
  */
 
-static bool SnapNormal( Vector3& normal ){
+bool SnapNormal( Vector3& normal ){
 #if Q3MAP2_EXPERIMENTAL_SNAP_NORMAL_FIX
 	int i;
 	bool adjusted = false;
