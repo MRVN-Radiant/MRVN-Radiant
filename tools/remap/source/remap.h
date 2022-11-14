@@ -2050,8 +2050,6 @@ inline Vector3 gridSize = { 64, 64, 128 };
 inline std::size_t numBSPEntities;
 inline std::vector<entity_t> entities;
 
-inline std::vector<std::string> savedTextures;
-
 /* Used only for loading, when saving each game has it's own vectors */
 inline std::vector<char> bspEntities;
 

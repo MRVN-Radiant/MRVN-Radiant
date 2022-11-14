@@ -297,42 +297,35 @@ void Titanfall::EmitEntity( const entity_t &e ) {
 
 /*
 	EmitTextureData()
-	
+	Emits texture data and returns its index
 */
 uint32_t Titanfall::EmitTextureData( shaderInfo_t shader ) {
-	std::string tex;
+	std::string tex = shader.shader.c_str();
 	std::size_t index;
-	tex = shader.shader.c_str();
 
-	savedTextures.push_back( tex );
+	// Strip 'textures/'
+	tex.erase( tex.begin(), tex.begin() + strlen( "textures/" ) );
+	std::replace( tex.begin(), tex.end(), '/', '\\' ); // Do we even need to do this ?
 
-	tex.erase(tex.begin(), tex.begin() + 9);
-	std::replace(tex.begin(), tex.end(), '/', '\\');
-
-	index = tex.find('\\');
-	if (index != std::string::npos)
-	{
-		std::replace(tex.begin(), tex.begin() + index, '_', '\\');
-	}
-
-	/* Check if it's already saved */
+	// Check if it's already saved
 	std::string table = std::string( Titanfall::Bsp::textureDataData.begin(), Titanfall::Bsp::textureDataData.end() );
-	index = table.find(tex);
+	index = table.find( tex );
 	if (index != std::string::npos) {
 		// Is already saved, find the index of its textureData
 
-		for (std::size_t i = 0; i < Titanfall::Bsp::textureData.size(); i++) {
-			Titanfall::TextureData_t &td = Titanfall::Bsp::textureData.at(i);
-			uint32_t &tdt = Titanfall::Bsp::textureDataTable.at(td.name_index);
+		for ( std::size_t i = 0; i < Titanfall::Bsp::textureData.size(); i++ ) {
+			Titanfall::TextureData_t &td = Titanfall::Bsp::textureData.at( i );
+			uint32_t &tdt = Titanfall::Bsp::textureDataTable.at( td.name_index );
 
-			if (tdt == index)
+			if ( tdt == index )
 				return i;
 		}
 	}
 
+	// Wasn't already saved, save it
 	index = Titanfall::Bsp::textureData.size();
 
-	/* Add to Table */
+	// Add to Table
 	StringOutputStream data;
 	data << tex.c_str();
 	std::vector<char> str = { data.begin(), data.end() + 1 };
@@ -346,7 +339,7 @@ uint32_t Titanfall::EmitTextureData( shaderInfo_t shader ) {
 	td.sizeY = shader.shaderImage->height;
 	td.visibleX = shader.shaderImage->width;
 	td.visibleY = shader.shaderImage->height;
-	td.flags = 512; // This should be the same as the mesh indexing this textureData
+	td.flags = shader.surfaceFlags;
 
 	return index;
 }
