@@ -611,9 +611,10 @@ int main( int argc, char* argv[] ){
 	fontconfig_workaround();
 #endif
 
-	if ( !check_version() ) {
+	// We dont need this, right ?
+	/*if ( !check_version() ) {
 		return EXIT_FAILURE;
-	}
+	}*/
 
 	show_splash();
 

@@ -7,7 +7,7 @@ BINDIR = $(RESOURCES)/install
 CONFDIR = $(RESOURCES)/etc
 DATADIR = $(RESOURCES)/share
 LIBDIR = $(RESOURCES)/lib
-VERSION = 1.5.0
+VERSION = 0.0.0
 DMG = $(TARGET)/NetRadiant-$(VERSION).dmg
 VOLUME_NAME = "NetRadiant $(VERSION)"
 

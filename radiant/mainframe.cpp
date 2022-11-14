@@ -332,22 +332,21 @@ void EnginePath_Unrealise(){
 }
 
 void setEnginePath( CopiedString& self, const char* value ){
-	const auto buffer = StringOutputStream( 256 )( DirectoryCleaned( value ) );
-	if ( !path_equal( buffer.c_str(), self.c_str() ) ) {
-#if 0
-		while ( !ConfirmModified( "Paths Changed" ) )
-		{
-			if ( Map_Unnamed( g_map ) ) {
-				Map_SaveAs();
-			}
-			else
-			{
-				Map_Save();
-			}
-		}
-		Map_RegionOff();
-#endif
+	auto buffer = StringOutputStream( 1028 )( DirectoryCleaned( value ) );
 
+	// Check if path starts with ${HOME} and make it relative to the real home dir
+	if( string_equal_prefix( buffer.c_str(), "${HOME}" ) ) {
+		CopiedString strippedPath = StringRange( &buffer.c_str()[7], &buffer.c_str()[strlen(buffer.c_str())] );
+		
+		CopiedString home = g_get_home_dir();
+		if( strlen(home.c_str()) == 0 )
+			globalErrorStream() << "Failed to find home directory, please verify that the resources path exists to prevent errors.";
+		
+		buffer.clear();
+		buffer << home << strippedPath; 
+	}
+
+	if ( !path_equal( buffer.c_str(), self.c_str() ) ) {
 		ScopeDisableScreenUpdates disableScreenUpdates( "Processing...", "Changing Engine Path" );
 
 		EnginePath_Unrealise();

@@ -270,7 +270,7 @@ ifneq "$(filter MINGW64_NT%,$(UNAME_S))" ""
 endif
 
 # VERSION!
-RADIANT_VERSION_NUMBER = 1.5.0
+RADIANT_VERSION_NUMBER = 0.0.0
 RADIANT_VERSION = $(RADIANT_VERSION_NUMBER)n
 RADIANT_MAJOR_VERSION = 5
 RADIANT_MINOR_VERSION = 0
@@ -1159,8 +1159,6 @@ install-data: binaries
 	$(MKDIR) $(INSTALLDIR)/gamepacks
 	$(FIND) $(INSTALLDIR_BASE)/ -name .svn -exec $(RM_R) {} \; -prune
 	$(CP) -a games/. $(INSTALLDIR)/gamepacks/
-	$(ECHO) $(RADIANT_MINOR_VERSION) > $(INSTALLDIR)/RADIANT_MINOR
-	$(ECHO) $(RADIANT_MAJOR_VERSION) > $(INSTALLDIR)/RADIANT_MAJOR
 	$(CP_R) setup/data/tools/* $(INSTALLDIR)/
 	$(MKDIR) $(INSTALLDIR)/docs
 	$(CP_R) docs/* $(INSTALLDIR)/docs/
