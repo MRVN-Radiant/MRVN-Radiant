@@ -82,7 +82,7 @@ struct game_titanfallonline : game_t
 			/* name             contentFlags                contentFlagsClear           surfaceFlags                surfaceFlagsClear           compileFlags                compileFlagsClear */
 
 			/* default */
-			{ "default",        0,                         -1,                          0,                         -1,                          C_SOLID,                    -1 },
+			{ "default",        0,                         -1,                          0x100000,                  -1,                          C_SOLID,                    -1 },
 
 			/* compiler */
 			{ "nodraw",         0,                          0,                          0,                          0,                          C_NODRAW,                   0 },
@@ -150,7 +150,7 @@ struct game_titanfall2 : game_t
 			/* name             contentFlags                contentFlagsClear           surfaceFlags                surfaceFlagsClear           compileFlags                compileFlagsClear */
 
 			/* default */
-			{ "default",        0,                         -1,                          0,                         -1,                          C_SOLID,                    -1 },
+			{ "default",        0,                         -1,                          0x100000,                  -1,                          C_SOLID,                    -1 },
 
 			/* compiler */
 			{ "nodraw",         0,                          0,                          0,                          0,                          C_NODRAW,                   0 },
@@ -218,7 +218,7 @@ struct game_apexlegends : game_t
 			/* name             contentFlags                contentFlagsClear           surfaceFlags                surfaceFlagsClear           compileFlags                compileFlagsClear */
 
 			/* default */
-			{ "default",        0,                         -1,                          0,                         -1,                         C_SOLID,                    -1 },
+			{ "default",        0,                         -1,                          0x100000,                  -1,                         C_SOLID,                    -1 },
 
 			/* compiler */
 			{ "nodraw",         0,                          0,                          0,                          0,                          C_NODRAW,                   0 },
