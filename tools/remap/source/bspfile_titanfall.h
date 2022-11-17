@@ -188,9 +188,9 @@ namespace Titanfall {
 
 	// 0x7B
 	struct LevelInfo_t {
-		uint32_t unk0;
-		uint32_t unk1;
-		uint32_t unk3;
+		uint32_t firstDecalMeshIndex;
+		uint32_t firstTransMeshIndex;
+		uint32_t firstSkyMeshIndex;
 		uint32_t propCount;
 		Vector3 unk2;
 	};

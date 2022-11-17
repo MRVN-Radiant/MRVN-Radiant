@@ -510,29 +510,54 @@ void Titanfall::EmitMeshes( const entity_t &e ) {
 			// Check against aabb
 			aabb.extend( vertex.xyz );
 
-			if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP ) {
+			if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP )
 				Titanfall::EmitVertexLitBump( vertex );
-				continue;
-			}
-			if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT ) {
+			else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT )
 				Titanfall::EmitVertexUnlit( vertex );
-				continue;
-			}
-			if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS ) {
+			else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS )
 				Titanfall::EmitVertexUnlitTS( vertex );
-				continue;
-			}
-
-			Titanfall::EmitVertexLitFlat( vertex );
+			else
+				Titanfall::EmitVertexLitFlat( vertex );
 		}
 
 		// Save triangles
 		for ( uint16_t triangle : mesh.triangles ) {
-			for ( uint32_t j = 0; j < Titanfall::Bsp::vertexLitBumpVertices.size(); j++ ) {
-				if ( !VectorCompare( Titanfall::Bsp::vertices.at( Titanfall::Bsp::vertexLitBumpVertices.at( j ).vertexIndex ),mesh.vertices.at( triangle ).xyz ) )
+			uint32_t totalVertices = 0;
+			if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP )
+				totalVertices = Titanfall::Bsp::vertexLitBumpVertices.size();
+			else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT )
+				totalVertices = Titanfall::Bsp::vertexUnlitVertices.size();
+			else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS )
+				totalVertices = Titanfall::Bsp::vertexUnlitTSVertices.size();
+			else
+				totalVertices = Titanfall::Bsp::vertexLitFlatVertices.size();
+
+
+			for ( uint32_t j = 0; j < totalVertices; j++ ) {
+				uint32_t vertexIndex = 0;
+				uint32_t normalIndex = 0;
+
+				if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP ) {
+					vertexIndex = Titanfall::Bsp::vertexLitBumpVertices.at( j ).vertexIndex;
+					normalIndex = Titanfall::Bsp::vertexLitBumpVertices.at( j ).normalIndex;
+				}
+				else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT ) {
+					vertexIndex = Titanfall::Bsp::vertexUnlitVertices.at( j ).vertexIndex;
+					normalIndex = Titanfall::Bsp::vertexUnlitVertices.at( j ).normalIndex;
+				}
+				else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS ) {
+					vertexIndex = Titanfall::Bsp::vertexUnlitTSVertices.at( j ).vertexIndex;
+					normalIndex = Titanfall::Bsp::vertexUnlitTSVertices.at( j ).normalIndex;
+				}
+				else {
+					vertexIndex = Titanfall::Bsp::vertexLitFlatVertices.at( j ).vertexIndex;
+					normalIndex = Titanfall::Bsp::vertexLitFlatVertices.at( j ).normalIndex;
+				}
+
+				if ( !VectorCompare( Titanfall::Bsp::vertices.at( vertexIndex ), mesh.vertices.at( triangle ).xyz ) )
 					continue;
 				
-				if ( !VectorCompare( Titanfall::Bsp::vertexNormals.at( Titanfall::Bsp::vertexLitBumpVertices.at( j ).normalIndex ), mesh.vertices.at( triangle ).normal ) )
+				if ( !VectorCompare( Titanfall::Bsp::vertexNormals.at( normalIndex ), mesh.vertices.at( triangle ).normal ) )
 					continue;
 				
 				uint16_t& index = Titanfall::Bsp::meshIndices.emplace_back();
@@ -711,22 +736,33 @@ void Titanfall::EmitPlane( const Plane3 &plane ) {
 */
 void Titanfall::EmitLevelInfo() {
 	Titanfall::LevelInfo_t &li = Titanfall::Bsp::levelInfo.emplace_back();
-	li.unk0 = li.unk1 = li.unk3 = 0;
-	for( Titanfall::Mesh_t &mesh : Titanfall::Bsp::meshes ) {
-		if ( mesh.flags & S_VERTEX_LIT_BUMP && !( mesh.flags & S_SKY ) )
-			li.unk0++;
 
-		if ( mesh.flags & S_VERTEX_LIT_BUMP )
-			li.unk1++;
-		
-		if ( mesh.flags & S_VERTEX_LIT_BUMP )
-			li.unk3++;
+	li.firstDecalMeshIndex = li.firstTransMeshIndex = li.firstSkyMeshIndex = 0;
+
+	// TODO: Add decal support
+	for( Titanfall::Mesh_t &mesh : Titanfall::Bsp::meshes ) {
+		//if (mesh.flags & S_SKY)
+		//	break;
+
+		li.firstDecalMeshIndex++;
 	}
 
-	// Something related to counting mesh flags
-	//li.unk0 = Titanfall::Bsp::meshes.size();
-	//li.unk1 = Titanfall::Bsp::meshes.size();
-	//li.unk3 = Titanfall::Bsp::meshes.size();
+	for ( Titanfall::Mesh_t& mesh : Titanfall::Bsp::meshes ) {
+		//if ( mesh.flags & S_TRANSLUCENT )
+		//	break;
+		
+		li.firstTransMeshIndex++;
+	}
+
+	for ( Titanfall::Mesh_t& mesh : Titanfall::Bsp::meshes ) {
+		// TODO: game shits itself when this is uncommented and your mesh is at the beginning of the vector
+		//       Respawn probably sort their meshes by flags ?? VERIFY
+		//if ( mesh.flags & S_SKY )
+		//	break;
+		
+		li.firstSkyMeshIndex++;
+	}
+
 	li.propCount = Titanfall2::GameLump.propCount;
 }
 
