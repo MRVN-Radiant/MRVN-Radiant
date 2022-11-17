@@ -43,9 +43,13 @@ jobs:
         wget https://www.dropbox.com/s/hcgkwzzmja3m6c0/netradiant-custom-extra-win.zip
         unzip -o netradiant-custom-extra-win.zip -d "install"
 
+    - name: Generate Artifact Name
+      run: |
+        echo "ARTIFACT_NAME=$(echo MRVN-radiant_`date -u -Idate`_${GITHUB_SHA::7}_Windows_${{ matrix.arch }})" >> $GITHUB_ENV
+
     - uses: actions/upload-artifact@v3
       with:
-        name: Windows-${{ matrix.arch }}
+        name: ${{ env.ARTIFACT_NAME }}
         path: install/
         if-no-files-found: error
 
@@ -75,8 +79,12 @@ jobs:
       run: |
         make -j 4 CXXFLAGS="-Wno-deprecated-declarations"
 
+    - name: Generate Artifact Name
+      run: |
+        echo "ARTIFACT_NAME=$(echo MRVN-radiant_`date -u -Idate`_${GITHUB_SHA::7}_Linux_${{ matrix.arch }})" >> $GITHUB_ENV
+
     - uses: actions/upload-artifact@v3
       with:
-        name: Linux-${{ matrix.arch }}
+        name: ${{ env.ARTIFACT_NAME }}
         path: install/
         if-no-files-found: error
