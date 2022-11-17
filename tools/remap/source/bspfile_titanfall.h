@@ -1,5 +1,6 @@
 #pragma once
 
+#include "bspfile_abstract.h"
 #include "qmath.h"
 #include <cstdint>
 #include "remap.h"
@@ -14,14 +15,19 @@ namespace Titanfall {
 	void EmitPlane( const Plane3 &plane );
 	uint32_t EmitTextureData( shaderInfo_t shader );
 	uint32_t EmitVertex( Vector3 &vertex );
-	uint32_t EmitVertexNormal( Vector3 &normal );
 	void BeginModel();
 	void EndModel();
 	void EmitEntityPartitions();
+	uint32_t EmitVertexNormal( Vector3 &normal );
+	void EmitVertexUnlit( Shared::Vertex_t &vertex );
+	void EmitVertexLitFlat( Shared::Vertex_t &vertex );
+	void EmitVertexLitBump( Shared::Vertex_t &vertex );
+	void EmitVertexUnlitTS( Shared::Vertex_t &vertex );
+	void EmitVertexBlinnPhong( Shared::Vertex_t &vertex );
 	void EmitMeshes( const entity_t &e );
-	void EmitBrushes( const entity_t &e );
-	void EmitCollisionGrid();
 	uint16_t EmitMaterialSort( uint32_t index );
+	void EmitCollisionGrid();
+	void EmitBrushes( const entity_t &e );
 	void EmitLevelInfo();
 	void EmitStubs();
 
@@ -43,6 +49,26 @@ namespace Titanfall {
 		uint32_t meshCount;
 	};
 
+	// 0x47
+	struct VertexUnlit_t {
+		uint32_t vertexIndex;
+		uint32_t normalIndex;
+		Vector2 uv0;
+		uint32_t unknown;
+	};
+
+	// 0x48
+	struct VertexLitFlat_t {
+		uint32_t vertexIndex;
+		uint32_t normalIndex;
+		Vector2 uv0;
+		uint32_t unknown0;
+		uint32_t unknown1;
+		uint32_t unknown2;
+		uint32_t unknown3;
+		uint32_t unknown4;
+	};
+
 	// 0x49
 	struct VertexLitBump_t {
 		uint32_t vertexIndex;
@@ -51,6 +77,24 @@ namespace Titanfall {
 		int32_t negativeOne;
 		Vector2 uv1;
 		uint32_t unk[4];
+	};
+
+	// 0x4A
+	struct VertexUnlitTS_t {
+		uint32_t vertexIndex;
+		uint32_t normalIndex;
+		Vector2 uv0;
+		uint32_t unknown0;
+		uint32_t unknown1;
+		uint32_t unknown2;
+	};
+
+	// 0x4B
+	struct VertexBlinnPhong_t {
+		uint32_t vertexIndex;
+		uint32_t normalIndex;
+		uint32_t unknown0;
+		uint32_t unknown1;
 	};
 
 	// 0x50
@@ -144,9 +188,9 @@ namespace Titanfall {
 
 	// 0x7B
 	struct LevelInfo_t {
-		uint32_t unk0;
-		uint32_t unk1;
-		uint32_t unk3;
+		uint32_t firstDecalMeshIndex;
+		uint32_t firstTransMeshIndex;
+		uint32_t firstSkyMeshIndex;
 		uint32_t propCount;
 		Vector3 unk2;
 	};
@@ -188,7 +232,11 @@ namespace Titanfall {
 		inline std::vector<Vector3> vertexNormals;
 		inline std::vector<char> textureDataData;
 		inline std::vector<uint32_t> textureDataTable;
+		inline std::vector<VertexUnlit_t> vertexUnlitVertices;
+		inline std::vector<VertexLitFlat_t> vertexLitFlatVertices;
 		inline std::vector<VertexLitBump_t> vertexLitBumpVertices;
+		inline std::vector<VertexUnlitTS_t> vertexUnlitTSVertices;
+		inline std::vector<VertexBlinnPhong_t> vertexBlinnPhongVertices;
 		inline std::vector<uint16_t> meshIndices;
 		inline std::vector<Mesh_t> meshes;
 		inline std::vector<MeshBounds_t> meshBounds;

@@ -13,7 +13,6 @@
 
 
    /* dependencies */
-#include "remap.h"
 #include "bspfile_abstract.h"
 #include <ctime>
 
@@ -176,7 +175,11 @@ void WriteR1BSPFile( const char* filename ) {
 	AddLump(file, header.lumps[R1_LUMP_TEXTURE_DATA_STRING_DATA],			Titanfall::Bsp::textureDataData);
 	AddLump(file, header.lumps[R1_LUMP_TEXTURE_DATA_STRING_TABLE],			Titanfall::Bsp::textureDataTable);
 	AddLump(file, header.lumps[R1_LUMP_WORLD_LIGHTS],						Titanfall::Bsp::worldLights_stub);
+	AddLump(file, header.lumps[R1_LUMP_VERTEX_UNLIT],						Titanfall::Bsp::vertexUnlitVertices);
+	AddLump(file, header.lumps[R1_LUMP_VERTEX_LIT_FLAT],					Titanfall::Bsp::vertexLitFlatVertices);
 	AddLump(file, header.lumps[R1_LUMP_VERTEX_LIT_BUMP],					Titanfall::Bsp::vertexLitBumpVertices);
+	AddLump(file, header.lumps[R1_LUMP_VERTEX_UNLIT_TS],					Titanfall::Bsp::vertexUnlitTSVertices);
+	AddLump(file, header.lumps[R1_LUMP_VERTEX_BLINN_PHONG],					Titanfall::Bsp::vertexBlinnPhongVertices);
 	AddLump(file, header.lumps[R1_LUMP_MESH_INDICES],						Titanfall::Bsp::meshIndices);
 	AddLump(file, header.lumps[R1_LUMP_MESHES],								Titanfall::Bsp::meshes);
 	AddLump(file, header.lumps[R1_LUMP_MESH_BOUNDS],						Titanfall::Bsp::meshBounds);
@@ -417,6 +420,61 @@ void Titanfall::EmitEntityPartitions() {
 }
 
 /*
+	EmitVertexUnlit
+	Saves a vertex into Titanfall::Bsp::vertexUnlitVertices
+*/
+void Titanfall::EmitVertexUnlit( Shared::Vertex_t &vertex ) {
+	Titanfall::VertexUnlit_t &ul = Titanfall::Bsp::vertexUnlitVertices.emplace_back();
+	ul.vertexIndex = Titanfall::EmitVertex( vertex.xyz );
+	ul.normalIndex = Titanfall::EmitVertexNormal( vertex.normal );
+	ul.uv0 = vertex.st;
+}
+
+/*
+	EmitVertexLitFlat
+	Saves a vertex into Titanfall::Bsp::vertexLitFlatVertices
+*/
+void Titanfall::EmitVertexLitFlat( Shared::Vertex_t &vertex ) {
+	Titanfall::VertexLitFlat_t &lf = Titanfall::Bsp::vertexLitFlatVertices.emplace_back();
+	lf.vertexIndex = Titanfall::EmitVertex( vertex.xyz );
+	lf.normalIndex = Titanfall::EmitVertexNormal( vertex.normal );
+	lf.uv0 = vertex.st;
+}
+
+/*
+	EmitVertexLitBump
+	Saves a vertex into Titanfall::Bsp::vertexLitBumpVertices
+*/
+void Titanfall::EmitVertexLitBump( Shared::Vertex_t &vertex ) {
+	Titanfall::VertexLitBump_t &lv = Titanfall::Bsp::vertexLitBumpVertices.emplace_back();
+	lv.vertexIndex = Titanfall::EmitVertex( vertex.xyz );
+	lv.normalIndex = Titanfall::EmitVertexNormal( vertex.normal );
+	lv.uv0 = vertex.st;
+	lv.negativeOne = -1;
+}
+
+/*
+	EmitVertexUnlitTS
+	Saves a vertex into Titanfall::Bsp::vertexUnlitTSVertices
+*/
+void Titanfall::EmitVertexUnlitTS( Shared::Vertex_t &vertex ) {
+	Titanfall::VertexUnlitTS_t &ul = Titanfall::Bsp::vertexUnlitTSVertices.emplace_back();
+	ul.vertexIndex = Titanfall::EmitVertex( vertex.xyz );
+	ul.normalIndex = Titanfall::EmitVertexNormal( vertex.normal );
+	ul.uv0 = vertex.st;
+}
+
+/*
+	EmitVertexBlinnPhong
+	Saves a vertex into Titanfall::Bsp::vertexBlinnPhongVertices
+*/
+void Titanfall::EmitVertexBlinnPhong( Shared::Vertex_t &vertex ) {
+	Titanfall::VertexBlinnPhong_t &bp = Titanfall::Bsp::vertexBlinnPhongVertices.emplace_back();
+	bp.vertexIndex = Titanfall::EmitVertex( vertex.xyz );
+	bp.normalIndex = Titanfall::EmitVertexNormal( vertex.normal );
+}
+
+/*
 	EmitMeshes()
 	writes the mesh list to the bsp
 */
@@ -424,7 +482,7 @@ void Titanfall::EmitMeshes( const entity_t &e ) {
 	for ( const Shared::Mesh_t &mesh : Shared::meshes ) {
 		Titanfall::Mesh_t &bm = Titanfall::Bsp::meshes.emplace_back();
 		bm.const0 = 4294967040; // :)
-		bm.flags = 1051136;
+		bm.flags = mesh.shaderInfo->surfaceFlags;
 		bm.firstVertex = Titanfall::Bsp::vertexLitBumpVertices.size();
 		bm.vertexCount = mesh.vertices.size();
 		bm.triOffset = Titanfall::Bsp::meshIndices.size();
@@ -441,23 +499,58 @@ void Titanfall::EmitMeshes( const entity_t &e ) {
 		// Save vertices and vertexnormals
 		for ( std::size_t i = 0; i < mesh.vertices.size(); i++ ) {
 			Shared::Vertex_t vertex = mesh.vertices.at( i );
+
 			// Check against aabb
 			aabb.extend( vertex.xyz );
 
-			Titanfall::VertexLitBump_t &lv = Titanfall::Bsp::vertexLitBumpVertices.emplace_back();
-			lv.uv0 = vertex.st;
-			lv.negativeOne = -1;
-			lv.vertexIndex = Titanfall::EmitVertex( vertex.xyz );
-			lv.normalIndex = Titanfall::EmitVertexNormal( vertex.normal );
+			if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP )
+				Titanfall::EmitVertexLitBump( vertex );
+			else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT )
+				Titanfall::EmitVertexUnlit( vertex );
+			else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS )
+				Titanfall::EmitVertexUnlitTS( vertex );
+			else
+				Titanfall::EmitVertexLitFlat( vertex );
 		}
 
 		// Save triangles
 		for ( uint16_t triangle : mesh.triangles ) {
-			for ( uint32_t j = 0; j < Titanfall::Bsp::vertexLitBumpVertices.size(); j++ ) {
-				if ( !VectorCompare( Titanfall::Bsp::vertices.at( Titanfall::Bsp::vertexLitBumpVertices.at( j ).vertexIndex ),mesh.vertices.at( triangle ).xyz ) )
+			uint32_t totalVertices = 0;
+			if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP )
+				totalVertices = Titanfall::Bsp::vertexLitBumpVertices.size();
+			else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT )
+				totalVertices = Titanfall::Bsp::vertexUnlitVertices.size();
+			else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS )
+				totalVertices = Titanfall::Bsp::vertexUnlitTSVertices.size();
+			else
+				totalVertices = Titanfall::Bsp::vertexLitFlatVertices.size();
+
+
+			for ( uint32_t j = 0; j < totalVertices; j++ ) {
+				uint32_t vertexIndex = 0;
+				uint32_t normalIndex = 0;
+
+				if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP ) {
+					vertexIndex = Titanfall::Bsp::vertexLitBumpVertices.at( j ).vertexIndex;
+					normalIndex = Titanfall::Bsp::vertexLitBumpVertices.at( j ).normalIndex;
+				}
+				else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT ) {
+					vertexIndex = Titanfall::Bsp::vertexUnlitVertices.at( j ).vertexIndex;
+					normalIndex = Titanfall::Bsp::vertexUnlitVertices.at( j ).normalIndex;
+				}
+				else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS ) {
+					vertexIndex = Titanfall::Bsp::vertexUnlitTSVertices.at( j ).vertexIndex;
+					normalIndex = Titanfall::Bsp::vertexUnlitTSVertices.at( j ).normalIndex;
+				}
+				else {
+					vertexIndex = Titanfall::Bsp::vertexLitFlatVertices.at( j ).vertexIndex;
+					normalIndex = Titanfall::Bsp::vertexLitFlatVertices.at( j ).normalIndex;
+				}
+
+				if ( !VectorCompare( Titanfall::Bsp::vertices.at( vertexIndex ), mesh.vertices.at( triangle ).xyz ) )
 					continue;
 				
-				if ( !VectorCompare( Titanfall::Bsp::vertexNormals.at( Titanfall::Bsp::vertexLitBumpVertices.at( j ).normalIndex ), mesh.vertices.at( triangle ).normal ) )
+				if ( !VectorCompare( Titanfall::Bsp::vertexNormals.at( normalIndex ), mesh.vertices.at( triangle ).normal ) )
 					continue;
 				
 				uint16_t& index = Titanfall::Bsp::meshIndices.emplace_back();
@@ -687,10 +780,33 @@ void Titanfall::EmitPlane( const Plane3 &plane ) {
 */
 void Titanfall::EmitLevelInfo() {
 	Titanfall::LevelInfo_t &li = Titanfall::Bsp::levelInfo.emplace_back();
-	// Something related to counting mesh flags
-	li.unk0 = Titanfall::Bsp::meshes.size();
-	li.unk1 = Titanfall::Bsp::meshes.size();
-	li.unk3 = Titanfall::Bsp::meshes.size();
+
+	li.firstDecalMeshIndex = li.firstTransMeshIndex = li.firstSkyMeshIndex = 0;
+
+	// TODO: Add decal support
+	for( Titanfall::Mesh_t &mesh : Titanfall::Bsp::meshes ) {
+		//if (mesh.flags & S_SKY)
+		//	break;
+
+		li.firstDecalMeshIndex++;
+	}
+
+	for ( Titanfall::Mesh_t& mesh : Titanfall::Bsp::meshes ) {
+		//if ( mesh.flags & S_TRANSLUCENT )
+		//	break;
+		
+		li.firstTransMeshIndex++;
+	}
+
+	for ( Titanfall::Mesh_t& mesh : Titanfall::Bsp::meshes ) {
+		// TODO: game shits itself when this is uncommented and your mesh is at the beginning of the vector
+		//       Respawn probably sort their meshes by flags ?? VERIFY
+		//if ( mesh.flags & S_SKY )
+		//	break;
+		
+		li.firstSkyMeshIndex++;
+	}
+
 	li.propCount = Titanfall2::GameLump.propCount;
 }
 

@@ -1181,7 +1181,7 @@ static void ParseBrush( bool onlyLights, bool noCollapseGroups, entity_t& mapEnt
 	}
 
 	/* get the content for the entire brush */
-	SetBrushContents( buildBrush );
+	// SetBrushContents( buildBrush );
 
 	/* allow detail brushes to be removed */
 	if ( nodetail && ( buildBrush.compileFlags & C_DETAIL ) ) {
