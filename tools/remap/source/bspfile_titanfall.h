@@ -12,6 +12,7 @@ void						CompileR1BSPFile();
 
 namespace Titanfall {
 	void EmitEntity( const entity_t &e );
+	void EmitTriggerBrushPlaneKeyValues( entity_t &e );
 	void EmitPlane( const Plane3 &plane );
 	uint32_t EmitTextureData( shaderInfo_t shader );
 	uint32_t EmitVertex( Vector3 &vertex );

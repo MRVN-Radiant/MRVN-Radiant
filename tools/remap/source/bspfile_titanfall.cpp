@@ -284,7 +284,8 @@ void Titanfall::EmitEntity( const entity_t &e ) {
 	}
 	// script
 	else if( striEqualPrefix( e.valueForKey( "classname" ), "info_target" ) ||
-			 striEqualPrefix( e.valueForKey( "classname" ), "prop_dynamic" ) ) {
+			 striEqualPrefix( e.valueForKey( "classname" ), "prop_dynamic" ) ||
+			 striEqualPrefix( e.valueForKey( "classname" ), "trigger_hurt" )) {
 				Titanfall::Ent::script.insert( Titanfall::Ent::script.end(), str.begin(), str.end() );
 	}
 	// snd
@@ -295,6 +296,37 @@ void Titanfall::EmitEntity( const entity_t &e ) {
 	// bsp entity lump
 	else {
 		Titanfall::Bsp::entities.insert( Titanfall::Bsp::entities.end(), str.begin(), str.end() );
+	}
+}
+
+/*
+	EmitTriggerBrushPlaneKeyValues()
+	Emits brush planes as keyvalues because respawn
+*/
+void Titanfall::EmitTriggerBrushPlaneKeyValues( entity_t &e ) {
+	std::size_t b = 0;
+	for ( const brush_t &brush : e.brushes ) {
+		for ( std::size_t s = 0; s < brush.sides.size(); s++) {
+			const side_t &side = brush.sides.at(s);
+			StringOutputStream key;
+			key << "*trigger_brush_"
+				<< b
+				<< "_plane_"
+				<< s;
+
+			StringOutputStream value;
+			value << side.plane.a
+				<< " "
+				<< side.plane.b
+				<< " "
+				<< side.plane.c
+				<< " "
+				<< side.plane.d;
+
+
+			e.setKeyValue( key.c_str(), value.c_str() );
+		}
+		b++;
 	}
 }
 

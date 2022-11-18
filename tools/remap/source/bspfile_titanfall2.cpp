@@ -382,8 +382,6 @@ void CompileR2BSPFile()
 		entity_t& entity = entities[entityNum];
 		const char* classname = entity.classname();
 
-		Titanfall::EmitEntity( entity );
-
 		/* visible geo */
 		if ( striEqual( classname,"worldspawn" ) )
 		{
@@ -396,11 +394,19 @@ void CompileR2BSPFile()
 
 			Titanfall::EndModel();
 		}
+		/* hurt */
+		else if ( striEqualPrefix( classname, "trigger_" ) )
+		{
+			Titanfall::EmitTriggerBrushPlaneKeyValues( entity );
+		}
 		/* props for gamelump */
 		else if ( striEqual( classname, "misc_model" ) )
 		{
 			EmitProp( entity );
 		}
+
+
+		Titanfall::EmitEntity( entity );
 	}
 
 	/* */

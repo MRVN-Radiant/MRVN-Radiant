@@ -329,4 +329,19 @@ ref script
 <angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 </point>
 
+<!--
+=============================================================================
+ Trigger Ents
+=============================================================================
+-->
+
+<group name="trigger_hurt">
+Deals damage to entities
+-------- KEYS --------
+<string key="damageSourceName" name="Damage Source Name" value="fall">Damage type</string>
+<targetname key="targetname" name="Target Name" value="trigger_hurt_">Target name</targetname>
+<integer key="damage" name="Damage" value="0">Damage inflicted</integer>
+<integer key="spawnflags" name="Spawnflags" value="4099">unknown</integer>
+</group>
+
 </classes>
