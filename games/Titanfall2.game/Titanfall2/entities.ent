@@ -344,4 +344,10 @@ Deals damage to entities
 <integer key="spawnflags" name="Spawnflags" value="4099">unknown</integer>
 </group>
 
+<group name="trigger_out_of_bounds">
+Triggers the out of bounds timer when player is inside
+-------- KEYS --------
+<integer key="spawnflags" name="Spawnflags" value="4099">unknown</integer>
+</group>
+
 </classes>
