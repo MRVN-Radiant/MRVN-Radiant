@@ -4,33 +4,37 @@
 
 
 
-float CalculateSAH( std::vector<Shared::visRef_t> &refs, int axis, float pos )
-{
-	MinMax left;
-	std::size_t leftCount = 0;
-	MinMax right;
-	std::size_t rightCount = 0;
+float CalculateSAH( std::vector<Shared::visRef_t> &refs, int axis, float pos[3] ) {
+	// 3 dividers, 4 nodes
+	// minmax | minmax | minmax | minmax 
+	MinMax minmaxs[4] = {};
+	std::size_t counts[4] = {};
 
 	for ( Shared::visRef_t &ref : refs )
 	{
 		float refPos = ref.minmax.maxs[axis];
-		if ( refPos < pos )
-		{
-			leftCount++;
-			left.extend( ref.minmax );
+		if ( refPos < pos[0] ) {
+			counts[0]++;
+			minmaxs[0].extend( ref.minmax );
 		}
-		else
-		{
-			rightCount++;
-			right.extend( ref.minmax );
+		if ( refPos > pos[0] && refPos < pos[1] ) {
+			counts[1]++;
+			minmaxs[1].extend( ref.minmax );
+		}
+		if ( refPos > pos[1] && refPos < pos[2] ) {
+			counts[2]++;
+			minmaxs[2].extend( ref.minmax );
+		}
+		if ( refPos > pos[2] ) {
+			counts[3]++;
+			minmaxs[3].extend( ref.minmax );
 		}
 	}
 
 	float cost = 0;
-	if ( leftCount != 0 )
-		cost += leftCount * left.area();
-	if ( rightCount != 0 )
-		cost += rightCount * right.area();
+	for( int i = 0; i < 4; i++ )
+		if( counts[i] != 0 )
+			cost += counts[i] * minmaxs[i].area();
 
 	return cost;
 }
@@ -217,78 +221,98 @@ void Shared::MakeVisReferences()
 	Sys_Printf( "%9zu shared vis references\n", Shared::visRefs.size() );
 }
 
-Shared::visNode_t Shared::MakeVisTree( std::vector<Shared::visRef_t> refs, float parentCost )
-{
+/*
+	MakeVisTree
+	Creates a node and either stops or tries to create children
+*/
+Shared::visNode_t Shared::MakeVisTree( std::vector<Shared::visRef_t> refs, float parentCost ) {
 	Shared::visNode_t node;
 
-	/* Make minmax of refs */
+	// Create MinMax of our node
 	MinMax minmax;
 	for ( Shared::visRef_t &ref : refs )
 		minmax.extend( ref.minmax );
 
 	node.minmax = minmax;
 
-	{
-		
+	// Check if a VisRef is large enough to be our child so it doesnt skew our splitting
+	/* {
 		std::vector<Shared::visRef_t> visRefs = refs;
 		refs.clear();
 
 		for ( Shared::visRef_t &ref : visRefs )
 		{
-			//Sys_Printf("amonsus %i\n", ref.index);
-			if ( ref.minmax.area() / minmax.area() > 0.7 )
+			if ( ref.minmax.area() / minmax.area() > 0.7)
 				node.refs.emplace_back( ref );
 			else
 				refs.emplace_back( ref );
 		}
-		
-		/*
-		std::size_t i = 0;
-		for (Shared::visRef_t& ref : refs)
-		{
-			Sys_Printf("amonsus %i\n", ref.index);
-			if (ref.minmax.area() / minmax.area() > 0.7)
-			{
-				refs.erase(refs.begin() + i);
-				node.refs.emplace_back(ref);
-				i--;
-			}
-			i++;
-		}
-		*/
-	}
+	}*/
 
-
-	float bestCost, bestPos = 0;
+	// Check all possible ways of splitting
+	float bestCost = 0;
+	float bestPos[3] = {};
 	int bestAxis = 0;
 
 	bestCost = 1e30f;
-
-	/* Loop through each axis and test possible splits */
-	for ( int axis = 0; axis < 3; axis++ )
-	{
-		for ( Shared::visRef_t &ref : refs )
-		{
-			float pos = ref.minmax.mins[axis];
-			float cost = CalculateSAH( refs, axis, pos );
-			
-			if ( cost < bestCost )
-			{
-				bestCost = cost;
-				bestPos = pos;
-				bestAxis = axis;//Sys_Printf("bestCost: %f; bestPos: %f; bestAxis: %i\n", bestCost, bestPos, bestAxis);
+	float pos[3] = {};
+	for ( int axis = 0; axis < 3; axis++ ) {
+		for ( std::size_t i = 0; i < refs.size(); i++ ) {
+			for ( std::size_t j = i + 1; j < refs.size(); j++ ) {
+				for ( std::size_t k = j + 1; k < refs.size(); k++ ) {
+					pos[2] = refs.at(k).minmax.mins[axis];
+				}
+				pos[1] = refs.at(j).minmax.mins[axis];
 			}
+			pos[0] = refs.at(i).minmax.mins[axis];
+		}
+		
+		float cost = CalculateSAH(refs, axis, pos);
+		if ( cost < bestCost )
+		{
+			bestCost = cost;
+			bestPos[0] = pos[0]; bestPos[1] = pos[1]; bestPos[2] = pos[2];
+			bestAxis = axis;
 		}
 	}
-	
-	if ( bestCost >= parentCost || refs.size() < 5 )
+
+	if ( bestCost >= parentCost )
 	{
 		for ( Shared::visRef_t &ref : refs )
 			node.refs.emplace_back( ref );
 
 		return node;
 	}
+	
+	MinMax nodes[4];
+	nodes[0] = minmax;
+	nodes[1] = minmax;
+	nodes[2] = minmax;
+	nodes[3] = minmax;
+	std::vector<Shared::visRef_t> nodeRefs[4];
 
+	nodes[0].maxs[bestAxis] = bestPos[0];
+	nodes[1].mins[bestAxis] = bestPos[0];
+	nodes[1].maxs[bestAxis] = bestPos[1];
+	nodes[2].mins[bestAxis] = bestPos[1];
+	nodes[2].maxs[bestAxis] = bestPos[2];
+	nodes[3].mins[bestAxis] = bestPos[2];
+
+	for ( Shared::visRef_t &ref : refs )
+	{
+		for( int i = 0; i < 4; i++ ) {
+			if( ref.minmax.test( nodes[i] ) ) {
+				nodeRefs[i].emplace_back( ref );
+				break;
+			}
+		}
+	}
+
+	for( int i = 0; i < 4; i++ )
+		if( nodeRefs[i].size() != 0)
+			node.children.emplace_back( Shared::MakeVisTree( nodeRefs[i], bestCost ) );
+
+	/*
 	MinMax left = minmax;
 	MinMax right = minmax;
 
@@ -316,6 +340,6 @@ Shared::visNode_t Shared::MakeVisTree( std::vector<Shared::visRef_t> refs, float
 		node.children.emplace_back( Shared::MakeVisTree( leftRefs, bestCost ) );
 	if( rightRefs.size() != 0 )
 		node.children.emplace_back( Shared::MakeVisTree( rightRefs, bestCost ) );
-
+	*/
 	return node;
 }

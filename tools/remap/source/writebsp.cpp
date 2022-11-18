@@ -425,7 +425,7 @@ void EmitVisChildrenOfTreeNode( Shared::visNode_t node )
 			bn.objRefCount = n.refs.size();
 		}
 
-		bn.firstChild = Titanfall::Bsp::cellAABBNodes.size() + 1;
+		bn.firstChild = Titanfall::Bsp::cellAABBNodes.size() + n.children.size();
 
 		if( i != 0 )
 			bn.firstChild += GetTotalVisNodeChildCount( node.children.at( i - 1 ) ) - 1;
