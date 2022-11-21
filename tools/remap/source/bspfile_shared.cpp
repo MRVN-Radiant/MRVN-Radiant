@@ -48,38 +48,45 @@ float CalculateSAH( std::vector<Shared::visRef_t> &refs, int axis, float pos[3] 
 */
 void Shared::MakeMeshes( const entity_t &e )
 {
-	/* Multiple entities can have meshes, make sure we clear before making new meshes */
+	// Multiple entities can have meshes, make sure we clear before making new meshes
 	Shared::meshes.clear();
 
 	Sys_FPrintf( SYS_VRB, "--- SharedMeshes ---\n" );
 
-	/* Brushes */
+	// Loop through brushes
 	for ( const brush_t &brush : e.brushes )
 	{
-		/* loop through sides */
+		// Loop through sides
 		for ( const side_t &side : brush.sides )
 		{
-			/* Skip bevels */
+			// Skip bevels
 			if ( side.bevel )
 				continue;
 
-			/* Check flags */
+			// Check flags
 			if ( side.shaderInfo->compileFlags & C_NODRAW )
 				continue;
+
+			// Check for degenerate windings
+			if( side.winding.size() < 3 ) {
+				Sys_FPrintf( SYS_WRN, "        Skipping degenerate winding!\n" );
+				continue;
+			}			
 			
 			Shared::Mesh_t &mesh = Shared::meshes.emplace_back();
 			mesh.shaderInfo = side.shaderInfo;
 
-			Vector3 normal = side.plane.normal();//Vector3(0.0f,0.0f,1.0f);
+			Vector3 normal = side.plane.normal();
 
-			/* Loop through vertices */
+			// Loop through vertices
 			for ( const Vector3 &vertex : side.winding )
 			{
-				/* Update AABB */
+				// Extend AABB
 				mesh.minmax.extend( vertex );
 
-				/* Texturing */
-				/* this is taken from surface.cpp, It doesn't work :) */
+				// Texturing
+				// This is taken from surface.cpp, It somewhat works
+				// TODO: Make this work better
 				Vector2 st;
 				Vector3 vTranslated, texX, texY;
 				float x, y;
@@ -89,7 +96,7 @@ void Shared::MakeMeshes( const entity_t &e )
 				y = vector3_dot(vTranslated, texY);
 				st[0] = side.texMat[0][0] * x + side.texMat[0][1] * y + side.texMat[0][2];
 				st[1] = side.texMat[1][0] * x + side.texMat[1][1] * y + side.texMat[1][2];
-
+				
 				
 				Shared::Vertex_t &sv = mesh.vertices.emplace_back();
 				sv.xyz = vertex;
@@ -97,7 +104,7 @@ void Shared::MakeMeshes( const entity_t &e )
 				sv.normal = normal;
 			}
 
-			/* Create triangles for side */
+			// Create triangles for side
 			for ( std::size_t i = 0; i < side.winding.size() - 2; i++ )
 			{
 				for ( int j = 0; j < 3; j++ )
@@ -109,7 +116,7 @@ void Shared::MakeMeshes( const entity_t &e )
 		}
 	}
 
-	/* Patches */
+	// Loop through patches
 	parseMesh_t *patch;
 	patch = e.patches;
 	while( patch != NULL ) {
@@ -145,52 +152,52 @@ void Shared::MakeMeshes( const entity_t &e )
 	}
 	
 
-	/* Combine */
+	// Combine all meshes based on shaderInfo and AABB tests
 	std::size_t index = 0;
 	std::size_t iterationsSinceCombine = 0;
 	while ( true )
 	{
-		/* std::out_of_range can't comprehend this  */
+		// std::out_of_range can't comprehend this
 		if ( index >= Shared::meshes.size() )
 			index = 0;
 
-		/* No more meshes to combine; break from the loop */
+		// No more meshes to combine; break from the loop
 		if ( iterationsSinceCombine >= Shared::meshes.size() )
 			break;
 
-		/* Get mesh which we then compare to the rest, maybe combine, maybe not */
+		// Get mesh which we then compare to the rest, maybe combine, maybe not
 		Shared::Mesh_t &mesh1 = Shared::meshes.at( index );
 
 		for ( std::size_t i = 0; i < Shared::meshes.size(); i++ )
 		{
-			/* We dont want to compare the same mesh */
+			// We dont want to compare the same mesh
 			if ( index == i )
 				continue;
 
 			Shared::Mesh_t &mesh2 = Shared::meshes.at( i );
 
-			/* check if they have the same shader */
+			// Check if they have the same shader
 			if ( !striEqual( mesh1.shaderInfo->shader.c_str(), mesh2.shaderInfo->shader.c_str() ) )
 				continue;
 
-			/* Check if they're intersecting */
+			// Check if they're intersecting
 			if ( !mesh1.minmax.test( mesh2.minmax ) )
 				continue;
 
 
-			/* Combine them */
-			/* Triangles */
+			// Combine them
+			// Triangles
 			for ( uint16_t &triIndex : mesh2.triangles )
 				mesh1.triangles.emplace_back( triIndex + mesh1.vertices.size() );
 			
-			/* Copy over vertices */
+			// Copy over vertices
 			mesh1.vertices.insert( mesh1.vertices.end(), mesh2.vertices.begin(), mesh2.vertices.end() );
 
-			/* Update minmax */
+			// Update minmax
 			mesh1.minmax.extend( mesh2.minmax );
 			
 
-			/* Delete mesh we combined as to not create duplicates */
+			// Delete mesh we combined as to not create duplicates
 			Shared::meshes.erase( Shared::meshes.begin() + i );
 			iterationsSinceCombine = 0;
 			break;
