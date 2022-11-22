@@ -1,13 +1,13 @@
-# MRVN-Radiant
+# MRVNRadiant
 
 The open-source, cross-platform level editor for Respawn Entertainment Source based games.
 
-MRVN-Radiant is a fork of NetRadiant-custom (GtkRadiant 1.4&rarr;massive rewrite&rarr;1.5&rarr;NetRadiant&rarr;NetRadiant-custom&rarr;this)
+MRVNRadiant is a fork of NetRadiant-custom (GtkRadiant 1.4 &rarr; massive rewrite &rarr; 1.5 &rarr; NetRadiant &rarr; NetRadiant-custom &rarr; this)
 
 <div align=left>
-<img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/F1F7Y/MRVN-radiant/build?style=for-the-badge">
-<img alt="GitHub Issues" src="https://img.shields.io/github/issues/F1F7Y/MRVN-radiant?style=for-the-badge">
-<img alt="GitHub Pullrequests" src="https://img.shields.io/github/issues-pr/F1F7Y/MRVN-radiant?style=for-the-badge">
+<img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/MRVNRadiant/MRVNRadiant/build?style=for-the-badge">
+<img alt="GitHub Issues" src="https://img.shields.io/github/issues/MRVNRadiant/MRVNRadiant?style=for-the-badge">
+<img alt="GitHub Pullrequests" src="https://img.shields.io/github/issues-pr/MRVNRadiant/MRVNRadiant?style=for-the-badge">
 </div>
 
 ## Supported games
