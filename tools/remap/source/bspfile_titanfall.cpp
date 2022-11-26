@@ -765,11 +765,13 @@ void Titanfall::EmitBrushes(const entity_t& e) {
 		}
 		
 		// TODO: Add correct material offset
+		int test = 0;
 		for( int i = 0; i < 6; i++ ) {
 			if( axials[i] ) {
 				Titanfall::Bsp::cmBrushSideProperties.emplace_back(1);
 			}
 			else {
+				test++;
 				Titanfall::Bsp::cmBrushSideProperties.emplace_back(0x4000);
 			}
 		}

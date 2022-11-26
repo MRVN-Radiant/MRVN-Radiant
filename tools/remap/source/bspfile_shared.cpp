@@ -242,19 +242,6 @@ Shared::visNode_t Shared::MakeVisTree( std::vector<Shared::visRef_t> refs, float
 
 	node.minmax = minmax;
 
-	// Check if a VisRef is large enough to be our child so it doesnt skew our splitting
-	/* {
-		std::vector<Shared::visRef_t> visRefs = refs;
-		refs.clear();
-
-		for ( Shared::visRef_t &ref : visRefs )
-		{
-			if ( ref.minmax.area() / minmax.area() > 0.7)
-				node.refs.emplace_back( ref );
-			else
-				refs.emplace_back( ref );
-		}
-	}*/
 
 	// Check all possible ways of splitting
 	float bestCost = 0;
@@ -319,34 +306,5 @@ Shared::visNode_t Shared::MakeVisTree( std::vector<Shared::visRef_t> refs, float
 		if( nodeRefs[i].size() != 0)
 			node.children.emplace_back( Shared::MakeVisTree( nodeRefs[i], bestCost ) );
 
-	/*
-	MinMax left = minmax;
-	MinMax right = minmax;
-
-	std::vector<Shared::visRef_t> leftRefs;
-	std::vector<Shared::visRef_t> rightRefs;
-
-	left.mins[bestAxis] = bestPos;
-	right.maxs[bestAxis] = bestPos;
-
-
-	for ( Shared::visRef_t &ref : refs )
-	{
-		if ( ref.minmax.test( left ) )
-		{
-			leftRefs.emplace_back( ref );
-			continue;
-		}
-
-		if ( ref.minmax.test( right ) )
-			rightRefs.emplace_back( ref );
-	}
-	
-
-	if( leftRefs.size() != 0 )
-		node.children.emplace_back( Shared::MakeVisTree( leftRefs, bestCost ) );
-	if( rightRefs.size() != 0 )
-		node.children.emplace_back( Shared::MakeVisTree( rightRefs, bestCost ) );
-	*/
 	return node;
 }
