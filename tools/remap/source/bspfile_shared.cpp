@@ -5,36 +5,46 @@
 
 
 float CalculateSAH( std::vector<Shared::visRef_t> &refs, int axis, float pos[3] ) {
-	// 3 dividers, 4 nodes
-	// minmax | minmax | minmax | minmax 
-	MinMax minmaxs[4] = {};
-	std::size_t counts[4] = {};
+	MinMax parentMinMax;
+	MinMax childMinMaxs[4] = {};
+	std::size_t childRefCounts[4] = {};
 
-	for ( Shared::visRef_t &ref : refs )
-	{
+	// Count and create AABBs from references
+	for ( Shared::visRef_t &ref : refs ) {
+		parentMinMax.extend( ref.minmax );
+
 		float refPos = ref.minmax.maxs[axis];
 		if ( refPos < pos[0] ) {
-			counts[0]++;
-			minmaxs[0].extend( ref.minmax );
+			childRefCounts[0]++;
+			childMinMaxs[0].extend( ref.minmax );
 		}
 		if ( refPos > pos[0] && refPos < pos[1] ) {
-			counts[1]++;
-			minmaxs[1].extend( ref.minmax );
+			childRefCounts[1]++;
+			childMinMaxs[1].extend( ref.minmax );
 		}
 		if ( refPos > pos[1] && refPos < pos[2] ) {
-			counts[2]++;
-			minmaxs[2].extend( ref.minmax );
+			childRefCounts[2]++;
+			childMinMaxs[2].extend( ref.minmax );
 		}
 		if ( refPos > pos[2] ) {
-			counts[3]++;
-			minmaxs[3].extend( ref.minmax );
+			childRefCounts[3]++;
+			childMinMaxs[3].extend( ref.minmax );
 		}
 	}
 
-	float cost = 0;
-	for( int i = 0; i < 4; i++ )
-		if( counts[i] != 0 )
-			cost += counts[i] * minmaxs[i].area();
+	
+	float parentArea = parentMinMax.area();
+
+	float cost = .5f;
+	for ( int i = 0; i < 4; i++ ) {
+		if( childRefCounts[i] != 0 ) {
+			float childArea = childMinMaxs[i].area();
+			cost += childRefCounts[i] * childArea;
+		}
+	}
+
+	cost /= parentArea;
+	//Sys_Printf("%f\n", cost);
 
 	return cost;
 }
@@ -117,7 +127,7 @@ void Shared::MakeMeshes( const entity_t &e )
 	}
 
 	// Loop through patches
-	parseMesh_t *patch;
+	parseMesh_t* patch;
 	patch = e.patches;
 	while( patch != NULL ) {
 		mesh_t patchMesh = patch->mesh;
@@ -132,6 +142,8 @@ void Shared::MakeMeshes( const entity_t &e )
 			vertex.xyz = patchMesh.verts[ index ].xyz;
 			vertex.normal = patchMesh.verts[ index ].normal;
 			vertex.st = patchMesh.verts[ index ].st;
+
+			mesh.minmax.extend( vertex.xyz );
 		}
 		
 		// Make triangles
@@ -224,7 +236,6 @@ void Shared::MakeVisReferences()
 
 	/* Props */
 
-
 	Sys_Printf( "%9zu shared vis references\n", Shared::visRefs.size() );
 }
 
@@ -242,6 +253,16 @@ Shared::visNode_t Shared::MakeVisTree( std::vector<Shared::visRef_t> refs, float
 
 	node.minmax = minmax;
 
+	// Check if a vis ref is large enough to reference directly
+	std::vector<Shared::visRef_t> visRefs = refs;
+	refs.clear();
+	for (Shared::visRef_t& ref : visRefs)
+	{
+		if (minmax.surrounds(ref.minmax) && ref.minmax.area() / minmax.area() > 0.8)
+			node.refs.emplace_back(ref);
+		else
+			refs.emplace_back(ref);
+	}
 
 	// Check all possible ways of splitting
 	float bestCost = 0;
@@ -255,23 +276,27 @@ Shared::visNode_t Shared::MakeVisTree( std::vector<Shared::visRef_t> refs, float
 			for ( std::size_t j = i + 1; j < refs.size(); j++ ) {
 				for ( std::size_t k = j + 1; k < refs.size(); k++ ) {
 					pos[2] = refs.at(k).minmax.mins[axis];
+
+					float cost = CalculateSAH(refs, axis, pos);
+					//Sys_Printf("%f\n", cost);
+					if (cost < bestCost)
+					{
+						bestCost = cost;
+						bestPos[0] = pos[0]; bestPos[1] = pos[1]; bestPos[2] = pos[2];
+						bestAxis = axis;
+					}
 				}
 				pos[1] = refs.at(j).minmax.mins[axis];
 			}
 			pos[0] = refs.at(i).minmax.mins[axis];
 		}
-		
-		float cost = CalculateSAH(refs, axis, pos);
-		if ( cost < bestCost )
-		{
-			bestCost = cost;
-			bestPos[0] = pos[0]; bestPos[1] = pos[1]; bestPos[2] = pos[2];
-			bestAxis = axis;
-		}
 	}
-
+	//Sys_Printf("%f < %f\n", bestCost, parentCost);
 	if ( bestCost >= parentCost )
 	{
+		if( refs.size() > 255 )
+			Sys_FPrintf( SYS_WRN, "CellAABBNode references more than 255 refs\n" );
+
 		for ( Shared::visRef_t &ref : refs )
 			node.refs.emplace_back( ref );
 
@@ -302,8 +327,10 @@ Shared::visNode_t Shared::MakeVisTree( std::vector<Shared::visRef_t> refs, float
 		}
 	}
 
+	//Sys_Printf("%li; %li; %li; %li\n", nodeRefs[0].size(), nodeRefs[1].size(), nodeRefs[2].size(), nodeRefs[3].size());
+
 	for( int i = 0; i < 4; i++ )
-		if( nodeRefs[i].size() != 0)
+		if( nodeRefs[i].size() != 0 )
 			node.children.emplace_back( Shared::MakeVisTree( nodeRefs[i], bestCost ) );
 
 	return node;

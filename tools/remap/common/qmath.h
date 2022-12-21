@@ -63,7 +63,7 @@ struct MinMax___
 		x = maxs.x() - mins.x();
 		y = maxs.y() - mins.y();
 		z = maxs.z() - mins.z();
-		return ( x * y + y  * z + z * x ) * 2;
+		return ( x * y + y * z + z * x ) * 2;
 	}
 	template<typename U>
 	void extend( const MinMax___<U>& other ){
