@@ -759,7 +759,7 @@ shaderInfo_t *ShaderInfoForShader( const char *shaderName ){
 	}
 
 	/* strip off extension */
-	auto shader = String64()( PathExtensionless( shaderName ) );
+	auto shader = String512()( PathExtensionless( shaderName ) );
 
 	/* search for it */
 	deprecationDepth = 0;
@@ -1145,7 +1145,7 @@ static void ParseShaderFile( const char *filename ){
 					/* subclass it */
 					if ( si2 != NULL ) {
 						/* preserve name */
-						const String64 temp = si->shader;
+						const String512 temp = si->shader;
 
 						/* copy shader */
 						*si = *si2;

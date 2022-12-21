@@ -124,7 +124,7 @@ class SkyProbes
 	std::vector<SkyProbe> m_probes;
 public:
 	SkyProbes() = default;
-	SkyProbes( const String64& skyParmsImageBase ){
+	SkyProbes( const String512& skyParmsImageBase ){
 		if( !skyParmsImageBase.empty() ){
 			std::vector<const image_t*> images;
 			for( const auto suffix : { "_lf", "_rt", "_ft", "_bk", "_up", "_dn" } )
@@ -216,7 +216,7 @@ public:
    simulates sky light with multiple suns
  */
 
-static void CreateSkyLights( const skylight_t& skylight, const Vector3& color, float filterRadius, int style, const String64& skyParmsImageBase ){
+static void CreateSkyLights( const skylight_t& skylight, const Vector3& color, float filterRadius, int style, const String512& skyParmsImageBase ){
 	/* dummy check */
 	if ( skylight.value <= 0.0f || skylight.iterations < 2 || skylight.horizon_min > skylight.horizon_max ) {
 		return;

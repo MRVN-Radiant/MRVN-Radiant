@@ -667,8 +667,8 @@ static shaderInfo_t *GetIndexedShader( const shaderInfo_t *parent, const indexMa
 
 	/* get the shader */
 	shaderInfo_t *si = ShaderInfoForShader( ( minShaderIndex == maxShaderIndex )?
-	                            String64()( "textures/", im->shader.c_str(), '_', int(maxShaderIndex) ):
-	                            String64()( "textures/", im->shader.c_str(), '_', int(minShaderIndex), "to", int(maxShaderIndex) ) );
+	                            String512()( "textures/", im->shader.c_str(), '_', int(maxShaderIndex) ):
+	                            String512()( "textures/", im->shader.c_str(), '_', int(minShaderIndex), "to", int(maxShaderIndex) ) );
 
 	/* inherit a few things from parent shader */
 	if ( parent->globalTexture ) {
@@ -762,7 +762,7 @@ mapDrawSurface_t *DrawSurfaceForSide( const entity_t& e, const brush_t& b, const
 	if ( skyFixHack && !strEmpty( si->skyParmsImageBase ) ) {
 		//%	Sys_FPrintf( SYS_VRB, "Enabling sky hack for shader %s using env %s\n", si->shader, si->skyParmsImageBase );
 		for( const auto suffix : { "_lf", "_rt", "_ft", "_bk", "_up", "_dn" } )
-			DrawSurfaceForShader( String64()( si->skyParmsImageBase, suffix ) );
+			DrawSurfaceForShader( String512()( si->skyParmsImageBase, suffix ) );
 	}
 
 	/* ydnar: gs mods */

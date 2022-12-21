@@ -232,7 +232,7 @@ void LoadR2BSPFile(const char* filename)
 			side_t& side = brush.sides.emplace_back();
 			side.plane = plane;
 
-			String64 textureName;
+			String512 textureName;
 			textureName = "NULL";
 
 			side.shaderInfo = new shaderInfo_t;
