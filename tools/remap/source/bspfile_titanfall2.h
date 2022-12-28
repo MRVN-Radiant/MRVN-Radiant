@@ -58,47 +58,13 @@ namespace Titanfall2
 		uint32_t unk5;
 	};
 
-	/* Stubs */
+	namespace Bsp {
+		/* Stubs */
+		inline std::vector<uint8_t> worldLights_stub;
 
-	inline std::vector<uint8_t> bspWorldLights_stub;
+		inline std::vector<uint8_t> lightMapHeaders_stub;
 
-	inline std::vector<uint8_t> bspTricollTris_stub;
-
-	inline std::vector<uint8_t> bspTricollNodes_stub;
-
-	inline std::vector<uint8_t> bspTricollHeaders_stub;
-
-	inline std::vector<uint8_t> bspLightMapHeaders_stub;
-
-	inline std::vector<uint8_t> bspCMGrid_stub;
-
-	inline std::vector<uint8_t> bspCMGridCells_stub;
-
-	inline std::vector<uint8_t> bspCMGridSets_stub;
-
-	inline std::vector<uint8_t> bspCMGeoSetBounds_stub;
-
-	inline std::vector<uint8_t> bspCMPrimitives_stub;
-
-	inline std::vector<uint8_t> bspCMPrimitiveBounds_stub;
-
-	inline std::vector<uint8_t> bspCMUniqueContents_stub;
-
-	inline std::vector<uint8_t> bspCMBrushes_stub;
-
-	inline std::vector<uint8_t> bspCMBrushSideProps_stub;
-
-	inline std::vector<uint8_t> bspCMBrushTexVecs_stub;
-
-	inline std::vector<uint8_t> bspTricollBevelStarts_stub;
-
-	inline std::vector<uint8_t> bspLightMapDataSky_stub;
-
-	inline std::vector<uint8_t> bspCSMAABBNodes_stub;
-
-	inline std::vector<uint8_t> bspCellBSPNodes_stub;
-
-	inline std::vector<uint8_t> bspCells_stub;
-
+		inline std::vector<uint8_t> lightMapDataSky_stub;
+	}
 	inline GameLump_t GameLump;
 }

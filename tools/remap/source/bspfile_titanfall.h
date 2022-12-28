@@ -256,7 +256,6 @@ namespace Titanfall {
 		inline std::vector<LevelInfo_t> levelInfo;
 
 		// Stubs
-		inline std::vector<uint8_t> entities_stub;
 		inline std::vector<uint8_t> physicsCollide_stub;
 		inline std::vector<uint8_t> gameLump_stub;
 		inline std::vector<uint8_t> worldLights_stub;
