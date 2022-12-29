@@ -256,7 +256,7 @@ void ApexLegends::EmitMeshes( const entity_t &e ) {
 
 			if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP )
                 ApexLegends::EmitVertexLitBump( vertex );
-			else if ( mesh.shaderInfo->surfaceFlags & 512 )
+			else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT )
                 ApexLegends::EmitVertexUnlit( vertex );
 			else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS )
                 ApexLegends::EmitVertexUnlitTS( vertex );
@@ -269,7 +269,7 @@ void ApexLegends::EmitMeshes( const entity_t &e ) {
 			uint32_t totalVertices = 0;
 			if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP )
 				totalVertices = ApexLegends::Bsp::vertexLitBumpVertices.size();
-			else if ( mesh.shaderInfo->surfaceFlags & 512 )
+			else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT)
 				totalVertices = ApexLegends::Bsp::vertexUnlitVertices.size();
 			else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS )
 				totalVertices = ApexLegends::Bsp::vertexUnlitTSVertices.size();
@@ -285,7 +285,7 @@ void ApexLegends::EmitMeshes( const entity_t &e ) {
 					vertexIndex = ApexLegends::Bsp::vertexLitBumpVertices.at( j ).vertexIndex;
 					normalIndex = ApexLegends::Bsp::vertexLitBumpVertices.at( j ).normalIndex;
 				}
-				else if ( mesh.shaderInfo->surfaceFlags & 512 ) {
+				else if ( mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) {
 					vertexIndex = ApexLegends::Bsp::vertexUnlitVertices.at( j ).vertexIndex;
 					normalIndex = ApexLegends::Bsp::vertexUnlitVertices.at( j ).normalIndex;
 				}

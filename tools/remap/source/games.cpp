@@ -225,7 +225,7 @@ struct game_apexlegends : game_t
 			{ "sky2d",          0,                          0,                          S_SKY_2D,                   0,                          0,                          0 },
 			{ "sky",            0,                          0,                          S_SKY,                      0,                          0,                          0 },
 			{ "trans",          0,                          0,                          S_TRANSLUCENT,              0,                          0,                          0 },
-			{ "unlit",          0,                          0,                          512,             0,                          0,                          0 },
+			{ "unlit",          0,                          0,                          S_VERTEX_UNLIT,             0,                          0,                          0 },
 			{ "litflat",        0,                          0,                          S_VERTEX_LIT_FLAT,          0,                          0,                          0 },
 			{ "litbump",        0,                          0,                          S_VERTEX_LIT_BUMP,          0,                          0,                          0 },
 			{ "unlitts",        0,                          0,                          S_VERTEX_UNLIT_TS,          0,                          0,                          0 },
