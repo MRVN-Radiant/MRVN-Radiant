@@ -203,6 +203,7 @@ void WriteEntFiles( const char *path ) {
 
 		FILE* file = SafeOpenWrite(name);
 		WriteEntFileHeader(file);
+		Titanfall::Ent::env.emplace_back('\0');
 		SafeWrite(file, Titanfall::Ent::env.data(), Titanfall::Ent::env.size());
 		fclose(file);
 
@@ -215,6 +216,7 @@ void WriteEntFiles( const char *path ) {
 
 		FILE* file = SafeOpenWrite(name);
 		WriteEntFileHeader(file);
+		Titanfall::Ent::fx.emplace_back('\0');
 		SafeWrite(file, Titanfall::Ent::fx.data(), Titanfall::Ent::fx.size());
 		fclose(file);
 
@@ -227,6 +229,7 @@ void WriteEntFiles( const char *path ) {
 
 		FILE* file = SafeOpenWrite(name);
 		WriteEntFileHeader(file);
+		Titanfall::Ent::script.emplace_back('\0');
 		SafeWrite(file, Titanfall::Ent::script.data(), Titanfall::Ent::script.size());
 		fclose(file);
 
@@ -239,6 +242,7 @@ void WriteEntFiles( const char *path ) {
 
 		FILE* file = SafeOpenWrite(name);
 		WriteEntFileHeader(file);
+		Titanfall::Ent::snd.emplace_back('\0');
 		SafeWrite(file, Titanfall::Ent::snd.data(), Titanfall::Ent::snd.size());
 		fclose(file);
 
@@ -251,6 +255,7 @@ void WriteEntFiles( const char *path ) {
 
 		FILE* file = SafeOpenWrite(name);
 		WriteEntFileHeader(file);
+		Titanfall::Ent::spawn.emplace_back('\0');
 		SafeWrite(file, Titanfall::Ent::spawn.data(), Titanfall::Ent::spawn.size());
 		fclose(file);
 
