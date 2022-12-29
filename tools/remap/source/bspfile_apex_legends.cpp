@@ -147,7 +147,7 @@ void WriteR5BSPFile(const char* filename) {
     AddLump(file, header.lumps[R5_LUMP_SURFACE_PROPERTIES],			ApexLegends::Bsp::surfaceProperties_stub);
     AddLump(file, header.lumps[R5_LUMP_BVH_NODES],		           	ApexLegends::Bsp::bvhNodes_stub);
     AddLump(file, header.lumps[R5_LUMP_BVH_LEAF_DATA],		    	ApexLegends::Bsp::bvhNodeLeafData_stub);
-    AddLump(file, header.lumps[R5_LUMP_ENTITY_PARTITIONS],			ApexLegends::Bsp::entityPartitions_stub);
+    AddLump(file, header.lumps[R5_LUMP_ENTITY_PARTITIONS],			Titanfall::Bsp::entityPartitions);
     AddLump(file, header.lumps[R5_LUMP_VERTEX_NORMALS],		    	Titanfall::Bsp::vertexNormals);
     // GameLump Stub
     {
@@ -227,6 +227,8 @@ void CompileR5BSPFile() {
     Shared::MakeVisReferences();
 	Shared::visRoot = Shared::MakeVisTree( Shared::visRefs, 1e30f );
     ApexLegends::EmitVisTree();
+
+    Titanfall::EmitEntityPartitions();
 
     Titanfall::EmitStubs();
     ApexLegends::EmitStubs();
@@ -517,7 +519,32 @@ void ApexLegends::EmitEntity( const entity_t &e ) {
 	std::vector<char> str = { data.begin(), data.end() };
 
 	
-	Titanfall::Bsp::entities.insert( Titanfall::Bsp::entities.end(), str.begin(), str.end() );
+	// env
+	if( striEqualPrefix( e.valueForKey( "classname" ), "light" ) ||
+		striEqualPrefix( e.valueForKey( "classname" ), "color" ) ||
+		striEqualPrefix( e.valueForKey( "classname" ), "fog" ) ||
+		striEqualPrefix( e.valueForKey( "classname" ), "env" ) ) {
+			Titanfall::Ent::env.insert( Titanfall::Ent::env.end(), str.begin(), str.end() );
+	}
+	// fx
+	else if( striEqualPrefix( e.valueForKey( "classname" ), "info_particle" ) ) {
+		Titanfall::Ent::fx.insert( Titanfall::Ent::fx.end(), str.begin(), str.end() );
+	}
+	// script
+	else if( striEqualPrefix( e.valueForKey( "classname" ), "info_target" ) ||
+			 striEqualPrefix( e.valueForKey( "classname" ), "prop_dynamic" ) ||
+			 striEqualPrefix( e.valueForKey( "classname" ), "trigger_hurt" )) {
+				Titanfall::Ent::script.insert( Titanfall::Ent::script.end(), str.begin(), str.end() );
+	}
+	// snd
+	// spawn
+	if( striEqualPrefix( e.valueForKey( "classname" ), "info_" ) ) {
+		Titanfall::Ent::spawn.insert( Titanfall::Ent::spawn.end(), str.begin(), str.end() );
+	}
+	// bsp entity lump
+	else {
+		Titanfall::Bsp::entities.insert( Titanfall::Bsp::entities.end(), str.begin(), str.end() );
+	}
 }
 
 /*
