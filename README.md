@@ -13,7 +13,7 @@ MRVNRadiant is a fork of NetRadiant-custom (GtkRadiant 1.4 &rarr; massive rewrit
 ## Supported games
 - Titanfall Online ( Titanfall Online Revival )
 - Titanfall 2 ( [Northstar](https://northstar.tf) )
-- Apex Legends ( R5Reloaded )
+- Apex Legends ( [R5Reloaded](https://r5reloaded.com/) )
 
 ## Status
 | Game | Coverage | Note |
