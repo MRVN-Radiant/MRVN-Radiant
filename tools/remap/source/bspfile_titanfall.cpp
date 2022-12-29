@@ -409,7 +409,7 @@ void EmitObjReferences() {
 	}*/
 }
 
-std::size_t EmitObjReferences(Shared::visNode_t& node) {
+std::size_t Titanfall::EmitObjReferences(Shared::visNode_t& node) {
 	//Sys_Printf("amongus\n");
 	/*for (std::size_t i = 0; i < Titanfall::Bsp::objReferences.size(); i++)
 		if ( Titanfall::Bsp::objReferences.at( i ) == ref.index )
@@ -445,7 +445,7 @@ uint16_t GetTotalVisNodeChildCount(Shared::visNode_t node) {
 	return count;
 }
 
-int EmitVisChildrenOfTreeNode(Shared::visNode_t node) {
+int Titanfall::EmitVisChildrenOfTreeNode(Shared::visNode_t node) {
 	int index = Titanfall::Bsp::cellAABBNodes.size(); // Index of first child of node
 
 	for (std::size_t i = 0; i < node.children.size(); i++) {
@@ -459,13 +459,13 @@ int EmitVisChildrenOfTreeNode(Shared::visNode_t node) {
 
 		if (n.refs.size())
 		{
-			bn.objRef = EmitObjReferences(n);
+			bn.objRef = Titanfall::EmitObjReferences(n);
 			bn.objRefCount = n.refs.size();
 		}
 	}
 
 	for (std::size_t i = 0; i < node.children.size(); i++) {
-		int firstChild = EmitVisChildrenOfTreeNode(node.children.at(i));
+		int firstChild = Titanfall::EmitVisChildrenOfTreeNode(node.children.at(i));
 
 		Titanfall::CellAABBNode_t& bn = Titanfall::Bsp::cellAABBNodes.at(index + i);
 		bn.firstChild = firstChild;

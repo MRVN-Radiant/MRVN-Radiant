@@ -21,6 +21,9 @@ namespace ApexLegends {
 	void EmitVertexLitFlat( Shared::Vertex_t &vertex );
 	void EmitVertexLitBump( Shared::Vertex_t &vertex );
 	void EmitVertexUnlitTS( Shared::Vertex_t &vertex );
+	std::size_t EmitObjReferences( Shared::visNode_t& node );
+	int EmitVisChildrenOfTreeNode( Shared::visNode_t node );
+	void EmitVisTree();
 
 
 	using Vertex_t = Vector3;
@@ -96,6 +99,19 @@ namespace ApexLegends {
 		uint32_t vertexOffset;
 	};
 
+	// 0x77
+	struct CellAABBNode_t {
+		Vector3 mins;
+		uint32_t childCount : 8;
+		uint32_t firstChild : 16;
+		uint32_t childFlags : 8;
+		Vector3 maxs;
+		uint32_t objRefCount : 8;
+		uint32_t objRefOffset : 16;
+		uint32_t objRefFlags : 8;
+	};
+
+
 	// GameLump Stub
 	struct GameLump_Stub_t {
 		uint32_t version = 1;
@@ -115,9 +131,10 @@ namespace ApexLegends {
 		inline std::vector<VertexBlinnPhong_t> vertexBlinnPhongVertices;
 		inline std::vector<uint16_t> meshIndices;
 		inline std::vector<Mesh_t> meshes;
-		inline std::vector<Titanfall::MeshBounds_t> meshBounds;
 		inline std::vector<MaterialSort_t> materialSorts;
-
+		inline std::vector<CellAABBNode_t> cellAABBNodes;
+		inline std::vector<int32_t> objReferences;
+	
 		// Stubs
 		inline std::vector<uint8_t> textureData_stub;
 		inline std::vector<uint8_t> vertices_stub;

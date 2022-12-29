@@ -183,9 +183,9 @@ void WriteR5BSPFile(const char* filename) {
     AddLump(file, header.lumps[R5_LUMP_CSM_AABB_NODES],		    	ApexLegends::Bsp::csmAABBNodes_stub);
     AddLump(file, header.lumps[R5_LUMP_CELL_BSP_NODES],		    	Titanfall::Bsp::cellBSPNodes_stub);
     AddLump(file, header.lumps[R5_LUMP_CELLS],			            Titanfall::Bsp::cells_stub);
-    AddLump(file, header.lumps[R5_LUMP_CELL_AABB_NODES],			ApexLegends::Bsp::cellAABBNodes_stub);
-    AddLump(file, header.lumps[R5_LUMP_OBJ_REFERENCES],			    ApexLegends::Bsp::objReferences_stub);
-    AddLump(file, header.lumps[R5_LUMP_OBJ_REFERENCE_BOUNDS],		ApexLegends::Bsp::objReferenceBounds_stub);
+    AddLump(file, header.lumps[R5_LUMP_CELL_AABB_NODES],			ApexLegends::Bsp::cellAABBNodes);
+    AddLump(file, header.lumps[R5_LUMP_OBJ_REFERENCES],			    ApexLegends::Bsp::objReferences);
+    AddLump(file, header.lumps[R5_LUMP_OBJ_REFERENCE_BOUNDS],		Titanfall::Bsp::objReferenceBounds);
     AddLump(file, header.lumps[R5_LUMP_LIGHTMAP_DATA_RTL_PAGE],		ApexLegends::Bsp::lightmapDataRTLPage_stub);
     AddLump(file, header.lumps[R5_LUMP_LEVEL_INFO],			        ApexLegends::Bsp::levelInfo_stub);
 
@@ -224,8 +224,83 @@ void CompileR5BSPFile() {
 		}
 	}
 
+    Shared::MakeVisReferences();
+	Shared::visRoot = Shared::MakeVisTree( Shared::visRefs, 1e30f );
+    ApexLegends::EmitVisTree();
+
     Titanfall::EmitStubs();
     ApexLegends::EmitStubs();
+}
+
+/*
+    EmitObjReferences
+    emits obj references to the bsp
+*/
+std::size_t ApexLegends::EmitObjReferences( Shared::visNode_t& node ) {
+    for ( Shared::visRef_t& ref : node.refs )
+    {
+        Titanfall::ObjReferenceBounds_t& rb = Titanfall::Bsp::objReferenceBounds.emplace_back();
+        rb.maxs = ref.minmax.maxs;
+        rb.mins = ref.minmax.mins;
+
+        ApexLegends::Bsp::objReferences.emplace_back(ref.index);
+    }
+
+    return ApexLegends::Bsp::objReferences.size() - node.refs.size();
+}
+
+int ApexLegends::EmitVisChildrenOfTreeNode(Shared::visNode_t node) {
+    int index = ApexLegends::Bsp::cellAABBNodes.size(); // Index of first child of node
+
+    for (std::size_t i = 0; i < node.children.size(); i++) {
+        Shared::visNode_t& n = node.children.at(i);
+
+        ApexLegends::CellAABBNode_t& bn = ApexLegends::Bsp::cellAABBNodes.emplace_back();
+        bn.maxs = n.minmax.maxs;
+        bn.mins = n.minmax.mins;
+        bn.childCount = n.children.size();
+        bn.childFlags = 0x40;
+
+        if (n.refs.size())
+        {
+            bn.objRefOffset = ApexLegends::EmitObjReferences(n);
+            bn.objRefCount = n.refs.size();
+            bn.objRefFlags = 0x40;
+        }
+    }
+
+    for (std::size_t i = 0; i < node.children.size(); i++) {
+        int firstChild = ApexLegends::EmitVisChildrenOfTreeNode(node.children.at(i));
+
+        ApexLegends::CellAABBNode_t& bn = ApexLegends::Bsp::cellAABBNodes.at(index + i);
+        bn.firstChild = firstChild;
+    }
+
+    return index;
+}
+
+/*
+    EmitVisTree
+    Emits the vistree to the bsp file
+*/
+void ApexLegends::EmitVisTree() {
+    Shared::visNode_t& root = Shared::visRoot;
+
+    ApexLegends::CellAABBNode_t& bn = ApexLegends::Bsp::cellAABBNodes.emplace_back();
+    bn.maxs = root.minmax.maxs;
+    bn.mins = root.minmax.mins;
+    bn.firstChild = ApexLegends::Bsp::cellAABBNodes.size();
+    bn.childCount = root.children.size();
+    bn.childFlags = 0x40;
+    
+    if (root.refs.size())
+    {
+        bn.objRefOffset = EmitObjReferences(root);
+        bn.objRefCount = root.refs.size();
+        bn.objRefFlags = 0x40;
+    }
+
+    EmitVisChildrenOfTreeNode( Shared::visRoot );
 }
 
 /*
