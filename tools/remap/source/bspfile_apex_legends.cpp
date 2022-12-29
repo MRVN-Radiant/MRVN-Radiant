@@ -412,7 +412,12 @@ uint32_t ApexLegends::EmitTextureData( shaderInfo_t shader ) {
 	if ( index != std::string::npos ) {
 		// Is already saved, find the index of its textureData
 
-        return index;
+        for ( std::size_t i = 0; i < ApexLegends::Bsp::textureData.size(); i++ ) {
+			ApexLegends::TextureData_t &td = ApexLegends::Bsp::textureData.at( i );
+
+			if ( td.surfaceIndex == index )
+				return i;
+		}
 	}
 
 	// Wasn't already saved, save it
