@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bspfile_abstract.h"
+#include "bspfile_shared.h"
 #include "qmath.h"
 #include <cstdint>
 #include "remap.h"

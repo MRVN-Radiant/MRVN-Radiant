@@ -30,7 +30,7 @@
 
 /* dependencies */
 #include "remap.h"
-#include "bspfile_titanfall.h"
+#include "bspfile_abstract.h"
 #include <ctime>
 
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "bspfile_titanfall2.h"
 #include "qmath.h"
 #include <cstdint>
 #include "remap.h"
@@ -14,30 +15,85 @@ namespace ApexLegends {
 
 	void EmitEntity( const entity_t &e );
 	void EmitMeshes( const entity_t &e );
+	uint32_t EmitTextureData( shaderInfo_t shader );
+	uint16_t EmitMaterialSort( uint32_t index );
+	void EmitVertexUnlit( Shared::Vertex_t &vertex );
+	void EmitVertexLitFlat( Shared::Vertex_t &vertex );
+	void EmitVertexLitBump( Shared::Vertex_t &vertex );
+	void EmitVertexUnlitTS( Shared::Vertex_t &vertex );
 
 
 	using Vertex_t = Vector3;
 
 	using VertexNormal_t = Vector3;
 
-	using MeshIndex_t = uint16_t;
+	// 0x02
+	struct TextureData_t {
+		uint32_t surfaceIndex;
+		uint32_t sizeX;
+		uint32_t sizeY;
+		uint32_t flags;
+	};
 
-    struct VertexLitBump_t {
+	// 0x47
+	struct VertexUnlit_t {
+		uint32_t vertexIndex;
+		uint32_t normalIndex;
+		Vector2 uv0;
+		int32_t negativeOne;
+	};
+
+	// 0x48
+	struct VertexLitFlat_t {
+		uint32_t vertexIndex;
+		uint32_t normalIndex;
+		Vector2 uv0;
+		int32_t unknown0;
+	};
+
+	// 0x49
+	struct VertexLitBump_t {
 		uint32_t vertexIndex;
 		uint32_t normalIndex;
 		Vector2 uv0;
 		int32_t negativeOne;
 		Vector2 uv1;
-		char color[4];
+		uint8_t color[4];
 	};
 
-	struct Mesh_t
-	{
-		uint32_t triangleOffset;
-		uint16_t triangleCount;
+	// 0x4A
+	struct VertexUnlitTS_t {
+		uint32_t vertexIndex;
+		uint32_t normalIndex;
+		Vector2 uv0;
+		int32_t unknown0;
+		int32_t unknown1;
+	};
+
+	// 0x4B
+    struct VertexBlinnPhong_t {
+		uint32_t vertexIndex;
+		uint32_t normalIndex;
+		Vector2 uv0;
+		Vector2 uv1;
+	};
+
+	// 0x50
+	struct Mesh_t {
+		uint32_t triOffset;
+		uint16_t triCount;
 		uint16_t unknown[8];
 		uint16_t materialOffset;
 		uint32_t flags;
+	};
+
+	// 0x52
+	struct MaterialSort_t {
+		uint16_t textureData;
+		uint16_t lightmapIndex;
+		uint16_t unknown0;
+		uint16_t unknown1;
+		uint32_t vertexOffset;
 	};
 
 	// GameLump Stub
@@ -51,8 +107,16 @@ namespace ApexLegends {
 	};
 
 	namespace Bsp {
+		inline std::vector<TextureData_t> textureData;
+		inline std::vector<VertexUnlit_t> vertexUnlitVertices;
+		inline std::vector<VertexLitFlat_t> vertexLitFlatVertices;
 		inline std::vector<VertexLitBump_t> vertexLitBumpVertices;
+		inline std::vector<VertexUnlitTS_t> vertexUnlitTSVertices;
+		inline std::vector<VertexBlinnPhong_t> vertexBlinnPhongVertices;
+		inline std::vector<uint16_t> meshIndices;
 		inline std::vector<Mesh_t> meshes;
+		inline std::vector<Titanfall::MeshBounds_t> meshBounds;
+		inline std::vector<MaterialSort_t> materialSorts;
 
 		// Stubs
 		inline std::vector<uint8_t> textureData_stub;
