@@ -12,7 +12,8 @@ void						CompileR5BSPFile();
 namespace ApexLegends {
 	void EmitStubs();
 
-	void EmitMeshes( const entity_t& e );
+	void EmitEntity( const entity_t &e );
+	void EmitMeshes( const entity_t &e );
 
 
 	using Vertex_t = Vector3;
@@ -54,7 +55,6 @@ namespace ApexLegends {
 		inline std::vector<Mesh_t> meshes;
 
 		// Stubs
-		inline std::vector<uint8_t> entities_stub;
 		inline std::vector<uint8_t> textureData_stub;
 		inline std::vector<uint8_t> vertices_stub;
 		inline std::vector<uint8_t> lightprobeParentInfos_stub;
@@ -82,8 +82,6 @@ namespace ApexLegends {
 		inline std::vector<uint8_t> tweakLights_stub;
 		inline std::vector<uint8_t> lightmapDataSky_stub;
 		inline std::vector<uint8_t> csmAABBNodes_stub;
-		inline std::vector<uint8_t> cellBspNodes_stub;
-		inline std::vector<uint8_t> cells_stub;
 		inline std::vector<uint8_t> cellAABBNodes_stub;
 		inline std::vector<uint8_t> objReferences_stub;
 		inline std::vector<uint8_t> objReferenceBounds_stub;

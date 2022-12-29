@@ -136,7 +136,7 @@ void WriteR5BSPFile(const char* filename) {
 	}
 	
 	/* Write lumps */
-	AddLump(file, header.lumps[R5_LUMP_ENTITIES],		        	ApexLegends::Bsp::entities_stub);
+	AddLump(file, header.lumps[R5_LUMP_ENTITIES],		        	Titanfall::Bsp::entities);
     AddLump(file, header.lumps[R5_LUMP_TEXTURE_DATA],	    		ApexLegends::Bsp::textureData_stub);
     AddLump(file, header.lumps[R5_LUMP_VERTICES],		        	ApexLegends::Bsp::vertices_stub);
     AddLump(file, header.lumps[R5_LUMP_LIGHTPROBE_PARENT_INFOS],    ApexLegends::Bsp::lightprobeParentInfos_stub);
@@ -178,8 +178,8 @@ void WriteR5BSPFile(const char* filename) {
     AddLump(file, header.lumps[R5_LUMP_TWEAK_LIGHTS],		    	ApexLegends::Bsp::tweakLights_stub);
     AddLump(file, header.lumps[R5_LUMP_LIGHTMAP_DATA_SKY],			ApexLegends::Bsp::lightmapDataSky_stub);
     AddLump(file, header.lumps[R5_LUMP_CSM_AABB_NODES],		    	ApexLegends::Bsp::csmAABBNodes_stub);
-    AddLump(file, header.lumps[R5_LUMP_CELL_BSP_NODES],		    	ApexLegends::Bsp::cellBspNodes_stub);
-    AddLump(file, header.lumps[R5_LUMP_CELLS],			            ApexLegends::Bsp::cells_stub);
+    AddLump(file, header.lumps[R5_LUMP_CELL_BSP_NODES],		    	Titanfall::Bsp::cellBSPNodes_stub);
+    AddLump(file, header.lumps[R5_LUMP_CELLS],			            Titanfall::Bsp::cells_stub);
     AddLump(file, header.lumps[R5_LUMP_CELL_AABB_NODES],			ApexLegends::Bsp::cellAABBNodes_stub);
     AddLump(file, header.lumps[R5_LUMP_OBJ_REFERENCES],			    ApexLegends::Bsp::objReferences_stub);
     AddLump(file, header.lumps[R5_LUMP_OBJ_REFERENCE_BOUNDS],		ApexLegends::Bsp::objReferenceBounds_stub);
@@ -210,7 +210,7 @@ void CompileR5BSPFile() {
 		entity_t& entity = entities[entityNum];
 		const char* classname = entity.classname();
 
-		//EmitEntity( entity );
+		ApexLegends::EmitEntity( entity );
 
 		/* visible geo */
 		if ( striEqual( classname,"worldspawn" ) )
@@ -221,6 +221,7 @@ void CompileR5BSPFile() {
 		}
 	}
 
+    Titanfall::EmitStubs();
     ApexLegends::EmitStubs();
 }
 
@@ -262,30 +263,30 @@ void ApexLegends::EmitMeshes( const entity_t& e ) {
 }
 
 /*
+   EmitEntity()
+   Saves an entity into it's corresponding .ent file or the lump in the .bsp
+ */
+void ApexLegends::EmitEntity( const entity_t &e ) {
+	StringOutputStream data;
+	data << "{\n";
+	for (const epair_t& pair : e.epairs)
+	{
+		data << "\"" << pair.key.c_str() << "\" \"" << pair.value.c_str() << "\"\n";
+	}
+	data << "}\n";
+
+
+	std::vector<char> str = { data.begin(), data.end() };
+
+	
+	Titanfall::Bsp::entities.insert( Titanfall::Bsp::entities.end(), str.begin(), str.end() );
+}
+
+/*
 	EmitStubs
 	Fills out all the nessesary lumps we dont generate so the map at least boots and we can noclip around
 */
 void ApexLegends::EmitStubs() {
-	// Entities
-	{
-		constexpr std::array<uint8_t, 215> data = {
-			0x7B, 0x0A, 0x22, 0x77, 0x6F, 0x72, 0x6C, 0x64, 0x5F, 0x6D, 0x61, 0x78, 0x73, 0x22, 0x20, 0x22,
-			0x31, 0x32, 0x37, 0x34, 0x39, 0x20, 0x36, 0x33, 0x31, 0x32, 0x20, 0x32, 0x36, 0x30, 0x34, 0x22,
-			0x0A, 0x22, 0x77, 0x6F, 0x72, 0x6C, 0x64, 0x5F, 0x6D, 0x69, 0x6E, 0x73, 0x22, 0x20, 0x22, 0x2D,
-			0x35, 0x36, 0x33, 0x20, 0x2D, 0x38, 0x32, 0x33, 0x30, 0x20, 0x2D, 0x38, 0x32, 0x39, 0x32, 0x22,
-			0x0A, 0x22, 0x73, 0x70, 0x61, 0x77, 0x6E, 0x63, 0x6C, 0x61, 0x73, 0x73, 0x22, 0x20, 0x22, 0x69,
-			0x64, 0x57, 0x6F, 0x72, 0x6C, 0x64, 0x73, 0x70, 0x61, 0x77, 0x6E, 0x22, 0x0A, 0x22, 0x6E, 0x61,
-			0x6D, 0x65, 0x22, 0x20, 0x22, 0x77, 0x6F, 0x72, 0x6C, 0x64, 0x22, 0x0A, 0x22, 0x6C, 0x69, 0x67,
-			0x68, 0x74, 0x70, 0x72, 0x6F, 0x62, 0x65, 0x5F, 0x76, 0x6F, 0x72, 0x6F, 0x6E, 0x6F, 0x69, 0x5F,
-			0x6C, 0x65, 0x61, 0x66, 0x73, 0x69, 0x7A, 0x65, 0x22, 0x20, 0x22, 0x31, 0x22, 0x0A, 0x22, 0x63,
-			0x6C, 0x61, 0x73, 0x73, 0x6E, 0x61, 0x6D, 0x65, 0x22, 0x20, 0x22, 0x77, 0x6F, 0x72, 0x6C, 0x64,
-			0x73, 0x70, 0x61, 0x77, 0x6E, 0x22, 0x0A, 0x22, 0x6D, 0x75, 0x73, 0x69, 0x63, 0x70, 0x6F, 0x73,
-			0x74, 0x66, 0x69, 0x78, 0x22, 0x20, 0x22, 0x57, 0x61, 0x74, 0x65, 0x72, 0x66, 0x72, 0x6F, 0x6E,
-			0x74, 0x22, 0x0A, 0x22, 0x6D, 0x61, 0x70, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x22, 0x20,
-			0x22, 0x33, 0x30, 0x22, 0x0A, 0x7D, 0x0A
-		};
-		ApexLegends::Bsp::entities_stub = { data.begin(), data.end() };
-	}
 	// Texture Data
 	{
 		constexpr std::array<uint8_t, 160> data = {
@@ -1938,20 +1939,6 @@ void ApexLegends::EmitStubs() {
             0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0x00, 0x00, 0x00, 0x00
         };
 		ApexLegends::Bsp::csmAABBNodes_stub = { data.begin(), data.end() };
-	}
-	// Cell BSP Nodes
-	{
-        constexpr std::array<uint8_t, 8> data = {
-            0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00
-        };
-		ApexLegends::Bsp::cellBspNodes_stub = { data.begin(), data.end() };
-	}
-	// Cells
-	{
-        constexpr std::array<uint8_t, 8> data = {
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF
-        };
-		ApexLegends::Bsp::cells_stub = { data.begin(), data.end() };
 	}
 	// Cell AABB Nodes
 	{
