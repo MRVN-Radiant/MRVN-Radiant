@@ -18,9 +18,9 @@ MRVNRadiant is a fork of NetRadiant-custom (GtkRadiant 1.4 &rarr; massive rewrit
 ## Status
 | Game | Coverage | Note |
 |------|----------|------|
-| Titanfall Online | 33% | Basic collision, no lighting, needs testing |
-| Titanfall 2 | 28% | Basic collision, no lighting, meshes flicker |
-| Apex Legends | 9% | Unplayable |
+| Titanfall Online | 38% | Basic collision, no lighting, needs testing |
+| Titanfall 2 | 37% | Basic collision, no lighting, meshes flicker |
+| Apex Legends | 25% | No collision, no lighting |
 
 > Coverage = Lumps generated / Total lump count. Stubbed lumps arent counted because they're not custom.
 
