@@ -30,7 +30,7 @@
 
 /* dependencies */
 #include "remap.h"
-#include "bspfile_titanfall.h"
+#include "bspfile_abstract.h"
 #include <ctime>
 
 
@@ -176,6 +176,22 @@ void WriteBSPFile( const char *filename ){
 }
 
 /*
+	WriteEntFileHeader()
+*/
+void WriteEntFileHeader( FILE *file ) {
+	// Apex Legends
+	if( g_game->bspVersion == 47 ) {
+		char message[] = "ENTITIES02 num_models=2\n";
+		SafeWrite(file, &message, sizeof(message) - 1);
+	} 
+	// Titanfall
+	else {
+		char message[] = "ENTITIES01\n";
+		SafeWrite( file, &message, sizeof(message) - 1 );
+	}
+}
+
+/*
 	WriteEntFiles()
 	Writes .ent files used by .bsp
 */
@@ -186,8 +202,7 @@ void WriteEntFiles( const char *path ) {
 		Sys_Printf( "Writing %s... ", name.c_str() );
 
 		FILE* file = SafeOpenWrite(name);
-		char message[] = "ENTITIES01\n";
-		SafeWrite(file, &message, sizeof(message) - 1);
+		WriteEntFileHeader(file);
 		SafeWrite(file, Titanfall::Ent::env.data(), Titanfall::Ent::env.size());
 		fclose(file);
 
@@ -199,8 +214,7 @@ void WriteEntFiles( const char *path ) {
 		Sys_Printf( "Writing %s... ", name.c_str() );
 
 		FILE* file = SafeOpenWrite(name);
-		char message[] = "ENTITIES01\n";
-		SafeWrite(file, &message, sizeof(message) - 1);
+		WriteEntFileHeader(file);
 		SafeWrite(file, Titanfall::Ent::fx.data(), Titanfall::Ent::fx.size());
 		fclose(file);
 
@@ -212,8 +226,7 @@ void WriteEntFiles( const char *path ) {
 		Sys_Printf( "Writing %s... ", name.c_str() );
 
 		FILE* file = SafeOpenWrite(name);
-		char message[] = "ENTITIES01\n";
-		SafeWrite(file, &message, sizeof(message) - 1);
+		WriteEntFileHeader(file);
 		SafeWrite(file, Titanfall::Ent::script.data(), Titanfall::Ent::script.size());
 		fclose(file);
 
@@ -225,8 +238,7 @@ void WriteEntFiles( const char *path ) {
 		Sys_Printf( "Writing %s... ", name.c_str() );
 
 		FILE* file = SafeOpenWrite(name);
-		char message[] = "ENTITIES01\n";
-		SafeWrite(file, &message, sizeof(message) - 1);
+		WriteEntFileHeader(file);
 		SafeWrite(file, Titanfall::Ent::snd.data(), Titanfall::Ent::snd.size());
 		fclose(file);
 
@@ -238,8 +250,7 @@ void WriteEntFiles( const char *path ) {
 		Sys_Printf( "Writing %s... ", name.c_str() );
 
 		FILE* file = SafeOpenWrite(name);
-		char message[] = "ENTITIES01\n";
-		SafeWrite(file, &message, sizeof(message) - 1);
+		WriteEntFileHeader(file);
 		SafeWrite(file, Titanfall::Ent::spawn.data(), Titanfall::Ent::spawn.size());
 		fclose(file);
 

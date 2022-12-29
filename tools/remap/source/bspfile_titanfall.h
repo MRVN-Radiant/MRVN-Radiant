@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bspfile_abstract.h"
+#include "bspfile_shared.h"
 #include "qmath.h"
 #include <cstdint>
 #include "remap.h"
@@ -26,6 +26,9 @@ namespace Titanfall {
 	void EmitVertexUnlitTS( Shared::Vertex_t &vertex );
 	void EmitVertexBlinnPhong( Shared::Vertex_t &vertex );
 	void EmitMeshes( const entity_t &e );
+	std::size_t EmitObjReferences( Shared::visNode_t& node );
+	int EmitVisChildrenOfTreeNode( Shared::visNode_t node );
+	void EmitVisTree();
 	uint16_t EmitMaterialSort( uint32_t index );
 	void EmitCollisionGrid();
 	void EmitBrushes( const entity_t &e );

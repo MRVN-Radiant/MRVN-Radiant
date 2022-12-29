@@ -1,5 +1,7 @@
 #pragma once
 
+#include "remap.h"
+
 /*
 	Stores things supported bsp versions share
 
