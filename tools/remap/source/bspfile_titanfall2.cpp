@@ -417,7 +417,7 @@ void CompileR2BSPFile()
 	/**/
 	Shared::MakeVisReferences();
 	Shared::visRoot = Shared::MakeVisTree( Shared::visRefs, 1e30f );
-	EmitVisTree();
+	Titanfall::EmitVisTree();
 
 	/* Emit LevelInfo */
 	Titanfall::EmitLevelInfo();
