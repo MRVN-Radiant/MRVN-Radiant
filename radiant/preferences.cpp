@@ -373,7 +373,7 @@ void CGameDialog::Init(){
 
 	CGameDescription* currentGameDescription = 0;
 
-	if ( !m_bGamePrompt ) {
+	if ( false/*!m_bGamePrompt*/ ) {
 		// search by .game name
 		std::list<CGameDescription *>::iterator iGame;
 		for ( iGame = mGames.begin(); iGame != mGames.end(); ++iGame )
