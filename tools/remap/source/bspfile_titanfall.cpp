@@ -255,38 +255,45 @@ void CompileR1BSPFile() {
 void Titanfall::EmitEntity(const entity_t &e) {
     StringOutputStream data;
     data << "{\n";
-    for (const epair_t& pair : e.epairs) {
+    for (const epair_t& pair : e.epairs)
         data << "\"" << pair.key.c_str() << "\" \"" << pair.value.c_str() << "\"\n";
-    }
     data << "}\n";
 
     std::vector<char> str = { data.begin(), data.end() };
 
     // TODO: un-hardcode this. somehow...
-    if (striEqualPrefix(e.valueForKey("classname"), "light")
-     || striEqualPrefix(e.valueForKey("classname"), "color")
-     || striEqualPrefix(e.valueForKey("classname"), "fog")
-     || striEqualPrefix(e.valueForKey("classname"), "env")) {
-        // env
+    // NOTE: classname -> editorclass & exclusions should have already been done
+    // -- e.g. prop_static -> game lump, light -> worldlights
+    const char *classname = e.classname();
+    #define ENT_IS(x)  striEqual(classname, x)
+    #define ENT_STARTS(x)  striEqualPrefix(classname, x)
+    // env
+    if (ENT_IS("env_fog_controler") || ENT_IS("sky_camera")) {
         Titanfall::Ent::env.insert(Titanfall::Ent::env.end(), str.begin(), str.end());
-    } else if (striEqualPrefix(e.valueForKey("classname"), "info_particle")) {
-        // fx
+    // fx
+    } else if (ENT_IS("beam_spotlight") || ENT_IS("env_sprite_clientside") || ENT_IS("info_particle_system")) {
+        // TODO: info_target (editorclass="info_target_fx")
+        // TODO: info_target_clientside (editorclass="info_target_fx_clientside")
         Titanfall::Ent::fx.insert(Titanfall::Ent::fx.end(), str.begin(), str.end());
-    } else if (striEqualPrefix(e.valueForKey("classname"), "info_target")
-          || striEqualPrefix(e.valueForKey("classname"), "prop_dynamic")
-          || striEqualPrefix(e.valueForKey("classname"), "trigger_hurt")) {
-        // script
+    // script
+    } else if (ENT_IS("assault_assaultpoint") || ENT_IS("info_hardpoint")     || ENT_IS("info_hint")
+            || ENT_STARTS("info_node")        || ENT_IS("info_target")        || ENT_IS("info_target_clientside")
+            || ENT_IS("path_track")           || ENT_IS("prop_control_panel") || ENT_IS("prop_dynamic")
+            || ENT_IS("prop_refuel_pump")     || ENT_IS("script_ref")         || ENT_IS("traverse")) {
         Titanfall::Ent::script.insert(Titanfall::Ent::script.end(), str.begin(), str.end());
-    }
-        // TODO: snd
-    if (striEqualPrefix(e.valueForKey("classname"), "info_")) {
-        // spawn
+    // snd
+    } else if (ENT_IS("ambient_generic")) {
+        Titanfall::Ent::script.insert(Titanfall::Ent::snd.end(), str.begin(), str.end());
+    // spawn
+    } else if (ENT_IS("info_frontline") || ENT_STARTS("info_spawnpoint_")) {
         Titanfall::Ent::spawn.insert(Titanfall::Ent::spawn.end(), str.begin(), str.end());
     }
     else {
         // bsp entity lump
         Titanfall::Bsp::entities.insert(Titanfall::Bsp::entities.end(), str.begin(), str.end());
     }
+    #undef ENT_IS
+    #undef ENT_STARTS
 }
 
 
