@@ -187,7 +187,7 @@ void WriteR5BSPFile(const char* filename) {
     AddLump(file, header.lumps[R5_LUMP_OBJ_REFERENCES],			    ApexLegends::Bsp::objReferences);
     AddLump(file, header.lumps[R5_LUMP_OBJ_REFERENCE_BOUNDS],		Titanfall::Bsp::objReferenceBounds);
     AddLump(file, header.lumps[R5_LUMP_LIGHTMAP_DATA_RTL_PAGE],		ApexLegends::Bsp::lightmapDataRTLPage_stub);
-    AddLump(file, header.lumps[R5_LUMP_LEVEL_INFO],			        ApexLegends::Bsp::levelInfo_stub);
+    AddLump(file, header.lumps[R5_LUMP_LEVEL_INFO],			        ApexLegends::Bsp::levelInfo);
 
 
 	/* emit bsp size */
@@ -229,6 +229,8 @@ void CompileR5BSPFile() {
     ApexLegends::EmitVisTree();
 
     Titanfall::EmitEntityPartitions();
+
+    ApexLegends::EmitLevelInfo();
 
     Titanfall::EmitStubs();
     ApexLegends::EmitStubs();
@@ -552,6 +554,19 @@ void ApexLegends::EmitEntity( const entity_t &e ) {
 	}
 }
 
+/*
+    EmitLevelInfo
+    Emits apex level info
+*/
+void ApexLegends::EmitLevelInfo() {
+    ApexLegends::LevelInfo_t &li = ApexLegends::Bsp::levelInfo.emplace_back();
+    li.unk0 = 51;
+    li.unk1 = 51;
+    li.unk2 = 51;
+    li.unk3 = 256;
+    li.unk4 = 22;
+    li.modelCount = 2;
+}
 /*
 	EmitStubs
 	Fills out all the nessesary lumps we dont generate so the map at least boots and we can noclip around
@@ -2254,14 +2269,5 @@ void ApexLegends::EmitStubs() {
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
 		ApexLegends::Bsp::lightmapDataRTLPage_stub = { data.begin(), data.end() };
-	}
-	// Level Info
-	{
-        constexpr std::array<uint8_t, 36> data = {
-            0x33, 0x00, 0x00, 0x00, 0x33, 0x00, 0x00, 0x00, 0x33, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
-            0x16, 0x00, 0x00, 0x00, 0xEB, 0xD3, 0x05, 0x3F, 0xC8, 0xEB, 0x8B, 0x3E, 0x62, 0xB7, 0x4E, 0xBF,
-            0x01, 0x00, 0x00, 0x00
-        };
-		ApexLegends::Bsp::levelInfo_stub = { data.begin(), data.end() };
 	}
 }

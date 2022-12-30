@@ -181,8 +181,8 @@ void WriteBSPFile( const char *filename ){
 void WriteEntFileHeader( FILE *file ) {
 	// Apex Legends
 	if( g_game->bspVersion == 47 ) {
-		char message[] = "ENTITIES02 num_models=2\n";
-		SafeWrite(file, &message, sizeof(message) - 1);
+		std::string message = "ENTITIES02 num_models=" + std::to_string( ApexLegends::Bsp::levelInfo.at(0).modelCount ) + "\n";
+		SafeWrite( file, message.c_str(), message.size() );
 	} 
 	// Titanfall
 	else {

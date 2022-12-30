@@ -24,6 +24,7 @@ namespace ApexLegends {
 	std::size_t EmitObjReferences( Shared::visNode_t& node );
 	int EmitVisChildrenOfTreeNode( Shared::visNode_t node );
 	void EmitVisTree();
+	void EmitLevelInfo();
 
 
 	using Vertex_t = Vector3;
@@ -111,6 +112,17 @@ namespace ApexLegends {
 		uint32_t objRefFlags : 8;
 	};
 
+	// 0x7B
+	struct LevelInfo_t {
+		int32_t unk0;
+		int32_t unk1;
+		int32_t unk2;
+		int32_t unk3;
+		int32_t unk4;
+		float unk5[3];
+		int32_t modelCount;
+	};
+
 
 	// GameLump Stub
 	struct GameLump_Stub_t {
@@ -134,6 +146,7 @@ namespace ApexLegends {
 		inline std::vector<MaterialSort_t> materialSorts;
 		inline std::vector<CellAABBNode_t> cellAABBNodes;
 		inline std::vector<int32_t> objReferences;
+		inline std::vector<LevelInfo_t> levelInfo;
 	
 		// Stubs
 		inline std::vector<uint8_t> textureData_stub;
@@ -167,6 +180,5 @@ namespace ApexLegends {
 		inline std::vector<uint8_t> objReferences_stub;
 		inline std::vector<uint8_t> objReferenceBounds_stub;
 		inline std::vector<uint8_t> lightmapDataRTLPage_stub;
-		inline std::vector<uint8_t> levelInfo_stub;
 	}
 }
