@@ -990,9 +990,80 @@ void TextureBrowser_Selection_MouseUp( TextureBrowser& textureBrowser, guint32 f
 		IShader* shader = Texture_At( textureBrowser, pointx, textureBrowser.height - 1 - pointy );
 		if ( shader != 0 ) {
 			if ( shader->IsDefault() ) {
-				globalWarningStream() << shader->getName() << " is not a shader, it's a texture.\n";
+				globalWarningStream() << "WARNING: " << shader->getName() << " is not a shader, it's a texture.\n";
+
+				StringOutputStream shaderPath;
+				shaderPath << GlobalRadiant().getGameDescriptionKeyValue( "shaderpath" ) << "/";
+				if( string_equal_prefix( shader->getName(), "textures/tools") )
+					shaderPath << "tools.shader";
+				else
+					shaderPath << "common.shader";
+
+
+				ModalDialog dialog;
+
+				GtkWindow* window = create_fixedsize_modal_dialog_window( 0, "Create shader", dialog );
+				{
+					// Main vbox
+					GtkWidget* vbox = gtk_vbox_new(false, false);
+					gtk_widget_show(vbox);
+					gtk_container_add(GTK_CONTAINER(window), vbox);
+
+					// Not a shader label
+					StringOutputStream textureLabel;
+					textureLabel << "\"" << shader->getName() << "\" isn't a shader!";
+					GtkWidget* label = gtk_label_new(textureLabel.c_str());
+					gtk_widget_show(label);
+					gtk_box_pack_start(GTK_BOX(vbox), label, false, false, 15);
+
+					// Would you like to create shader label
+					StringOutputStream shaderLabel;
+					shaderLabel << "Would you like to create a shader definition in:";
+					label = gtk_label_new(shaderLabel.c_str());
+					gtk_widget_show(label);
+					gtk_box_pack_start(GTK_BOX(vbox), label, false, false, 0);
+
+					// Shader path
+					StringOutputStream pathLabel;
+					pathLabel << "\"" << EnginePath_get() << GlobalRadiant().getGameName() << "/" << shaderPath << "\"?";
+					label = gtk_label_new(pathLabel.c_str());
+					gtk_widget_show(label);
+					gtk_box_pack_start(GTK_BOX(vbox), label, false, false, 0);
+
+					// Bottom dialog bar buttons hbox
+					GtkWidget* hbox = gtk_hbox_new(false, false);
+					gtk_widget_show(hbox);
+					gtk_box_pack_start(GTK_BOX(vbox), hbox, false, false, 2);
+					{
+						GtkButton* cancel = create_dialog_button("Cancel", G_CALLBACK(dialog_button_cancel), &dialog);
+						gtk_box_pack_start(GTK_BOX(hbox), GTK_WIDGET(cancel), false, false, 0);
+						gtk_box_set_child_packing(GTK_BOX(hbox), GTK_WIDGET(cancel), false, false, 0, GTK_PACK_END);
+						widget_make_default(GTK_WIDGET(cancel));
+
+						GtkButton* create = create_dialog_button("Create", G_CALLBACK(dialog_button_ok), &dialog);
+						gtk_box_pack_start(GTK_BOX(hbox), GTK_WIDGET(create), false, false, 0);
+						gtk_box_set_child_packing(GTK_BOX(hbox), GTK_WIDGET(create), false, false, 0, GTK_PACK_END);
+					}
+				}
+
+				// User wants to create shader definition
+				if ( modal_dialog_show( window, dialog ) == eIDOK ) {
+					StringOutputStream filename;
+					filename << EnginePath_get() << GlobalRadiant().getGameName() << "/" << shaderPath;
+
+					TextFileOutputStream file(filename.c_str(), true);
+					if (!file.failed()) {
+						file << "\n\n" << shader->getName() << "\n{\n\t\n}";
+						file.close();
+						globalOutputStream() << "Created shader definition. Please reload shaders to see the changes in editor!";
+						DoShaderView( shaderPath.c_str(), shader->getName(), (flags & GDK_CONTROL_MASK) != 0);
+					} else {
+						globalErrorStream() << "Failed to cerate shader definition!";
+					}
+				}
 			}
 			else{
+				globalErrorStream() << shader->getShaderFileName();
 				DoShaderView( shader->getShaderFileName(), shader->getName(), ( flags & GDK_CONTROL_MASK ) != 0 );
 			}
 		}

@@ -52,13 +52,17 @@ class TextFileOutputStream : public TextOutputStream
 {
 	FILE* m_file;
 public:
-	TextFileOutputStream( const char* name ){
-		m_file = name[0] == '\0' ? 0 : fopen( name, "wt" );
+	TextFileOutputStream( const char* name, bool append = false ){
+		m_file = name[0] == '\0' ? 0 : fopen( name, append ? "awt" : "wt" );
 	}
 	~TextFileOutputStream(){
 		if ( !failed() ) {
 			fclose( m_file );
 		}
+	}
+
+	void close() {
+		fclose( m_file );
 	}
 
 	bool failed() const {
