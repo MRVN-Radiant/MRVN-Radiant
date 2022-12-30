@@ -1899,4 +1899,7 @@ void LoadShaderInfo(){
 
 	/* emit some statistics */
 	Sys_FPrintf( SYS_VRB, "%9d shaderInfo\n", numShaderInfo );
+
+	if( numShaderInfo == 0 )
+		Sys_FPrintf( SYS_WRN, "WARNING: 0 shaders loaded! Make sure you setup your shader directory and shader definitions properly!\n" );
 }
