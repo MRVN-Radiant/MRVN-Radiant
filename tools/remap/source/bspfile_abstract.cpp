@@ -375,38 +375,25 @@ void InjectCommandLine( const char *stage, const std::vector<const char *>& args
    pairs to the data created by the map editor
 */
 void UnparseEntities() {
-    StringOutputStream data( 8192 );
-
-    /* run through entity list */
-    for ( std::size_t i = 0; i < numBSPEntities && i < entities.size(); ++i ) {
-        const entity_t& e = entities[ i ];
-        /* get epair */
-        if ( e.epairs.empty() ) {
-            continue;   /* ent got removed */
-        }
+    StringOutputStream data(8192);
+    for (std::size_t i = 0; i < numBSPEntities && i < entities.size(); ++i) {  // run through entity list
+        const entity_t& e = entities[i];
+        if (e.epairs.empty())
+            continue;  // ent got removed
         /* ydnar: certain entities get stripped from bsp file */
         const char *classname = e.classname();
-        if ( striEqual( classname, "misc_model" )
-          || striEqual( classname, "_decal" )
-          || striEqual( classname, "_skybox" ) ) {
+        #define ENT_IS(x)  striEqual(classname, x)
+        if (ENT_IS("misc_model") || ENT_IS("_decal") || ENT_IS("_skybox"))
             continue;
-        }
+        #undef ENT_IS
 
-        /* add beginning brace */
         data << "{\n";
-
-        /* walk epair list */
-        for ( const auto& ep : e.epairs ) {
-            /* copy and clean */
-            data << '\"' << StripTrailing( ep.key.c_str() ) << "\" \"" << StripTrailing( ep.value.c_str() ) << "\"\n";
-        }
-
-        /* add trailing brace */
+        for (const auto& ep : e.epairs)
+            data << '\"' << StripTrailing(ep.key.c_str()) << "\" \"" << StripTrailing(ep.value.c_str()) << "\"\n";
         data << "}\n";
     }
 
-    /* save out */
-    bspEntData = { data.begin(), data.end() + 1 }; // include '\0'
+    bspEntData = { data.begin(), data.end() + 1 };  // include '\0'
 }
 
 
@@ -414,10 +401,10 @@ void UnparseEntities() {
    PrintEntity()
    prints an entity's epairs to the console
 */
-void PrintEntity( const entity_t *ent ) {
-    Sys_Printf( "------- entity %p -------\n", ent );
-    for ( const auto& ep : ent->epairs )
-        Sys_Printf( "%s = %s\n", ep.key.c_str(), ep.value.c_str() );
+void PrintEntity(const entity_t *ent) {
+    Sys_Printf("------- entity %p -------\n", ent);
+    for (const auto& ep : ent->epairs)
+        Sys_Printf("%s = %s\n", ep.key.c_str(), ep.value.c_str());
 }
 
 
