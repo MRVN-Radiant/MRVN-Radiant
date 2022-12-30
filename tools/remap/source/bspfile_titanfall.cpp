@@ -253,6 +253,57 @@ void CompileR1BSPFile() {
    Saves an entity into it's corresponding .ent file or the lump in the .bsp
 */
 void Titanfall::EmitEntity(const entity_t &e) {
+    // TODO: un-hardcode this. somehow...
+    // temporary enums
+    #define ENT_BSP     0
+    #define ENT_ENV     1
+    #define ENT_FX      2
+    #define ENT_SCRIPT  3
+    #define ENT_SND     4
+    #define ENT_SPAWN   5
+    int dest = ENT_BSP;  // deferred write
+    const char *classname = e.classname();
+    #define ENT_IS(x)  striEqual(classname, x)
+    #define ENT_STARTS(x)  striEqualPrefix(classname, x)
+    #define EDITORCLASS(x, y)  if (ENT_IS(y)) { e.setKeyValue("classname", x); e.setKeyValue("editorclass", y); }
+    if (ENT_IS("env_fog_controler") || ENT_IS("sky_camera")) {
+        dest = ENT_ENV;
+    } else if (ENT_IS("beam_spotlight")
+            || ENT_IS("env_sprite_clientside")
+            || ENT_IS("info_target_fx")
+            || ENT_IS("info_target_fx_clientside")
+            || ENT_IS("info_particle_system")) {
+        dest = ENT_FX;
+        // classname -> editorclass
+        EDITORCLASS("info_target", "info_target_fx")
+        else EDITORCLASS("info_target_clientside", "info_target_fx_clientside")
+    } else if (ENT_IS("assault_assaultpoint")
+            || ENT_IS("info_hardpoint")
+            || ENT_IS("info_hint")
+            || ENT_STARTS("info_node")
+            || ENT_IS("info_target")
+            || ENT_IS("info_target_clientside")
+            || ENT_IS("path_track")
+            || ENT_IS("prop_control_panel")
+            || ENT_IS("prop_dynamic")
+            || ENT_IS("prop_refuel_pump")
+            || ENT_IS("script_ref")
+            || ENT_IS("traverse")) {
+        dest = ENT_SCRIPT;
+    } else if (ENT_IS("ambient_generic")) {
+        dest = ENT_SND;
+    } else if (ENT_IS("info_frontline") || ENT_STARTS("info_spawnpoint_")) {
+        dest = ENT_SPAWN;
+    // TODO: filter out compiled ents here
+    // e.g. prop_static, env_cubemap, info_lightprobe, light (static worldlights), etc.
+    } else {
+        dest = ENT_BSP;
+    }
+    #undef ENT_IS
+    #undef ENT_STARTS
+    #undef EDITORCLASS
+
+    // write
     StringOutputStream data;
     data << "{\n";
     for (const epair_t& pair : e.epairs)
@@ -261,39 +312,29 @@ void Titanfall::EmitEntity(const entity_t &e) {
 
     std::vector<char> str = { data.begin(), data.end() };
 
-    // TODO: un-hardcode this. somehow...
-    // NOTE: classname -> editorclass & exclusions should have already been done
-    // -- e.g. prop_static -> game lump, light -> worldlights
-    const char *classname = e.classname();
-    #define ENT_IS(x)  striEqual(classname, x)
-    #define ENT_STARTS(x)  striEqualPrefix(classname, x)
-    // env
-    if (ENT_IS("env_fog_controler") || ENT_IS("sky_camera")) {
-        Titanfall::Ent::env.insert(Titanfall::Ent::env.end(), str.begin(), str.end());
-    // fx
-    } else if (ENT_IS("beam_spotlight") || ENT_IS("env_sprite_clientside") || ENT_IS("info_particle_system")) {
-        // TODO: info_target (editorclass="info_target_fx")
-        // TODO: info_target_clientside (editorclass="info_target_fx_clientside")
-        Titanfall::Ent::fx.insert(Titanfall::Ent::fx.end(), str.begin(), str.end());
-    // script
-    } else if (ENT_IS("assault_assaultpoint") || ENT_IS("info_hardpoint")     || ENT_IS("info_hint")
-            || ENT_STARTS("info_node")        || ENT_IS("info_target")        || ENT_IS("info_target_clientside")
-            || ENT_IS("path_track")           || ENT_IS("prop_control_panel") || ENT_IS("prop_dynamic")
-            || ENT_IS("prop_refuel_pump")     || ENT_IS("script_ref")         || ENT_IS("traverse")) {
-        Titanfall::Ent::script.insert(Titanfall::Ent::script.end(), str.begin(), str.end());
-    // snd
-    } else if (ENT_IS("ambient_generic")) {
-        Titanfall::Ent::script.insert(Titanfall::Ent::snd.end(), str.begin(), str.end());
-    // spawn
-    } else if (ENT_IS("info_frontline") || ENT_STARTS("info_spawnpoint_")) {
-        Titanfall::Ent::spawn.insert(Titanfall::Ent::spawn.end(), str.begin(), str.end());
+    #define ENT_APPEND(x)  Titanfall::Ent::x.insert(Titanfall::Ent::x.end(), str.begin(), str.end()); break
+    switch (dest) {
+        case ENT_BSP:
+            Titanfall::Bsp::entities.insert(Titanfall::Bsp::entities.end(), str.begin(), str.end());
+        case ENT_ENV:
+            ENT_APPEND(env);
+        case ENT_FX:
+            ENT_APPEND(fx);
+        case ENT_SCRIPT:
+            ENT_APPEND(script);
+        case ENT_SND:
+            ENT_APPEND(snd);
+        case ENT_SPAWN:
+            ENT_APPEND(spawn);
+        // NOTE: default should never be hit
     }
-    else {
-        // bsp entity lump
-        Titanfall::Bsp::entities.insert(Titanfall::Bsp::entities.end(), str.begin(), str.end());
-    }
-    #undef ENT_IS
-    #undef ENT_STARTS
+    #undef ENT_APPEND
+    #undef ENT_BSP
+    #undef ENT_ENV
+    #undef ENT_FX
+    #undef ENT_SCRIPT
+    #undef ENT_SND
+    #undef ENT_SPAWN
 }
 
 
