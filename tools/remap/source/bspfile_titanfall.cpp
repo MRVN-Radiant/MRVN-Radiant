@@ -360,7 +360,7 @@ void Titanfall::EmitTriggerBrushPlaneKeyValues(entity_t &e) {
             StringOutputStream key;
             key << "*trigger_brush_"
                 << b
-                << "_plane_"w
+                << "_plane_"
                 << s;
 
             StringOutputStream value;
