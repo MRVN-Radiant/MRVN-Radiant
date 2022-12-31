@@ -253,7 +253,6 @@ void CompileR1BSPFile() {
    Saves an entity into it's corresponding .ent file or the lump in the .bsp
 */
 void Titanfall::EmitEntity(const entity_t &e) {
-    // TODO: un-hardcode this. somehow...
     // temporary enums
     #define ENT_BSP     0
     #define ENT_ENV     1
@@ -261,11 +260,16 @@ void Titanfall::EmitEntity(const entity_t &e) {
     #define ENT_SCRIPT  3
     #define ENT_SND     4
     #define ENT_SPAWN   5
+
     int dest = ENT_BSP;  // deferred write
     const char *classname = e.classname();
-    #define ENT_IS(x)  striEqual(classname, x)
-    #define ENT_STARTS(x)  striEqualPrefix(classname, x)
-    #define EDITORCLASS(x, y)  if (ENT_IS(y)) { e.setKeyValue("classname", x); e.setKeyValue("editorclass", y); }
+    entity_t e2 = (entity_t)e;  // stripping const so we can make changes
+
+    // NOTE: key string compares also exist as methods but we really need to unroll all those function calls
+    // -- resist the urge to optimise all these string compares, there are more important jobs to do.
+    #define ENT_IS(x)          striEqual(classname, x)
+    #define ENT_STARTS(x)      striEqualPrefix(classname, x)
+    #define EDITORCLASS(x, y)  if (ENT_IS(y)) { e2.setKeyValue("classname", x); e2.setKeyValue("editorclass", y); }
     if (ENT_IS("env_fog_controler")
      || ENT_IS("sky_camera")) {
         dest = ENT_ENV;
@@ -296,19 +300,22 @@ void Titanfall::EmitEntity(const entity_t &e) {
     } else if (ENT_IS("info_frontline")
             || ENT_STARTS("info_spawnpoint_")) {
         dest = ENT_SPAWN;
-    // TODO: filter out compiled ents here
-    // e.g. prop_static, env_cubemap, info_lightprobe, light (static worldlights), etc.
     } else {
+        // TODO: filter out editor only entities *just* before this else
+        // e.g. prop_static, env_cubemap, info_lightprobe, light (static worldlights), etc.
+        // !!! and make sure those entities still get used for the appropriate lumps !!!
         dest = ENT_BSP;
     }
     #undef ENT_IS
     #undef ENT_STARTS
     #undef EDITORCLASS
 
+    // TODO: general entity edits (e.g. float angle (Yaw) -> float[3] angles (Pitch Yaw Roll))
+
     // write
-    StringOutputStream data;
+    StringOutputStream  data;
     data << "{\n";
-    for (const epair_t& pair : e.epairs) {
+    for (const epair_t& pair : e2.epairs) {  // e2 to get editorclass changes
         data << "\"" << pair.key.c_str() << "\" \"" << pair.value.c_str() << "\"\n";
     }
     data << "}\n";
@@ -318,7 +325,7 @@ void Titanfall::EmitEntity(const entity_t &e) {
     #define ENT_APPEND(x)  Titanfall::Ent::x.insert(Titanfall::Ent::x.end(), str.begin(), str.end()); break
     switch (dest) {
         case ENT_BSP:
-            Titanfall::Bsp::entities.insert(Titanfall::Bsp::entities.end(), str.begin(), str.end());
+            Titanfall::Bsp::entities.insert(Titanfall::Bsp::entities.end(), str.begin(), str.end()); break;
         case ENT_ENV:
             ENT_APPEND(env);
         case ENT_FX:

@@ -39,8 +39,7 @@
 #ifndef Q3MAP_VERSION
 #error no Q3MAP_VERSION defined
 #endif
-#define Q3MAP_MOTD      "Your map saw the pretty lights from q3map2's BFG"
-
+#define Q3MAP_MOTD  "Your map saw the pretty lights from q3map2's BFG"
 
 
 
@@ -87,11 +86,12 @@
 
    ------------------------------------------------------------------------------- */
 
+
 /* temporary hacks and tests (please keep off in SVN to prevent anyone's legacy map from screwing up) */
 /* 2011-01-10 TTimo says we should turn these on in SVN, so turning on now */
-#define Q3MAP2_EXPERIMENTAL_HIGH_PRECISION_MATH_FIXES   1
-#define Q3MAP2_EXPERIMENTAL_SNAP_NORMAL_FIX     1
-#define Q3MAP2_EXPERIMENTAL_SNAP_PLANE_FIX      1
+#define Q3MAP2_EXPERIMENTAL_HIGH_PRECISION_MATH_FIXES  1
+#define Q3MAP2_EXPERIMENTAL_SNAP_NORMAL_FIX            1
+#define Q3MAP2_EXPERIMENTAL_SNAP_PLANE_FIX             1
 
 /* general */
 // actual shader name length limit depends on game engine and name use manner (plain texture/custom shader)
@@ -112,17 +112,17 @@
 #define CASE_INSENSITIVE_EPAIRS 1
 
 #if CASE_INSENSITIVE_EPAIRS
-	#define EPAIR_EQUAL        striEqual
+    #define EPAIR_EQUAL  striEqual
 #else
-	#define EPAIR_EQUAL        strEqual
+    #define EPAIR_EQUAL  strEqual
 #endif
 
 
 /* shadow flags */
-#define WORLDSPAWN_CAST_SHADOWS 1
-#define WORLDSPAWN_RECV_SHADOWS 1
-#define ENTITY_CAST_SHADOWS     0
-#define ENTITY_RECV_SHADOWS     1
+#define WORLDSPAWN_CAST_SHADOWS  1
+#define WORLDSPAWN_RECV_SHADOWS  1
+#define ENTITY_CAST_SHADOWS      0
+#define ENTITY_RECV_SHADOWS      1
 
 
 /* bsp */
@@ -136,46 +136,45 @@
 #define PLANESIDE_EPSILON       0.001f
 #define PLANENUM_LEAF           -1
 
-enum class EBrushType
-{
-	Undefined,
-	Quake,
-	Bp,
-	Valve220
+enum class EBrushType {
+    Undefined,
+    Quake,
+    Bp,
+    Valve220
 };
 
 /* vis */
-#define VIS_HEADER_SIZE         8
+#define VIS_HEADER_SIZE  8
 
-#define SEPERATORCACHE          /* separator caching helps a bit */
+#define SEPERATORCACHE  /* separator caching helps a bit */
 
-#define PORTALFILE              "PRT1"
+#define PORTALFILE  "PRT1"
 
-#define MAX_PORTALS             0x20000 /* same as MAX_MAP_PORTALS */
-#define MAX_SEPERATORS          MAX_POINTS_ON_WINDING
-#define MAX_POINTS_ON_FIXED_WINDING 24  /* ydnar: increased this from 12 at the expense of more memory */
-#define MAX_PORTALS_ON_LEAF     1024
+#define MAX_PORTALS                  0x20000  // same as MAX_MAP_PORTALS
+#define MAX_SEPERATORS               MAX_POINTS_ON_WINDING
+#define MAX_POINTS_ON_FIXED_WINDING  24  /* ydnar: increased this from 12 at the expense of more memory */
+#define MAX_PORTALS_ON_LEAF          1024
 
 
 /* light */
 #define MAX_TRACE_TEST_NODES    256
 #define DEFAULT_INHIBIT_RADIUS  1.5f
 
-#define LUXEL_EPSILON           0.125f
-#define VERTEX_EPSILON          -0.125f
-#define GRID_EPSILON            0.0f
+#define LUXEL_EPSILON   0.125f
+#define VERTEX_EPSILON -0.125f
+#define GRID_EPSILON    0.0f
 
-#define DEFAULT_LIGHTMAP_SAMPLE_SIZE    16
-#define DEFAULT_LIGHTMAP_MIN_SAMPLE_SIZE    0
-#define DEFAULT_LIGHTMAP_SAMPLE_OFFSET  1.0f
-#define DEFAULT_SUBDIVIDE_THRESHOLD     1.0f
+#define DEFAULT_LIGHTMAP_SAMPLE_SIZE      16
+#define DEFAULT_LIGHTMAP_MIN_SAMPLE_SIZE  0
+#define DEFAULT_LIGHTMAP_SAMPLE_OFFSET    1.0f
+#define DEFAULT_SUBDIVIDE_THRESHOLD       1.0f
 
-#define CLUSTER_UNMAPPED        -1
-#define CLUSTER_OCCLUDED        -2
-#define CLUSTER_FLOODED         -3
+#define CLUSTER_UNMAPPED  -1
+#define CLUSTER_OCCLUDED  -2
+#define CLUSTER_FLOODED   -3
 
-#define FLAG_FORCE_SUBSAMPLING 1
-#define FLAG_ALREADY_SUBSAMPLED 2
+#define FLAG_FORCE_SUBSAMPLING   1
+#define FLAG_ALREADY_SUBSAMPLED  2
 
 
 /* -------------------------------------------------------------------------------
@@ -183,6 +182,7 @@ enum class EBrushType
    abstracted bsp file
 
    ------------------------------------------------------------------------------- */
+
 
 #define EXTERNAL_LIGHTMAP       "lm_%04d.tga"
 
@@ -202,7 +202,8 @@ enum class EBrushType
 #define MAX_MAP_LEAFS           0x20000
 #define MAX_MAP_PORTALS         0x20000
 #define MAX_MAP_LIGHTING        0x800000
-#define MAX_MAP_LIGHTGRID       0x100000    //%	0x800000 /* ydnar: set to points, not bytes */
+#define MAX_MAP_LIGHTGRID       0x100000    // % 0x800000
+/* ydnar: set to points, not bytes */
 #define MAX_MAP_VISCLUSTERS     0x4000 // <= MAX_MAP_LEAFS
 #define MAX_MAP_VISIBILITY      ( VIS_HEADER_SIZE + MAX_MAP_VISCLUSTERS * ( ( ( MAX_MAP_VISCLUSTERS + 63 ) & ~63 ) >> 3 ) )
 
@@ -216,111 +217,98 @@ enum class EBrushType
 #define LIGHTMAP_HEIGHT         128
 
 
-
-struct bspLump_t
-{
-	int offset, length, lumpVer, padding;
+struct bspLump_t {
+    int offset, length, lumpVer, padding;
 };
 
 
-struct rbspHeader_t
-{
-	char ident[4];		/* rBSP */
-	int version;		/* 37 for r2 */
-	int mapVersion;		/* 30 */
-	int maxLump;		/* 127 */
+struct rbspHeader_t {
+    char  ident[4];    /* rBSP */
+    int   version;     /* 37 for r2 */
+    int   mapVersion;  /* 30 */
+    int   maxLump;     /* 127 */
 
-	bspLump_t lumps[128];
+    bspLump_t  lumps[128];
 };
+
 
 using bspPlane_t = Plane3f;
 
-struct bspBrush_t
-{
-	Vector3 origin;
-	uint16_t flags;
-	uint16_t index;
-	Vector3 extents;
-	uint32_t side_plane;
+
+struct bspBrush_t {
+    Vector3   origin;
+    uint16_t  flags;
+    uint16_t  index;
+    Vector3   extents;
+    uint32_t  side_plane;
 };
 
+
 // Old
-struct bspShader_t
-{
-	char shader[ MAX_QPATH ];
-	int surfaceFlags;
-	int contentFlags;
+struct bspShader_t {
+    char  shader[MAX_QPATH];
+    int   surfaceFlags;
+    int   contentFlags;
 };
 
 
 /* planes x^1 is always the opposite of plane x */
-
 using bspPlane_t = Plane3f;
 
 
-struct bspNode_t
-{
-	int planeNum;
-	int children[ 2 ];              /* negative numbers are -(leafs+1), not nodes */
-	MinMax___<int> minmax;          /* for frustum culling */
+struct bspNode_t {
+    int planeNum;
+    int children[2];  /* negative numbers are -(leafs + 1), not nodes */
+    MinMax___<int> minmax;  /* for frustum culling */
 };
 
 
-struct bspLeaf_t
-{
-	int cluster;                    /* -1 = opaque cluster (do I still store these?) */
-	int area;
+struct bspLeaf_t {
+    int cluster;                    /* -1 = opaque cluster (do I still store these?) */
+    int area;
 
-	MinMax___<int> minmax;          /* for frustum culling */
+    MinMax___<int> minmax;          /* for frustum culling */
 
-	int firstBSPLeafSurface;
-	int numBSPLeafSurfaces;
+    int firstBSPLeafSurface;
+    int numBSPLeafSurfaces;
 
-	int firstBSPLeafBrush;
-	int numBSPLeafBrushes;
+    int firstBSPLeafBrush;
+    int numBSPLeafBrushes;
 };
 
 
-struct bspBrushSide_t
-{
-	int planeNum;                   /* positive plane side faces out of the leaf */
-	int shaderNum;
-	int surfaceNum;                 /* RBSP */
+struct bspBrushSide_t {
+    int  planeNum;    /* positive plane side faces out of the leaf */
+    int  shaderNum;
+    int  surfaceNum;  /* RBSP */
 };
 
 
-
-struct bspDrawVert_t
-{
-	Vector3 xyz;
-	Vector2 st;
-	Vector2 lightmap[ MAX_LIGHTMAPS ];          /* RBSP */
-	Vector3 normal;
-	Color4b color[ MAX_LIGHTMAPS ];             /* RBSP */
+struct bspDrawVert_t {
+	Vector3  xyz;
+	Vector2  st;
+	Vector2  lightmap[MAX_LIGHTMAPS];  /* RBSP */
+	Vector3  normal;
+	Color4b  color[MAX_LIGHTMAPS];  /* RBSP */
 };
 
 
-enum bspSurfaceType_t
-{
-	MST_BAD,
-	MST_PLANAR,
-	MST_PATCH,
-	MST_TRIANGLE_SOUP,
-	MST_FLARE,
-	MST_FOLIAGE
+enum bspSurfaceType_t {
+    MST_BAD,
+    MST_PLANAR,
+    MST_PATCH,
+    MST_TRIANGLE_SOUP,
+    MST_FLARE,
+    MST_FOLIAGE
 };
 
 
-struct bspGridPoint_t
-{
-	Vector3b ambient[ MAX_LIGHTMAPS ];    /* RBSP - array */
-	Vector3b directed[ MAX_LIGHTMAPS ];   /* RBSP - array */
-	byte styles[ MAX_LIGHTMAPS ];         /* RBSP - whole */
-	byte latLong[ 2 ];
+struct bspGridPoint_t {
+    Vector3b  ambient[MAX_LIGHTMAPS];   /* RBSP - array */
+    Vector3b  directed[MAX_LIGHTMAPS];  /* RBSP - array */
+    byte      styles[MAX_LIGHTMAPS];    /* RBSP - whole */
+    byte      latLong[2];
 };
-
-
-
 
 
 /* -------------------------------------------------------------------------------
@@ -329,236 +317,231 @@ struct bspGridPoint_t
 
    ------------------------------------------------------------------------------- */
 
+
 /* ydnar: for q3map_tcMod */
-typedef Vector3 tcMod_t[ 3 ];
+typedef Vector3 tcMod_t[3];
 
 
-struct image_t
-{
-	CopiedString name;       // relative path w/o extension
-	CopiedString filename;   // relative path with extension
-	int width, height;
-	byte *pixels = nullptr;
+struct image_t {
+    CopiedString  name;      // relative path w/o extension
+    CopiedString  filename;  // relative path with extension
+    int   width, height;
+    byte *pixels = nullptr;
 
-	image_t() = default;
-	image_t( const char *name, const char *filename, int width, int height, byte *pixels ) :
-		name( name ),
-		filename( filename ),
-		width( width ),
-		height( height ),
-		pixels( pixels )
-	{}
-	image_t( image_t&& other ) noexcept :
-		name( std::move( other.name ) ),
-		filename( std::move( other.filename ) ),
-		width( other.width ),
-		height( other.height ),
-		pixels( std::exchange( other.pixels, nullptr ) )
-	{}
-	~image_t(){
-		free( pixels );
-	}
+    image_t() = default;
 
-	byte *at( int width, int height ) const {
-		return pixels + 4 * ( height * this->width + width );
-	}
+    image_t(const char *name, const char *filename, int width, int height, byte *pixels) :
+        name(name),
+        filename(filename),
+        width(width),
+        height(height),
+        pixels(pixels)
+    {}
+
+    image_t(image_t&& other) noexcept :
+        name(std::move(other.name)),
+        filename(std::move(other.filename)),
+        width(other.width),
+        height(other.height),
+        pixels(std::exchange(other.pixels, nullptr))
+    {}
+
+    ~image_t() {
+        free(pixels);
+    }
+
+    byte *at(int width, int height) const {
+        return pixels + 4 * (height * this->width + width);
+    }
 };
 
 
-struct sun_t
-{
-	Vector3 direction, color;
-	float photons, deviance, filterRadius;
-	int numSamples, style;
-};
-
-struct skylight_t
-{
-	float value;
-	int iterations;
-	int horizon_min = 0;
-	int horizon_max = 90;
-	bool sample_color = true;
+struct sun_t {
+    Vector3  direction, color;
+    float    photons, deviance, filterRadius;
+    int      numSamples, style;
 };
 
 
-struct surfaceModel_t
-{
-	CopiedString model;
-	float density, odds;
-	float minScale, maxScale;
-	float minAngle, maxAngle;
-	bool oriented;
+struct skylight_t {
+    float  value;
+    int    iterations;
+    int    horizon_min = 0;
+    int    horizon_max = 90;
+    bool   sample_color = true;
+};
+
+
+struct surfaceModel_t {
+    CopiedString  model;
+    float         density, odds;
+    float         minScale, maxScale;
+    float         minAngle, maxAngle;
+    bool          oriented;
 };
 
 
 /* ydnar/sd: foliage stuff for wolf et (engine-supported optimization of the above) */
-struct foliage_t
-{
-	CopiedString model;
-	float scale, density, odds;
-	int inverseAlpha;
-};
-
-struct foliageInstance_t
-{
-	Vector3 xyz, normal;
+struct foliage_t {
+    CopiedString  model;
+    float         scale, density, odds;
+    int           inverseAlpha;
 };
 
 
-struct remap_t
-{
-	char from[ 1024 ];
-	char to[ MAX_QPATH ];
+struct foliageInstance_t {
+    Vector3  xyz, normal;
 };
 
 
-enum class EColorMod
-{
-	None,
-	Volume,
-	ColorSet,
-	AlphaSet,
-	ColorScale,
-	AlphaScale,
-	ColorDotProduct,
-	AlphaDotProduct,
-	ColorDotProductScale,
-	AlphaDotProductScale,
-	ColorDotProduct2,
-	AlphaDotProduct2,
-	ColorDotProduct2Scale,
-	AlphaDotProduct2Scale
+struct remap_t {
+    char  from[1024];
+    char  to[MAX_QPATH];
 };
 
 
-struct colorMod_t
-{
-	colorMod_t   *next;
-	EColorMod type;
-	float data[ 16 ];
+enum class EColorMod {
+    None,
+    Volume,
+    ColorSet,
+    AlphaSet,
+    ColorScale,
+    AlphaScale,
+    ColorDotProduct,
+    AlphaDotProduct,
+    ColorDotProductScale,
+    AlphaDotProductScale,
+    ColorDotProduct2,
+    AlphaDotProduct2,
+    ColorDotProduct2Scale,
+    AlphaDotProduct2Scale
 };
 
 
-enum class EImplicitMap
-{
-	None,
-	Opaque,
-	Masked,
-	Blend
+struct colorMod_t {
+    colorMod_t *next;
+    EColorMod   type;
+    float       data[16];
 };
 
 
-struct shaderInfo_t
-{
-	String512 shader;
-	int surfaceFlags;
-	int contentFlags;
-	int compileFlags;
-	float value;                                        /* light value */
+enum class EImplicitMap {
+    None,
+    Opaque,
+    Masked,
+    Blend
+};
 
-	const char          *flareShader;                   /* for light flares */
-	char                *damageShader;                  /* ydnar: sof2 damage shader name */
-	char                *backShader;                    /* for surfaces that generate different front and back passes */
-	char                *cloneShader;                   /* ydnar: for cloning of a surface */
-	char                *remapShader;                   /* ydnar: remap a shader in final stage */
-	char                *deprecateShader;               /* vortex: shader is deprecated and replaced by this on use */
 
-	std::list<surfaceModel_t> surfaceModels;            /* ydnar: for distribution of models */
-	std::list<foliage_t>      foliage;                  /* ydnar/splash damage: wolf et foliage */
+struct shaderInfo_t {
+    String512   shader;
+    int         surfaceFlags;
+    int         contentFlags;
+    int         compileFlags;
+    float       value;                                  /* light value */
 
-	float subdivisions;                                 /* from a "tesssize xxx" */
-	float backsplashFraction;                           /* floating point value, usually 0.05 */
-	float backsplashDistance;                           /* default 16 */
-	float lightSubdivide;                               /* default 999 */
-	float lightFilterRadius;                            /* ydnar: lightmap filtering/blurring radius for lights created by this shader (default: 0) */
+    const char *flareShader;                            /* for light flares */
+    char       *damageShader;                           /* ydnar: sof2 damage shader name */
+    char       *backShader;                             /* for surfaces that generate different front and back passes */
+    char       *cloneShader;                            /* ydnar: for cloning of a surface */
+    char       *remapShader;                            /* ydnar: remap a shader in final stage */
+    char       *deprecateShader;                        /* vortex: shader is deprecated and replaced by this on use */
 
-	int lightmapSampleSize;                             /* lightmap sample size */
-	float lightmapSampleOffset;                         /* ydnar: lightmap sample offset (default: 1.0) */
+    std::list<surfaceModel_t>  surfaceModels;           /* ydnar: for distribution of models */
+    std::list<foliage_t>       foliage;                 /* ydnar/splash damage: wolf et foliage */
 
-	float bounceScale;                                  /* ydnar: radiosity re-emission [0,1.0+] */
-	float offset;                                       /* ydnar: offset in units */
-	float shadeAngleDegrees;                            /* ydnar: breaking angle for smooth shading (degrees) */
+    float       subdivisions;                           /* from a "tesssize xxx" */
+    float       backsplashFraction;                     /* floating point value, usually 0.05 */
+    float       backsplashDistance;                     /* default 16 */
+    float       lightSubdivide;                         /* default 999 */
+    float       lightFilterRadius;                      /* ydnar: lightmap filtering/blurring radius for lights created by this shader (default: 0) */
 
-	MinMax minmax;                                      /* ydnar: for particle studio vertexDeform move support */
+    int         lightmapSampleSize;                     /* lightmap sample size */
+    float       lightmapSampleOffset;                   /* ydnar: lightmap sample offset (default: 1.0) */
 
-	bool legacyTerrain;                                 /* ydnar: enable legacy terrain crutches */
-	bool indexed;                                       /* ydnar: attempt to use indexmap (terrain alphamap style) */
-	bool forceMeta;                                     /* ydnar: force metasurface path */
-	bool noClip;                                        /* ydnar: don't clip into bsp, preserve original face winding */
-	bool noFast;                                        /* ydnar: suppress fast lighting for surfaces with this shader */
-	bool invert;                                        /* ydnar: reverse facing */
-	bool nonplanar;                                     /* ydnar: for nonplanar meta surface merging */
-	bool tcGen;                                         /* ydnar: has explicit texcoord generation */
-	Vector3 vecs[ 2 ];                                  /* ydnar: explicit texture vectors for [0,1] texture space */
-	tcMod_t mod;                                        /* ydnar: q3map_tcMod matrix for djbob :) */
-	Vector3 lightmapAxis{ 0 };                          /* ydnar: explicit lightmap axis projection */
-	colorMod_t          *colorMod;                      /* ydnar: q3map_rgb/color/alpha/Set/Mod support */
+    float       bounceScale;                            /* ydnar: radiosity re-emission [0,1.0+] */
+    float       offset;                                 /* ydnar: offset in units */
+    float       shadeAngleDegrees;                      /* ydnar: breaking angle for smooth shading (degrees) */
 
-	int furNumLayers;                                   /* ydnar: number of fur layers */
-	float furOffset;                                    /* ydnar: offset of each layer */
-	float furFade;                                      /* ydnar: alpha fade amount per layer */
+    MinMax      minmax;                                 /* ydnar: for particle studio vertexDeform move support */
 
-	bool splotchFix;                                    /* ydnar: filter splotches on lightmaps */
+    bool        legacyTerrain;                          /* ydnar: enable legacy terrain crutches */
+    bool        indexed;                                /* ydnar: attempt to use indexmap (terrain alphamap style) */
+    bool        forceMeta;                              /* ydnar: force metasurface path */
+    bool        noClip;                                 /* ydnar: don't clip into bsp, preserve original face winding */
+    bool        noFast;                                 /* ydnar: suppress fast lighting for surfaces with this shader */
+    bool        invert;                                 /* ydnar: reverse facing */
+    bool        nonplanar;                              /* ydnar: for nonplanar meta surface merging */
+    bool        tcGen;                                  /* ydnar: has explicit texcoord generation */
+    Vector3     vecs[2];                                /* ydnar: explicit texture vectors for [0,1] texture space */
+    tcMod_t     mod;                                    /* ydnar: q3map_tcMod matrix for djbob :) */
+    Vector3     lightmapAxis{ 0 };                      /* ydnar: explicit lightmap axis projection */
+    colorMod_t *colorMod;                               /* ydnar: q3map_rgb/color/alpha/Set/Mod support */
 
-	bool hasPasses;                                     /* false if the shader doesn't define any rendering passes */
-	bool globalTexture;                                 /* don't normalize texture repeats */
-	bool twoSided;                                      /* cull none */
-	bool autosprite;                                    /* autosprite shaders will become point lights instead of area lights */
-	bool polygonOffset;                                 /* ydnar: don't face cull this or against this */
-	bool patchShadows;                                  /* have patches casting shadows when using -light for this surface */
-	bool vertexShadows;                                 /* shadows will be casted at this surface even when vertex lit */
-	bool forceSunlight;                                 /* force sun light at this surface even tho we might not calculate shadows in vertex lighting */
-	bool notjunc;                                       /* don't use this surface for tjunction fixing */
-	bool fogParms;                                      /* ydnar: has fogparms */
-	bool noFog;                                         /* ydnar: suppress fogging */
-	bool clipModel;                                     /* ydnar: solid model hack */
-	bool noVertexLight;                                 /* ydnar: leave vertex color alone */
-	bool noDirty;                                       /* jal: do not apply the dirty pass to this surface */
+    int furNumLayers;                                   /* ydnar: number of fur layers */
+    float furOffset;                                    /* ydnar: offset of each layer */
+    float furFade;                                      /* ydnar: alpha fade amount per layer */
 
-	byte styleMarker;                                   /* ydnar: light styles hack */
+    bool splotchFix;                                    /* ydnar: filter splotches on lightmaps */
 
-	float vertexScale;                                  /* vertex light scale */
+    bool hasPasses;                                     /* false if the shader doesn't define any rendering passes */
+    bool globalTexture;                                 /* don't normalize texture repeats */
+    bool twoSided;                                      /* cull none */
+    bool autosprite;                                    /* autosprite shaders will become point lights instead of area lights */
+    bool polygonOffset;                                 /* ydnar: don't face cull this or against this */
+    bool patchShadows;                                  /* have patches casting shadows when using -light for this surface */
+    bool vertexShadows;                                 /* shadows will be casted at this surface even when vertex lit */
+    bool forceSunlight;                                 /* force sun light at this surface even tho we might not calculate shadows in vertex lighting */
+    bool notjunc;                                       /* don't use this surface for tjunction fixing */
+    bool fogParms;                                      /* ydnar: has fogparms */
+    bool noFog;                                         /* ydnar: suppress fogging */
+    bool clipModel;                                     /* ydnar: solid model hack */
+    bool noVertexLight;                                 /* ydnar: leave vertex color alone */
+    bool noDirty;                                       /* jal: do not apply the dirty pass to this surface */
 
-	String512 skyParmsImageBase;                         /* ydnar: for skies */
+    byte styleMarker;                                   /* ydnar: light styles hack */
 
-	String512 editorImagePath;                           /* use this image to generate texture coordinates */
-	String512 lightImagePath;                            /* use this image to generate color / averageColor */
-	String512 normalImagePath;                           /* ydnar: normalmap image for bumpmapping */
+    float vertexScale;                                  /* vertex light scale */
 
-	EImplicitMap implicitMap;                           /* ydnar: enemy territory implicit shaders */
-	String512 implicitImagePath;
+    String512 skyParmsImageBase;                         /* ydnar: for skies */
 
-	const image_t       *shaderImage;
-	const image_t       *lightImage;
-	const image_t       *normalImage;
+    String512 editorImagePath;                           /* use this image to generate texture coordinates */
+    String512 lightImagePath;                            /* use this image to generate color / averageColor */
+    String512 normalImagePath;                           /* ydnar: normalmap image for bumpmapping */
 
-	std::vector<skylight_t>  skylights;                 /* ydnar */
-	std::vector<sun_t>  suns;                           /* ydnar */
+    EImplicitMap implicitMap;                           /* ydnar: enemy territory implicit shaders */
+    String512 implicitImagePath;
 
-	Vector3 color{ 0 };                                 /* normalized color */
-	Color4f averageColor = { 0, 0, 0, 0 };
-	byte lightStyle;
+    const image_t       *shaderImage;
+    const image_t       *lightImage;
+    const image_t       *normalImage;
 
-	/* vortex: per-surface floodlight */
-	float floodlightDirectionScale;
-	Vector3 floodlightRGB;
-	float floodlightIntensity;
-	float floodlightDistance;
+    std::vector<skylight_t>  skylights;                 /* ydnar */
+    std::vector<sun_t>  suns;                           /* ydnar */
 
-	bool lmMergable;                                    /* ydnar */
-	int lmCustomWidth, lmCustomHeight;                  /* ydnar */
-	float lmBrightness;                                 /* ydnar */
-	float lmFilterRadius;                               /* ydnar: lightmap filtering/blurring radius for this shader (default: 0) */
+    Vector3 color{ 0 };                                 /* normalized color */
+    Color4f averageColor = { 0, 0, 0, 0 };
+    byte lightStyle;
 
-	int shaderWidth, shaderHeight;                      /* ydnar */
-	Vector2 stFlat;
+    /* vortex: per-surface floodlight */
+    float floodlightDirectionScale;
+    Vector3 floodlightRGB;
+    float floodlightIntensity;
+    float floodlightDistance;
 
-	Vector3 fogDir{ 0 };                                /* ydnar */
+    bool lmMergable;                                    /* ydnar */
+    int lmCustomWidth, lmCustomHeight;                  /* ydnar */
+    float lmBrightness;                                 /* ydnar */
+    float lmFilterRadius;                               /* ydnar: lightmap filtering/blurring radius for this shader (default: 0) */
 
-	char                *shaderText;                    /* ydnar */
-	bool custom;
-	bool finished;
+    int shaderWidth, shaderHeight;                      /* ydnar */
+    Vector2 stFlat;
+
+    Vector3 fogDir{ 0 };                                /* ydnar */
+
+    char                *shaderText;                    /* ydnar */
+    bool custom;
+    bool finished;
 };
 
 
@@ -907,40 +890,38 @@ private:
 };
 
 
-struct node_t
-{
-	/* both leafs and nodes */
-	int planenum;                       /* -1 = leaf node */
-	node_t              *parent;
-	MinMax minmax;                      /* valid after portalization */
+struct node_t {
+    /* both leafs and nodes */
+    int     planenum;                    /* -1 = leaf node */
+    node_t *parent;
+    MinMax  minmax;                      /* valid after portalization */
 
-	/* nodes only */
-	node_t              *children[ 2 ];
-	int compileFlags;                   /* ydnar: hint, antiportal */
-	int tinyportals;
-	Vector3 referencepoint;
+    /* nodes only */
+    node_t  *children[2];
+    int      compileFlags;               /* ydnar: hint, antiportal */
+    int      tinyportals;
+    Vector3  referencepoint;
 
-	/* leafs only */
-	bool opaque;                        /* view can never be inside */
-	bool areaportal;
-	bool skybox;                        /* ydnar: a skybox leaf */
-	bool sky;                           /* ydnar: a sky leaf */
-	int cluster;                        /* for portalfile writing */
-	int area;                           /* for areaportals */
-	brushlist_t          brushlist;     /* fragments of all brushes in this leaf */
-	drawSurfRef_t       *drawSurfReferences;
+    /* leafs only */
+    bool            opaque;              /* view can never be inside */
+    bool            areaportal;
+    bool            skybox;              /* ydnar: a skybox leaf */
+    bool            sky;                 /* ydnar: a sky leaf */
+    int             cluster;             /* for portalfile writing */
+    int             area;                /* for areaportals */
+    brushlist_t     brushlist;           /* fragments of all brushes in this leaf */
+    drawSurfRef_t  *drawSurfReferences;
 
-	int occupied;                       /* 1 or greater can reach entity */
-	const entity_t      *occupant;      /* for leak file testing */
+    int  occupied;                       /* 1 or greater can reach entity */
+    const entity_t *occupant;            /* for leak file testing */
 
-	struct portal_t     *portals;       /* also on nodes during construction */
+    struct portal_t *portals;            /* also on nodes during construction */
 
-	bool has_structural_children;
+    bool  has_structural_children;
 };
 
 
-struct portal_t
-{
+struct portal_t {
 	plane_t plane;
 	node_t              *onnode;        /* NULL = outside box */
 	node_t              *nodes[ 2 ];    /* [ 0 ] = front side of plane */
