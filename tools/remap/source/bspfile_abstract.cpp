@@ -27,7 +27,6 @@
    ------------------------------------------------------------------------------- */
 
 
-
 /* dependencies */
 #include "remap.h"
 #include "bspfile_abstract.h"
@@ -55,16 +54,17 @@
    SwapBlock()
    if all values are 32 bits, this can be used to swap everything
 */
-void SwapBlock( int *block, int size ) {
+void SwapBlock(int *block, int size) {
     /* dummy check */
-    if ( block == NULL ) {
+    if (block == NULL) {
         return;
     }
 
     /* swap */
     size >>= 2;
-    for ( int i = 0; i < size; ++i )
-        block[ i ] = LittleLong( block[ i ] );
+    for (int i = 0; i < size; ++i) {
+        block[i] = LittleLong(block[i]);
+    }
 }
 
 
@@ -73,12 +73,13 @@ void SwapBlock( int *block, int size ) {
    if all values are 32 bits, this can be used to swap everything
 */
 template<typename T>
-void SwapBlock( std::vector<T>& block ){
-    const size_t size = ( sizeof( T ) * block.size() ) >> 2; // get size in integers
+void SwapBlock(std::vector<T>& block){
+    const size_t size = (sizeof(T) * block.size()) >> 2;  // get size in integers
     /* swap */
-    int *intptr = reinterpret_cast<int *>( block.data() );
-    for ( size_t i = 0; i < size; ++i )
-        intptr[ i ] = LittleLong( intptr[ i ] );
+    int *intptr = reinterpret_cast<int*>(block.data());
+    for (size_t i = 0; i < size; ++i) {
+        intptr[i] = LittleLong(intptr[i]);
+    }
 }
 
 
@@ -86,20 +87,19 @@ void SwapBlock( std::vector<T>& block ){
    SwapBSPFile()
    byte swaps all data in the abstract bsp
 */
-static void SwapBSPFile() {
-    // ...
-}
+static void SwapBSPFile() {}
 
 
 /*
    LoadEntFile()
    loads an ent file
 */
-void LoadEntFile( const char* filename, std::vector<char> &ents ) {
-    if ( !FileExists( filename ) )
+void LoadEntFile(const char *filename, std::vector<char> &ents) {
+    if (!FileExists(filename)) {
         return;
+    }
     /* Open it */
-    MemBuffer f = LoadFile( filename );
+    MemBuffer f = LoadFile(filename);
     /* Add to bspEntities */
     std::vector<char> ent = { (char*)((byte*)f.data() + 10), (char*)((byte*)f.data() + f.size()) };
     ents.insert(ents.end(), ent.begin(), ent.end());
@@ -110,14 +110,14 @@ void LoadEntFile( const char* filename, std::vector<char> &ents ) {
    LoadBSPFile()
    loads a bsp file into memory
 */
-void LoadBSPFile( const char *filename ) {
+void LoadBSPFile(const char *filename) {
     /* dummy check */
-    if ( g_game == NULL || g_game->load == NULL ) {
-        Error( "LoadBSPFile: unsupported BSP file format" );
+    if (g_game == NULL || g_game->load == NULL) {
+        Error("LoadBSPFile: unsupported BSP file format");
     }
 
     /* load it, then byte swap the in-memory version */
-    g_game->load( filename );
+    g_game->load(filename);
     SwapBSPFile();
 }
 
@@ -126,10 +126,10 @@ void LoadBSPFile( const char *filename ) {
    LoadBSPFilePartially()
    loads bsp file parts meaningful for autopacker
 */
-void LoadBSPFilePartially( const char *filename ) {
+void LoadBSPFilePartially(const char *filename) {
     /* dummy check */
-    if ( g_game == NULL || g_game->load == NULL ) {
-        Error( "LoadBSPFile: unsupported BSP file format" );
+    if (g_game == NULL || g_game->load == NULL) {
+        Error("LoadBSPFile: unsupported BSP file format");
     }
 
     /* load it, then byte swap the in-memory version */
@@ -143,47 +143,47 @@ void LoadBSPFilePartially( const char *filename ) {
    WriteBSPFile()
    writes a bsp file
 */
-void WriteBSPFile( const char *filename ) {
-    char tempname[ 1024 ];
+void WriteBSPFile(const char *filename) {
+    char tempname[1024];
     time_t tm;
 
-    Sys_Printf( "Writing %s... ", filename );
+    Sys_Printf("Writing %s... ", filename);
 
     /* dummy check */
-    if ( g_game == NULL || g_game->write == NULL ) {
-        Sys_Printf( "Failed!\n" );
-        Error( "WriteBSPFile: unsupported BSP file format" );
+    if (g_game == NULL || g_game->write == NULL) {
+        Sys_Printf("Failed!\n");
+        Error("WriteBSPFile: unsupported BSP file format");
     }
 
-    Sys_Printf( "Success!\n" );
+    Sys_Printf("Success!\n");
 
     /* make fake temp name so existing bsp file isn't damaged in case write process fails */
-    time( &tm );
-    sprintf( tempname, "%s.%08X", filename, (int) tm );
+    time(&tm);
+    sprintf(tempname, "%s.%08X", filename, (int)tm);
 
     /* byteswap, write the bsp, then swap back so it can be manipulated further */
     SwapBSPFile();
-    g_game->write( tempname );
+    g_game->write(tempname);
     SwapBSPFile();
 
     /* replace existing bsp file */
-    remove( filename );
-    rename( tempname, filename );
+    remove(filename);
+    rename(tempname, filename);
 }
 
 
 /*
     WriteEntFileHeader()
 */
-void WriteEntFileHeader( FILE *file ) {
+void WriteEntFileHeader(FILE *file) {
     if (g_game->bspVersion == 47) {
         // Apex Legends
         std::string message = "ENTITIES02 num_models=" + std::to_string(ApexLegends::Bsp::levelInfo.at(0).modelCount) + "\n";
-        SafeWrite( file, message.c_str(), message.size() );
-    }  else {
+        SafeWrite(file, message.c_str(), message.size());
+    } else {
         // Titanfall
         char message[] = "ENTITIES01\n";
-        SafeWrite( file, &message, sizeof(message) - 1 );
+        SafeWrite(file, &message, sizeof(message) - 1);
     }
 }
 
@@ -192,11 +192,11 @@ void WriteEntFileHeader( FILE *file ) {
     WriteEntFiles()
     Writes .ent files used by .bsp
 */
-void WriteEntFiles( const char *path ) {
+void WriteEntFiles(const char *path) {
     // env
-    if ( Titanfall::Ent::env.size() ) {
+    if (Titanfall::Ent::env.size()) {
         auto name = StringOutputStream(1024)(PathExtensionless(path), "_env.ent");
-        Sys_Printf( "Writing %s... ", name.c_str() );
+        Sys_Printf("Writing %s... ", name.c_str());
 
         FILE* file = SafeOpenWrite(name);
         WriteEntFileHeader(file);
@@ -204,12 +204,12 @@ void WriteEntFiles( const char *path ) {
         SafeWrite(file, Titanfall::Ent::env.data(), Titanfall::Ent::env.size());
         fclose(file);
 
-        Sys_Printf( "Success!\n" );
+        Sys_Printf("Success!\n");
     }
     // fx
-    if ( Titanfall::Ent::fx.size() ) {
+    if (Titanfall::Ent::fx.size()) {
         auto name = StringOutputStream(1024)(PathExtensionless(path), "_fx.ent");
-        Sys_Printf( "Writing %s... ", name.c_str() );
+        Sys_Printf("Writing %s... ", name.c_str());
 
         FILE* file = SafeOpenWrite(name);
         WriteEntFileHeader(file);
@@ -217,12 +217,12 @@ void WriteEntFiles( const char *path ) {
         SafeWrite(file, Titanfall::Ent::fx.data(), Titanfall::Ent::fx.size());
         fclose(file);
 
-        Sys_Printf( "Success!\n" );
+        Sys_Printf("Success!\n");
     }
     // script
-    if ( Titanfall::Ent::script.size() ) {
+    if (Titanfall::Ent::script.size()) {
         auto name = StringOutputStream(1024)(PathExtensionless(path), "_script.ent");
-        Sys_Printf( "Writing %s... ", name.c_str() );
+        Sys_Printf("Writing %s... ", name.c_str());
 
         FILE* file = SafeOpenWrite(name);
         WriteEntFileHeader(file);
@@ -230,12 +230,12 @@ void WriteEntFiles( const char *path ) {
         SafeWrite(file, Titanfall::Ent::script.data(), Titanfall::Ent::script.size());
         fclose(file);
 
-        Sys_Printf( "Success!\n" );
+        Sys_Printf("Success!\n");
     }
     // snd
-    if ( Titanfall::Ent::snd.size() ) {
+    if (Titanfall::Ent::snd.size()) {
         auto name = StringOutputStream(1024)(PathExtensionless(path), "_snd.ent");
-        Sys_Printf( "Writing %s... ", name.c_str() );
+        Sys_Printf("Writing %s... ", name.c_str());
 
         FILE* file = SafeOpenWrite(name);
         WriteEntFileHeader(file);
@@ -243,12 +243,12 @@ void WriteEntFiles( const char *path ) {
         SafeWrite(file, Titanfall::Ent::snd.data(), Titanfall::Ent::snd.size());
         fclose(file);
 
-        Sys_Printf( "Success!\n" );
+        Sys_Printf("Success!\n");
     }
     // spawn
-    if ( Titanfall::Ent::spawn.size() ) {
+    if (Titanfall::Ent::spawn.size()) {
         auto name = StringOutputStream(1024)(PathExtensionless(path), "_spawn.ent");
-        Sys_Printf( "Writing %s... ", name.c_str() );
+        Sys_Printf("Writing %s... ", name.c_str());
 
         FILE* file = SafeOpenWrite(name);
         WriteEntFileHeader(file);
@@ -256,7 +256,7 @@ void WriteEntFiles( const char *path ) {
         SafeWrite(file, Titanfall::Ent::spawn.data(), Titanfall::Ent::spawn.size());
         fclose(file);
 
-        Sys_Printf( "Success!\n" );
+        Sys_Printf("Success!\n");
     }
 }
 
@@ -306,25 +306,25 @@ void ParseEPair( std::list<epair_t>& epairs ) {
 */
 static bool ParseEntity() {
     /* dummy check */
-    if ( !GetToken( true ) ) {
+    if (!GetToken(true)) {
         return false;
     }
-    if ( !strEqual( token, "{" ) ) {
-        Error( "ParseEntity: { not found" );
+    if (!strEqual(token, "{")) {
+        Error("ParseEntity: { not found");
     }
 
     /* create new entity */
     entity_t& e = entities.emplace_back();
 
     /* parse */
-    while ( 1 ) {
-        if ( !GetToken( true ) ) {
-            Error( "ParseEntity: EOF without closing brace" );
+    while (1) {
+        if (!GetToken(true)) {
+            Error("ParseEntity: EOF without closing brace");
         }
-        if ( strEqual( token, "}" ) ) {
+        if (strEqual(token,"}")) {
             break;
         }
-        ParseEPair( e.epairs );
+        ParseEPair(e.epairs);
     }
 
     /* return to sender */
@@ -339,7 +339,7 @@ static bool ParseEntity() {
 void ParseEntities() {
     entities.clear();
     ParseFromMemory( Titanfall::Bsp::entities.data(), Titanfall::Bsp::entities.size() );
-    while ( ParseEntity() ){};
+    while (ParseEntity()) {};
 
     /* ydnar: set number of bsp entities in case a map is loaded on top */
     numBSPEntities = entities.size();
@@ -349,22 +349,25 @@ void ParseEntities() {
 /*
     must be called before UnparseEntities
 */
-void InjectCommandLine( const char *stage, const std::vector<const char *>& args ) {
-    auto str = StringOutputStream( 256 )( entities[ 0 ].valueForKey( "_q3map2_cmdline" ) );  // read previousCommandLine
-    if( !str.empty() )
+void InjectCommandLine(const char *stage, const std::vector<const char*> &args) {
+    auto str = StringOutputStream(256)(entities[0].valueForKey("_q3map2_cmdline"));  // read previousCommandLine
+    if(!str.empty()) {
         str << "; ";
+    }
 
     str << stage;
 
-    for ( const char *c : args ) {
+    for (const char *c : args) {
         str << ' ';
-        for( ; !strEmpty( c ); ++c )
-            if ( *c != '\\' && *c != '"' && *c != ';' && (unsigned char) *c >= ' ' )
+        for( ; !strEmpty(c); ++c) {
+            if (*c != '\\' && *c != '"' && *c != ';' && (unsigned char)*c >= ' ') {
                 str << *c;
+            }
+        }
     }
 
-    entities[0].setKeyValue( "_q3map2_cmdline", str );
-    entities[0].setKeyValue( "_q3map2_version", Q3MAP_VERSION );
+    entities[0].setKeyValue("_q3map2_cmdline", str);
+    entities[0].setKeyValue("_q3map2_version", Q3MAP_VERSION);
 }
 
 
@@ -378,18 +381,23 @@ void UnparseEntities() {
     StringOutputStream data(8192);
     for (std::size_t i = 0; i < numBSPEntities && i < entities.size(); ++i) {  // run through entity list
         const entity_t& e = entities[i];
-        if (e.epairs.empty())
+        if (e.epairs.empty()) {
             continue;  // ent got removed
+        }
         /* ydnar: certain entities get stripped from bsp file */
         const char *classname = e.classname();
         #define ENT_IS(x)  striEqual(classname, x)
-        if (ENT_IS("misc_model") || ENT_IS("_decal") || ENT_IS("_skybox"))
+        if (ENT_IS("misc_model")
+         || ENT_IS("_decal")
+         || ENT_IS("_skybox")) {
             continue;
+        }
         #undef ENT_IS
 
         data << "{\n";
-        for (const auto& ep : e.epairs)
+        for (const auto& ep : e.epairs) {
             data << '\"' << StripTrailing(ep.key.c_str()) << "\" \"" << StripTrailing(ep.value.c_str()) << "\"\n";
+        }
         data << "}\n";
     }
 
@@ -403,8 +411,9 @@ void UnparseEntities() {
 */
 void PrintEntity(const entity_t *ent) {
     Sys_Printf("------- entity %p -------\n", ent);
-    for (const auto& ep : ent->epairs)
+    for (const auto& ep : ent->epairs) {
         Sys_Printf("%s = %s\n", ep.key.c_str(), ep.value.c_str());
+    }
 }
 
 
@@ -412,17 +421,17 @@ void PrintEntity(const entity_t *ent) {
    setKeyValue()
    sets an epair in an entity
 */
-void entity_t::setKeyValue( const char *key, const char *value ) {
+void entity_t::setKeyValue(const char *key, const char *value) {
     /* check for existing epair */
-    for ( auto& ep : epairs ) {
-        if ( EPAIR_EQUAL( ep.key.c_str(), key ) ) {
+    for (auto &ep : epairs) {
+        if (EPAIR_EQUAL(ep.key.c_str(), key)) {
             ep.value = value;
             return;
         }
     }
 
     /* create new epair */
-    epairs.emplace_back( epair_t{ key, value } );
+    epairs.emplace_back(epair_t{ key, value });
 }
 
 
@@ -430,10 +439,10 @@ void entity_t::setKeyValue( const char *key, const char *value ) {
    valueForKey()
    gets the value for an entity key
 */
-const char *entity_t::valueForKey( const char *key ) const {
+const char *entity_t::valueForKey(const char *key) const {
     /* walk epair list */
-    for ( const auto& ep : epairs ) {
-        if ( EPAIR_EQUAL( ep.key.c_str(), key ) ) {
+    for (const auto& ep : epairs) {
+        if (EPAIR_EQUAL(ep.key.c_str(), key)) {
             return ep.value.c_str();
         }
     }
@@ -443,11 +452,11 @@ const char *entity_t::valueForKey( const char *key ) const {
 }
 
 
-bool entity_t::read_keyvalue_( bool &bool_value, std::initializer_list<const char*>&& keys ) const {
-    for( const char* key : keys ) {
-        const char* value = valueForKey( key );
-        if( !strEmpty( value ) ) {
-            bool_value = ( value[0] == '1' );
+bool entity_t::read_keyvalue_(bool &bool_value, std::initializer_list<const char*> &&keys) const {
+    for (const char* key : keys) {
+        const char* value = valueForKey(key);
+        if (!strEmpty(value)) {
+            bool_value = (value[0] == '1');
             return true;
         }
     }
@@ -455,11 +464,11 @@ bool entity_t::read_keyvalue_( bool &bool_value, std::initializer_list<const cha
 }
 
 
-bool entity_t::read_keyvalue_( int &int_value, std::initializer_list<const char*>&& keys ) const {
-    for( const char* key : keys ){
-        const char* value = valueForKey( key );
-        if( !strEmpty( value ) ){
-            int_value = atoi( value );
+bool entity_t::read_keyvalue_(int &int_value, std::initializer_list<const char*> &&keys) const {
+    for (const char* key : keys) {
+        const char* value = valueForKey(key);
+        if (!strEmpty(value)) {
+            int_value = atoi(value);
             return true;
         }
     }
@@ -467,11 +476,11 @@ bool entity_t::read_keyvalue_( int &int_value, std::initializer_list<const char*
 }
 
 
-bool entity_t::read_keyvalue_( float &float_value, std::initializer_list<const char*>&& keys ) const {
-    for( const char* key : keys ){
-        const char* value = valueForKey( key );
-        if( !strEmpty( value ) ){
-            float_value = atof( value );
+bool entity_t::read_keyvalue_(float &float_value, std::initializer_list<const char*> &&keys) const {
+    for (const char* key : keys) {
+        const char* value = valueForKey(key);
+        if(!strEmpty(value)) {
+            float_value = atof(value);
             return true;
         }
     }
@@ -479,12 +488,12 @@ bool entity_t::read_keyvalue_( float &float_value, std::initializer_list<const c
 }
 
 
-bool entity_t::read_keyvalue_( Vector3& vector3_value, std::initializer_list<const char*>&& keys ) const {
-    for( const char* key : keys ) {
-        const char* value = valueForKey( key );
-        if( !strEmpty( value ) ) {
+bool entity_t::read_keyvalue_(Vector3 &vector3_value, std::initializer_list<const char*> &&keys) const {
+    for (const char* key : keys) {
+        const char* value = valueForKey(key);
+        if (!strEmpty(value)) {
             float v0, v1, v2;
-            if( 3 == sscanf( value, "%f %f %f", &v0, &v1, &v2 ) ) {
+            if (3 == sscanf(value, "%f %f %f", &v0, &v1, &v2)) {
                 vector3_value[0] = v0;
                 vector3_value[1] = v1;
                 vector3_value[2] = v2;
@@ -496,10 +505,10 @@ bool entity_t::read_keyvalue_( Vector3& vector3_value, std::initializer_list<con
 }
 
 
-bool entity_t::read_keyvalue_( const char *&string_ptr_value, std::initializer_list<const char*>&& keys ) const {
-    for( const char* key : keys ) {
-        const char* value = valueForKey( key );
-        if( !strEmpty( value ) ) {
+bool entity_t::read_keyvalue_(const char *&string_ptr_value, std::initializer_list<const char*> &&keys) const {
+    for (const char* key : keys) {
+        const char* value = valueForKey(key);
+        if (!strEmpty(value)) {
             string_ptr_value = value;
             return true;
         }

@@ -266,7 +266,8 @@ void Titanfall::EmitEntity(const entity_t &e) {
     #define ENT_IS(x)  striEqual(classname, x)
     #define ENT_STARTS(x)  striEqualPrefix(classname, x)
     #define EDITORCLASS(x, y)  if (ENT_IS(y)) { e.setKeyValue("classname", x); e.setKeyValue("editorclass", y); }
-    if (ENT_IS("env_fog_controler") || ENT_IS("sky_camera")) {
+    if (ENT_IS("env_fog_controler")
+     || ENT_IS("sky_camera")) {
         dest = ENT_ENV;
     } else if (ENT_IS("beam_spotlight")
             || ENT_IS("env_sprite_clientside")
@@ -274,7 +275,7 @@ void Titanfall::EmitEntity(const entity_t &e) {
             || ENT_IS("info_target_fx_clientside")
             || ENT_IS("info_particle_system")) {
         dest = ENT_FX;
-        // classname -> editorclass
+        /* editorclass conversion */
         EDITORCLASS("info_target", "info_target_fx")
         else EDITORCLASS("info_target_clientside", "info_target_fx_clientside")
     } else if (ENT_IS("assault_assaultpoint")
@@ -292,7 +293,8 @@ void Titanfall::EmitEntity(const entity_t &e) {
         dest = ENT_SCRIPT;
     } else if (ENT_IS("ambient_generic")) {
         dest = ENT_SND;
-    } else if (ENT_IS("info_frontline") || ENT_STARTS("info_spawnpoint_")) {
+    } else if (ENT_IS("info_frontline")
+            || ENT_STARTS("info_spawnpoint_")) {
         dest = ENT_SPAWN;
     // TODO: filter out compiled ents here
     // e.g. prop_static, env_cubemap, info_lightprobe, light (static worldlights), etc.
@@ -306,8 +308,9 @@ void Titanfall::EmitEntity(const entity_t &e) {
     // write
     StringOutputStream data;
     data << "{\n";
-    for (const epair_t& pair : e.epairs)
+    for (const epair_t& pair : e.epairs) {
         data << "\"" << pair.key.c_str() << "\" \"" << pair.value.c_str() << "\"\n";
+    }
     data << "}\n";
 
     std::vector<char> str = { data.begin(), data.end() };
@@ -392,8 +395,9 @@ uint32_t Titanfall::EmitTextureData(shaderInfo_t shader) {
             Titanfall::TextureData_t &td = Titanfall::Bsp::textureData.at(i);
             uint32_t &tdt = Titanfall::Bsp::textureDataTable.at(td.name_index);
 
-            if (tdt == index)
+            if (tdt == index) {
                 return i;
+            }
         }
     }
 
@@ -451,9 +455,11 @@ void EmitObjReferences() {
 
 std::size_t Titanfall::EmitObjReferences(Shared::visNode_t& node) {
     // Sys_Printf("amongus\n");
-    // for (std::size_t i = 0; i < Titanfall::Bsp::objReferences.size(); i++)
-    //     if (Titanfall::Bsp::objReferences.at(i) == ref.index)
+    // for (std::size_t i = 0; i < Titanfall::Bsp::objReferences.size(); i++) {
+    //     if (Titanfall::Bsp::objReferences.at(i) == ref.index) {
     //         return i;
+    //     }
+    // }
 
     for (Shared::visRef_t& ref : node.refs) {
         Titanfall::ObjReferenceBounds_t& rb = Titanfall::Bsp::objReferenceBounds.emplace_back();
@@ -469,16 +475,18 @@ std::size_t Titanfall::EmitObjReferences(Shared::visNode_t& node) {
 
 uint16_t GetTotalVisRefCount(Shared::visNode_t node) {
     uint16_t count = node.refs.size();
-    for (Shared::visNode_t& n : node.children)
-            count += GetTotalVisRefCount(n);
+    for (Shared::visNode_t& n : node.children) {
+        count += GetTotalVisRefCount(n);
+    }
     return count;
 }
 
 
 uint16_t GetTotalVisNodeChildCount(Shared::visNode_t node) {
     uint16_t count = node.children.size();
-    for (Shared::visNode_t& n : node.children)
-            count += GetTotalVisNodeChildCount(n);
+    for (Shared::visNode_t& n : node.children) {
+        count += GetTotalVisNodeChildCount(n);
+    }
     return count;
 }
 
@@ -536,8 +544,9 @@ void Titanfall::EmitVisTree() {
 */
 uint32_t Titanfall::EmitVertex(Vector3 &vertex) {
     for (uint32_t i = 0; i < (uint32_t)Titanfall::Bsp::vertices.size(); i++) {
-        if (VectorCompare(vertex, Titanfall::Bsp::vertices.at(i)))
+        if (VectorCompare(vertex, Titanfall::Bsp::vertices.at(i))) {
             return i;
+        }
     }
 
     Titanfall::Bsp::vertices.emplace_back(vertex);
@@ -592,16 +601,25 @@ void Titanfall::EndModel() {
 void Titanfall::EmitEntityPartitions() {
     std::string partitions = "01*";
 
-    if (Titanfall::Ent::env.size())
+    if (Titanfall::Ent::env.size()) {
         partitions += " env";
-    if (Titanfall::Ent::fx.size())
+    }
+
+    if (Titanfall::Ent::fx.size()) {
         partitions += " fx";
-    if (Titanfall::Ent::script.size())
+    }
+
+    if (Titanfall::Ent::script.size()) {
         partitions += " script";
-    if (Titanfall::Ent::snd.size())
+    }
+
+    if (Titanfall::Ent::snd.size()) {
         partitions += " snd";
-    if (Titanfall::Ent::spawn.size())
+    }
+
+    if (Titanfall::Ent::spawn.size()) {
         partitions += " spawn";
+    }
 
     Titanfall::Bsp::entityPartitions = { partitions.begin(), partitions.end() + 1 };
 }
@@ -693,27 +711,29 @@ void Titanfall::EmitMeshes(const entity_t &e) {
             // Check against aabb
             aabb.extend(vertex.xyz);
 
-            if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP)
+            if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) {
                 Titanfall::EmitVertexLitBump(vertex);
-            else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT)
+            } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) {
                 Titanfall::EmitVertexUnlit(vertex);
-            else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS)
+            } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) {
                 Titanfall::EmitVertexUnlitTS(vertex);
-            else
+            } else {
                 Titanfall::EmitVertexLitFlat(vertex);
+            }
         }
 
         // Save triangles
         for (uint16_t triangle : mesh.triangles) {
             uint32_t totalVertices = 0;
-            if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP)
+            if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) {
                 totalVertices = Titanfall::Bsp::vertexLitBumpVertices.size();
-            else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT)
+            } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) {
                 totalVertices = Titanfall::Bsp::vertexUnlitVertices.size();
-            else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS)
+            } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) {
                 totalVertices = Titanfall::Bsp::vertexUnlitTSVertices.size();
-            else
+            } else {
                 totalVertices = Titanfall::Bsp::vertexLitFlatVertices.size();
+            }
 
             for (uint32_t j = 0; j < totalVertices; j++) {
                 uint32_t vertexIndex = 0;
@@ -733,11 +753,13 @@ void Titanfall::EmitMeshes(const entity_t &e) {
                     normalIndex = Titanfall::Bsp::vertexLitFlatVertices.at(j).normalIndex;
                 }
 
-                if (!VectorCompare(Titanfall::Bsp::vertices.at(vertexIndex), mesh.vertices.at(triangle).xyz))
+                if (!VectorCompare(Titanfall::Bsp::vertices.at(vertexIndex), mesh.vertices.at(triangle).xyz)) {
                     continue;
+                }
 
-                if (!VectorCompare(Titanfall::Bsp::vertexNormals.at(normalIndex), mesh.vertices.at(triangle).normal))
+                if (!VectorCompare(Titanfall::Bsp::vertexNormals.at(normalIndex), mesh.vertices.at(triangle).normal)) {
                     continue;
+                }
 
                 uint16_t& index = Titanfall::Bsp::meshIndices.emplace_back();
                 index = j;
@@ -761,8 +783,9 @@ uint16_t Titanfall::EmitMaterialSort(uint32_t index) {
     /* Check if the material sort we need already exists */
     std::size_t pos = 0;
     for (Titanfall::MaterialSort_t &ms : Titanfall::Bsp::materialSorts) {
-        if (ms.textureData == index)
+        if (ms.textureData == index) {
             return pos;
+        }
 
         pos++;
     }
@@ -836,8 +859,9 @@ void Titanfall::EmitCollisionGrid() {
                 brushMinmax.maxs = brush.origin + brush.extents;
 
                 // NOTE: Still doesnt work
-                if (!cellMinmax.test(brushMinmax))
+                if (!cellMinmax.test(brushMinmax)) {
                     continue;
+                }
 
                 Titanfall::CMGeoSet_t& set = Titanfall::Bsp::cmGeoSets.emplace_back();
                 set.unknown0 = 0;
@@ -905,24 +929,23 @@ void Titanfall::EmitBrushes(const entity_t& e) {
             Vector3 normal = side.plane.normal();
             SnapNormal(normal);
 
-            // +X
-            if (normal[0] == 1.0f)
-                axials[0] = true;
-            // -X
-            if (normal[0] == -1.0f)
-                axials[1] = true;
-            // +Y
-            if (normal[1] == 1.0f)
-                axials[2] = true;
-            // -Y
-            if (normal[1] == -1.0f)
-                axials[3] = true;
-            // +Z
-            if (normal[2] == 1.0f)
-                axials[4] = true;
-            // -Z
-            if (normal[2] == -1.0f)
-                axials[5] = true;
+            if (normal[0] == 1.0f) {
+                axials[0] = true;  // +X
+            } else if (normal[0] == -1.0f) {
+                axials[1] = true;  // -X
+            }
+
+            if (normal[1] == 1.0f) {
+                axials[2] = true;  // +Y
+            } else if (normal[1] == -1.0f) {
+                axials[3] = true;  // -Y
+            }
+
+            if (normal[2] == 1.0f) {
+                axials[4] = true;  // +Z
+            } else if (normal[2] == -1.0f) {
+                axials[5] = true;  // -Z
+            }
         }
 
         // TODO: Add correct material offset
@@ -981,24 +1004,27 @@ void Titanfall::EmitLevelInfo() {
 
     // TODO: Add decal support
     for (Titanfall::Mesh_t &mesh : Titanfall::Bsp::meshes) {
-        // if (mesh.flags & S_SKY)
+        // if (mesh.flags & S_SKY) {
         //     break;
+        // }
 
         li.firstDecalMeshIndex++;
     }
 
-    for (Titanfall::Mesh_t& mesh : Titanfall::Bsp::meshes) {
-        // if (mesh.flags & S_TRANSLUCENT)
+    for (Titanfall::Mesh_t &mesh : Titanfall::Bsp::meshes) {
+        // if (mesh.flags & S_TRANSLUCENT) {
         //     break;
+        // }
 
         li.firstTransMeshIndex++;
     }
 
-    for (Titanfall::Mesh_t& mesh : Titanfall::Bsp::meshes) {
+    for (Titanfall::Mesh_t &mesh : Titanfall::Bsp::meshes) {
         // TODO: game shits itself when this is uncommented and your mesh is at the beginning of the vector
         //       Respawn probably sort their meshes by flags ?? VERIFY
-        // if (mesh.flags & S_SKY)
+        // if (mesh.flags & S_SKY) {
         //     break;
+        // }
 
         li.firstSkyMeshIndex++;
     }

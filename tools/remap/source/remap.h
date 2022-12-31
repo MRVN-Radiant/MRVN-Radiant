@@ -766,142 +766,144 @@ constexpr const char *surfaceTypeName( ESurfaceType type ){
 
 
 /* ydnar: this struct needs an overhaul (again, heh) */
-struct mapDrawSurface_t
-{
-	ESurfaceType type;
-	bool planar;
-	int outputNum;                          /* ydnar: to match this sort of thing up */
+struct mapDrawSurface_t {
+    ESurfaceType type;
+    bool planar;
+    int outputNum;                   /* ydnar: to match this sort of thing up */
 
-	bool fur;                               /* ydnar: this is kind of a hack, but hey... */
-	bool skybox;                            /* ydnar: yet another fun hack */
-	bool backSide;                          /* ydnar: q3map_backShader support */
+    bool fur;                        /* ydnar: this is kind of a hack, but hey... */
+    bool skybox;                     /* ydnar: yet another fun hack */
+    bool backSide;                   /* ydnar: q3map_backShader support */
 
-	mapDrawSurface_t *parent;        /* ydnar: for cloned (skybox) surfaces to share lighting data */
-	mapDrawSurface_t *clone;         /* ydnar: for cloned surfaces */
-	mapDrawSurface_t *cel;           /* ydnar: for cloned cel surfaces */
+    mapDrawSurface_t *parent;        /* ydnar: for cloned (skybox) surfaces to share lighting data */
+    mapDrawSurface_t *clone;         /* ydnar: for cloned surfaces */
+    mapDrawSurface_t *cel;           /* ydnar: for cloned cel surfaces */
 
-	shaderInfo_t        *shaderInfo;
-	shaderInfo_t        *celShader;
-	const brush_t       *mapBrush;
-	parseMesh_t         *mapMesh;
-	sideRef_t           *sideRef;
+    shaderInfo_t        *shaderInfo;
+    shaderInfo_t        *celShader;
+    const brush_t       *mapBrush;
+    parseMesh_t         *mapMesh;
+    sideRef_t           *sideRef;
 
-	int fogNum;
+    int fogNum;
 
-	int numVerts;                           /* vertexes and triangles */
-	bspDrawVert_t       *verts;
-	int numIndexes;
-	int                 *indexes;
+    int numVerts;                           /* vertexes and triangles */
+    bspDrawVert_t       *verts;
+    int numIndexes;
+    int                 *indexes;
 
-	int planeNum;
-	Vector3 lightmapOrigin;                 /* also used for flares */
-	Vector3 lightmapVecs[ 3 ];              /* also used for flares */
-	int lightStyle;                         /* used for flares */
+    int planeNum;
+    Vector3 lightmapOrigin;                 /* also used for flares */
+    Vector3 lightmapVecs[ 3 ];              /* also used for flares */
+    int lightStyle;                         /* used for flares */
 
-	/* ydnar: per-surface (per-entity, actually) lightmap sample size scaling */
-	float lightmapScale;
+    /* ydnar: per-surface (per-entity, actually) lightmap sample size scaling */
+    float lightmapScale;
 
-	/* jal: per-surface (per-entity, actually) shadeangle */
-	float shadeAngleDegrees;
+    /* jal: per-surface (per-entity, actually) shadeangle */
+    float shadeAngleDegrees;
 
-	/* ydnar: surface classification */
-	MinMax minmax;
-	Vector3 lightmapAxis;
-	int sampleSize;
+    /* ydnar: surface classification */
+    MinMax minmax;
+    Vector3 lightmapAxis;
+    int sampleSize;
 
-	/* ydnar: shadow group support */
-	int castShadows, recvShadows;
+    /* ydnar: shadow group support */
+    int castShadows, recvShadows;
 
-	/* ydnar: for patches */
-	float longestCurve;
-	int maxIterations;
-	int patchWidth, patchHeight;
-	MinMax bounds;
+    /* ydnar: for patches */
+    float longestCurve;
+    int maxIterations;
+    int patchWidth, patchHeight;
+    MinMax bounds;
 
-	/* ydnar/sd: for foliage */
-	int numFoliageInstances;
+    /* ydnar/sd: for foliage */
+    int numFoliageInstances;
 
-	/* ydnar: editor/useful numbering */
-	int entityNum;
-	int surfaceNum;
+    /* ydnar: editor/useful numbering */
+    int entityNum;
+    int surfaceNum;
 };
 
 
-struct drawSurfRef_t
-{
-	drawSurfRef_t    *nextRef;
-	int outputNum;
+struct drawSurfRef_t {
+    drawSurfRef_t *nextRef;
+    int outputNum;
 };
 
 
-struct epair_t
-{
-	CopiedString key, value;
+struct epair_t {
+    CopiedString key, value;
 };
 
 
-struct entity_t
-{
-	Vector3 origin{ 0 };
-	brushlist_t brushes;
-	std::vector<brush_t*>  colorModBrushes;
-	parseMesh_t         *patches;
-	int mapEntityNum;                               /* .map file entities numbering */
-	int firstDrawSurf;
-	int firstBrush, numBrushes;                     /* only valid during BSP compile */
-	std::list<epair_t> epairs;
-	Vector3 originbrush_origin{ 0 };
+struct entity_t {
+    Vector3                origin{ 0 };
+    brushlist_t            brushes;
+    std::vector<brush_t*>  colorModBrushes;
+    parseMesh_t           *patches;
+    int                    mapEntityNum;            /* .map file entities numbering */
+    int                    firstDrawSurf;
+    int                    firstBrush, numBrushes;  /* only valid during BSP compile */
+    std::list<epair_t>     epairs;
+    Vector3                originbrush_origin{ 0 };
 
-	void setKeyValue( const char *key, const char *value );
-	const char *valueForKey( const char *key ) const;
+    void        setKeyValue(const char *key, const char *value);
+    const char *valueForKey(const char *key) const;
 
-	template<typename ... Keys>
-	bool boolForKey( Keys ... keys ) const {
-		bool bool_value = false;
-		read_keyvalue_( bool_value, { keys ... } );
-		return bool_value;
-	}
-	template<typename ... Keys>
-	int intForKey( Keys ... keys ) const {
-		int int_value = 0;
-		read_keyvalue_( int_value, { keys ... } );
-		return int_value;
-	}
-	template<typename ... Keys>
-	float floatForKey( Keys ... keys ) const {
-		float float_value = 0;
-		read_keyvalue_( float_value, { keys ... } );
-		return float_value;
-	}
-	Vector3 vectorForKey( const char *key ) const {
-		Vector3 vec( 0 );
-		read_keyvalue_( vec, { key } );
-		return vec;
-	}
+    template<typename ... Keys>
+    bool boolForKey(Keys ... keys) const {
+        bool bool_value = false;
+        read_keyvalue_(bool_value, { keys ... });
+        return bool_value;
+    }
 
-	const char *classname() const {
-		return valueForKey( "classname" );
-	}
-	bool classname_is( const char *name ) const {
-		return striEqual( classname(), name );
-	}
-	bool classname_prefixed( const char *prefix ) const {
-		return striEqualPrefix( classname(), prefix );
-	}
+    template<typename ... Keys>
+    int intForKey(Keys ... keys) const {
+        int int_value = 0;
+        read_keyvalue_(int_value, { keys ... });
+        return int_value;
+    }
 
-		/* entity: read key value variadic template
-		returns true on successful read
-		returns false and does not modify value otherwise */
-	template<typename T, typename ... Keys>
-	bool read_keyvalue( T& value_ref, Keys ... keys ) const {
-		return read_keyvalue_( value_ref, { keys ... } );
-	}
+    template<typename ... Keys>
+    float floatForKey(Keys ... keys) const {
+        float float_value = 0;
+        read_keyvalue_(float_value, { keys ... });
+        return float_value;
+    }
+
+    Vector3 vectorForKey(const char *key) const {
+        Vector3 vec(0);
+        read_keyvalue_(vec, { key });
+        return vec;
+    }
+
+    const char *classname() const {
+        return valueForKey("classname");
+    }
+
+    bool classname_is(const char *name) const {
+        return striEqual(classname(), name);
+    }
+
+    bool classname_prefixed(const char *prefix) const {
+        return striEqualPrefix(classname(), prefix);
+    }
+
+    /* entity: read key value variadic template
+    returns true on successful read
+    returns false and does not modify value otherwise */
+    template<typename T, typename ... Keys>
+    bool read_keyvalue(T& value_ref, Keys ... keys) const {
+            return read_keyvalue_(value_ref, { keys ... });
+    }
+
 private:
-	bool read_keyvalue_( bool &bool_value, std::initializer_list<const char*>&& keys ) const;
-	bool read_keyvalue_( int &int_value, std::initializer_list<const char*>&& keys ) const;
-	bool read_keyvalue_( float &float_value, std::initializer_list<const char*>&& keys ) const;
-	bool read_keyvalue_( Vector3& vector3_value, std::initializer_list<const char*>&& keys ) const;
-	bool read_keyvalue_( const char *&string_ptr_value, std::initializer_list<const char*>&& keys ) const;
+    bool read_keyvalue_(bool              &bool_value, std::initializer_list<const char*> &&keys ) const;
+    bool read_keyvalue_(int                &int_value, std::initializer_list<const char*> &&keys ) const;
+    bool read_keyvalue_(float            &float_value, std::initializer_list<const char*> &&keys ) const;
+    bool read_keyvalue_(Vector3        &vector3_value, std::initializer_list<const char*> &&keys ) const;
+    bool read_keyvalue_(const char *&string_ptr_value, std::initializer_list<const char*> &&keys ) const;
 };
 
 
