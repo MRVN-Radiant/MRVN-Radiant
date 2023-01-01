@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-	Titanfall 2 entity definitions for MRVN-radiant
+        Titanfall 2 entity definitions for MRVN-radiant
         Definitions by catornot (2022-11-2)
         Boxes & Models by snake-biscuits (2022-11-6)
 -->
@@ -28,29 +28,29 @@
 Used for spawning player when match starts.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
-<targetname key="targetname" name="Target Name" value="info_player_start_">UNIQUE Target name</targetname>
+<targetname key="targetname" name="Target Name" value="spawn_">UNIQUE Target name</targetname>
 <angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
-<boolean key="gamemode_aitdm" name="gamemode_aitdm" value="1">Use this for Attrition?</boolean>
-<boolean key="gamemode_at" name="gamemode_at" value="1">Use this for Bounty Hunt?</boolean>
-<boolean key="gamemode_coliseum" name="gamemode_coliseum" value="1">Use this for Coliseum(The gamemode)?</boolean>
-<boolean key="gamemode_cp" name="gamemode_cp" value="1">Use this for Amped hardpoint?</boolean>
-<boolean key="gamemode_ctf" name="gamemode_ctf" value="1">Use this for Capture the flag?</boolean>
-<boolean key="gamemode_mfd" name="gamemode_mfd" value="1">Use this for Marked for death?</boolean>
-<boolean key="gamemode_ps" name="gamemode_ps" value="1">Use this for Pilots vs Pilots?</boolean>
-<boolean key="gamemode_solo" name="gamemode_solo" value="1">Use this for Campaign?</boolean>
-<boolean key="gamemode_tdm" name="gamemode_tdm" value="1">Use this for Skirmish?</boolean>
-<boolean key="gamemode_lf" name="gamemode_lf" value="1">Use this for Live fire?</boolean>
-<boolean key="gamemode_ffa" name="gamemode_ffa" value="1">Use this for Free for all?</boolean>
-<boolean key="gamemode_fra" name="gamemode_fra" value="1">Use this for Free agents?</boolean>
-<boolean key="gamemode_chamber" name="gamemode_chamber" value="1">Use this for One in the chamber?</boolean>
-<boolean key="gamemode_ctf_comp" name="gamemode_ctf_comp" value="1">Use this for Competitive CTF?</boolean>
-<boolean key="gamemode_fastball" name="gamemode_fastball" value="1">Use this for Fastball?</boolean>
-<boolean key="gamemode_gg" name="gamemode_gg" value="1">Use this for Gun game?</boolean>
-<boolean key="gamemode_hidden" name="gamemode_hidden" value="1">Use this for The hidden?</boolean>
-<boolean key="gamemode_hs" name="gamemode_hs" value="1">Use this for Hide and seek?</boolean>
-<boolean key="gamemode_inf" name="gamemode_inf" value="1">Use this for Infection?</boolean>
-<boolean key="gamemode_kr" name="gamemode_kr" value="1">Use this for Amped killrace?</boolean>
-<boolean key="gamemode_sns" name="gamemode_sns" value="1">Use this for Sticks and stones?</boolean>
+<boolean key="gamemode_aitdm" name="gamemode_aitdm" value="0">Use this for Attrition?</boolean>
+<boolean key="gamemode_at" name="gamemode_at" value="0">Use this for Bounty Hunt?</boolean>
+<boolean key="gamemode_coliseum" name="gamemode_coliseum" value="0">Use this for Coliseum(The gamemode)?</boolean>
+<boolean key="gamemode_cp" name="gamemode_cp" value="0">Use this for Amped hardpoint?</boolean>
+<boolean key="gamemode_ctf" name="gamemode_ctf" value="0">Use this for Capture the flag?</boolean>
+<boolean key="gamemode_mfd" name="gamemode_mfd" value="0">Use this for Marked for death?</boolean>
+<boolean key="gamemode_ps" name="gamemode_ps" value="0">Use this for Pilots vs Pilots?</boolean>
+<boolean key="gamemode_solo" name="gamemode_solo" value="0">Use this for Campaign?</boolean>
+<boolean key="gamemode_tdm" name="gamemode_tdm" value="0">Use this for Skirmish?</boolean>
+<boolean key="gamemode_lf" name="gamemode_lf" value="0">Use this for Live fire?</boolean>
+<boolean key="gamemode_ffa" name="gamemode_ffa" value="0">Use this for Free for all?</boolean>
+<boolean key="gamemode_fra" name="gamemode_fra" value="0">Use this for Free agents?</boolean>
+<boolean key="gamemode_chamber" name="gamemode_chamber" value="0">Use this for One in the chamber?</boolean>
+<boolean key="gamemode_ctf_comp" name="gamemode_ctf_comp" value="0">Use this for Competitive CTF?</boolean>
+<boolean key="gamemode_fastball" name="gamemode_fastball" value="0">Use this for Fastball?</boolean>
+<boolean key="gamemode_gg" name="gamemode_gg" value="0">Use this for Gun game?</boolean>
+<boolean key="gamemode_hidden" name="gamemode_hidden" value="0">Use this for The hidden?</boolean>
+<boolean key="gamemode_hs" name="gamemode_hs" value="0">Use this for Hide and seek?</boolean>
+<boolean key="gamemode_inf" name="gamemode_inf" value="0">Use this for Infection?</boolean>
+<boolean key="gamemode_kr" name="gamemode_kr" value="0">Use this for Amped killrace?</boolean>
+<boolean key="gamemode_sns" name="gamemode_sns" value="0">Use this for Sticks and stones?</boolean>
 -------- NOTES --------
 Place slightly above the ground to avoid getting stuck in the floor.
 </point>
@@ -60,29 +60,29 @@ Place slightly above the ground to avoid getting stuck in the floor.
 Used for respawning players.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
-<targetname key="targetname" name="Target Name" value="info_spawnpoint_human_">UNIQUE Target name</targetname>
+<targetname key="targetname" name="Target Name" value="spawn_">UNIQUE Target name</targetname>
 <angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
-<boolean key="gamemode_aitdm" name="gamemode_aitdm" value="1">Use this for Attrition?</boolean>
-<boolean key="gamemode_at" name="gamemode_at" value="1">Use this for Bounty Hunt?</boolean>
-<boolean key="gamemode_coliseum" name="gamemode_coliseum" value="1">Use this for Coliseum(The gamemode)?</boolean>
-<boolean key="gamemode_cp" name="gamemode_cp" value="1">Use this for Amped hardpoint?</boolean>
-<boolean key="gamemode_ctf" name="gamemode_ctf" value="1">Use this for Capture the flag?</boolean>
-<boolean key="gamemode_mfd" name="gamemode_mfd" value="1">Use this for Marked for death?</boolean>
-<boolean key="gamemode_ps" name="gamemode_ps" value="1">Use this for Pilots vs Pilots?</boolean>
-<boolean key="gamemode_solo" name="gamemode_solo" value="1">Use this for Campaign?</boolean>
-<boolean key="gamemode_tdm" name="gamemode_tdm" value="1">Use this for Skirmish?</boolean>
-<boolean key="gamemode_lf" name="gamemode_lf" value="1">Use this for Live fire?</boolean>
-<boolean key="gamemode_ffa" name="gamemode_ffa" value="1">Use this for Free for all?</boolean>
-<boolean key="gamemode_fra" name="gamemode_fra" value="1">Use this for Free agents?</boolean>
-<boolean key="gamemode_chamber" name="gamemode_chamber" value="1">Use this for One in the chamber?</boolean>
-<boolean key="gamemode_ctf_comp" name="gamemode_ctf_comp" value="1">Use this for Competitive CTF?</boolean>
-<boolean key="gamemode_fastball" name="gamemode_fastball" value="1">Use this for Fastball?</boolean>
-<boolean key="gamemode_gg" name="gamemode_gg" value="1">Use this for Gun game?</boolean>
-<boolean key="gamemode_hidden" name="gamemode_hidden" value="1">Use this for The hidden?</boolean>
-<boolean key="gamemode_hs" name="gamemode_hs" value="1">Use this for Hide and seek?</boolean>
-<boolean key="gamemode_inf" name="gamemode_inf" value="1">Use this for Infection?</boolean>
-<boolean key="gamemode_kr" name="gamemode_kr" value="1">Use this for Amped killrace?</boolean>
-<boolean key="gamemode_sns" name="gamemode_sns" value="1">Use this for Sticks and stones?</boolean>
+<boolean key="gamemode_aitdm" name="gamemode_aitdm" value="0">Use this for Attrition?</boolean>
+<boolean key="gamemode_at" name="gamemode_at" value="0">Use this for Bounty Hunt?</boolean>
+<boolean key="gamemode_coliseum" name="gamemode_coliseum" value="0">Use this for Coliseum(The gamemode)?</boolean>
+<boolean key="gamemode_cp" name="gamemode_cp" value="0">Use this for Amped hardpoint?</boolean>
+<boolean key="gamemode_ctf" name="gamemode_ctf" value="0">Use this for Capture the flag?</boolean>
+<boolean key="gamemode_mfd" name="gamemode_mfd" value="0">Use this for Marked for death?</boolean>
+<boolean key="gamemode_ps" name="gamemode_ps" value="0">Use this for Pilots vs Pilots?</boolean>
+<boolean key="gamemode_solo" name="gamemode_solo" value="0">Use this for Campaign?</boolean>
+<boolean key="gamemode_tdm" name="gamemode_tdm" value="0">Use this for Skirmish?</boolean>
+<boolean key="gamemode_lf" name="gamemode_lf" value="0">Use this for Live fire?</boolean>
+<boolean key="gamemode_ffa" name="gamemode_ffa" value="0">Use this for Free for all?</boolean>
+<boolean key="gamemode_fra" name="gamemode_fra" value="0">Use this for Free agents?</boolean>
+<boolean key="gamemode_chamber" name="gamemode_chamber" value="0">Use this for One in the chamber?</boolean>
+<boolean key="gamemode_ctf_comp" name="gamemode_ctf_comp" value="0">Use this for Competitive CTF?</boolean>
+<boolean key="gamemode_fastball" name="gamemode_fastball" value="0">Use this for Fastball?</boolean>
+<boolean key="gamemode_gg" name="gamemode_gg" value="0">Use this for Gun game?</boolean>
+<boolean key="gamemode_hidden" name="gamemode_hidden" value="0">Use this for The hidden?</boolean>
+<boolean key="gamemode_hs" name="gamemode_hs" value="0">Use this for Hide and seek?</boolean>
+<boolean key="gamemode_inf" name="gamemode_inf" value="0">Use this for Infection?</boolean>
+<boolean key="gamemode_kr" name="gamemode_kr" value="0">Use this for Amped killrace?</boolean>
+<boolean key="gamemode_sns" name="gamemode_sns" value="0">Use this for Sticks and stones?</boolean>
 -------- NOTES --------
 Place slightly above the ground to avoid getting stuck in the floor.
 </point>
@@ -91,29 +91,29 @@ Place slightly above the ground to avoid getting stuck in the floor.
 Used for spawning player when match starts.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
-<targetname key="targetname" name="Target Name" value="info_spawnpoint_dropship_start_">UNIQUE Target name</targetname>
+<targetname key="targetname" name="Target Name" value="spawn_">UNIQUE Target name</targetname>
 <angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
-<boolean key="gamemode_aitdm" name="gamemode_aitdm" value="1">Use this for Attrition?</boolean>
-<boolean key="gamemode_at" name="gamemode_at" value="1">Use this for Bounty Hunt?</boolean>
-<boolean key="gamemode_coliseum" name="gamemode_coliseum" value="1">Use this for Coliseum(The gamemode)?</boolean>
-<boolean key="gamemode_cp" name="gamemode_cp" value="1">Use this for Amped hardpoint?</boolean>
-<boolean key="gamemode_ctf" name="gamemode_ctf" value="1">Use this for Capture the flag?</boolean>
-<boolean key="gamemode_mfd" name="gamemode_mfd" value="1">Use this for Marked for death?</boolean>
-<boolean key="gamemode_ps" name="gamemode_ps" value="1">Use this for Pilots vs Pilots?</boolean>
-<boolean key="gamemode_solo" name="gamemode_solo" value="1">Use this for Campaign?</boolean>
-<boolean key="gamemode_tdm" name="gamemode_tdm" value="1">Use this for Skirmish?</boolean>
-<boolean key="gamemode_lf" name="gamemode_lf" value="1">Use this for Live fire?</boolean>
-<boolean key="gamemode_ffa" name="gamemode_ffa" value="1">Use this for Free for all?</boolean>
-<boolean key="gamemode_fra" name="gamemode_fra" value="1">Use this for Free agents?</boolean>
-<boolean key="gamemode_chamber" name="gamemode_chamber" value="1">Use this for One in the chamber?</boolean>
-<boolean key="gamemode_ctf_comp" name="gamemode_ctf_comp" value="1">Use this for Competitive CTF?</boolean>
-<boolean key="gamemode_fastball" name="gamemode_fastball" value="1">Use this for Fastball?</boolean>
-<boolean key="gamemode_gg" name="gamemode_gg" value="1">Use this for Gun game?</boolean>
-<boolean key="gamemode_hidden" name="gamemode_hidden" value="1">Use this for The hidden?</boolean>
-<boolean key="gamemode_hs" name="gamemode_hs" value="1">Use this for Hide and seek?</boolean>
-<boolean key="gamemode_inf" name="gamemode_inf" value="1">Use this for Infection?</boolean>
-<boolean key="gamemode_kr" name="gamemode_kr" value="1">Use this for Amped killrace?</boolean>
-<boolean key="gamemode_sns" name="gamemode_sns" value="1">Use this for Sticks and stones?</boolean>
+<boolean key="gamemode_aitdm" name="gamemode_aitdm" value="0">Use this for Attrition?</boolean>
+<boolean key="gamemode_at" name="gamemode_at" value="0">Use this for Bounty Hunt?</boolean>
+<boolean key="gamemode_coliseum" name="gamemode_coliseum" value="0">Use this for Coliseum(The gamemode)?</boolean>
+<boolean key="gamemode_cp" name="gamemode_cp" value="0">Use this for Amped hardpoint?</boolean>
+<boolean key="gamemode_ctf" name="gamemode_ctf" value="0">Use this for Capture the flag?</boolean>
+<boolean key="gamemode_mfd" name="gamemode_mfd" value="0">Use this for Marked for death?</boolean>
+<boolean key="gamemode_ps" name="gamemode_ps" value="0">Use this for Pilots vs Pilots?</boolean>
+<boolean key="gamemode_solo" name="gamemode_solo" value="0">Use this for Campaign?</boolean>
+<boolean key="gamemode_tdm" name="gamemode_tdm" value="0">Use this for Skirmish?</boolean>
+<boolean key="gamemode_lf" name="gamemode_lf" value="0">Use this for Live fire?</boolean>
+<boolean key="gamemode_ffa" name="gamemode_ffa" value="0">Use this for Free for all?</boolean>
+<boolean key="gamemode_fra" name="gamemode_fra" value="0">Use this for Free agents?</boolean>
+<boolean key="gamemode_chamber" name="gamemode_chamber" value="0">Use this for One in the chamber?</boolean>
+<boolean key="gamemode_ctf_comp" name="gamemode_ctf_comp" value="0">Use this for Competitive CTF?</boolean>
+<boolean key="gamemode_fastball" name="gamemode_fastball" value="0">Use this for Fastball?</boolean>
+<boolean key="gamemode_gg" name="gamemode_gg" value="0">Use this for Gun game?</boolean>
+<boolean key="gamemode_hidden" name="gamemode_hidden" value="0">Use this for The hidden?</boolean>
+<boolean key="gamemode_hs" name="gamemode_hs" value="0">Use this for Hide and seek?</boolean>
+<boolean key="gamemode_inf" name="gamemode_inf" value="0">Use this for Infection?</boolean>
+<boolean key="gamemode_kr" name="gamemode_kr" value="0">Use this for Amped killrace?</boolean>
+<boolean key="gamemode_sns" name="gamemode_sns" value="0">Use this for Sticks and stones?</boolean>
 </point>
 
 <!-- TODO: model="models/dev/mp_titan_spawn_start.mdl" -->
@@ -121,29 +121,29 @@ Used for spawning player when match starts.
 Used for spawning player when match starts.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
-<targetname key="targetname" name="Target Name" value="info_spawnpoint_titan_start_">UNIQUE Target name</targetname>
+<targetname key="targetname" name="Target Name" value="spawn_">UNIQUE Target name</targetname>
 <angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
-<boolean key="gamemode_aitdm" name="gamemode_aitdm" value="1">Use this for Attrition?</boolean>
-<boolean key="gamemode_at" name="gamemode_at" value="1">Use this for Bounty Hunt?</boolean>
-<boolean key="gamemode_coliseum" name="gamemode_coliseum" value="1">Use this for Coliseum(The gamemode)?</boolean>
-<boolean key="gamemode_cp" name="gamemode_cp" value="1">Use this for Amped hardpoint?</boolean>
-<boolean key="gamemode_ctf" name="gamemode_ctf" value="1">Use this for Capture the flag?</boolean>
-<boolean key="gamemode_mfd" name="gamemode_mfd" value="1">Use this for Marked for death?</boolean>
-<boolean key="gamemode_ps" name="gamemode_ps" value="1">Use this for Pilots vs Pilots?</boolean>
-<boolean key="gamemode_solo" name="gamemode_solo" value="1">Use this for Campaign?</boolean>
-<boolean key="gamemode_tdm" name="gamemode_tdm" value="1">Use this for Skirmish?</boolean>
-<boolean key="gamemode_lf" name="gamemode_lf" value="1">Use this for Live fire?</boolean>
-<boolean key="gamemode_ffa" name="gamemode_ffa" value="1">Use this for Free for all?</boolean>
-<boolean key="gamemode_fra" name="gamemode_fra" value="1">Use this for Free agents?</boolean>
-<boolean key="gamemode_chamber" name="gamemode_chamber" value="1">Use this for One in the chamber?</boolean>
-<boolean key="gamemode_ctf_comp" name="gamemode_ctf_comp" value="1">Use this for Competitive CTF?</boolean>
-<boolean key="gamemode_fastball" name="gamemode_fastball" value="1">Use this for Fastball?</boolean>
-<boolean key="gamemode_gg" name="gamemode_gg" value="1">Use this for Gun game?</boolean>
-<boolean key="gamemode_hidden" name="gamemode_hidden" value="1">Use this for The hidden?</boolean>
-<boolean key="gamemode_hs" name="gamemode_hs" value="1">Use this for Hide and seek?</boolean>
-<boolean key="gamemode_inf" name="gamemode_inf" value="1">Use this for Infection?</boolean>
-<boolean key="gamemode_kr" name="gamemode_kr" value="1">Use this for Amped killrace?</boolean>
-<boolean key="gamemode_sns" name="gamemode_sns" value="1">Use this for Sticks and stones?</boolean>
+<boolean key="gamemode_aitdm" name="gamemode_aitdm" value="0">Use this for Attrition?</boolean>
+<boolean key="gamemode_at" name="gamemode_at" value="0">Use this for Bounty Hunt?</boolean>
+<boolean key="gamemode_coliseum" name="gamemode_coliseum" value="0">Use this for Coliseum(The gamemode)?</boolean>
+<boolean key="gamemode_cp" name="gamemode_cp" value="0">Use this for Amped hardpoint?</boolean>
+<boolean key="gamemode_ctf" name="gamemode_ctf" value="0">Use this for Capture the flag?</boolean>
+<boolean key="gamemode_mfd" name="gamemode_mfd" value="0">Use this for Marked for death?</boolean>
+<boolean key="gamemode_ps" name="gamemode_ps" value="0">Use this for Pilots vs Pilots?</boolean>
+<boolean key="gamemode_solo" name="gamemode_solo" value="0">Use this for Campaign?</boolean>
+<boolean key="gamemode_tdm" name="gamemode_tdm" value="0">Use this for Skirmish?</boolean>
+<boolean key="gamemode_lf" name="gamemode_lf" value="0">Use this for Live fire?</boolean>
+<boolean key="gamemode_ffa" name="gamemode_ffa" value="0">Use this for Free for all?</boolean>
+<boolean key="gamemode_fra" name="gamemode_fra" value="0">Use this for Free agents?</boolean>
+<boolean key="gamemode_chamber" name="gamemode_chamber" value="0">Use this for One in the chamber?</boolean>
+<boolean key="gamemode_ctf_comp" name="gamemode_ctf_comp" value="0">Use this for Competitive CTF?</boolean>
+<boolean key="gamemode_fastball" name="gamemode_fastball" value="0">Use this for Fastball?</boolean>
+<boolean key="gamemode_gg" name="gamemode_gg" value="0">Use this for Gun game?</boolean>
+<boolean key="gamemode_hidden" name="gamemode_hidden" value="0">Use this for The hidden?</boolean>
+<boolean key="gamemode_hs" name="gamemode_hs" value="0">Use this for Hide and seek?</boolean>
+<boolean key="gamemode_inf" name="gamemode_inf" value="0">Use this for Infection?</boolean>
+<boolean key="gamemode_kr" name="gamemode_kr" value="0">Use this for Amped killrace?</boolean>
+<boolean key="gamemode_sns" name="gamemode_sns" value="0">Use this for Sticks and stones?</boolean>
 -------- NOTES --------
 Place slightly above the ground to avoid getting stuck in the floor.
 </point>
@@ -153,29 +153,29 @@ Place slightly above the ground to avoid getting stuck in the floor.
 Used for spawning player when match starts.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
-<targetname key="targetname" name="Target Name" value="info_spawnpoint_titan_">UNIQUE Target name</targetname>
+<targetname key="targetname" name="Target Name" value="spawn_">UNIQUE Target name</targetname>
 <angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
-<boolean key="gamemode_aitdm" name="gamemode_aitdm" value="1">Use this for Attrition?</boolean>
-<boolean key="gamemode_at" name="gamemode_at" value="1">Use this for Bounty Hunt?</boolean>
-<boolean key="gamemode_coliseum" name="gamemode_coliseum" value="1">Use this for Coliseum(The gamemode)?</boolean>
-<boolean key="gamemode_cp" name="gamemode_cp" value="1">Use this for Amped hardpoint?</boolean>
-<boolean key="gamemode_ctf" name="gamemode_ctf" value="1">Use this for Capture the flag?</boolean>
-<boolean key="gamemode_mfd" name="gamemode_mfd" value="1">Use this for Marked for death?</boolean>
-<boolean key="gamemode_ps" name="gamemode_ps" value="1">Use this for Pilots vs Pilots?</boolean>
-<boolean key="gamemode_solo" name="gamemode_solo" value="1">Use this for Campaign?</boolean>
-<boolean key="gamemode_tdm" name="gamemode_tdm" value="1">Use this for Skirmish?</boolean>
-<boolean key="gamemode_lf" name="gamemode_lf" value="1">Use this for Live fire?</boolean>
-<boolean key="gamemode_ffa" name="gamemode_ffa" value="1">Use this for Free for all?</boolean>
-<boolean key="gamemode_fra" name="gamemode_fra" value="1">Use this for Free agents?</boolean>
-<boolean key="gamemode_chamber" name="gamemode_chamber" value="1">Use this for One in the chamber?</boolean>
-<boolean key="gamemode_ctf_comp" name="gamemode_ctf_comp" value="1">Use this for Competitive CTF?</boolean>
-<boolean key="gamemode_fastball" name="gamemode_fastball" value="1">Use this for Fastball?</boolean>
-<boolean key="gamemode_gg" name="gamemode_gg" value="1">Use this for Gun game?</boolean>
-<boolean key="gamemode_hidden" name="gamemode_hidden" value="1">Use this for The hidden?</boolean>
-<boolean key="gamemode_hs" name="gamemode_hs" value="1">Use this for Hide and seek?</boolean>
-<boolean key="gamemode_inf" name="gamemode_inf" value="1">Use this for Infection?</boolean>
-<boolean key="gamemode_kr" name="gamemode_kr" value="1">Use this for Amped killrace?</boolean>
-<boolean key="gamemode_sns" name="gamemode_sns" value="1">Use this for Sticks and stones?</boolean>
+<boolean key="gamemode_aitdm" name="gamemode_aitdm" value="0">Use this for Attrition?</boolean>
+<boolean key="gamemode_at" name="gamemode_at" value="0">Use this for Bounty Hunt?</boolean>
+<boolean key="gamemode_coliseum" name="gamemode_coliseum" value="0">Use this for Coliseum(The gamemode)?</boolean>
+<boolean key="gamemode_cp" name="gamemode_cp" value="0">Use this for Amped hardpoint?</boolean>
+<boolean key="gamemode_ctf" name="gamemode_ctf" value="0">Use this for Capture the flag?</boolean>
+<boolean key="gamemode_mfd" name="gamemode_mfd" value="0">Use this for Marked for death?</boolean>
+<boolean key="gamemode_ps" name="gamemode_ps" value="0">Use this for Pilots vs Pilots?</boolean>
+<boolean key="gamemode_solo" name="gamemode_solo" value="0">Use this for Campaign?</boolean>
+<boolean key="gamemode_tdm" name="gamemode_tdm" value="0">Use this for Skirmish?</boolean>
+<boolean key="gamemode_lf" name="gamemode_lf" value="0">Use this for Live fire?</boolean>
+<boolean key="gamemode_ffa" name="gamemode_ffa" value="0">Use this for Free for all?</boolean>
+<boolean key="gamemode_fra" name="gamemode_fra" value="0">Use this for Free agents?</boolean>
+<boolean key="gamemode_chamber" name="gamemode_chamber" value="0">Use this for One in the chamber?</boolean>
+<boolean key="gamemode_ctf_comp" name="gamemode_ctf_comp" value="0">Use this for Competitive CTF?</boolean>
+<boolean key="gamemode_fastball" name="gamemode_fastball" value="0">Use this for Fastball?</boolean>
+<boolean key="gamemode_gg" name="gamemode_gg" value="0">Use this for Gun game?</boolean>
+<boolean key="gamemode_hidden" name="gamemode_hidden" value="0">Use this for The hidden?</boolean>
+<boolean key="gamemode_hs" name="gamemode_hs" value="0">Use this for Hide and seek?</boolean>
+<boolean key="gamemode_inf" name="gamemode_inf" value="0">Use this for Infection?</boolean>
+<boolean key="gamemode_kr" name="gamemode_kr" value="0">Use this for Amped killrace?</boolean>
+<boolean key="gamemode_sns" name="gamemode_sns" value="0">Use this for Sticks and stones?</boolean>
 -------- NOTES --------
 Place slightly above the ground to avoid getting stuck in the floor.
 </point>
@@ -185,7 +185,7 @@ Place slightly above the ground to avoid getting stuck in the floor.
 Used to spawn the flags in ctf.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
-<targetname key="targetname" name="Target Name" value="info_spawnpoint_flag_">UNIQUE Target name</targetname>
+<targetname key="targetname" name="Target Name" value="flag_">UNIQUE Target name</targetname>
 <angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 </point>
 
@@ -194,7 +194,7 @@ Used to spawn the flags in ctf.
 Used to spawn the flag in live fire.
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
-<targetname key="targetname" name="Target Name" value="info_speedball_flag_">UNIQUE Target name</targetname>
+<targetname key="targetname" name="Target Name" value="flag_">UNIQUE Target name</targetname>
 <angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 </point>
 
@@ -213,7 +213,7 @@ Used to spawn the flag in live fire.
 Used to spawn the hardpoints in amped hardpoints
 -------- KEYS --------
 <integer key="teamnum" name="Team number" value="-1">TEAM_ANY = -1; TEAM_BOTH = 4; TEAM_MILITIA = 3, TEAM_IMC = 2</integer>
-<targetname key="targetname" name="Target Name" value="info_hardpoint_">UNIQUE Target name</targetname>
+<targetname key="targetname" name="Target Name" value="hardpoint_">UNIQUE Target name</targetname>
 <angles key="angles" name="Pitch Yaw Roll" value="0 0 0">Individual control of PITCH, YAW, and ROLL.</angles>
 <string key="hardpointGroup" name="Hardpoint Group" value="A">used to indicate the hardpoint name (A,B,C)</string>
 <real key="scale" name="Scale" value="1">Value used to scale the ents model, hitboxes DO NOT scale.</real>
@@ -231,8 +231,8 @@ Model must be set!
 <!-- TODO: model="models/editor/axis_helper_thick.mdl" -->
 <point name="move_rope" color=".3 .3 1" box="-8 -8 -8 8 8 8">
 -------- KEYS --------
-<targetname key="targetname" name="Target Name" value="move_rope_">The target name of the zipline</targetname>
-<targetname key="NextKey" name="Next Key" value="move_rope_">The second point of the zipline</targetname>
+<targetname key="targetname" name="Target Name" value="zipline_">The target name of the zipline</targetname>
+<targetname key="NextKey" name="Next Key" value="zipline_">The second point of the zipline</targetname>
 <boolean key="Zipline" name="Zipline">Set this to 1</boolean>
 <integer key="Subdiv" name="Subdivisions" value="0">Number of subdivisions between each rope segment. Higher values make smoother ropes, but are slower to render.</integer>
 <integer key="Slack" name="Slack">How much extra length the rope has (by default it has the length between its two endpoints in the editor).</integer>
@@ -341,13 +341,24 @@ Deals damage to entities
 <string key="damageSourceName" name="Damage Source Name" value="fall">Damage type</string>
 <targetname key="targetname" name="Target Name" value="trigger_hurt_">Target name</targetname>
 <integer key="damage" name="Damage" value="0">Damage inflicted</integer>
-<integer key="spawnflags" name="Spawnflags" value="4099">unknown</integer>
+-------- SPAWNFLAGS --------
+<flag key="CLIENTS" name="Affects Players" bit="0">Give players a warning to return to the map</flag>
+<flag key="NPCS" name="Affects NPCs" bit="1">Might affect AI Minions &amp; Titans; need to test with navmeshes</flag>
+<flag key="BOTS" name="Disallow Bots" bit="12">Tell AI to stay out of here?</flag>
+-------- NOTES --------
+CLIENTS spawnflag must be set
 </group>
 
 <group name="trigger_out_of_bounds">
 Triggers the out of bounds timer when player is inside
 -------- KEYS --------
-<integer key="spawnflags" name="Spawnflags" value="4099">unknown</integer>
+<boolean key="startDisabled" name="Start Disabled" value="0">Starts inactive, can be activated later with a script</boolean>
+-------- SPAWNFLAGS --------
+<flag key="CLIENTS" name="Affects Players" bit="0">Give players a warning to return to the map</flag>
+<flag key="NPCS" name="Affects NPCs" bit="1">Might affect AI Minions &amp; Titans; need to test with navmeshes</flag>
+<flag key="BOTS" name="Disallow Bots" bit="12">Tell AI to stay out of here?</flag>
+-------- NOTES --------
+CLIENTS spawnflag must be set
 </group>
 
 </classes>
