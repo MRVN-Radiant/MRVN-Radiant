@@ -68,7 +68,7 @@ public:
     EntitySetKeyValueSelected(const char *key, const char *value)
         : m_key(key), m_value(value) {}
 
-    bool pre(const scene::Path& path, scene::Instance &instance) const {
+    bool pre(const scene::Path &path, scene::Instance &instance) const {
         return true;
     }
 
@@ -87,20 +87,19 @@ class EntitySetClassnameSelected : public scene::Graph::Walker {
     const bool   m_2world;
 
 public:
-    EntitySetClassnameSelected( const char* classname )
-            : m_classname( classname ), m_world( Map_FindWorldspawn( g_map ) ), m_2world( m_world && string_equal( m_classname, "worldspawn" ) ){
-    }
+    EntitySetClassnameSelected(const char *classname)
+            : m_classname(classname), m_world(Map_FindWorldspawn(g_map)), m_2world(m_world && string_equal(m_classname, "worldspawn")) {}
 
-    bool pre( const scene::Path& path, scene::Instance& instance ) const {
+    bool pre(const scene::Path &path, scene::Instance &instance) const {
             return true;
     }
 
-    void post( const scene::Path& path, scene::Instance& instance ) const {
-        Entity* entity = Node_getEntity( path.top() );
-        if ( entity != 0 && ( instance.childSelected() || Instance_isSelected( instance ) ) ) {
+    void post(const scene::Path &path, scene::Instance &instance) const {
+        Entity *entity = Node_getEntity(path.top());
+        if (entity != 0 && (instance.childSelected() || Instance_isSelected(instance))) {
             if (path.top().get_pointer() == m_world) {  /* do not want to convert whole worldspawn entity */
                 if (instance.childSelected() && !m_2world) {  /* create an entity from world brushes instead */
-                    EntityClass* entityClass = GlobalEntityClassManager().findOrInsert( m_classname, true );
+                    EntityClass *entityClass = GlobalEntityClassManager().findOrInsert(m_classname, true);
                     if (entityClass->fixedsize) {
                         return;
                     }
@@ -115,19 +114,19 @@ public:
                     // }
 
                     NodeSmartReference  node(GlobalEntityCreator().createEntity(entityClass));
-                    Node_getTraversable(GlobalSceneGraph().root() )->insert(node);
+                    Node_getTraversable(GlobalSceneGraph().root())->insert(node);
 
                     scene::Path  entitypath(makeReference(GlobalSceneGraph().root()));
                     entitypath.push(makeReference(node.get()));
-                    scene::Instance& entityInstance = findInstance(entitypath);
+                    scene::Instance &entityInstance = findInstance(entitypath);
 
                     if (g_pGameDescription->mGameType == "doom3") {
                         Node_getEntity(node)->setKeyValue("model", Node_getEntity(node)->getKeyValue("name"));
                     }
 
                     // Scene_parentSelectedBrushesToEntity(GlobalSceneGraph(), node);
-                    Scene_parentSubgraphSelectedBrushesToEntity( GlobalSceneGraph(), node, path );
-                    Scene_forEachChildSelectable( SelectableSetSelected( true ), entityInstance.path() );
+                    Scene_parentSubgraphSelectedBrushesToEntity(GlobalSceneGraph(), node, path);
+                    Scene_forEachChildSelectable(SelectableSetSelected(true), entityInstance.path());
                 }
 
                 return;
@@ -135,7 +134,7 @@ public:
             } else if (m_2world) {  /* ungroupSelectedEntities */
                 // condition is skipped with world = 0, so code next to this may create multiple worldspawns;
                 // TODO: handle this very special case?
-                if(node_is_group(path.top())){
+                if (node_is_group(path.top())) {
                     parentBrushes(path.top(), *m_world);
                     Path_deleteTop(path);
                 }
@@ -169,8 +168,8 @@ public:
              * targeted + having model + not loaded b4 new entities aren't selectable normally + rendered only while 0 0 0 is rendered */
 
             if (!entity->isContainer() && !eclass->fixedsize) {  /* point entity to group one */
-                AABB bounds( g_vector3_identity, Vector3(16, 16, 16));
-                if (!string_parse_vector3( entity->getKeyValue("origin"), bounds.origin)) {
+                AABB bounds(g_vector3_identity, Vector3(16, 16, 16));
+                if (!string_parse_vector3(entity->getKeyValue("origin"), bounds.origin)) {
                     bounds.origin = g_vector3_identity;
                 }
 
@@ -209,7 +208,7 @@ void Entity_ungroup() {
 
 
 #if 0
-void Entity_ungroupSelected(){
+void Entity_ungroupSelected() {
     if (GlobalSelectionSystem().countSelected() < 1) {
         return;
     }
@@ -219,14 +218,14 @@ void Entity_ungroupSelected(){
     scene::Instance &instance = GlobalSelectionSystem().ultimateSelected();
     scene::Path path = instance.path();
 
-    scene::Node& world = Map_FindOrInsertWorldspawn(g_map);
+    scene::Node &world = Map_FindOrInsertWorldspawn(g_map);
 
     if (!Node_isEntity(path.top()) && path.size() > 1) {
         path.pop();
     }
 
     if (Node_isEntity(path.top())
-     && node_is_group( path.top())) {
+     && node_is_group(path.top())) {
         if (&world != path.top().get_pointer()) {
             parentBrushes(path.top(), world);
             Path_deleteTop(path);
@@ -248,7 +247,7 @@ public:
     }
 
     void post(const scene::Path &path, scene::Instance &instance) const {
-        Entity* entity = Node_getEntity(path.top());
+        Entity *entity = Node_getEntity(path.top());
         if (entity != 0
          && Instance_isSelected(instance)
          && node_is_group(path.top())
@@ -268,13 +267,13 @@ class EntityGroupSelected : public scene::Graph::Walker {
 public:
     EntityGroupSelected(const scene::Path &p) : group(p.top().get()), worldspawn(Map_FindOrInsertWorldspawn(g_map)) {}
 
-    bool pre( const scene::Path& path, scene::Instance& instance ) const {
+    bool pre(const scene::Path &path, scene::Instance &instance) const {
             return true;
     }
 
-    void post(const scene::Path& path, scene::Instance& instance) const {
+    void post(const scene::Path &path, scene::Instance &instance) const {
         if (Instance_isSelected(instance)) {
-            Entity* entity = Node_getEntity( path.top());
+            Entity *entity = Node_getEntity(path.top());
             if (entity == 0 && Node_isPrimitive(path.top())) {
                 NodeSmartReference child(path.top().get());
                 NodeSmartReference parent(path.parent().get());
@@ -301,7 +300,7 @@ public:
 
 // moves selected primitives to entity, whose entityNode is selected or to worldspawn, if none
 void Entity_moveSelectedPrimitives() {
-    if ( GlobalSelectionSystem().countSelected() < 1) {
+    if (GlobalSelectionSystem().countSelected() < 1) {
         return;
     }
 
@@ -328,13 +327,13 @@ void Entity_moveSelectedPrimitives(bool toLast) {
         return;
     }
 
-    const scene::Path& path = toLast ? GlobalSelectionSystem().ultimateSelected().path() : GlobalSelectionSystem().firstSelected().path();
-    scene::Node& node = (!Node_isEntity(path.top()) && path.size() > 1) ? path.parent() : path.top();
+    const scene::Path &path = toLast ? GlobalSelectionSystem().ultimateSelected().path() : GlobalSelectionSystem().firstSelected().path();
+    scene::Node &node = (!Node_isEntity(path.top()) && path.size() > 1) ? path.parent() : path.top();
 
     if (Node_isEntity(node) && node_is_group(node)) {
         StringOutputStream  command;
-        command << "movePrimitivesToEntity " << makeQuoted( Node_getEntity(node)->getClassName());
-        UndoableCommand undo( command.c_str());
+        command << "movePrimitivesToEntity " << makeQuoted(Node_getEntity(node)->getClassName());
+        UndoableCommand undo(command.c_str());
         Scene_parentSelectedBrushesToEntity(GlobalSceneGraph(), node);
     }
 }
@@ -356,8 +355,7 @@ void Entity_connectSelected() {
         GlobalEntityCreator().connectEntities(
             GlobalSelectionSystem().penultimateSelected().path(),
             GlobalSelectionSystem().ultimateSelected().path(),
-            0
-        );
+            0);
     } else {
         globalErrorStream() << "entityConnectSelected: exactly two instances must be selected\n";
     }
@@ -369,8 +367,7 @@ void Entity_killconnectSelected() {
             GlobalEntityCreator().connectEntities(
                 GlobalSelectionSystem().penultimateSelected().path(),
                 GlobalSelectionSystem().ultimateSelected().path(),
-                1
-            );
+                1);
         } else {
             globalErrorStream() << "entityKillConnectSelected: exactly two instances must be selected\n";
         }
@@ -381,7 +378,7 @@ AABB Doom3Light_getBounds(const AABB &workzone) {
     AABB aabb(workzone);
 
     Vector3 defaultRadius(300, 300, 300);
-    if (!string_parse_vector3( EntityClass_valueForKey(*GlobalEntityClassManager().findOrInsert("light", false), "light_radius"), defaultRadius)) {
+    if (!string_parse_vector3(EntityClass_valueForKey(*GlobalEntityClassManager().findOrInsert("light", false), "light_radius"), defaultRadius)) {
         globalErrorStream() << "Doom3Light_getBounds: failed to parse default light radius\n";
     }
 
@@ -407,41 +404,66 @@ AABB Doom3Light_getBounds(const AABB &workzone) {
 int g_iLastLightIntensity;
 
 
+/* right click and select entity type */
 void Entity_createFromSelection(const char *name, const Vector3 &origin) {
 #if 0
     if (string_equal_nocase(name, "worldspawn")) {
-        gtk_MessageBox(GTK_WIDGET( MainFrame_getWindow()), "Can't create an entity with worldspawn.", "info");
+        gtk_MessageBox(GTK_WIDGET(MainFrame_getWindow()), "Can't create an entity with worldspawn.", "info");
         return;
     }
 #else
     const scene::Node *world_node = Map_FindWorldspawn(g_map);
     if (world_node && string_equal(name, "worldspawn")) {
-        // GlobalRadiant().m_pfnMessageBox( GTK_WIDGET( MainFrame_getWindow() ), "There's already a worldspawn in your map!", "Info", eMB_OK, eMB_ICONDEFAULT );
-        UndoableCommand  undo( "ungroupSelectedPrimitives" );
-        Scene_parentSelectedBrushesToEntity( GlobalSceneGraph(), Map_FindOrInsertWorldspawn(g_map));
+        // GlobalRadiant().m_pfnMessageBox(GTK_WIDGET(MainFrame_getWindow()), "There's already a worldspawn in your map!", "Info", eMB_OK, eMB_ICONDEFAULT);
+        UndoableCommand  undo("ungroupSelectedPrimitives");
+        Scene_parentSelectedBrushesToEntity(GlobalSceneGraph(), Map_FindOrInsertWorldspawn(g_map));
         // ^ no action if no worldspawn (but one inserted) (since insertion deselects everything)
-        //Scene_parentSelectedBrushesToEntity( GlobalSceneGraph(), *Map_FindWorldspawn( g_map ) ); = crash, if no worldspawn
+        //Scene_parentSelectedBrushesToEntity(GlobalSceneGraph(), *Map_FindWorldspawn(g_map)); = crash, if no worldspawn
         return;
     }
 #endif
     StringOutputStream  command;
     command << "entityCreate -class " << name;
-    UndoableCommand undo(command.c_str());
+    UndoableCommand  undo(command.c_str());
 
-    EntityClass* entityClass = GlobalEntityClassManager().findOrInsert(name, true);
+    EntityClass *entityClass = GlobalEntityClassManager().findOrInsert(name, true);
 
     const bool  isModel = entityClass->miscmodel_is
                        || (GlobalSelectionSystem().countSelected() == 0
                         && classname_equal(name, "func_static")
                         && g_pGameDescription->mGameType == "doom3");
 
-    const bool  brushesSelected = Scene_countSelectedBrushes( GlobalSceneGraph() ) != 0;
+    const bool  brushesSelected = Scene_countSelectedBrushes(GlobalSceneGraph()) != 0;
 
-    //is important to have retexturing here; if doing in the end, undo doesn't succeed;
+    /* it's important to have retexturing here; if doing in the end, undo doesn't succeed; */
+    // TODO: envmap_volume -> ??? (make a new texture?)
+    // TODO: fog_volume -> fogvolume
+    // TODO: light_probe_volume -> lightprobevolume
+    // TODO: light_environment_volume -> envmapvolume
+    // TODO: checkpoint_disabled_volume -> trigger_checkpoint_off
     if (string_compare_nocase_n(name, "trigger_", 8) == 0 && brushesSelected && !entityClass->fixedsize) {
-        // const char* shader = GetCommonShader("trigger").c_str();
-        Scene_PatchSetShader_Selected(GlobalSceneGraph(), GetCommonShader("trigger").c_str());
-        Scene_BrushSetShader_Selected(GlobalSceneGraph(), GetCommonShader("trigger").c_str());
+        // const char *shader = GetCommonShader("trigger").c_str();
+
+        #define USE_TOOL_TEXTURE(x) \
+            Scene_PatchSetShader_Selected(GlobalSceneGraph(), "textures/tools/tools" x); \
+            Scene_BrushSetShader_Selected(GlobalSceneGraph(), "textures/tools/tools" x);
+
+        // TODO: maybe don't hardcode this? idk
+        if (!string_compare_nocase(name, "trigger_capture_point")) {
+            USE_TOOL_TEXTURE("trigger_capturepoint")
+        } else if (!string_compare_nocase_n(name, "trigger_checkpoint", 18)) {
+            USE_TOOL_TEXTURE("trigger_checkpoint")
+        } else if (!string_compare_nocase_n(name, "trigger_flag_", 13)) {
+            USE_TOOL_TEXTURE("trigger_flag")
+        } else if (!string_compare_nocase(name, "trigger_out_of_bounds")) {
+            USE_TOOL_TEXTURE("out_of_bounds")
+        } else if (!string_compare_nocase(name, "trigger_spawn")) {
+            USE_TOOL_TEXTURE("trigger_spawn")
+        } else {
+            Scene_PatchSetShader_Selected(GlobalSceneGraph(), GetCommonShader("trigger").c_str());
+            Scene_BrushSetShader_Selected(GlobalSceneGraph(), GetCommonShader("trigger").c_str());
+        }
+        #undef USE_TOOL_TEXTURE
     }
 
     if (!(entityClass->fixedsize || isModel) && !brushesSelected) {
@@ -456,7 +478,7 @@ void Entity_createFromSelection(const char *name, const Vector3 &origin) {
     Node_getTraversable(GlobalSceneGraph().root())->insert(node);
 
     scene::Path entitypath(makeReference(GlobalSceneGraph().root()));
-    entitypath.push(makeReference( node.get()));
+    entitypath.push(makeReference(node.get()));
     scene::Instance &instance = findInstance(entitypath);
 
     Entity *entity = Node_getEntity(node);
@@ -488,11 +510,11 @@ void Entity_createFromSelection(const char *name, const Vector3 &origin) {
 
     if (g_pGameDescription->mGameType == "hl") {
         // FIXME - Hydra: really we need a combined light AND color dialog for halflife.
-        if ( string_equal_nocase(name, "light")
-          || string_equal_nocase(name, "light_environment")
-          || string_equal_nocase(name, "light_spot")) {
+        if (string_equal_nocase(name, "light")
+         || string_equal_nocase(name, "light_environment")
+         || string_equal_nocase(name, "light_spot")) {
             int  intensity = g_iLastLightIntensity;
-            if ( DoLightIntensityDlg(&intensity ) == eIDOK) {
+            if (DoLightIntensityDlg(&intensity) == eIDOK) {
                 g_iLastLightIntensity = intensity;
                 char  buf[30];
                 sprintf(buf, "255 255 255 %d", intensity);
@@ -521,7 +543,7 @@ void Entity_createFromSelection(const char *name, const Vector3 &origin) {
     }
 
     // handle set default model key value : no dialog needed
-    if (isModel && string_empty( EntityClass_valueForKey(*entityClass, entityClass->miscmodel_key()))) {
+    if (isModel && string_empty(EntityClass_valueForKey(*entityClass, entityClass->miscmodel_key()))) {
         const char *model = misc_model_dialog(GTK_WIDGET(MainFrame_getWindow()));
         if (model != 0) {
             entity->setKeyValue(entityClass->miscmodel_key(), model);
@@ -590,7 +612,7 @@ void Entity_setColour() {
         }
 
         if (entity != 0) {
-            const char* strColor = entity->getKeyValue("_color");
+            const char *strColor = entity->getKeyValue("_color");
             if (!string_empty(strColor)) {
                 Vector3 rgb;
                 if (string_parse_vector3(strColor, rgb)) {
@@ -599,9 +621,9 @@ void Entity_setColour() {
             }
             if (color_dialog(GTK_WIDGET(MainFrame_getWindow()), g_entity_globals.color_entity)) {
                 char  buffer[128];
-                sprintf( buffer, "%g %g %g", g_entity_globals.color_entity[0],
-                                             g_entity_globals.color_entity[1],
-                                             g_entity_globals.color_entity[2] );
+                sprintf(buffer, "%g %g %g", g_entity_globals.color_entity[0],
+                                            g_entity_globals.color_entity[1],
+                                            g_entity_globals.color_entity[2]);
 
                 StringOutputStream  command(256);
                 command << "entitySetColour " << buffer;
@@ -623,7 +645,7 @@ const char *misc_model_dialog(GtkWidget *parent, const char *filepath) {
             }
         }
 
-        if(buffer.empty()) {
+        if (buffer.empty()) {
             buffer << g_qeglobals.m_userGamePath << "models/";
             if (!file_readable(buffer.c_str())) {
                 // just go to fsmain
@@ -663,8 +685,7 @@ void Entity_constructPreferences(PreferencesPage &page) {
     page.appendCheckBox(
         "Show", "Light Radii",
         LightRadiiImportCaller(GlobalEntityCreator()),
-        LightRadiiExportCaller(GlobalEntityCreator())
-    );
+        LightRadiiExportCaller(GlobalEntityCreator()));
 }
 */
 
@@ -714,12 +735,10 @@ typedef ReferenceCaller1<EntityCreator, const BoolImportCallback&, ShowTargetNam
 void Entity_constructPreferences(PreferencesPage &page) {
     page.appendSpinner("Names Display Distance (3D)", 512.0, 0.0, 200500.0,
                        IntImportCallback(ShowNamesDistImportCaller(GlobalEntityCreator())),
-                       IntExportCallback(ShowNamesDistExportCaller(GlobalEntityCreator()))
-                      );
+                       IntExportCallback(ShowNamesDistExportCaller(GlobalEntityCreator())));
     page.appendSpinner("Names Display Ratio (2D)", 64.0, 0.0, 100500.0,
                        IntImportCallback(ShowNamesRatioImportCaller(GlobalEntityCreator())),
-                       IntExportCallback(ShowNamesRatioExportCaller(GlobalEntityCreator()))
-                      );
+                       IntExportCallback(ShowNamesRatioExportCaller(GlobalEntityCreator())));
     page.appendCheckBox("Entity Names", "= Targetnames",
                         BoolImportCallback(ShowTargetNamesImportCaller(GlobalEntityCreator())),
                         BoolExportCallback(ShowTargetNamesExportCaller(GlobalEntityCreator())));
@@ -779,20 +798,20 @@ void Entity_Construct() {
     GlobalCommands_insert("EntityColorNormalize", FreeCaller<Entity_normalizeColor>());
     GlobalCommands_insert("EntitiesConnect", FreeCaller<Entity_connectSelected>(), Accelerator('K', GDK_CONTROL_MASK));
     if (g_pGameDescription->mGameType == "nexuiz" || g_pGameDescription->mGameType == "q1") {
-        GlobalCommands_insert( "EntitiesKillConnect", FreeCaller<Entity_killconnectSelected>(), Accelerator('K', GDK_SHIFT_MASK));
+        GlobalCommands_insert("EntitiesKillConnect", FreeCaller<Entity_killconnectSelected>(), Accelerator('K', GDK_SHIFT_MASK));
     }
-    GlobalCommands_insert( "EntityMovePrimitivesToLast", FreeCaller<Entity_moveSelectedPrimitivesToLast>(), Accelerator('M', GDK_CONTROL_MASK));
-    GlobalCommands_insert( "EntityMovePrimitivesToFirst", FreeCaller<Entity_moveSelectedPrimitivesToFirst>());
-    GlobalCommands_insert( "EntityUngroup", FreeCaller<Entity_ungroup>());
-    GlobalCommands_insert( "EntityUngroupPrimitives", FreeCaller<Entity_ungroupSelectedPrimitives>());
+    GlobalCommands_insert("EntityMovePrimitivesToLast", FreeCaller<Entity_moveSelectedPrimitivesToLast>(), Accelerator('M', GDK_CONTROL_MASK));
+    GlobalCommands_insert("EntityMovePrimitivesToFirst", FreeCaller<Entity_moveSelectedPrimitivesToFirst>());
+    GlobalCommands_insert("EntityUngroup", FreeCaller<Entity_ungroup>());
+    GlobalCommands_insert("EntityUngroupPrimitives", FreeCaller<Entity_ungroupSelectedPrimitives>());
 
-    GlobalToggles_insert( "ShowLightRadiuses", FreeCaller<ToggleShowLightRadii>(), ToggleItem::AddCallbackCaller(g_show_lightradii_item));
+    GlobalToggles_insert("ShowLightRadiuses", FreeCaller<ToggleShowLightRadii>(), ToggleItem::AddCallbackCaller(g_show_lightradii_item));
 
-    GlobalPreferenceSystem().registerPreference( "SI_Colors5", Vector3ImportStringCaller(g_entity_globals.color_entity), Vector3ExportStringCaller(g_entity_globals.color_entity));
-    GlobalPreferenceSystem().registerPreference( "LastLightIntensity", IntImportStringCaller(g_iLastLightIntensity), IntExportStringCaller(g_iLastLightIntensity));
+    GlobalPreferenceSystem().registerPreference("SI_Colors5", Vector3ImportStringCaller(g_entity_globals.color_entity), Vector3ExportStringCaller(g_entity_globals.color_entity));
+    GlobalPreferenceSystem().registerPreference("LastLightIntensity", IntImportStringCaller(g_iLastLightIntensity), IntExportStringCaller(g_iLastLightIntensity));
 
     Entity_registerPreferencesPage();
 }
- 
+
 
 void Entity_Destroy() {}
