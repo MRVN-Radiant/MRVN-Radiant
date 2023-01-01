@@ -30,52 +30,52 @@
 #include "bspfile_titanfall2.h"
 #include "bspfile_apex_legends.h"
 
+
 /*
    AddLump()
    adds a lump to an outgoing bsp file
- */
+*/
 template<typename T>
-void AddLump( FILE *file, bspLump_t& lump, const std::vector<T>& data ){
-	const int length = sizeof( T ) * data.size();
-	/* add lump to bsp file header */
-	lump.offset = LittleLong( ftell( file ) );
-	lump.length = LittleLong( length );
+void AddLump(FILE *file, bspLump_t &lump, const std::vector<T> &data) {
+    const int length = sizeof(T) * data.size();
+    /* add lump to bsp file header */
+    lump.offset = LittleLong(ftell(file));
+    lump.length = LittleLong(length);
 
-	/* write lump to file */
-	SafeWrite( file, data.data(), length );
+    /* write lump to file */
+    SafeWrite(file, data.data(), length);
 
-	/* write padding zeros */
-	SafeWrite( file, std::array<byte, 3>{}.data(), ( ( length + 3 ) & ~3 ) - length );
+    /* write padding zeros */
+    SafeWrite(file, std::array<byte, 3>{}.data(), ((length + 3) & ~3) - length);
 }
 
 
 /*
    CopyLump()
    copies a bsp file lump into a destination buffer
- */
+*/
 template<typename DstT, typename SrcT = DstT>
-void CopyLump( rbspHeader_t *header, int lump, std::vector<DstT>& data ){
-	/* get lump length and offset */
-	uint32_t length = header->lumps[ lump ].length;
-	uint32_t offset = header->lumps[ lump ].offset;
+void CopyLump(rbspHeader_t *header, int lump, std::vector<DstT> &data) {
+    /* get lump length and offset */
+    uint32_t length = header->lumps[lump].length;
+    uint32_t offset = header->lumps[lump].offset;
 
-	/* handle erroneous cases */
-	if ( length <= 0 ) {
-		data.clear();
-		return;
-	}
+    /* handle erroneous cases */
+    if (length <= 0) {
+        data.clear();
+        return;
+    }
 
-	if ( length % sizeof( SrcT ) ) {
-		if ( force ) {
-			Sys_Warning( "CopyLump: odd lump size (%d) in lump %d\n", length, lump );
-			data.clear();
-			return;
-		}
-		else{
-			Error( "CopyLump: odd lump size (%d) in lump %d", length, lump );
-		}
-	}
+    if (length % sizeof(SrcT)) {
+        if (force) {
+            Sys_Warning("CopyLump: odd lump size (%d) in lump %d\n", length, lump);
+            data.clear();
+            return;
+        } else {
+            Error("CopyLump: odd lump size (%d) in lump %d", length, lump);
+        }
+    }
 
-	/* copy block of memory and return */
-	data = { ( SrcT* )( (byte*) header + offset ), ( SrcT* )( (byte*) header + offset + length ) };
+    /* copy block of memory and return */
+    data = { (SrcT*)((byte*)header + offset), (SrcT*)((byte*)header + offset + length) };
 }
