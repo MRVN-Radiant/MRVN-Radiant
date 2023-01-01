@@ -21,6 +21,7 @@ void CompileR2BSPFile();
 
 
 namespace Titanfall2 {
+    void EmitEntity(const entity_t &e);
     void EmitStubs();
 
     struct GameLump_Path {

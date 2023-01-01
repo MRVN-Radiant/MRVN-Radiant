@@ -270,18 +270,20 @@ void Titanfall::EmitEntity(const entity_t &e) {
     #define ENT_IS(x)          striEqual(classname, x)
     #define ENT_STARTS(x)      striEqualPrefix(classname, x)
     #define EDITORCLASS(x, y)  if (ENT_IS(y)) { e2.setKeyValue("classname", x); e2.setKeyValue("editorclass", y); }
+    // env
     if (ENT_IS("env_fog_controler")
      || ENT_IS("sky_camera")) {
         dest = ENT_ENV;
+    // fx
     } else if (ENT_IS("beam_spotlight")
             || ENT_IS("env_sprite_clientside")
-            || ENT_IS("info_target_fx")
-            || ENT_IS("info_target_fx_clientside")
+            || ENT_STARTS("info_target_fx")
             || ENT_IS("info_particle_system")) {
         dest = ENT_FX;
         /* editorclass conversion */
         EDITORCLASS("info_target", "info_target_fx")
         else EDITORCLASS("info_target_clientside", "info_target_fx_clientside")
+    // script
     } else if (ENT_IS("assault_assaultpoint")
             || ENT_IS("info_hardpoint")
             || ENT_IS("info_hint")
@@ -295,15 +297,20 @@ void Titanfall::EmitEntity(const entity_t &e) {
             || ENT_IS("script_ref")
             || ENT_IS("traverse")) {
         dest = ENT_SCRIPT;
+        /* editorclass conversion */
+        EDITORCLASS("info_node", "info_node_spectre")
+    // snd
     } else if (ENT_IS("ambient_generic")) {
         dest = ENT_SND;
+    // spawn
     } else if (ENT_IS("info_frontline")
             || ENT_STARTS("info_spawnpoint_")) {
         dest = ENT_SPAWN;
+    // TODO: filter out editor only entities *just* before this else
+    // e.g. prop_static, env_cubemap, info_lightprobe, light (static worldlights), etc.
+    // !!! and make sure those entities still get used for the appropriate lumps !!!
+    // bsp
     } else {
-        // TODO: filter out editor only entities *just* before this else
-        // e.g. prop_static, env_cubemap, info_lightprobe, light (static worldlights), etc.
-        // !!! and make sure those entities still get used for the appropriate lumps !!!
         dest = ENT_BSP;
     }
     #undef ENT_IS
@@ -358,20 +365,10 @@ void Titanfall::EmitTriggerBrushPlaneKeyValues(entity_t &e) {
         for (std::size_t s = 0; s < brush.sides.size(); s++) {
             const side_t &side = brush.sides.at(s);
             StringOutputStream key;
-            key << "*trigger_brush_"
-                << b
-                << "_plane_"
-                << s;
+            key << "*trigger_brush_" << b << "_plane_" << s;
 
             StringOutputStream value;
-            value << side.plane.a
-                  << " "
-                  << side.plane.b
-                  << " "
-                  << side.plane.c
-                  << " "
-                  << side.plane.d;
-
+            value << side.plane.a << " " << side.plane.b << " " << side.plane.c << " " << side.plane.d;
 
             e.setKeyValue(key.c_str(), value.c_str());
         }
