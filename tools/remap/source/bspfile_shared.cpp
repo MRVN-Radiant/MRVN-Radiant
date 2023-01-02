@@ -4,46 +4,6 @@
 
 
 
-float CalculateSAH( std::vector<Shared::visRef_t> &refs, int axis, float pos ) {
-	MinMax parentMinMax;
-	MinMax childMinMaxs[2] = {};
-	std::size_t childRefCounts[2] = {};
-
-	// Count and create AABBs from references
-	for ( Shared::visRef_t &ref : refs ) {
-		parentMinMax.extend( ref.minmax );
-
-		float refPos = ref.minmax.maxs[axis];
-		if ( refPos < pos ) {
-			childRefCounts[0]++;
-			childMinMaxs[0].extend( ref.minmax );
-		}
-		else {
-			childRefCounts[1]++;
-			childMinMaxs[1].extend( ref.minmax );
-		}
-	}
-
-	
-	float parentArea = parentMinMax.area();
-
-	float cost = .5f;
-	for ( int i = 0; i < 2; i++ ) {
-		if( childRefCounts[i] != 0 ) {
-			float childArea = childMinMaxs[i].area();
-			cost += childRefCounts[i] * childArea;
-		}
-	}
-
-	cost /= parentArea;
-	//Sys_Printf("%f\n", cost);
-
-	return cost;
-}
-
-
-
-
 /*
 	EmitMeshes()
 	Emits shared meshes for a given entity
@@ -229,6 +189,47 @@ void Shared::MakeVisReferences()
 	/* Props */
 
 	Sys_Printf( "%9zu shared vis references\n", Shared::visRefs.size() );
+}
+
+/*
+	CalculateSAH
+	calculates the surface-area-heurestic for a BVH2 Tree
+*/
+float CalculateSAH( std::vector<Shared::visRef_t> &refs, int axis, float pos ) {
+	MinMax parentMinMax;
+	MinMax childMinMaxs[2] = {};
+	std::size_t childRefCounts[2] = {};
+
+	// Count and create AABBs from references
+	for ( Shared::visRef_t &ref : refs ) {
+		parentMinMax.extend( ref.minmax );
+
+		float refPos = ref.minmax.maxs[axis];
+		if ( refPos < pos ) {
+			childRefCounts[0]++;
+			childMinMaxs[0].extend( ref.minmax );
+		}
+		else {
+			childRefCounts[1]++;
+			childMinMaxs[1].extend( ref.minmax );
+		}
+	}
+
+	
+	float parentArea = parentMinMax.area();
+
+	float cost = .5f;
+	for ( int i = 0; i < 2; i++ ) {
+		if( childRefCounts[i] != 0 ) {
+			float childArea = childMinMaxs[i].area();
+			cost += childRefCounts[i] * childArea;
+		}
+	}
+
+	cost /= parentArea;
+	//Sys_Printf("%f\n", cost);
+
+	return cost;
 }
 
 /*
