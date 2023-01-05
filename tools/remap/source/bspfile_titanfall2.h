@@ -4,6 +4,7 @@
 #include "qmath.h"
 #include <cstdint>
 #include "remap.h"
+#include "lump_names.h"
 
 
 void WriteR2EntFiles(const char* filename);
