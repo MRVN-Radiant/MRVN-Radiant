@@ -46,4 +46,5 @@ namespace Shared
 	void MakeMeshes( const entity_t &e );
 	void MakeVisReferences();
 	visNode_t MakeVisTree( std::vector<Shared::visRef_t> refs, float parentCost );
+	void MergeVisTree( Shared::visNode_t &node );
 }

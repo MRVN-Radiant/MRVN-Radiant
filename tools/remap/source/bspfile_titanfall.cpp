@@ -245,6 +245,7 @@ void CompileR1BSPFile() {
 
 	Shared::MakeVisReferences();
 	Shared::visRoot = Shared::MakeVisTree(Shared::visRefs, 1e30f);
+	Shared::MergeVisTree(Shared::visRoot);
 	EmitVisTree();
 
 	Titanfall::EmitLevelInfo();

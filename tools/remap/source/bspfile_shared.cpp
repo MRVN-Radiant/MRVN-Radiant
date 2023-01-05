@@ -193,33 +193,42 @@ void Shared::MakeVisReferences()
 
 /*
 	CalculateSAH
-	calculates the surface-area-heurestic for a BVH2 Tree
+	calculates the surface-area-heurestic for a BVHx Tree
 */
-float CalculateSAH( std::vector<Shared::visRef_t> &refs, int axis, float pos ) {
-	MinMax parentMinMax;
-	MinMax childMinMaxs[2] = {};
-	std::size_t childRefCounts[2] = {};
+float CalculateSAH( std::vector<Shared::visRef_t> &refs, MinMax &parent, int &axis, float *pos, int type ) {
+	MinMax childMinMaxs[type] = {};
+	std::size_t childRefCounts[type] = {};
 
 	// Count and create AABBs from references
 	for ( Shared::visRef_t &ref : refs ) {
-		parentMinMax.extend( ref.minmax );
-
 		float refPos = ref.minmax.maxs[axis];
-		if ( refPos < pos ) {
+
+		// Since this function supports any number of children we need to 
+		// First node handling
+		if ( refPos < pos[0] ) {
 			childRefCounts[0]++;
 			childMinMaxs[0].extend( ref.minmax );
+			continue;
 		}
-		else {
-			childRefCounts[1]++;
-			childMinMaxs[1].extend( ref.minmax );
+		// Middle nodes
+		for( int separator = 1; separator < type - 1; separator++ ) {
+			if (refPos > pos[separator - 1] && refPos < pos[separator]) {
+				childRefCounts[separator]++;
+				childMinMaxs[separator].extend( ref.minmax );
+			}
 		}
+
+		// Last node handling
+		childRefCounts[type - 1]++;
+		childMinMaxs[type - 1].extend( ref.minmax );
+		
 	}
 
 	
-	float parentArea = parentMinMax.area();
+	float parentArea = parent.area();
 
 	float cost = .5f;
-	for ( int i = 0; i < 2; i++ ) {
+	for ( int i = 0; i < type; i++ ) {
 		if( childRefCounts[i] != 0 ) {
 			float childArea = childMinMaxs[i].area();
 			cost += childRefCounts[i] * childArea;
@@ -263,26 +272,26 @@ Shared::visNode_t Shared::MakeVisTree( std::vector<Shared::visRef_t> refs, float
 	int bestAxis = 0;
 
 	bestCost = 1e30f;
-	float pos;
+	float pos[1];
 	for ( int axis = 0; axis < 3; axis++ ) {
 		for ( std::size_t i = 0; i < refs.size(); i++ ) {
-			pos = refs.at(i).minmax.mins[axis];
+			pos[0] = refs.at(i).minmax.mins[axis];
 
-			float cost = CalculateSAH(refs, axis, pos);
+			float cost = CalculateSAH(refs, minmax, axis, pos, 2);
 			//Sys_Printf("%f\n", cost);
 			if (cost < bestCost)
 			{
 				bestCost = cost;
-				bestPos = pos;
+				bestPos = pos[0];
 				bestAxis = axis;
 			}
 		}
 	}
-	//Sys_Printf("%f < %f\n", bestCost, parentCost);
+	
 	if ( bestCost >= parentCost )
 	{
 		if( refs.size() > 255 )
-			Sys_FPrintf( SYS_WRN, "CellAABBNode references more than 255 refs\n" );
+			Sys_FPrintf( SYS_ERR, "CellAABBNode references more than 255 refs\n" );
 
 		for ( Shared::visRef_t &ref : refs )
 			node.refs.emplace_back( ref );
@@ -303,7 +312,6 @@ Shared::visNode_t Shared::MakeVisTree( std::vector<Shared::visRef_t> refs, float
 		for( int i = 0; i < 2; i++ ) {
 			if( ref.minmax.test( nodes[i] ) ) {
 				nodeRefs[i].emplace_back( ref );
-				break;
 			}
 		}
 	}
@@ -315,4 +323,55 @@ Shared::visNode_t Shared::MakeVisTree( std::vector<Shared::visRef_t> refs, float
 			node.children.emplace_back( Shared::MakeVisTree( nodeRefs[i], bestCost ) );
 
 	return node;
+}
+
+
+/*
+	MergeVisTree
+	Walks the tree and tries to merge as many nodes as it can
+	This gives us a shallower tree which should reduce mesh flickering
+*/
+void Shared::MergeVisTree( Shared::visNode_t &node ) {
+	float originalSAH = 0;
+	for( Shared::visNode_t &child : node.children ) {
+		originalSAH = child.minmax.area();
+	}
+	originalSAH /= node.minmax.area();
+	
+	int timeout = 0;
+
+	float newSAH = 1e30f;
+	// Try to merge as many children as we can
+	// Both the timeout and the "/ 10" are arbitrary
+	while( originalSAH / 10 < newSAH ) {
+		std::vector<visNode_t> children;
+		children = node.children;
+		node.children.clear();
+
+		for( Shared::visNode_t &child : children ) {
+			if( child.children.size() == 0 || child.refs.size() != 0 ) {
+				node.children.push_back( child );
+				continue;
+			}
+
+			for( Shared::visNode_t &c : child.children ) {
+				node.children.push_back( c );
+			}
+		}
+		
+		newSAH = 0;
+		for( Shared::visNode_t &child : node.children ) {
+			newSAH = child.minmax.area();
+		}
+		newSAH /= node.minmax.area();
+
+		timeout++;
+		if( timeout > 10 )
+			break;
+	}
+
+	for( Shared::visNode_t &child : node.children ) {
+		if( child.children.size() != 0 )
+			MergeVisTree(child);
+	}
 }
