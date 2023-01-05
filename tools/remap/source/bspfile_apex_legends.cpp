@@ -226,6 +226,7 @@ void CompileR5BSPFile() {
 
     Shared::MakeVisReferences();
 	Shared::visRoot = Shared::MakeVisTree( Shared::visRefs, 1e30f );
+    Shared::MergeVisTree(Shared::visRoot);
     ApexLegends::EmitVisTree();
 
     Titanfall::EmitEntityPartitions();
