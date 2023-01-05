@@ -85,4 +85,4 @@ inline StringFixedSize<SIZE>& operator<<( StringFixedSize<SIZE>& ostream, const 
 	return ostream_write( ostream, t );
 }
 
-using String64 = StringFixedSize<64>;
+using String512 = StringFixedSize<512>;

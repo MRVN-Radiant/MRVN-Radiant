@@ -5,7 +5,7 @@ The open-source, cross-platform level editor for Respawn Entertainment Source ba
 MRVNRadiant is a fork of NetRadiant-custom (GtkRadiant 1.4 &rarr; massive rewrite &rarr; 1.5 &rarr; NetRadiant &rarr; NetRadiant-custom &rarr; this)
 
 <div align=left>
-<img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/MRVNRadiant/MRVNRadiant/build?style=for-the-badge">
+<img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/MRVNRadiant/MRVNRadiant/build.yml?style=for-the-badge">
 <img alt="GitHub Issues" src="https://img.shields.io/github/issues/MRVNRadiant/MRVNRadiant?style=for-the-badge">
 <img alt="GitHub Pullrequests" src="https://img.shields.io/github/issues-pr/MRVNRadiant/MRVNRadiant?style=for-the-badge">
 </div>
@@ -13,14 +13,14 @@ MRVNRadiant is a fork of NetRadiant-custom (GtkRadiant 1.4 &rarr; massive rewrit
 ## Supported games
 - Titanfall Online ( Titanfall Online Revival )
 - Titanfall 2 ( [Northstar](https://northstar.tf) )
-- Apex Legends ( R5Reloaded )
+- Apex Legends ( [R5Reloaded](https://r5reloaded.com/) )
 
 ## Status
 | Game | Coverage | Note |
 |------|----------|------|
-| Titanfall Online | 33% | Basic collision, no lighting, needs testing |
-| Titanfall 2 | 28% | Basic collision, no lighting, meshes flicker |
-| Apex Legends | 9% | Unplayable |
+| Titanfall Online | 38% | Basic collision, no lighting, needs testing |
+| Titanfall 2 | 37% | Basic collision, no lighting, meshes flicker |
+| Apex Legends | 25% | No collision, no lighting |
 
 > Coverage = Lumps generated / Total lump count. Stubbed lumps arent counted because they're not custom.
 

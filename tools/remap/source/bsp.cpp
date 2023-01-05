@@ -367,7 +367,7 @@ static void ProcessWorldModel( entity_t& e ){
 
 	/* ydnar: fog hull */
 	if ( e.read_keyvalue( value, "_foghull" ) ) {
-		const auto shader = String64()( "textures/", value );
+		const auto shader = String512()( "textures/", value );
 		MakeFogHullSurfs( shader );
 	}
 

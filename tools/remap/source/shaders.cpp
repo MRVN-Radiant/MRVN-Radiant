@@ -759,7 +759,7 @@ shaderInfo_t *ShaderInfoForShader( const char *shaderName ){
 	}
 
 	/* strip off extension */
-	auto shader = String64()( PathExtensionless( shaderName ) );
+	auto shader = String512()( PathExtensionless( shaderName ) );
 
 	/* search for it */
 	deprecationDepth = 0;
@@ -1145,7 +1145,7 @@ static void ParseShaderFile( const char *filename ){
 					/* subclass it */
 					if ( si2 != NULL ) {
 						/* preserve name */
-						const String64 temp = si->shader;
+						const String512 temp = si->shader;
 
 						/* copy shader */
 						*si = *si2;
@@ -1899,4 +1899,7 @@ void LoadShaderInfo(){
 
 	/* emit some statistics */
 	Sys_FPrintf( SYS_VRB, "%9d shaderInfo\n", numShaderInfo );
+
+	if( numShaderInfo == 0 )
+		Sys_FPrintf( SYS_WRN, "WARNING: 0 shaders loaded! Make sure you setup your shader directory and shader definitions properly!\n" );
 }
