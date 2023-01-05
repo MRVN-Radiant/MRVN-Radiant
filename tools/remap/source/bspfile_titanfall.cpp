@@ -236,9 +236,10 @@ void CompileR1BSPFile() {
 
     Titanfall::EmitEntityPartitions();
 
-    Shared::MakeVisReferences();
-    Shared::visRoot = Shared::MakeVisTree(Shared::visRefs, 1e30f);
-    Titanfall::EmitVisTree();
+	Shared::MakeVisReferences();
+	Shared::visRoot = Shared::MakeVisTree(Shared::visRefs, 1e30f);
+	Shared::MergeVisTree(Shared::visRoot);
+	Titanfall::EmitVisTree();
 
     Titanfall::EmitLevelInfo();
 
@@ -429,120 +430,6 @@ uint32_t Titanfall::EmitTextureData(shaderInfo_t shader) {
 
 
 /*
-   EmitObjReferences()
-   writes obj references used by vis tree
-*/
-void EmitObjReferences() {
-    /* Meshes */
-    for (uint16_t i = 0; i < Titanfall::Bsp::meshBounds.size(); i++) {
-        Titanfall::MeshBounds_t mesh = Titanfall::Bsp::meshBounds.at(i);
-
-        Titanfall::ObjReferenceBounds_t& refBounds = Titanfall::Bsp::objReferenceBounds.emplace_back();
-        refBounds.mins = mesh.origin - mesh.extents;
-        refBounds.maxs = mesh.origin + mesh.extents;
-
-        uint16_t& ref = Titanfall::Bsp::objReferences.emplace_back();
-        ref = i;
-    }
-
-    /* Props */
-    // for (uint16_t i = 0; i < Titanfall2GameLump.propCount; i++) {
-    //     Titanfall::ObjReferenceBounds_t& refBounds = Titanfall::Bsp::objReferenceBounds.emplace_back();
-    //     refBounds.mins = Vector3(-1000, -1000, -1000);
-    //     refBounds.maxs = Vector3(1000, 1000, 1000);
-
-    //     uint16_t& ref = Titanfall::Bsp::objReferences.emplace_back();
-    //     ref = Titanfall::Bsp::meshBounds.size() + i;
-    // }
-}
-
-
-std::size_t Titanfall::EmitObjReferences(Shared::visNode_t& node) {
-    // Sys_Printf("amongus\n");
-    // for (std::size_t i = 0; i < Titanfall::Bsp::objReferences.size(); i++) {
-    //     if (Titanfall::Bsp::objReferences.at(i) == ref.index) {
-    //         return i;
-    //     }
-    // }
-
-    for (Shared::visRef_t& ref : node.refs) {
-        Titanfall::ObjReferenceBounds_t& rb = Titanfall::Bsp::objReferenceBounds.emplace_back();
-        rb.maxs = ref.minmax.maxs;
-        rb.mins = ref.minmax.mins;
-
-        Titanfall::Bsp::objReferences.emplace_back(ref.index);
-    }
-
-    return Titanfall::Bsp::objReferences.size() - node.refs.size();
-}
-
-
-uint16_t GetTotalVisRefCount(Shared::visNode_t node) {
-    uint16_t count = node.refs.size();
-    for (Shared::visNode_t& n : node.children) {
-        count += GetTotalVisRefCount(n);
-    }
-    return count;
-}
-
-
-uint16_t GetTotalVisNodeChildCount(Shared::visNode_t node) {
-    uint16_t count = node.children.size();
-    for (Shared::visNode_t& n : node.children) {
-        count += GetTotalVisNodeChildCount(n);
-    }
-    return count;
-}
-
-
-int Titanfall::EmitVisChildrenOfTreeNode(Shared::visNode_t node) {
-    int index = Titanfall::Bsp::cellAABBNodes.size();  // Index of first child of node
-
-    for (std::size_t i = 0; i < node.children.size(); i++) {
-        Shared::visNode_t& n = node.children.at(i);
-
-        Titanfall::CellAABBNode_t& bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
-        bn.maxs = n.minmax.maxs;
-        bn.mins = n.minmax.mins;
-        bn.childCount = n.children.size();
-        bn.totalRefCount = GetTotalVisRefCount(n);
-
-        if (n.refs.size()) {
-            bn.objRef = Titanfall::EmitObjReferences(n);
-            bn.objRefCount = n.refs.size();
-        }
-    }
-
-    for (std::size_t i = 0; i < node.children.size(); i++) {
-        int firstChild = Titanfall::EmitVisChildrenOfTreeNode(node.children.at(i));
-
-        Titanfall::CellAABBNode_t& bn = Titanfall::Bsp::cellAABBNodes.at(index + i);
-        bn.firstChild = firstChild;
-    }
-
-    return index;
-}
-
-
-void Titanfall::EmitVisTree() {
-    Shared::visNode_t& root = Shared::visRoot;
-
-    Titanfall::CellAABBNode_t& bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
-    bn.maxs = root.minmax.maxs;
-    bn.mins = root.minmax.mins;
-    bn.firstChild = Titanfall::Bsp::cellAABBNodes.size();
-    bn.childCount = root.children.size();
-    bn.totalRefCount = GetTotalVisRefCount(root);
-    if (root.refs.size()) {
-        bn.objRef = EmitObjReferences(root);
-        bn.objRefCount = root.refs.size();
-    }
-
-    EmitVisChildrenOfTreeNode(Shared::visRoot);
-}
-
-
-/*
     EmitVertex
     Saves a vertex into Titanfall::vertices and returns its index
 */
@@ -630,8 +517,139 @@ void Titanfall::EmitEntityPartitions() {
 
 
 /*
-    EmitVertexUnlit
-    Saves a vertex into Titanfall::Bsp::vertexUnlitVertices
+	EmitObjReferences
+	Emits obj references and returns an index to the first one
+*/
+std::size_t Titanfall::EmitObjReferences( Shared::visNode_t &node ) {
+	// Stores which indicies were found
+	std::list<std::size_t> indicies;
+	// Try to check for duplicates
+	for ( Shared::visRef_t &ref : node.refs ) {
+		for( std::size_t i = 0; i < Titanfall::Bsp::objReferences.size(); i++) {
+			uint16_t &tf = Titanfall::Bsp::objReferences.at(i);
+			if( tf == ref.index )
+				indicies.push_back(i);
+		}
+	}
+	indicies.sort();
+
+	// We found all, now check if they're next to each other
+	if( indicies.size() == node.refs.size() ) {
+		std::size_t lastIndex = -1;
+		for( std::size_t &i : indicies ) {
+			if( lastIndex == -1 ) {
+				lastIndex = i;
+				continue;
+			}
+			
+			if( i != lastIndex + 1 ) {
+				lastIndex = -1;
+				break;
+			}
+		}
+
+		if( lastIndex != -1 ) {
+			return indicies.front();
+		}
+	}
+
+
+	for( Shared::visRef_t& ref : node.refs ) {
+		Titanfall::ObjReferenceBounds_t& rb = Titanfall::Bsp::objReferenceBounds.emplace_back();
+		rb.maxs = ref.minmax.maxs;
+		rb.mins = ref.minmax.mins;
+
+		Titanfall::Bsp::objReferences.emplace_back(ref.index);
+	}
+	
+
+	return Titanfall::Bsp::objReferences.size() - node.refs.size();
+}
+
+/*
+	GetTotalVisRefCount
+	Calculates the total number of obj refs under a vistree node
+*/
+uint16_t GetTotalVisRefCount( Shared::visNode_t node ) {
+	uint16_t count = node.refs.size();
+
+	for ( Shared::visNode_t& n : node.children )
+		count += GetTotalVisRefCount( n );
+
+	return count;
+}
+
+/*
+	GetTotalVisNodeChildCount
+	Calculates the total child count of node
+*/
+uint16_t GetTotalVisNodeChildCount( Shared::visNode_t node ) {
+	uint16_t count = node.children.size();
+
+	for ( Shared::visNode_t& n : node.children )
+		count += GetTotalVisNodeChildCount( n );
+
+	return count;
+}
+
+/*
+	EmitVisChildrenOfTreeNode
+	Emits children of a vis tree node
+*/
+int Titanfall::EmitVisChildrenOfTreeNode( Shared::visNode_t node ) {
+	int index = Titanfall::Bsp::cellAABBNodes.size(); // Index of first child of node
+
+	for( std::size_t i = 0; i < node.children.size(); i++ ) {
+		Shared::visNode_t &n = node.children.at( i );
+
+		Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
+		bn.maxs = n.minmax.maxs;
+		bn.mins = n.minmax.mins;
+		bn.childCount = n.children.size();
+		bn.totalRefCount = GetTotalVisRefCount( n );
+
+		if (n.refs.size())
+		{
+			bn.objRef = Titanfall::EmitObjReferences(n);
+			bn.objRefCount = n.refs.size();
+		}
+	}
+	
+	for( std::size_t i = 0; i < node.children.size(); i++ ) {
+		int firstChild = EmitVisChildrenOfTreeNode( node.children.at( i ) );
+
+		Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.at( index + i );
+		bn.firstChild = firstChild;
+	}
+
+	return index;
+}
+
+/*
+	EmitVisTree
+	Emits vistree 
+*/
+void Titanfall::EmitVisTree() {
+	Shared::visNode_t &root = Shared::visRoot;
+
+	Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
+	bn.maxs = root.minmax.maxs;
+	bn.mins = root.minmax.mins;
+	bn.firstChild = Titanfall::Bsp::cellAABBNodes.size();
+	bn.childCount = root.children.size();
+	bn.totalRefCount = GetTotalVisRefCount( root );
+	if ( root.refs.size() )
+	{
+		bn.objRef = EmitObjReferences( root );
+		bn.objRefCount = root.refs.size();
+	}
+
+	EmitVisChildrenOfTreeNode( Shared::visRoot );
+}
+
+/*
+	EmitVertexUnlit
+	Saves a vertex into Titanfall::Bsp::vertexUnlitVertices
 */
 void Titanfall::EmitVertexUnlit(Shared::Vertex_t &vertex) {
     Titanfall::VertexUnlit_t &ul = Titanfall::Bsp::vertexUnlitVertices.emplace_back();

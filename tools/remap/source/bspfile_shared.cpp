@@ -4,44 +4,6 @@
 
 
 
-float CalculateSAH( std::vector<Shared::visRef_t> &refs, int axis, float pos[3] ) {
-	// 3 dividers, 4 nodes
-	// minmax | minmax | minmax | minmax 
-	MinMax minmaxs[4] = {};
-	std::size_t counts[4] = {};
-
-	for ( Shared::visRef_t &ref : refs )
-	{
-		float refPos = ref.minmax.maxs[axis];
-		if ( refPos < pos[0] ) {
-			counts[0]++;
-			minmaxs[0].extend( ref.minmax );
-		}
-		if ( refPos > pos[0] && refPos < pos[1] ) {
-			counts[1]++;
-			minmaxs[1].extend( ref.minmax );
-		}
-		if ( refPos > pos[1] && refPos < pos[2] ) {
-			counts[2]++;
-			minmaxs[2].extend( ref.minmax );
-		}
-		if ( refPos > pos[2] ) {
-			counts[3]++;
-			minmaxs[3].extend( ref.minmax );
-		}
-	}
-
-	float cost = 0;
-	for( int i = 0; i < 4; i++ )
-		if( counts[i] != 0 )
-			cost += counts[i] * minmaxs[i].area();
-
-	return cost;
-}
-
-
-
-
 /*
 	EmitMeshes()
 	Emits shared meshes for a given entity
@@ -117,7 +79,7 @@ void Shared::MakeMeshes( const entity_t &e )
 	}
 
 	// Loop through patches
-	parseMesh_t *patch;
+	parseMesh_t* patch;
 	patch = e.patches;
 	while( patch != NULL ) {
 		mesh_t patchMesh = patch->mesh;
@@ -132,6 +94,8 @@ void Shared::MakeMeshes( const entity_t &e )
 			vertex.xyz = patchMesh.verts[ index ].xyz;
 			vertex.normal = patchMesh.verts[ index ].normal;
 			vertex.st = patchMesh.verts[ index ].st;
+
+			mesh.minmax.extend( vertex.xyz );
 		}
 		
 		// Make triangles
@@ -224,8 +188,57 @@ void Shared::MakeVisReferences()
 
 	/* Props */
 
-
 	Sys_Printf( "%9zu shared vis references\n", Shared::visRefs.size() );
+}
+
+/*
+	CalculateSAH
+	calculates the surface-area-heurestic for a BVHx Tree
+*/
+float CalculateSAH( std::vector<Shared::visRef_t> &refs, MinMax &parent, int &axis, float *pos, int type ) {
+	MinMax childMinMaxs[type] = {};
+	std::size_t childRefCounts[type] = {};
+
+	// Count and create AABBs from references
+	for ( Shared::visRef_t &ref : refs ) {
+		float refPos = ref.minmax.maxs[axis];
+
+		// Since this function supports any number of children we need to 
+		// First node handling
+		if ( refPos < pos[0] ) {
+			childRefCounts[0]++;
+			childMinMaxs[0].extend( ref.minmax );
+			continue;
+		}
+		// Middle nodes
+		for( int separator = 1; separator < type - 1; separator++ ) {
+			if (refPos > pos[separator - 1] && refPos < pos[separator]) {
+				childRefCounts[separator]++;
+				childMinMaxs[separator].extend( ref.minmax );
+			}
+		}
+
+		// Last node handling
+		childRefCounts[type - 1]++;
+		childMinMaxs[type - 1].extend( ref.minmax );
+		
+	}
+
+	
+	float parentArea = parent.area();
+
+	float cost = .5f;
+	for ( int i = 0; i < type; i++ ) {
+		if( childRefCounts[i] != 0 ) {
+			float childArea = childMinMaxs[i].area();
+			cost += childRefCounts[i] * childArea;
+		}
+	}
+
+	cost /= parentArea;
+	//Sys_Printf("%f\n", cost);
+
+	return cost;
 }
 
 /*
@@ -242,69 +255,123 @@ Shared::visNode_t Shared::MakeVisTree( std::vector<Shared::visRef_t> refs, float
 
 	node.minmax = minmax;
 
+	// Check if a vis ref is large enough to reference directly
+	std::vector<Shared::visRef_t> visRefs = refs;
+	refs.clear();
+	for (Shared::visRef_t& ref : visRefs)
+	{
+		if (minmax.surrounds(ref.minmax) && ref.minmax.area() / minmax.area() > 0.8)
+			node.refs.emplace_back(ref);
+		else
+			refs.emplace_back(ref);
+	}
 
 	// Check all possible ways of splitting
 	float bestCost = 0;
-	float bestPos[3] = {};
+	float bestPos = 0;
 	int bestAxis = 0;
 
 	bestCost = 1e30f;
-	float pos[3] = {};
+	float pos[1];
 	for ( int axis = 0; axis < 3; axis++ ) {
 		for ( std::size_t i = 0; i < refs.size(); i++ ) {
-			for ( std::size_t j = i + 1; j < refs.size(); j++ ) {
-				for ( std::size_t k = j + 1; k < refs.size(); k++ ) {
-					pos[2] = refs.at(k).minmax.mins[axis];
-				}
-				pos[1] = refs.at(j).minmax.mins[axis];
-			}
 			pos[0] = refs.at(i).minmax.mins[axis];
-		}
-		
-		float cost = CalculateSAH(refs, axis, pos);
-		if ( cost < bestCost )
-		{
-			bestCost = cost;
-			bestPos[0] = pos[0]; bestPos[1] = pos[1]; bestPos[2] = pos[2];
-			bestAxis = axis;
+
+			float cost = CalculateSAH(refs, minmax, axis, pos, 2);
+			//Sys_Printf("%f\n", cost);
+			if (cost < bestCost)
+			{
+				bestCost = cost;
+				bestPos = pos[0];
+				bestAxis = axis;
+			}
 		}
 	}
-
+	
 	if ( bestCost >= parentCost )
 	{
+		if( refs.size() > 255 )
+			Sys_FPrintf( SYS_ERR, "CellAABBNode references more than 255 refs\n" );
+
 		for ( Shared::visRef_t &ref : refs )
 			node.refs.emplace_back( ref );
 
 		return node;
 	}
 	
-	MinMax nodes[4];
+	MinMax nodes[2];
 	nodes[0] = minmax;
 	nodes[1] = minmax;
-	nodes[2] = minmax;
-	nodes[3] = minmax;
-	std::vector<Shared::visRef_t> nodeRefs[4];
+	std::vector<Shared::visRef_t> nodeRefs[2];
 
-	nodes[0].maxs[bestAxis] = bestPos[0];
-	nodes[1].mins[bestAxis] = bestPos[0];
-	nodes[1].maxs[bestAxis] = bestPos[1];
-	nodes[2].mins[bestAxis] = bestPos[1];
-	nodes[2].maxs[bestAxis] = bestPos[2];
-	nodes[3].mins[bestAxis] = bestPos[2];
+	nodes[0].maxs[bestAxis] = bestPos;
+	nodes[1].mins[bestAxis] = bestPos;
 
 	for ( Shared::visRef_t &ref : refs )
 	{
-		for( int i = 0; i < 4; i++ ) {
+		for( int i = 0; i < 2; i++ ) {
 			if( ref.minmax.test( nodes[i] ) ) {
 				nodeRefs[i].emplace_back( ref );
-				break;
 			}
 		}
 	}
 
-	for( int i = 0; i < 4; i++ )
-		if( nodeRefs[i].size() != 0)
+	//Sys_Printf("%li; %li; %li; %li\n", nodeRefs[0].size(), nodeRefs[1].size(), nodeRefs[2].size(), nodeRefs[3].size());
+
+	for( int i = 0; i < 2; i++ )
+		if( nodeRefs[i].size() != 0 )
 			node.children.emplace_back( Shared::MakeVisTree( nodeRefs[i], bestCost ) );
 
 	return node;
+}
+
+
+/*
+	MergeVisTree
+	Walks the tree and tries to merge as many nodes as it can
+	This gives us a shallower tree which should reduce mesh flickering
+*/
+void Shared::MergeVisTree( Shared::visNode_t &node ) {
+	float originalSAH = 0;
+	for( Shared::visNode_t &child : node.children ) {
+		originalSAH = child.minmax.area();
+	}
+	originalSAH /= node.minmax.area();
+	
+	int timeout = 0;
+
+	float newSAH = 1e30f;
+	// Try to merge as many children as we can
+	// Both the timeout and the "/ 10" are arbitrary
+	while( originalSAH / 10 < newSAH ) {
+		std::vector<visNode_t> children;
+		children = node.children;
+		node.children.clear();
+
+		for( Shared::visNode_t &child : children ) {
+			if( child.children.size() == 0 || child.refs.size() != 0 ) {
+				node.children.push_back( child );
+				continue;
+			}
+
+			for( Shared::visNode_t &c : child.children ) {
+				node.children.push_back( c );
+			}
+		}
+		
+		newSAH = 0;
+		for( Shared::visNode_t &child : node.children ) {
+			newSAH = child.minmax.area();
+		}
+		newSAH /= node.minmax.area();
+
+		timeout++;
+		if( timeout > 10 )
+			break;
+	}
+
+	for( Shared::visNode_t &child : node.children ) {
+		if( child.children.size() != 0 )
+			MergeVisTree(child);
+	}
 }

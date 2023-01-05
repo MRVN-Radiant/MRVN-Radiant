@@ -368,51 +368,61 @@ void WriteR2BSPFile(const char* filename) {
 /*
    CompileR2BSPFile()
    writes a titanfall2 bsp file and it's .ent files
-*/
-void CompileR2BSPFile() {
-    SetUpGameLump();
+ */
+void CompileR2BSPFile()
+{
+	SetUpGameLump();
 
-    for (size_t entityNum = 0; entityNum < entities.size(); ++entityNum) {
-        /* get entity */
-        entity_t& entity = entities[entityNum];
-        const char* classname = entity.classname();
+	for (size_t entityNum = 0; entityNum < entities.size(); ++entityNum)
+	{
+		/* get entity */
+		entity_t& entity = entities[entityNum];
+		const char* classname = entity.classname();
 
-        /* visible geo */
-        if (striEqual(classname,"worldspawn")) {
-            Titanfall::BeginModel();
-            /* generate bsp meshes from map brushes */
-            Shared::MakeMeshes(entity);
-            Titanfall::EmitMeshes(entity);
+		/* visible geo */
+		if ( striEqual( classname,"worldspawn" ) )
+		{
+			Titanfall::BeginModel();
+			/* generate bsp meshes from map brushes */
+			Shared::MakeMeshes( entity );
+			Titanfall::EmitMeshes( entity );
+			
+			Titanfall::EmitBrushes( entity );
 
-            Titanfall::EmitBrushes(entity);
+			Titanfall::EndModel();
+		}
+		/* hurt */
+		else if ( striEqualPrefix( classname, "trigger_" ) )
+		{
+			Titanfall::EmitTriggerBrushPlaneKeyValues( entity );
+		}
+		/* props for gamelump */
+		else if ( striEqual( classname, "misc_model" ) )
+		{
+			EmitProp( entity );
+		}
 
-            Titanfall::EndModel();
-        }
-        /* hurt */
-        else if (striEqualPrefix(classname, "trigger_")) {
-            Titanfall::EmitTriggerBrushPlaneKeyValues(entity);
-        }
-        /* props for gamelump */
-        else if (striEqual(classname, "misc_model")) {
-            EmitProp(entity);
-        }
 
-        Titanfall2::EmitEntity(entity);
-    }
+		Titanfall::EmitEntity( entity );
+	}
 
-    Titanfall::EmitEntityPartitions();
+	/* */
+	Titanfall::EmitEntityPartitions();
 
-    Titanfall::EmitCollisionGrid();
+	Titanfall::EmitCollisionGrid();
 
-    Shared::MakeVisReferences();
-    Shared::visRoot = Shared::MakeVisTree( Shared::visRefs, 1e30f );
-    Titanfall::EmitVisTree();
+	/**/
+	Shared::MakeVisReferences();
+	Shared::visRoot = Shared::MakeVisTree( Shared::visRefs, 1e30f );
+	Shared::MergeVisTree(Shared::visRoot);
+	Titanfall::EmitVisTree();
 
-    Titanfall::EmitLevelInfo();
+	/* Emit LevelInfo */
+	Titanfall::EmitLevelInfo();
 
-    /* Generate unknown lumps */
-    Titanfall2::EmitStubs();
-    Titanfall::EmitStubs();
+	/* Generate unknown lumps */
+	Titanfall2::EmitStubs();
+	Titanfall::EmitStubs();
 }
 
 

@@ -32,7 +32,6 @@
 #include "remap.h"
 #include "bspfile_abstract.h"
 
-
 /*
    EmitShader()
    emits a bsp shader entry
@@ -335,8 +334,6 @@ void EndBSPFile( bool do_write ){
 		WriteEntFiles( source );
 	}
 }
-
-
 
 
 void SetUpGameLump()

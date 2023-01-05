@@ -11,11 +11,28 @@ void WriteR1BSPFile(const char* filename);
 void CompileR1BSPFile();
 
 namespace Titanfall {
-    void         EmitEntity(const entity_t &e);
-    void         EmitTriggerBrushPlaneKeyValues(entity_t &e);
-    void         EmitPlane(const Plane3 &plane);
-    uint32_t     EmitTextureData(shaderInfo_t shader);
-    uint32_t     EmitVertex(Vector3 &vertex);
+	void EmitEntity( const entity_t &e );
+	void EmitTriggerBrushPlaneKeyValues( entity_t &e );
+	void EmitPlane( const Plane3 &plane );
+	uint32_t EmitTextureData( shaderInfo_t shader );
+	uint32_t EmitVertex( Vector3 &vertex );
+	void BeginModel();
+	void EndModel();
+	void EmitEntityPartitions();
+	std::size_t EmitObjReferences( Shared::visNode_t& node );
+	void EmitVisTree();
+	uint32_t EmitVertexNormal( Vector3 &normal );
+	void EmitVertexUnlit( Shared::Vertex_t &vertex );
+	void EmitVertexLitFlat( Shared::Vertex_t &vertex );
+	void EmitVertexLitBump( Shared::Vertex_t &vertex );
+	void EmitVertexUnlitTS( Shared::Vertex_t &vertex );
+	void EmitVertexBlinnPhong( Shared::Vertex_t &vertex );
+	void EmitMeshes( const entity_t &e );
+	uint16_t EmitMaterialSort( uint32_t index );
+	void EmitCollisionGrid();
+	void EmitBrushes( const entity_t &e );
+	void EmitLevelInfo();
+	void EmitStubs();
 
     void         BeginModel();
     void         EndModel();
