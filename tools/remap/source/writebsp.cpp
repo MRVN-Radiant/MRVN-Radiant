@@ -32,7 +32,6 @@
 #include "remap.h"
 #include "bspfile_abstract.h"
 
-
 /*
    EmitShader()
    emits a bsp shader entry
@@ -368,21 +367,48 @@ void EmitObjReferences()
 	}*/
 }
 
-std::size_t EmitObjReferences( Shared::visNode_t &node )
-{
-	//Sys_Printf("amongus\n");
-	/*for (std::size_t i = 0; i < Titanfall::Bsp::objReferences.size(); i++)
-		if ( Titanfall::Bsp::objReferences.at( i ) == ref.index )
-			return i;
-			*/
-	for ( Shared::visRef_t &ref : node.refs )
-	{
+std::size_t EmitObjReferences( Shared::visNode_t &node ) {
+	// Stores which indicies were found
+	std::list<std::size_t> indicies;
+	// Try to check for duplicates
+	for ( Shared::visRef_t &ref : node.refs ) {
+		for( std::size_t i = 0; i < Titanfall::Bsp::objReferences.size(); i++) {
+			uint16_t &tf = Titanfall::Bsp::objReferences.at(i);
+			if( tf == ref.index )
+				indicies.push_back(i);
+		}
+	}
+	indicies.sort();
+
+	// We found all, now check if they're next to each other
+	if( indicies.size() == node.refs.size() ) {
+		std::size_t lastIndex = -1;
+		for( std::size_t &i : indicies ) {
+			if( lastIndex == -1 ) {
+				lastIndex = i;
+				continue;
+			}
+			
+			if( i != lastIndex + 1 ) {
+				lastIndex = -1;
+				break;
+			}
+		}
+
+		if( lastIndex != -1 ) {
+			return indicies.front();
+		}
+	}
+
+
+	for( Shared::visRef_t& ref : node.refs ) {
 		Titanfall::ObjReferenceBounds_t& rb = Titanfall::Bsp::objReferenceBounds.emplace_back();
 		rb.maxs = ref.minmax.maxs;
 		rb.mins = ref.minmax.mins;
 
-		Titanfall::Bsp::objReferences.emplace_back( ref.index );
+		Titanfall::Bsp::objReferences.emplace_back(ref.index);
 	}
+	
 
 	return Titanfall::Bsp::objReferences.size() - node.refs.size();
 }
