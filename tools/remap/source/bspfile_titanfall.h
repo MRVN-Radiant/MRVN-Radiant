@@ -19,6 +19,8 @@ namespace Titanfall {
 	void BeginModel();
 	void EndModel();
 	void EmitEntityPartitions();
+	std::size_t EmitObjReferences( Shared::visNode_t& node );
+	void EmitVisTree();
 	uint32_t EmitVertexNormal( Vector3 &normal );
 	void EmitVertexUnlit( Shared::Vertex_t &vertex );
 	void EmitVertexLitFlat( Shared::Vertex_t &vertex );

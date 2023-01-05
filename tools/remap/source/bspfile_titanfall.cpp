@@ -246,7 +246,7 @@ void CompileR1BSPFile() {
 	Shared::MakeVisReferences();
 	Shared::visRoot = Shared::MakeVisTree(Shared::visRefs, 1e30f);
 	Shared::MergeVisTree(Shared::visRoot);
-	EmitVisTree();
+	Titanfall::EmitVisTree();
 
 	Titanfall::EmitLevelInfo();
 
@@ -450,6 +450,137 @@ void Titanfall::EmitEntityPartitions() {
 		partitions += " spawn";
 	
 	Titanfall::Bsp::entityPartitions = { partitions.begin(), partitions.end() + 1 };
+}
+
+/*
+	EmitObjReferences
+	Emits obj references and returns an index to the first one
+*/
+std::size_t Titanfall::EmitObjReferences( Shared::visNode_t &node ) {
+	// Stores which indicies were found
+	std::list<std::size_t> indicies;
+	// Try to check for duplicates
+	for ( Shared::visRef_t &ref : node.refs ) {
+		for( std::size_t i = 0; i < Titanfall::Bsp::objReferences.size(); i++) {
+			uint16_t &tf = Titanfall::Bsp::objReferences.at(i);
+			if( tf == ref.index )
+				indicies.push_back(i);
+		}
+	}
+	indicies.sort();
+
+	// We found all, now check if they're next to each other
+	if( indicies.size() == node.refs.size() ) {
+		std::size_t lastIndex = -1;
+		for( std::size_t &i : indicies ) {
+			if( lastIndex == -1 ) {
+				lastIndex = i;
+				continue;
+			}
+			
+			if( i != lastIndex + 1 ) {
+				lastIndex = -1;
+				break;
+			}
+		}
+
+		if( lastIndex != -1 ) {
+			return indicies.front();
+		}
+	}
+
+
+	for( Shared::visRef_t& ref : node.refs ) {
+		Titanfall::ObjReferenceBounds_t& rb = Titanfall::Bsp::objReferenceBounds.emplace_back();
+		rb.maxs = ref.minmax.maxs;
+		rb.mins = ref.minmax.mins;
+
+		Titanfall::Bsp::objReferences.emplace_back(ref.index);
+	}
+	
+
+	return Titanfall::Bsp::objReferences.size() - node.refs.size();
+}
+
+/*
+	GetTotalVisRefCount
+	Calculates the total number of obj refs under a vistree node
+*/
+uint16_t GetTotalVisRefCount( Shared::visNode_t node ) {
+	uint16_t count = node.refs.size();
+
+	for ( Shared::visNode_t& n : node.children )
+		count += GetTotalVisRefCount( n );
+
+	return count;
+}
+
+/*
+	GetTotalVisNodeChildCount
+	Calculates the total child count of node
+*/
+uint16_t GetTotalVisNodeChildCount( Shared::visNode_t node ) {
+	uint16_t count = node.children.size();
+
+	for ( Shared::visNode_t& n : node.children )
+		count += GetTotalVisNodeChildCount( n );
+
+	return count;
+}
+
+/*
+	EmitVisChildrenOfTreeNode
+	Emits children of a vis tree node
+*/
+int EmitVisChildrenOfTreeNode( Shared::visNode_t node ) {
+	int index = Titanfall::Bsp::cellAABBNodes.size(); // Index of first child of node
+
+	for( std::size_t i = 0; i < node.children.size(); i++ ) {
+		Shared::visNode_t &n = node.children.at( i );
+
+		Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
+		bn.maxs = n.minmax.maxs;
+		bn.mins = n.minmax.mins;
+		bn.childCount = n.children.size();
+		bn.totalRefCount = GetTotalVisRefCount( n );
+
+		if (n.refs.size())
+		{
+			bn.objRef = Titanfall::EmitObjReferences(n);
+			bn.objRefCount = n.refs.size();
+		}
+	}
+	
+	for( std::size_t i = 0; i < node.children.size(); i++ ) {
+		int firstChild = EmitVisChildrenOfTreeNode( node.children.at( i ) );
+
+		Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.at( index + i );
+		bn.firstChild = firstChild;
+	}
+
+	return index;
+}
+
+/*
+	EmitVisTree
+	Emits vistree 
+*/
+void Titanfall::EmitVisTree() {
+	Shared::visNode_t &root = Shared::visRoot;
+
+	Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
+	bn.maxs = root.minmax.maxs;
+	bn.mins = root.minmax.mins;
+	bn.firstChild = Titanfall::Bsp::cellAABBNodes.size();
+	bn.childCount = root.children.size();
+	bn.totalRefCount = GetTotalVisRefCount( root );
+	if ( root.refs.size() )
+	{
+		bn.objRef = EmitObjReferences( root );
+		bn.objRefCount = root.refs.size();
+	}
+
+	EmitVisChildrenOfTreeNode( Shared::visRoot );
 }
 
 /*
