@@ -513,6 +513,7 @@ $(INSTALLDIR)/remap.$(EXE): \
 	tools/remap/source/bspfile_titanfall.o \
 	tools/remap/source/bspfile_titanfall2.o \
 	tools/remap/source/bspfile_apex_legends.o \
+	tools/remap/source/bspfile_decompile_titanfall.o \
 	tools/remap/source/bsp.o \
 	tools/remap/source/convert_bsp.o \
 	tools/remap/source/convert_json.o \

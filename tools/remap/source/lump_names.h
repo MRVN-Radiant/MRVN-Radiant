@@ -35,7 +35,7 @@
 #define R1_LUMP_LIGHTMAP_HEADERS                0x53
 #define R1_LUMP_CM_GRID                         0x55
 #define R1_LUMP_CM_GRID_CELLS                   0x56
-#define R1_LUMP_CM_GRID_SETS                    0x57
+#define R1_LUMP_CM_GEO_SETS                     0x57
 #define R1_LUMP_CM_GEO_SET_BOUNDS               0x58
 #define R1_LUMP_CM_PRIMITIVES                   0x59
 #define R1_LUMP_CM_PRIMITIVE_BOUNDS             0x5A
@@ -117,7 +117,7 @@
 #define R2_LUMP_LIGHTMAP_HEADERS                0x53
 #define R2_LUMP_CM_GRID                         0x55
 #define R2_LUMP_CM_GRID_CELLS                   0x56
-#define R2_LUMP_CM_GRID_SETS                    0x57
+#define R2_LUMP_CM_GEO_SETS                     0x57
 #define R2_LUMP_CM_GEO_SET_BOUNDS               0x58
 #define R2_LUMP_CM_PRIMITIVES                   0x59
 #define R2_LUMP_CM_PRIMITIVE_BOUNDS             0x5A

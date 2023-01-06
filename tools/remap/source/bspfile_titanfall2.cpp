@@ -25,133 +25,8 @@
    loads a titanfall2 bsp file
 */
 void LoadR2BSPFile(const char* filename) {
-    Sys_FPrintf( SYS_VRB, "Loading bsp file: \"%s\"\n", filename );
-
-    // Load file into memory
-    MemBuffer file = LoadFile(filename);
-
-    rbspHeader_t* header = file.data();
-
-    // Make sure magic matches the format we're trying to load
-    if (!force && memcmp( header->ident, g_game->bspIdent, 4)) {
-        Error("%s is not a %s file", filename, g_game->bspIdent);
-    }
-    // TODO: Make this game agnostic so we can for example import tfo maps while apex legends is our game
-    if (!force && header->version != g_game->bspVersion) {
-        Error("%s is version %d, not %d", filename, header->version, g_game->bspVersion);
-    }
-
-    // Load lumps
-    CopyLump((rbspHeader_t*)header, R2_LUMP_ENTITIES,             Titanfall::Bsp::entities);
-    CopyLump((rbspHeader_t*)header, R2_LUMP_PLANES,               Titanfall::Bsp::planes);
-    CopyLump((rbspHeader_t*)header, R2_LUMP_ENTITY_PARTITIONS,    Titanfall::Bsp::entityPartitions);
-    CopyLump((rbspHeader_t*)header, R2_LUMP_CM_GRID,              Titanfall::Bsp::cmGrid);
-    CopyLump((rbspHeader_t*)header, R2_LUMP_CM_BRUSHES,           Titanfall::Bsp::cmBrushes);
-    CopyLump((rbspHeader_t*)header, R2_LUMP_CM_BRUSH_SIDE_PLANES, Titanfall::Bsp::cmBrushSidePlaneOffsets);
-    CopyLump((rbspHeader_t*)header, R2_LUMP_CM_BRUSH_SIDE_PROPS,  Titanfall::Bsp::cmBrushSideProperties);
-
-    // Load all .ent files referenced in bsp if they exist
-    // TODO: Actually do this ^
-    #if 1
-    if (header->lumps[R2_LUMP_ENTITY_PARTITIONS].length) {
-        /* Spawn */
-        {
-            auto name = StringOutputStream(256)(PathExtensionless(filename), "_spawn.ent");
-            LoadEntFile( name.c_str(), Titanfall::Bsp::entities );
-        }
-        /* Snd */
-        {
-            auto name = StringOutputStream(256)(PathExtensionless(filename), "_snd.ent");
-            LoadEntFile( name.c_str(), Titanfall::Bsp::entities );
-        }
-        /* Script */
-        {
-            auto name = StringOutputStream(256)(PathExtensionless(filename), "_script.ent");
-            LoadEntFile(name.c_str(), Titanfall::Bsp::entities);
-        }
-        /* Fx */
-        {
-            auto name = StringOutputStream(256)(PathExtensionless(filename), "_fx.ent");
-            LoadEntFile(name.c_str(), Titanfall::Bsp::entities);
-        }
-        /* Env */
-        {
-            auto name = StringOutputStream(256)(PathExtensionless(filename), "_env.ent");
-            LoadEntFile(name.c_str(), Titanfall::Bsp::entities);
-        }
-    }
-    #endif
-
-    // Parse entities into entities vector
-    ParseEntities();
-
-    // Make worldspawn if we have 0 entities
-    // This should never happen
-    if (entities.size() == 0) {
-        entity_t &worldspawn = entities.emplace_back();
-        worldspawn.setKeyValue( "classname", "worldspawn" );
-    }
-
-    for (Titanfall::CMBrush_t &bspBrush : Titanfall::Bsp::cmBrushes) {
-        Vector3 mins = bspBrush.origin - bspBrush.extents;
-        Vector3 maxs = bspBrush.origin + bspBrush.extents;
-
-        // Create the base 6 planes from the brush AABB
-        std::vector<Plane3> planes;
-        {
-            Vector3 vertices[8];
-            vertices[0] = maxs;
-            vertices[1] = Vector3(maxs.x(), maxs.y(), mins.z());
-            vertices[2] = Vector3(maxs.x(), mins.y(), maxs.z());
-            vertices[3] = Vector3(mins.x(), maxs.y(), maxs.z());
-            vertices[4] = mins;
-            vertices[5] = Vector3(mins.x(), mins.y(), maxs.z());
-            vertices[6] = Vector3(mins.x(), maxs.y(), mins.z());
-            vertices[7] = Vector3(maxs.x(), mins.y(), mins.z());
-
-            // Create planes from AABB
-            Plane3& plane0 = planes.emplace_back();
-            PlaneFromPoints(plane0, vertices[0], vertices[1], vertices[2]);
-            Plane3& plane1 = planes.emplace_back();
-            PlaneFromPoints(plane1, vertices[0], vertices[2], vertices[3]);
-            Plane3& plane2 = planes.emplace_back();
-            PlaneFromPoints(plane2, vertices[0], vertices[3], vertices[1]);
-            Plane3& plane3 = planes.emplace_back();
-            PlaneFromPoints(plane3, vertices[6], vertices[5], vertices[4]);
-            Plane3& plane4 = planes.emplace_back();
-            PlaneFromPoints(plane4, vertices[7], vertices[6], vertices[4]);
-            Plane3& plane5 = planes.emplace_back();
-            PlaneFromPoints(plane5, vertices[5], vertices[7], vertices[4]);
-        }
-
-        /* NOTE: This doesnt work :) */
-        // Add extra planes to brush
-        // for (uint16_t i = 0; i < bspBrush.planeCount; i++) {
-        //     if (bspBrush.sidePlaneIndex
-        //       + Titanfall::Bsp::cmBrushSidePlaneOffsets.at(bspBrush.sidePlaneIndex)
-        //       + Titanfall::Bsp::cmGrid[0].brushSidePlaneOffset > 72)
-        //             break;
-
-        //     Plane3 &plane = planes.emplace_back();
-        //     plane = Plane3(Titanfall::Bsp::planes.at(bspBrush.sidePlaneIndex
-        //                 + Titanfall::Bsp::cmBrushSidePlaneOffsets.at(bspBrush.sidePlaneIndex)
-        //                 + Titanfall::Bsp::cmGrid[0].brushSidePlaneOffset));
-        // }
-
-        // Make brush and fill it with sides
-        brush_t &brush = entities.data()[0].brushes.emplace_back();
-
-        for (Plane3 plane : planes) {
-            side_t& side = brush.sides.emplace_back();
-            side.plane = plane;
-
-            String512 textureName;
-            textureName = "NULL";
-
-            side.shaderInfo = new shaderInfo_t;
-            side.shaderInfo->shader = textureName;
-        }
-    }
+    Titanfall::LoadLumpsAndEntities( filename );
+    Titanfall::ParseLoadedBSP();
 }
 
 
@@ -251,7 +126,7 @@ void WriteR2BSPFile(const char* filename) {
     AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_HEADERS],          Titanfall2::Bsp::lightMapHeaders_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_CM_GRID],                   Titanfall::Bsp::cmGrid);
     AddLump(file, header.lumps[R2_LUMP_CM_GRID_CELLS],             Titanfall::Bsp::cmGridCells);
-    AddLump(file, header.lumps[R2_LUMP_CM_GRID_SETS],              Titanfall::Bsp::cmGeoSets);
+    AddLump(file, header.lumps[R2_LUMP_CM_GEO_SETS],              Titanfall::Bsp::cmGeoSets);
     AddLump(file, header.lumps[R2_LUMP_CM_GEO_SET_BOUNDS],         Titanfall::Bsp::cmGeoSetBounds);
     // AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVES],             Titanfall::Bsp::cmPrimitives_stub);  // stub
     // AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVE_BOUNDS],       Titanfall::Bsp::cmPrimitiveBounds_stub);  // stub

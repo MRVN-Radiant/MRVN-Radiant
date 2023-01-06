@@ -11,6 +11,12 @@ void LoadR1BSPFile(const char* filename);
 void WriteR1BSPFile(const char* filename);
 void CompileR1BSPFile();
 
+
+#define MASK_TEXTURE_DATA 0x01FF
+#define MASK_DISCARD 0x4000
+
+
+
 namespace Titanfall {
 	void EmitEntity( const entity_t &e );
 	void EmitTriggerBrushPlaneKeyValues( entity_t &e );
@@ -72,6 +78,22 @@ namespace Titanfall {
         MinMax minmax;
         uint32_t  firstMesh;
         uint32_t  meshCount;
+    };
+
+    // 0x45
+    struct TricollHeader_t {
+        int16_t flags;
+        int16_t texinfoFlags;
+        int16_t texdata;
+        int16_t numVerts;
+        int16_t numTris;
+        int16_t numBevelIndexes;
+        int32_t firstVert;
+        int32_t firstTri;
+        int32_t firstNode;
+        int32_t firstBevelIndex;
+        Vector3 org;
+        float scale;
     };
 
     // 0x47
@@ -173,8 +195,15 @@ namespace Titanfall {
 
     // 0x57
     struct CMGeoSet_t {
-        uint16_t  unknown0;
-        uint16_t  unknown1;
+        uint16_t  straddleGroup;
+        uint16_t  primitiveCount;
+        uint32_t  unknown2 : 8;
+        uint32_t  collisionShapeIndex : 16;
+        uint32_t  collisionShapeType : 8;
+    };
+
+    // 0x59
+    struct CMPrimitive_t {
         uint32_t  unknown2 : 8;
         uint32_t  collisionShapeIndex : 16;
         uint32_t  collisionShapeType : 8;
@@ -256,6 +285,7 @@ namespace Titanfall {
         inline std::vector<Vector3>               vertexNormals;
         inline std::vector<char>                  textureDataData;
         inline std::vector<uint32_t>              textureDataTable;
+        inline std::vector<TricollHeader_t>       tricollHeaders;
         inline std::vector<VertexUnlit_t>         vertexUnlitVertices;
         inline std::vector<VertexLitFlat_t>       vertexLitFlatVertices;
         inline std::vector<VertexLitBump_t>       vertexLitBumpVertices;
@@ -269,6 +299,8 @@ namespace Titanfall {
         inline std::vector<CMGridCell_t>          cmGridCells;
         inline std::vector<CMGeoSet_t>            cmGeoSets;
         inline std::vector<CMBound_t>             cmGeoSetBounds;
+        inline std::vector<CMPrimitive_t>         cmPrimitives;
+        inline std::vector<CMBound_t>             cmPrimitiveBounds;
         inline std::vector<uint16_t>              cmBrushSideProperties;
         inline std::vector<CMBrush_t>             cmBrushes;
         inline std::vector<uint16_t>              cmBrushSidePlaneOffsets;

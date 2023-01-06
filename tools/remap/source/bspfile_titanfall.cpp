@@ -21,7 +21,10 @@
    LoadR2BSPFile()
    loads a r1 bsp file
 */
-void LoadR1BSPFile(const char* filename) {}
+void LoadR1BSPFile(const char* filename) {
+    Titanfall::LoadLumpsAndEntities(filename);
+    Titanfall::ParseLoadedBSP();
+}
 
 
 /*
@@ -103,7 +106,7 @@ void WriteR1BSPFile(const char* filename) {
     AddLump(file, header.lumps[R1_LUMP_LIGHTMAP_HEADERS],            Titanfall::Bsp::lightmapHeaders_stub);  // stub
     AddLump(file, header.lumps[R1_LUMP_CM_GRID],                     Titanfall::Bsp::cmGrid);
     AddLump(file, header.lumps[R1_LUMP_CM_GRID_CELLS],               Titanfall::Bsp::cmGridCells);
-    AddLump(file, header.lumps[R1_LUMP_CM_GRID_SETS],                Titanfall::Bsp::cmGeoSets);
+    AddLump(file, header.lumps[R1_LUMP_CM_GEO_SETS],                Titanfall::Bsp::cmGeoSets);
     AddLump(file, header.lumps[R1_LUMP_CM_GEO_SET_BOUNDS],           Titanfall::Bsp::cmGeoSetBounds);
     AddLump(file, header.lumps[R1_LUMP_CM_UNIQUE_CONTENTS],          Titanfall::Bsp::cmUniqueContents_stub);  // stub
     AddLump(file, header.lumps[R1_LUMP_CM_BRUSHES],                  Titanfall::Bsp::cmBrushes);
@@ -809,8 +812,8 @@ void Titanfall::EmitCollisionGrid() {
                 }
 
                 Titanfall::CMGeoSet_t& set = Titanfall::Bsp::cmGeoSets.emplace_back();
-                set.unknown0 = 0;
-                set.unknown1 = 1;
+                set.straddleGroup = 0;
+                set.primitiveCount = 1;
                 set.unknown2 = 0;
                 set.collisionShapeIndex = index;
 
@@ -900,7 +903,7 @@ void Titanfall::EmitBrushes(const entity_t& e) {
                 Titanfall::Bsp::cmBrushSideProperties.emplace_back(1);
             } else {
                 test++;
-                Titanfall::Bsp::cmBrushSideProperties.emplace_back(0x4000);
+                Titanfall::Bsp::cmBrushSideProperties.emplace_back(MASK_DISCARD);
             }
         }
 
