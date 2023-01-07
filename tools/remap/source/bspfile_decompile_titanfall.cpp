@@ -23,6 +23,7 @@ void Titanfall::LoadLumpsAndEntities(const char* filename) {
     CopyLump((rbspHeader_t*)header, R1_LUMP_PLANES, Titanfall::Bsp::planes);
     CopyLump((rbspHeader_t*)header, R1_LUMP_VERTICES, Titanfall::Bsp::vertices);
     CopyLump((rbspHeader_t*)header, R1_LUMP_TEXTURE_DATA, Titanfall::Bsp::textureData);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_ENTITY_PARTITIONS, Titanfall::Bsp::entityPartitions);
     CopyLump((rbspHeader_t*)header, R1_LUMP_TEXTURE_DATA_STRING_DATA, Titanfall::Bsp::textureDataData);
     CopyLump((rbspHeader_t*)header, R1_LUMP_TEXTURE_DATA_STRING_TABLE, Titanfall::Bsp::textureDataTable);
     CopyLump((rbspHeader_t*)header, R1_LUMP_ENTITY_PARTITIONS, Titanfall::Bsp::entityPartitions);
@@ -37,7 +38,30 @@ void Titanfall::LoadLumpsAndEntities(const char* filename) {
 
     // Load ent files
     {
+        std::vector<std::string> partitions;
+
+        {
+            std::string partition;
+            for( const char &c : Titanfall::Bsp::entityPartitions ) {
+                if( c == ' ' || c == '\0' ) {
+                    partition += ".ent\0";
+                    partitions.emplace_back( partition );
+                    partition.clear();
+                    partition += "_";
+                    continue;
+                }
+
+                partition += c;
+            }
+        }
+
+        // Remove header
+        partitions.erase(partitions.begin());
         
+        for( std::string &partition : partitions ) {
+            auto name = StringOutputStream(256)( PathExtensionless(filename), partition.c_str() );
+            LoadEntFile( name.c_str(), Titanfall::Bsp::entities );
+        }
     }
 }
 
