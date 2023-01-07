@@ -161,8 +161,7 @@ void WriteR2BSPFile(const char* filename) {
    CompileR2BSPFile()
    writes a titanfall2 bsp file and it's .ent files
  */
-void CompileR2BSPFile()
-{
+void CompileR2BSPFile() {
 	SetUpGameLump();
 
 	for (size_t entityNum = 0; entityNum < entities.size(); ++entityNum)

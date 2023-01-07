@@ -1199,3 +1199,25 @@ void Titanfall::EmitStubs() {
         Titanfall::Bsp::cells_stub = { data.begin(), data.end() };
     }
 }
+
+/*
+    EmitExtraEntity
+    Emits an entity into Titanfall::Ent::extra, only used when -onlyentities argument is used
+*/
+void Titanfall::EmitExtraEntity( entity_t &e ) {
+    if( striEqual( e.classname(), "worldspawn" ) )
+        return;
+
+    Titanfall::EmitTriggerBrushPlaneKeyValues( e );
+
+    StringOutputStream  data;
+    data << "{\n";
+    for( const epair_t& pair : e.epairs ) {
+        data << "\"" << pair.key.c_str() << "\" \"" << pair.value.c_str() << "\"\n";
+    }
+    data << "}\n";
+
+    std::vector<char> str = { data.begin(), data.end() };
+
+    Titanfall::Ent::extra.insert( Titanfall::Ent::extra.end(), str.begin(), str.end() );
+}

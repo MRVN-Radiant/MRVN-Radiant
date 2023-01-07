@@ -258,6 +258,20 @@ void WriteEntFiles(const char *path) {
 
         Sys_Printf("Success!\n");
     }
+    // extra
+    // has contents only when -onlyentities argument is used, doesn't get referenced by the BSP!
+    if (Titanfall::Ent::extra.size()) {
+        auto name = StringOutputStream(1024)(PathExtensionless(path), "_extra.ent");
+        Sys_Printf("Writing %s... ", name.c_str());
+
+        FILE* file = SafeOpenWrite(name);
+        WriteEntFileHeader(file);
+        Titanfall::Ent::extra.emplace_back('\0');
+        SafeWrite(file, Titanfall::Ent::extra.data(), Titanfall::Ent::extra.size());
+        fclose(file);
+
+        Sys_Printf("Success!\n");
+    }
 }
 
 

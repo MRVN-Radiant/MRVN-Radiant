@@ -61,6 +61,8 @@ namespace Titanfall {
     void         EmitLevelInfo();
     void         EmitStubs();
 
+    void         EmitExtraEntity( entity_t &e ); 
+
     /* Lump Structs */
     // 0x02
     struct TextureData_t {
@@ -273,6 +275,7 @@ namespace Titanfall {
         inline std::vector<char> script;
         inline std::vector<char> snd;
         inline std::vector<char> spawn;
+        inline std::vector<char> extra;
     }
 
     namespace Bsp {
