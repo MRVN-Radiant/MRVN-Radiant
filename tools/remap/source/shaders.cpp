@@ -196,7 +196,6 @@ static void TCModRotate(tcMod_t &mod, float euler) {
 }
 
 
-
 const surfaceParm_t *GetSurfaceParm(const char *name) {
     /* walk the current game's surfaceparms */
     for (const surfaceParm_t &sp : g_game->surfaceParms) {
@@ -206,7 +205,7 @@ const surfaceParm_t *GetSurfaceParm(const char *name) {
     }
 
     /* check custom info parms */
-    for (const surfaceParm_t &sp : Span(custSurfaceParms, numCustSurfaceParms))
+    for (const surfaceParm_t &sp : Span(custSurfaceParms, numCustSurfaceParms)) {
         if (striEqual(name, sp.name)) {
             return &sp;
         }
@@ -313,7 +312,8 @@ void WriteMapShaderFile() {
 
             /* print it to the file */
             fprintf(file, "%s%s\n", si.shader.c_str(), si.shaderText);
-            // Sys_Printf("%s%s\n", si.shader.c_str(), si.shaderText);  /* FIXME: remove debugging code */
+            // Sys_Printf("%s%s\n", si.shader.c_str(), si.shaderText);
+            /* FIXME: remove debugging code */
 
             Sys_FPrintf(SYS_VRB, ".");
         }
@@ -594,7 +594,7 @@ static void FinishShader(shaderInfo_t *si) {
 
         /* find pixel coordinates best matching the average color of the image */
         float bestDist = 99999999;
-        const Vector2 o(1.0f / si->shaderImage->width, 1.0f / si->shaderImage->height);
+        const Vector2  o (1.0f / si->shaderImage->width, 1.0f / si->shaderImage->height);
         for (y = 0, st[1] = 0.0f; y < si->shaderImage->height; y++, st[1] += o[1]) {
             for (x = 0, st[0] = 0.0f; x < si->shaderImage->width; x++, st[0] += o[0]) {
                 /* sample the shader image */
@@ -709,7 +709,7 @@ shaderInfo_t *ShaderInfoForShaderNull(const char *shaderName) {
 shaderInfo_t *ShaderInfoForShader(const char *shaderName) {
     int i;
     int deprecationDepth;
-    shaderInfo_t    *si;
+    shaderInfo_t *si;
 
     /* dummy check */
     if (strEmptyOrNull(shaderName)) {
@@ -774,7 +774,7 @@ static void Parse1DMatrixAppend(ShaderTextCollector &text, int x, float *m) {
         if (!text.GetToken(false)) {
             Error("Parse1DMatrixAppend(): line %d: Number not found!\n"
                   "File location be: %s\n",  // yarr
-                  scriptline, g_strLoadedFileLocation);
+              scriptline, g_strLoadedFileLocation);
         }
         m[i] = atof(token);
     }
@@ -782,7 +782,7 @@ static void Parse1DMatrixAppend(ShaderTextCollector &text, int x, float *m) {
     if (!text.GetToken(true) || !strEqual(token, ")")) {
         Error("Parse1DMatrixAppend(): line %d: ')' not found!\n"
               "File location be: %s\n",  // yarr
-              scriptline, g_strLoadedFileLocation);
+          scriptline, g_strLoadedFileLocation);
     }
 }
 
@@ -822,7 +822,6 @@ static void ParseShaderFile(const char *filename) {
             /* -----------------------------------------------------------------
                shader stages (passes)
                ----------------------------------------------------------------- */
-
             /* parse stage directives */
             if (strEqual(token, "{")) {
                 si->hasPasses = true;
