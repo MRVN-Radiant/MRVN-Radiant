@@ -11,7 +11,6 @@
    ------------------------------------------------------------------------------- */
 
 
-
 /* dependencies */
 #include "remap.h"
 #include "bspfile_abstract.h"
@@ -34,7 +33,7 @@ void LoadR2BSPFile( rbspHeader_t *header, const char *filename ) {
    WriteR2BSPFile()
    writes a titanfall2 bsp file and it's .ent files
 */
-void WriteR2BSPFile(const char* filename) {
+void WriteR2BSPFile(const char *filename) {
     rbspHeader_t header{};
 
     /* set up header */
@@ -54,7 +53,7 @@ void WriteR2BSPFile(const char* filename) {
     header.lumps[0x53].lumpVer = 1;
 
     /* write initial header */
-    FILE* file = SafeOpenWrite(filename);
+    FILE *file = SafeOpenWrite(filename);
     SafeWrite(file, &header, sizeof(header));    /* overwritten later */
 
     /* :) */
@@ -64,14 +63,14 @@ void WriteR2BSPFile(const char* filename) {
     }
     {
         char message[64];
-        strncpy(message,StringOutputStream(64)("Version:        ", Q3MAP_VERSION).c_str(),64);
+        strncpy(message, StringOutputStream(64)("Version:        ", Q3MAP_VERSION).c_str(), 64);
         SafeWrite(file, &message, sizeof(message));
     }
     {
         time_t t;
         time(&t);
         char message[64];
-        strncpy(message,StringOutputStream(64)("Time:           ", asctime(localtime(&t))).c_str(),64);
+        strncpy(message, StringOutputStream(64)("Time:           ", asctime(localtime(&t))).c_str(), 64);
         SafeWrite(file, &message, sizeof(message));
     }
 
@@ -96,7 +95,7 @@ void WriteR2BSPFile(const char* filename) {
                                     + Titanfall2::GameLump.pathCount * sizeof(Titanfall2::GameLump_Path)
                                     + Titanfall2::GameLump.propCount * sizeof(Titanfall2::GameLump_Prop);
         SafeWrite(file, &Titanfall2::GameLump, sizeof(Titanfall2::GameLump));
-        // need to write vectors separately 
+        // need to write vectors separately
         // paths
         fseek(file, start + 24, SEEK_SET);
         SafeWrite(file, Titanfall2::GameLump.paths.data(), 128 * Titanfall2::GameLump.pathCount);
@@ -162,58 +161,51 @@ void WriteR2BSPFile(const char* filename) {
    writes a titanfall2 bsp file and it's .ent files
  */
 void CompileR2BSPFile() {
-	//SetUpGameLump();
+    // SetUpGameLump();
 
-	for (size_t entityNum = 0; entityNum < entities.size(); ++entityNum)
-	{
-		/* get entity */
-		entity_t& entity = entities[entityNum];
-		const char* classname = entity.classname();
+    for (size_t entityNum = 0; entityNum < entities.size(); ++entityNum) {
+        /* get entity */
+        entity_t &entity = entities[entityNum];
+        const char *classname = entity.classname();
 
-		/* visible geo */
-		if ( striEqual( classname,"worldspawn" ) )
-		{
-			Titanfall::BeginModel();
-			/* generate bsp meshes from map brushes */
-			Shared::MakeMeshes( entity );
-			Titanfall::EmitMeshes( entity );
-			
-			Titanfall::EmitBrushes( entity );
+        /* visible geo */
+        if (striEqual(classname, "worldspawn")) {
+            Titanfall::BeginModel();
+            /* generate bsp meshes from map brushes */
+            Shared::MakeMeshes(entity);
+            Titanfall::EmitMeshes(entity);
 
-			Titanfall::EndModel();
-		}
-		/* hurt */
-		else if ( striEqualPrefix( classname, "trigger_" ) )
-		{
-			Titanfall::EmitTriggerBrushPlaneKeyValues( entity );
-		}
-		/* props for gamelump */
-		else if ( striEqual( classname, "misc_model" ) )
-		{
-			//EmitProp( entity );
-		}
+            Titanfall::EmitBrushes(entity);
 
+            Titanfall::EndModel();
+        /* hurt */
+        } else if (striEqualPrefix(classname, "trigger_")) {
+            Titanfall::EmitTriggerBrushPlaneKeyValues( entity );
+        /* props for gamelump */
+        } else if (striEqual(classname, "misc_model")) {
+            // EmitProp(entity);
+        }
 
-		Titanfall::EmitEntity( entity );
-	}
+        Titanfall::EmitEntity(entity);
+    }
 
-	/* */
-	Titanfall::EmitEntityPartitions();
+    /* */
+    Titanfall::EmitEntityPartitions();
 
-	Titanfall::EmitCollisionGrid();
+    Titanfall::EmitCollisionGrid();
 
-	/**/
-	Shared::MakeVisReferences();
-	Shared::visRoot = Shared::MakeVisTree( Shared::visRefs, 1e30f );
-	Shared::MergeVisTree(Shared::visRoot);
-	Titanfall::EmitVisTree();
+    /* */
+    Shared::MakeVisReferences();
+    Shared::visRoot = Shared::MakeVisTree(Shared::visRefs, 1e30f);
+    Shared::MergeVisTree(Shared::visRoot);
+    Titanfall::EmitVisTree();
 
-	/* Emit LevelInfo */
-	Titanfall::EmitLevelInfo();
+    /* Emit LevelInfo */
+    Titanfall::EmitLevelInfo();
 
-	/* Generate unknown lumps */
-	Titanfall2::EmitStubs();
-	Titanfall::EmitStubs();
+    /* Generate unknown lumps */
+    Titanfall2::EmitStubs();
+    Titanfall::EmitStubs();
 }
 
 
@@ -507,7 +499,7 @@ void Titanfall2::EmitEntity(const entity_t &e) {
     // write
     StringOutputStream data;
     data << "{\n";
-    for (const epair_t& pair : e2.epairs) {  // e2 to get editorclass changes
+    for (const epair_t &pair : e2.epairs) {  // e2 to get editorclass changes
         data << "\"" << pair.key.c_str() << "\" \"" << pair.value.c_str() << "\"\n";
     }
     data << "}\n";

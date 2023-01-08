@@ -23,7 +23,7 @@
 void LoadR1BSPFile(rbspHeader_t *header, const char *filename) {
     Titanfall::LoadLumpsAndEntities(header, filename);
     Titanfall::ParseLoadedBSP();
-};
+}
 
 
 /*
