@@ -73,7 +73,7 @@ void SwapBlock(int *block, int size) {
    if all values are 32 bits, this can be used to swap everything
 */
 template<typename T>
-void SwapBlock(std::vector<T>& block){
+void SwapBlock(std::vector<T> &block){
     const size_t size = (sizeof(T) * block.size()) >> 2;  // get size in integers
     /* swap */
     int *intptr = reinterpret_cast<int*>(block.data());
@@ -133,8 +133,8 @@ void LoadBSPFilePartially(const char *filename) {
     }
 
     /* load it, then byte swap the in-memory version */
-    // g_game->load( filename );
-    // LoadIBSPorRBSPFilePartially( filename );
+    // g_game->load(filename);
+    // LoadIBSPorRBSPFilePartially(filename);
     // SwapBSPFile();
 }
 
@@ -198,7 +198,7 @@ void WriteEntFiles(const char *path) {
         auto name = StringOutputStream(1024)(PathExtensionless(path), "_env.ent");
         Sys_Printf("Writing %s... ", name.c_str());
 
-        FILE* file = SafeOpenWrite(name);
+        FILE *file = SafeOpenWrite(name);
         WriteEntFileHeader(file);
         Titanfall::Ent::env.emplace_back('\0');
         SafeWrite(file, Titanfall::Ent::env.data(), Titanfall::Ent::env.size());
@@ -211,7 +211,7 @@ void WriteEntFiles(const char *path) {
         auto name = StringOutputStream(1024)(PathExtensionless(path), "_fx.ent");
         Sys_Printf("Writing %s... ", name.c_str());
 
-        FILE* file = SafeOpenWrite(name);
+        FILE *file = SafeOpenWrite(name);
         WriteEntFileHeader(file);
         Titanfall::Ent::fx.emplace_back('\0');
         SafeWrite(file, Titanfall::Ent::fx.data(), Titanfall::Ent::fx.size());
@@ -224,7 +224,7 @@ void WriteEntFiles(const char *path) {
         auto name = StringOutputStream(1024)(PathExtensionless(path), "_script.ent");
         Sys_Printf("Writing %s... ", name.c_str());
 
-        FILE* file = SafeOpenWrite(name);
+        FILE *file = SafeOpenWrite(name);
         WriteEntFileHeader(file);
         Titanfall::Ent::script.emplace_back('\0');
         SafeWrite(file, Titanfall::Ent::script.data(), Titanfall::Ent::script.size());
@@ -237,7 +237,7 @@ void WriteEntFiles(const char *path) {
         auto name = StringOutputStream(1024)(PathExtensionless(path), "_snd.ent");
         Sys_Printf("Writing %s... ", name.c_str());
 
-        FILE* file = SafeOpenWrite(name);
+        FILE *file = SafeOpenWrite(name);
         WriteEntFileHeader(file);
         Titanfall::Ent::snd.emplace_back('\0');
         SafeWrite(file, Titanfall::Ent::snd.data(), Titanfall::Ent::snd.size());
@@ -250,7 +250,7 @@ void WriteEntFiles(const char *path) {
         auto name = StringOutputStream(1024)(PathExtensionless(path), "_spawn.ent");
         Sys_Printf("Writing %s... ", name.c_str());
 
-        FILE* file = SafeOpenWrite(name);
+        FILE *file = SafeOpenWrite(name);
         WriteEntFileHeader(file);
         Titanfall::Ent::spawn.emplace_back('\0');
         SafeWrite(file, Titanfall::Ent::spawn.data(), Titanfall::Ent::spawn.size());
@@ -286,12 +286,12 @@ void WriteEntFiles(const char *path) {
    StripTrailing()
    strips low byte chars off the end of a string
 */
-inline StringRange StripTrailing( const char *string ) {
-    const char *end = string + strlen( string );
-    while ( end != string && end[-1] <= 32 ) {
+inline StringRange StripTrailing(const char *string) {
+    const char *end = string + strlen(string);
+    while (end != string && end[-1] <= 32) {
         --end;
     }
-    return StringRange( string, end );
+    return StringRange(string, end);
 }
 
 
@@ -299,18 +299,18 @@ inline StringRange StripTrailing( const char *string ) {
    ParseEpair()
    parses a single quoted "key" "value" pair into an epair struct
 */
-void ParseEPair( std::list<epair_t>& epairs ) {
+void ParseEPair(std::list<epair_t> &epairs) {
     /* handle key */
     /* strip trailing spaces that sometimes get accidentally added in the editor */
     epair_t ep;
-    ep.key = StripTrailing( token );
+    ep.key = StripTrailing(token);
 
     /* handle value */
-    GetToken( false );
-    ep.value = StripTrailing( token );
+    GetToken(false);
+    ep.value = StripTrailing(token);
 
-    if( !ep.key.empty() && !ep.value.empty() )
-        epairs.push_back( std::move( ep ) );
+    if(!ep.key.empty() && !ep.value.empty())
+        epairs.push_back(std::move(ep));
 }
 
 
@@ -323,12 +323,13 @@ static bool ParseEntity() {
     if (!GetToken(true)) {
         return false;
     }
+
     if (!strEqual(token, "{")) {
         Error("ParseEntity: { not found");
     }
 
     /* create new entity */
-    entity_t& e = entities.emplace_back();
+    entity_t &e = entities.emplace_back();
 
     /* parse */
     while (1) {
@@ -352,7 +353,7 @@ static bool ParseEntity() {
 */
 void ParseEntities() {
     entities.clear();
-    ParseFromMemory( Titanfall::Bsp::entities.data(), Titanfall::Bsp::entities.size() );
+    ParseFromMemory(Titanfall::Bsp::entities.data(), Titanfall::Bsp::entities.size());
     while (ParseEntity()) {};
 
     /* ydnar: set number of bsp entities in case a map is loaded on top */
@@ -373,7 +374,7 @@ void InjectCommandLine(const char *stage, const std::vector<const char*> &args) 
 
     for (const char *c : args) {
         str << ' ';
-        for( ; !strEmpty(c); ++c) {
+        for(; !strEmpty(c); ++c) {
             if (*c != '\\' && *c != '"' && *c != ';' && (unsigned char)*c >= ' ') {
                 str << *c;
             }
@@ -394,7 +395,7 @@ void InjectCommandLine(const char *stage, const std::vector<const char*> &args) 
 void UnparseEntities() {
     StringOutputStream data(8192);
     for (std::size_t i = 0; i < numBSPEntities && i < entities.size(); ++i) {  // run through entity list
-        const entity_t& e = entities[i];
+        const entity_t &e = entities[i];
         if (e.epairs.empty()) {
             continue;  // ent got removed
         }
@@ -409,7 +410,7 @@ void UnparseEntities() {
         #undef ENT_IS
 
         data << "{\n";
-        for (const auto& ep : e.epairs) {
+        for (const auto &ep : e.epairs) {
             data << '\"' << StripTrailing(ep.key.c_str()) << "\" \"" << StripTrailing(ep.value.c_str()) << "\"\n";
         }
         data << "}\n";
@@ -425,7 +426,7 @@ void UnparseEntities() {
 */
 void PrintEntity(const entity_t *ent) {
     Sys_Printf("------- entity %p -------\n", ent);
-    for (const auto& ep : ent->epairs) {
+    for (const auto &ep : ent->epairs) {
         Sys_Printf("%s = %s\n", ep.key.c_str(), ep.value.c_str());
     }
 }
@@ -455,7 +456,7 @@ void entity_t::setKeyValue(const char *key, const char *value) {
 */
 const char *entity_t::valueForKey(const char *key) const {
     /* walk epair list */
-    for (const auto& ep : epairs) {
+    for (const auto &ep : epairs) {
         if (EPAIR_EQUAL(ep.key.c_str(), key)) {
             return ep.value.c_str();
         }
@@ -467,8 +468,8 @@ const char *entity_t::valueForKey(const char *key) const {
 
 
 bool entity_t::read_keyvalue_(bool &bool_value, std::initializer_list<const char*> &&keys) const {
-    for (const char* key : keys) {
-        const char* value = valueForKey(key);
+    for (const char *key : keys) {
+        const char *value = valueForKey(key);
         if (!strEmpty(value)) {
             bool_value = (value[0] == '1');
             return true;
@@ -479,8 +480,8 @@ bool entity_t::read_keyvalue_(bool &bool_value, std::initializer_list<const char
 
 
 bool entity_t::read_keyvalue_(int &int_value, std::initializer_list<const char*> &&keys) const {
-    for (const char* key : keys) {
-        const char* value = valueForKey(key);
+    for (const char *key : keys) {
+        const char *value = valueForKey(key);
         if (!strEmpty(value)) {
             int_value = atoi(value);
             return true;
@@ -491,8 +492,8 @@ bool entity_t::read_keyvalue_(int &int_value, std::initializer_list<const char*>
 
 
 bool entity_t::read_keyvalue_(float &float_value, std::initializer_list<const char*> &&keys) const {
-    for (const char* key : keys) {
-        const char* value = valueForKey(key);
+    for (const char *key : keys) {
+        const char *value = valueForKey(key);
         if(!strEmpty(value)) {
             float_value = atof(value);
             return true;
@@ -503,8 +504,8 @@ bool entity_t::read_keyvalue_(float &float_value, std::initializer_list<const ch
 
 
 bool entity_t::read_keyvalue_(Vector3 &vector3_value, std::initializer_list<const char*> &&keys) const {
-    for (const char* key : keys) {
-        const char* value = valueForKey(key);
+    for (const char *key : keys) {
+        const char *value = valueForKey(key);
         if (!strEmpty(value)) {
             float v0, v1, v2;
             if (3 == sscanf(value, "%f %f %f", &v0, &v1, &v2)) {
@@ -520,8 +521,8 @@ bool entity_t::read_keyvalue_(Vector3 &vector3_value, std::initializer_list<cons
 
 
 bool entity_t::read_keyvalue_(const char *&string_ptr_value, std::initializer_list<const char*> &&keys) const {
-    for (const char* key : keys) {
-        const char* value = valueForKey(key);
+    for (const char *key : keys) {
+        const char *value = valueForKey(key);
         if (!strEmpty(value)) {
             string_ptr_value = value;
             return true;
@@ -535,10 +536,10 @@ bool entity_t::read_keyvalue_(const char *&string_ptr_value, std::initializer_li
    FindTargetEntity()
    finds an entity target
 */
-entity_t *FindTargetEntity( const char *target ) {
+entity_t *FindTargetEntity(const char *target) {
     /* walk entity list */
-    for ( auto& e : entities ) {
-        if ( strEqual( e.valueForKey( "targetname" ), target ) ) {
+    for (auto &e : entities) {
+        if (strEqual(e.valueForKey("targetname"), target)) {
             return &e;
         }
     }
@@ -553,27 +554,27 @@ entity_t *FindTargetEntity( const char *target ) {
    gets an entity's shadow flags
    NOTE: does not set them to defaults if the keys are not found!
 */
-void GetEntityShadowFlags( const entity_t *ent, const entity_t *ent2, int *castShadows, int *recvShadows ) {
+void GetEntityShadowFlags(const entity_t *ent, const entity_t *ent2, int *castShadows, int *recvShadows) {
     /* get cast shadows */
-    if ( castShadows != NULL ) {
-        ( ent != NULL && ent->read_keyvalue( *castShadows, "_castShadows", "_cs" ) ) ||
-        ( ent2 != NULL && ent2->read_keyvalue( *castShadows, "_castShadows", "_cs" ) );
+    if (castShadows != NULL) {
+        (ent != NULL && ent->read_keyvalue(*castShadows, "_castShadows", "_cs")) ||
+        (ent2 != NULL && ent2->read_keyvalue(*castShadows, "_castShadows", "_cs"));
     }
 
     /* receive */
-    if ( recvShadows != NULL ) {
-        ( ent != NULL && ent->read_keyvalue( *recvShadows, "_receiveShadows", "_rs" ) ) ||
-        ( ent2 != NULL && ent2->read_keyvalue( *recvShadows, "_receiveShadows", "_rs" ) );
+    if (recvShadows != NULL) {
+        (ent != NULL && ent->read_keyvalue(*recvShadows, "_receiveShadows", "_rs")) ||
+        (ent2 != NULL && ent2->read_keyvalue(*recvShadows, "_receiveShadows", "_rs"));
     }
 
     /* vortex: game-specific default entity keys */
-    if ( striEqual( g_game->magic, "dq" ) || striEqual( g_game->magic, "prophecy" ) ) {
+    if (striEqual(g_game->magic, "dq") || striEqual(g_game->magic, "prophecy")) {
         /* vortex: deluxe quake default shadow flags */
-        if ( ent->classname_is( "func_wall" ) ) {
-            if ( recvShadows != NULL ) {
+        if (ent->classname_is("func_wall")) {
+            if (recvShadows != NULL) {
                 *recvShadows = 1;
             }
-            if ( castShadows != NULL ) {
+            if (castShadows != NULL) {
                 *castShadows = 1;
             }
         }

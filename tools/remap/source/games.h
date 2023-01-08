@@ -21,7 +21,6 @@
 */
 
 
-
 /* marker */
 #pragma once
 
@@ -29,7 +28,7 @@
 
 
 struct bspLump_t {
-	int offset, length, lumpVer, padding;
+        int offset, length, lumpVer, padding;
 };
 
 struct rbspHeader_t {
@@ -74,71 +73,75 @@ const int S_VERTEX_UNLIT         = 0x00000400;
 // const int S_VERTEX_BLINN_PHONG   = ?
 
 // Collision flags
-const int CM_UNKNOWN             = 0x00000001;	
+const int CM_UNKNOWN             = 0x00000001;
+
 
 /* ydnar: for multiple game support */
-struct surfaceParm_t
-{
-	const char  *name;
-	int contentFlags, contentFlagsClear;
-	int surfaceFlags, surfaceFlagsClear;
-	int compileFlags, compileFlagsClear;
+struct surfaceParm_t {
+    const char *name;
+    int  contentFlags, contentFlagsClear;
+    int  surfaceFlags, surfaceFlagsClear;
+    int  compileFlags, compileFlagsClear;
 };
 
-enum class EMiniMapMode
-{
-	Gray,
-	Black,
-	White
+
+enum class EMiniMapMode {
+    Gray,
+    Black,
+    White
 };
 
-struct game_t
-{
-	const char          *arg;                           /* -game matches this */
-	const char          *gamePath;                      /* main game data dir */
-	const char          *homeBasePath;                  /* home sub-dir on unix */
-	const char          *magic;                         /* magic word for figuring out base path */
-	const char          *shaderPath;                    /* shader directory */
-	int maxLMSurfaceVerts;                              /* default maximum lightmapped surface verts */
-	int maxSurfaceVerts;                                /* default maximum surface verts */
-	int maxSurfaceIndexes;                              /* default maximum surface indexes (tris * 3) */
-	bool emitFlares;                                    /* when true, emit flare surfaces */
-	const char          *flareShader;                   /* default flare shader (MUST BE SET) */
-	bool wolfLight;                                     /* when true, lights work like wolf q3map  */
-	int lightmapSize;                                   /* bsp lightmap width/height */
-	float lightmapGamma;                                /* default lightmap gamma */
-	bool lightmapsRGB;                                  /* default lightmap sRGB mode */
-	bool texturesRGB;                                   /* default texture sRGB mode */
-	bool colorsRGB;                                     /* default color sRGB mode */
-	float lightmapExposure;                             /* default lightmap exposure */
-	float lightmapCompensate;                           /* default lightmap compensate value */
-	float gridScale;                                    /* vortex: default lightgrid scale (affects both directional and ambient spectres) */
-	float gridAmbientScale;                             /* vortex: default lightgrid ambient spectre scale */
-	bool lightAngleHL;                                  /* jal: use half-lambert curve for light angle attenuation */
-	bool noStyles;                                      /* use lightstyles hack or not */
-	bool keepLights;                                    /* keep light entities on bsp */
-	int patchSubdivisions;                              /* default patchMeta subdivisions tolerance */
-	bool patchShadows;                                  /* patch casting enabled */
-	bool deluxeMap;                                     /* compile deluxemaps */
-	int deluxeMode;                                     /* deluxemap mode (0 - modelspace, 1 - tangentspace with renormalization, 2 - tangentspace without renormalization) */
-	int miniMapSize;                                    /* minimap size */
-	float miniMapSharpen;                               /* minimap sharpening coefficient */
-	float miniMapBorder;                                /* minimap border amount */
-	bool miniMapKeepAspect;                             /* minimap keep aspect ratio by letterboxing */
-	EMiniMapMode miniMapMode;                           /* minimap mode */
-	const char          *miniMapNameFormat;             /* minimap name format */
-	const char          *bspIdent;                      /* 4-letter bsp file prefix */
-	int bspVersion;                                     /* bsp version to use */
-	bool lumpSwap;                                      /* cod-style len/ofs order */
-	typedef void ( *bspLoadFunc )( rbspHeader_t *, const char * );
-	bspLoadFunc load;
-	typedef void ( *bspWriteFunc )( const char * );
-	bspWriteFunc write;
-	typedef void ( *bspCompileFunc )();
-	bspCompileFunc compile;
-	std::vector<surfaceParm_t> surfaceParms;            /* surfaceparm array */
-	int brushBevelsSurfaceFlagsMask;                    /* apply only these surfaceflags to bevels to reduce extra bsp shaders amount; applying them to get correct physics at walkable brush edges and vertices */
+
+struct game_t {
+    const char     *arg;                           /* -game matches this */
+    const char     *gamePath;                      /* main game data dir */
+    const char     *homeBasePath;                  /* home sub-dir on unix */
+    const char     *magic;                         /* magic word for figuring out base path */
+    const char     *shaderPath;                    /* shader directory */
+    int             maxLMSurfaceVerts;             /* default maximum lightmapped surface verts */
+    int             maxSurfaceVerts;               /* default maximum surface verts */
+    int             maxSurfaceIndexes;             /* default maximum surface indexes (tris * 3) */
+    bool            emitFlares;                    /* when true, emit flare surfaces */
+    const char     *flareShader;                   /* default flare shader (MUST BE SET) */
+    bool            wolfLight;                     /* when true, lights work like wolf q3map  */
+    int             lightmapSize;                  /* bsp lightmap width/height */
+    float           lightmapGamma;                 /* default lightmap gamma */
+    bool            lightmapsRGB;                  /* default lightmap sRGB mode */
+    bool            texturesRGB;                   /* default texture sRGB mode */
+    bool            colorsRGB;                     /* default color sRGB mode */
+    float           lightmapExposure;              /* default lightmap exposure */
+    float           lightmapCompensate;            /* default lightmap compensate value */
+    float           gridScale;                     /* vortex: default lightgrid scale (affects both directional and ambient spectres) */
+    float           gridAmbientScale;              /* vortex: default lightgrid ambient spectre scale */
+    bool            lightAngleHL;                  /* jal: use half-lambert curve for light angle attenuation */
+    bool            noStyles;                      /* use lightstyles hack or not */
+    bool            keepLights;                    /* keep light entities on bsp */
+    int             patchSubdivisions;             /* default patchMeta subdivisions tolerance */
+    bool            patchShadows;                  /* patch casting enabled */
+    bool            deluxeMap;                     /* compile deluxemaps */
+    int             deluxeMode;                    /* deluxemap mode (0 - modelspace,
+                                                                      1 - tangentspace with renormalization,
+                                                                      2 - tangentspace without renormalization) */
+    int             miniMapSize;                   /* minimap size */
+    float           miniMapSharpen;                /* minimap sharpening coefficient */
+    float           miniMapBorder;                 /* minimap border amount */
+    bool            miniMapKeepAspect;             /* minimap keep aspect ratio by letterboxing */
+    EMiniMapMode    miniMapMode;                   /* minimap mode */
+    const char     *miniMapNameFormat;             /* minimap name format */
+    const char     *bspIdent;                      /* 4-letter bsp file prefix */
+    int             bspVersion;                    /* bsp version to use */
+    bool            lumpSwap;                      /* cod-style len/ofs order */
+    typedef void  (*bspLoadFunc)(rbspHeader_t*, const char*);
+    bspLoadFunc     load;
+    typedef void  (*bspWriteFunc)(const char*);
+    bspWriteFunc    write;
+    typedef void  (*bspCompileFunc)();
+    bspCompileFunc  compile;
+    std::vector<surfaceParm_t>  surfaceParms;      /* surfaceparm array */
+    int             brushBevelsSurfaceFlagsMask;   /* apply only these surfaceflags to bevels to reduce extra bsp shaders amount;
+                                                      applying them to get correct physics at walkable brush edges and vertices */
 };
 
-extern const std::vector<game_t> g_games;
-extern const game_t *g_game;
+
+extern const std::vector<game_t>  g_games;
+extern const game_t              *g_game;
