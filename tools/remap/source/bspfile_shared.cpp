@@ -6,6 +6,17 @@
     EmitMeshes()
     Emits shared meshes for a given entity
 */
+// TODO: pre-sort meshes into: opaque, decal, transparent, skybox
+// -- surfaceparm compile flags, default opaque
+// -- surfaceparm decal
+// -- surfaceparm trans
+// -- surfaceparm sky | sky2d
+
+// Shared::meshes -> std::vector<Shared::Mesh_t>  opaque_meshes
+// Shared::meshes -> std::vector<Shared::Mesh_t>  decal_meshes
+// Shared::meshes -> std::vector<Shared::Mesh_t>  trans_meshes
+// Shared::meshes -> std::vector<Shared::Mesh_t>  sky_meshes
+// NOTE: meshes are worldspawn only rn, which makes things simple...
 void Shared::MakeMeshes(const entity_t &e) {
     // Multiple entities can have meshes, make sure we clear before making new meshes
     Shared::meshes.clear();

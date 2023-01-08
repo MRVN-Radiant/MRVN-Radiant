@@ -679,6 +679,18 @@ void Titanfall::EmitVertexBlinnPhong(Shared::Vertex_t &vertex) {
     writes the mesh list to the bsp
 */
 void Titanfall::EmitMeshes(const entity_t &e) {
+    // TODO: pre-sort meshes into: opaque, decal, transparent, skybox
+    // -- surfaceparm compile flags, default opaque
+    // -- surfaceparm decal
+    // -- surfaceparm trans
+    // -- surfaceparm sky | sky2d
+
+    // Shared::meshes -> std::vector<Shared::Mesh_t>  opaque_meshes
+    // Shared::meshes -> std::vector<Shared::Mesh_t>  decal_meshes
+    // Shared::meshes -> std::vector<Shared::Mesh_t>  trans_meshes
+    // Shared::meshes -> std::vector<Shared::Mesh_t>  sky_meshes
+    // NOTE: meshes are worldspawn only rn, which makes things simple...
+
     for (const Shared::Mesh_t &mesh : Shared::meshes) {
         Titanfall::Mesh_t &bm = Titanfall::Bsp::meshes.emplace_back();
         bm.const0 = 4294967040;  // :)
