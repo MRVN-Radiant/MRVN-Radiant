@@ -16,23 +16,22 @@
 #include <ctime>
 
 
-
 /*
    LoadR2BSPFile()
    loads a r1 bsp file
 */
-void LoadR1BSPFile( rbspHeader_t *header, const char *filename ) {
-    Titanfall::LoadLumpsAndEntities( header, filename );
+void LoadR1BSPFile(rbspHeader_t *header, const char *filename) {
+    Titanfall::LoadLumpsAndEntities(header, filename);
     Titanfall::ParseLoadedBSP();
-}
+};
 
 
 /*
    WriteR2BSPFile()
    writes a r1 bsp file
 */
-void WriteR1BSPFile(const char* filename) {
-    rbspHeader_t header{};
+void WriteR1BSPFile(const char *filename) {
+    rbspHeader_t  header {};
 
     // Set up header
     memcpy(header.ident, g_game->bspIdent, 4);
@@ -47,7 +46,7 @@ void WriteR1BSPFile(const char* filename) {
     header.lumps[0x53].lumpVer = 1;
 
     // write initial header
-    FILE* file = SafeOpenWrite(filename);
+    FILE *file = SafeOpenWrite(filename);
     SafeWrite(file, &header, sizeof(header));
 
     {
@@ -150,8 +149,8 @@ void CompileR1BSPFile() {
 
     for (std::size_t entityNum = 0; entityNum < entities.size(); ++entityNum) {
         // Get entity
-        entity_t& entity = entities[entityNum];
-        const char* classname = entity.classname();
+        entity_t &entity = entities[entityNum];
+        const char *classname = entity.classname();
 
         Titanfall::EmitEntity(entity);
 
@@ -171,10 +170,10 @@ void CompileR1BSPFile() {
 
     Titanfall::EmitEntityPartitions();
 
-	Shared::MakeVisReferences();
-	Shared::visRoot = Shared::MakeVisTree(Shared::visRefs, 1e30f);
-	Shared::MergeVisTree(Shared::visRoot);
-	Titanfall::EmitVisTree();
+    Shared::MakeVisReferences();
+    Shared::visRoot = Shared::MakeVisTree(Shared::visRefs, 1e30f);
+    Shared::MergeVisTree(Shared::visRoot);
+    Titanfall::EmitVisTree();
 
     Titanfall::EmitLevelInfo();
 
@@ -258,7 +257,7 @@ void Titanfall::EmitEntity(const entity_t &e) {
     // write
     StringOutputStream  data;
     data << "{\n";
-    for (const epair_t& pair : e2.epairs) {  // e2 to get editorclass changes
+    for (const epair_t &pair : e2.epairs) {  // e2 to get editorclass changes
         data << "\"" << pair.key.c_str() << "\" \"" << pair.value.c_str() << "\"\n";
     }
     data << "}\n";
@@ -368,9 +367,9 @@ uint32_t Titanfall::EmitTextureData(shaderInfo_t shader) {
     index = Titanfall::Bsp::textureData.size();
 
     // Add to Table
-    StringOutputStream data;
+    StringOutputStream  data;
     data << tex.c_str();
-    std::vector<char> str = { data.begin(), data.end() + 1 };
+    std::vector<char>  str = { data.begin(), data.end() + 1 };
 
     Titanfall::Bsp::textureDataTable.emplace_back(Titanfall::Bsp::textureDataData.size());
     Titanfall::Bsp::textureDataData.insert(Titanfall::Bsp::textureDataData.end(), str.begin(), str.end());
@@ -481,139 +480,143 @@ void Titanfall::EmitEntityPartitions() {
 
 
 /*
-	EmitObjReferences
-	Emits obj references and returns an index to the first one
+        EmitObjReferences
+        Emits obj references and returns an index to the first one
 */
-std::size_t Titanfall::EmitObjReferences( Shared::visNode_t &node ) {
-	// Stores which indicies were found
-	std::list<std::size_t> indicies;
-	// Try to check for duplicates
-	for ( Shared::visRef_t &ref : node.refs ) {
-		for( std::size_t i = 0; i < Titanfall::Bsp::objReferences.size(); i++) {
-			uint16_t &tf = Titanfall::Bsp::objReferences.at(i);
-			if( tf == ref.index )
-				indicies.push_back(i);
-		}
-	}
-	indicies.sort();
+std::size_t Titanfall::EmitObjReferences(Shared::visNode_t &node) {
+        // Stores which indicies were found
+        std::list<std::size_t> indicies;
+        // Try to check for duplicates
+        for (Shared::visRef_t &ref : node.refs) {
+            for (std::size_t i = 0; i < Titanfall::Bsp::objReferences.size(); i++) {
+                uint16_t &tf = Titanfall::Bsp::objReferences.at(i);
+                if (tf == ref.index) {
+                    indicies.push_back(i);
+                }
+            }
+        }
+        indicies.sort();
 
-	// We found all, now check if they're next to each other
-	if( indicies.size() == node.refs.size() ) {
-		std::size_t lastIndex = -1;
-		for( std::size_t &i : indicies ) {
-			if( lastIndex == -1 ) {
-				lastIndex = i;
-				continue;
-			}
-			
-			if( i != lastIndex + 1 ) {
-				lastIndex = -1;
-				break;
-			}
-		}
+        // We found all, now check if they're next to each other
+        if (indicies.size() == node.refs.size()) {
+            std::size_t lastIndex = -1;
+            for (std::size_t &i : indicies) {
+                if (lastIndex == -1) {
+                    lastIndex = i;
+                    continue;
+                }
 
-		if( lastIndex != -1 ) {
-			return indicies.front();
-		}
-	}
+                if (i != lastIndex + 1) {
+                    lastIndex = -1;
+                    break;
+                }
+            }
 
+            if (lastIndex != -1) {
+                return indicies.front();
+            }
+        }
 
-	for( Shared::visRef_t& ref : node.refs ) {
-		Titanfall::ObjReferenceBounds_t& rb = Titanfall::Bsp::objReferenceBounds.emplace_back();
-		rb.maxs = ref.minmax.maxs;
-		rb.mins = ref.minmax.mins;
+        for (Shared::visRef_t &ref : node.refs) {
+            Titanfall::ObjReferenceBounds_t &rb = Titanfall::Bsp::objReferenceBounds.emplace_back();
+            rb.maxs = ref.minmax.maxs;
+            rb.mins = ref.minmax.mins;
 
-		Titanfall::Bsp::objReferences.emplace_back(ref.index);
-	}
-	
+            Titanfall::Bsp::objReferences.emplace_back(ref.index);
+        }
 
-	return Titanfall::Bsp::objReferences.size() - node.refs.size();
+        return Titanfall::Bsp::objReferences.size() - node.refs.size();
 }
 
+
 /*
-	GetTotalVisRefCount
-	Calculates the total number of obj refs under a vistree node
+    GetTotalVisRefCount
+    Calculates the total number of obj refs under a vistree node
 */
-uint16_t GetTotalVisRefCount( Shared::visNode_t node ) {
-	uint16_t count = node.refs.size();
+uint16_t GetTotalVisRefCount(Shared::visNode_t node) {
+    uint16_t count = node.refs.size();
 
-	for ( Shared::visNode_t& n : node.children )
-		count += GetTotalVisRefCount( n );
+    for (Shared::visNode_t &n : node.children) {
+        count += GetTotalVisRefCount(n);
+    }
 
-	return count;
+    return count;
 }
 
+
 /*
-	GetTotalVisNodeChildCount
-	Calculates the total child count of node
+    GetTotalVisNodeChildCount
+    Calculates the total child count of node
 */
-uint16_t GetTotalVisNodeChildCount( Shared::visNode_t node ) {
-	uint16_t count = node.children.size();
+uint16_t GetTotalVisNodeChildCount(Shared::visNode_t node) {
+    uint16_t count = node.children.size();
 
-	for ( Shared::visNode_t& n : node.children )
-		count += GetTotalVisNodeChildCount( n );
+    for (Shared::visNode_t &n : node.children) {
+        count += GetTotalVisNodeChildCount(n);
+    }
 
-	return count;
+    return count;
 }
 
+
 /*
-	EmitVisChildrenOfTreeNode
-	Emits children of a vis tree node
+    EmitVisChildrenOfTreeNode
+    Emits children of a vis tree node
 */
-int Titanfall::EmitVisChildrenOfTreeNode( Shared::visNode_t node ) {
-	int index = Titanfall::Bsp::cellAABBNodes.size(); // Index of first child of node
+int Titanfall::EmitVisChildrenOfTreeNode(Shared::visNode_t node) {
+    int index = Titanfall::Bsp::cellAABBNodes.size();  // Index of first child of node
 
-	for( std::size_t i = 0; i < node.children.size(); i++ ) {
-		Shared::visNode_t &n = node.children.at( i );
+    for (std::size_t i = 0; i < node.children.size(); i++) {
+        Shared::visNode_t &n = node.children.at(i);
 
-		Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
-		bn.maxs = n.minmax.maxs;
-		bn.mins = n.minmax.mins;
-		bn.childCount = n.children.size();
-		bn.totalRefCount = GetTotalVisRefCount( n );
+        Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
+        bn.maxs = n.minmax.maxs;
+        bn.mins = n.minmax.mins;
+        bn.childCount = n.children.size();
+        bn.totalRefCount = GetTotalVisRefCount(n);
 
-		if (n.refs.size())
-		{
-			bn.objRef = Titanfall::EmitObjReferences(n);
-			bn.objRefCount = n.refs.size();
-		}
-	}
-	
-	for( std::size_t i = 0; i < node.children.size(); i++ ) {
-		int firstChild = EmitVisChildrenOfTreeNode( node.children.at( i ) );
+        if (n.refs.size()) {
+            bn.objRef = Titanfall::EmitObjReferences(n);
+            bn.objRefCount = n.refs.size();
+        }
+    }
 
-		Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.at( index + i );
-		bn.firstChild = firstChild;
-	}
+    for (std::size_t i = 0; i < node.children.size(); i++) {
+        int firstChild = EmitVisChildrenOfTreeNode(node.children.at(i));
 
-	return index;
+        Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.at(index + i);
+        bn.firstChild = firstChild;
+    }
+
+    return index;
 }
 
+
 /*
-	EmitVisTree
-	Emits vistree 
+    EmitVisTree
+    Emits vistree
 */
 void Titanfall::EmitVisTree() {
-	Shared::visNode_t &root = Shared::visRoot;
+    Shared::visNode_t &root = Shared::visRoot;
 
-	Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
-	bn.maxs = root.minmax.maxs;
-	bn.mins = root.minmax.mins;
-	bn.firstChild = Titanfall::Bsp::cellAABBNodes.size();
-	bn.childCount = root.children.size();
-	bn.totalRefCount = GetTotalVisRefCount( root );
-	if ( root.refs.size() )
-	{
-		bn.objRef = EmitObjReferences( root );
-		bn.objRefCount = root.refs.size();
-	}
+    Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
+    bn.maxs = root.minmax.maxs;
+    bn.mins = root.minmax.mins;
+    bn.firstChild = Titanfall::Bsp::cellAABBNodes.size();
+    bn.childCount = root.children.size();
+    bn.totalRefCount = GetTotalVisRefCount(root);
+    if (root.refs.size()) {
+        bn.objRef = EmitObjReferences(root);
+        bn.objRefCount = root.refs.size();
+    }
 
-	EmitVisChildrenOfTreeNode( Shared::visRoot );
+    EmitVisChildrenOfTreeNode(Shared::visRoot);
 }
 
+
 /*
-	EmitVertexUnlit
-	Saves a vertex into Titanfall::Bsp::vertexUnlitVertices
+    EmitVertexUnlit
+    Saves a vertex into Titanfall::Bsp::vertexUnlitVertices
 */
 void Titanfall::EmitVertexUnlit(Shared::Vertex_t &vertex) {
     Titanfall::VertexUnlit_t &ul = Titanfall::Bsp::vertexUnlitVertices.emplace_back();
@@ -747,14 +750,14 @@ void Titanfall::EmitMeshes(const entity_t &e) {
                     continue;
                 }
 
-                uint16_t& index = Titanfall::Bsp::meshIndices.emplace_back();
+                uint16_t &index = Titanfall::Bsp::meshIndices.emplace_back();
                 index = j;
                 break;
             }
         }
 
         // Save MeshBounds
-        Titanfall::MeshBounds_t& mb = Titanfall::Bsp::meshBounds.emplace_back();
+        Titanfall::MeshBounds_t &mb = Titanfall::Bsp::meshBounds.emplace_back();
         mb.origin = (aabb.maxs + aabb.mins) / 2;
         mb.extents = (aabb.maxs - aabb.mins) / 2;
     }
@@ -802,7 +805,7 @@ void Titanfall::EmitCollisionGrid() {
         scale = scale < 256 ? 256 : scale;
     }
 
-    Titanfall::CMGrid_t& grid = Titanfall::Bsp::cmGrid.emplace_back();
+    Titanfall::CMGrid_t &grid = Titanfall::Bsp::cmGrid.emplace_back();
     grid.scale = scale;
     grid.xOffset = floor(Titanfall::Bsp::models[0].minmax.mins.x() / grid.scale) - 1;
     grid.yOffset = floor(Titanfall::Bsp::models[0].minmax.mins.y() / grid.scale) - 1;
@@ -833,7 +836,7 @@ void Titanfall::EmitCollisionGrid() {
             //            cellMinmax.mins.x(), cellMinmax.mins.y(), cellMinmax.mins.z(),
             //            cellMinmax.maxs.x(), cellMinmax.maxs.y(), cellMinmax.maxs.z());
 
-            Titanfall::CMGridCell_t& cell = Titanfall::Bsp::cmGridCells.emplace_back();
+            Titanfall::CMGridCell_t &cell = Titanfall::Bsp::cmGridCells.emplace_back();
             cell.start = Titanfall::Bsp::cmGeoSets.size();
 
             // Check brushes
@@ -849,13 +852,13 @@ void Titanfall::EmitCollisionGrid() {
                     continue;
                 }
 
-                Titanfall::CMGeoSet_t& set = Titanfall::Bsp::cmGeoSets.emplace_back();
+                Titanfall::CMGeoSet_t &set = Titanfall::Bsp::cmGeoSets.emplace_back();
                 set.straddleGroup = 0;
                 set.primitiveCount = 1;
                 set.unknown2 = 0;
                 set.collisionShapeIndex = index;
 
-                Titanfall::CMBound_t& bound = Titanfall::Bsp::cmGeoSetBounds.emplace_back();
+                Titanfall::CMBound_t &bound = Titanfall::Bsp::cmGeoSetBounds.emplace_back();
                 bound.unknown1 = 128;
                 bound.origin = brush.origin;
                 // The + 1.0f fixes the infinitely falling in one place while touching a floor bug
@@ -868,7 +871,7 @@ void Titanfall::EmitCollisionGrid() {
 
     // Make GridCells for Models, why respawn ?
     for (Titanfall::Model_t &model : Titanfall::Bsp::models) {
-        Titanfall::CMGridCell_t& cell = Titanfall::Bsp::cmGridCells.emplace_back();
+        Titanfall::CMGridCell_t &cell = Titanfall::Bsp::cmGridCells.emplace_back();
         cell.start = Titanfall::Bsp::cmGeoSets.size();
         cell.count = 0;
     }
@@ -879,10 +882,10 @@ void Titanfall::EmitCollisionGrid() {
     EmitBrushes()
     Emits brushes of entity into bsp
 */
-void Titanfall::EmitBrushes(const entity_t& e) {
+void Titanfall::EmitBrushes(const entity_t &e) {
     uint16_t index = 0;
-    for (const brush_t& brush : e.brushes) {
-        Titanfall::CMBrush_t& b = Titanfall::Bsp::cmBrushes.emplace_back();
+    for (const brush_t &brush : e.brushes) {
+        Titanfall::CMBrush_t &b = Titanfall::Bsp::cmBrushes.emplace_back();
 
         b.extents = (brush.minmax.maxs - brush.minmax.mins) / 2;
         b.origin = brush.minmax.maxs - b.extents;
@@ -890,8 +893,8 @@ void Titanfall::EmitBrushes(const entity_t& e) {
         b.planeCount = 0;
         b.unknown = 0;
 
-        std::vector<side_t> axialSides;
-        std::vector<side_t> cuttingSides;
+        std::vector<side_t>  axialSides;
+        std::vector<side_t>  cuttingSides;
         // +X -X +Y -Y +Z -Z
         bool axials[6];
         // The bsp brushes are AABBs + cutting planes
@@ -958,7 +961,7 @@ void Titanfall::EmitBrushes(const entity_t& e) {
             Titanfall::EmitPlane(side.plane);
             b.planeCount++;
             Titanfall::Bsp::cmBrushSideProperties.emplace_back(1);
-            uint16_t& so = Titanfall::Bsp::cmBrushSidePlaneOffsets.emplace_back();
+            uint16_t &so = Titanfall::Bsp::cmBrushSidePlaneOffsets.emplace_back();
             so = 0;
         }
 
