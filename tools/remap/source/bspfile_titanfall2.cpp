@@ -165,9 +165,10 @@ void CompileR2BSPFile() {
 
     for (size_t entityNum = 0; entityNum < entities.size(); ++entityNum) {
         /* get entity */
-        entity_t &entity = entities[entityNum];
+        entity_t   &entity = entities[entityNum];
         const char *classname = entity.classname();
 
+        // NOTE: entities' classnames are editorclasses until we call EmitEntity
         /* visible geo */
         if (striEqual(classname, "worldspawn")) {
             Titanfall::BeginModel();
@@ -178,11 +179,20 @@ void CompileR2BSPFile() {
             Titanfall::EmitBrushes(entity);
 
             Titanfall::EndModel();
-        /* hurt */
-        } else if (striEqualPrefix(classname, "trigger_")) {
-            Titanfall::EmitTriggerBrushPlaneKeyValues( entity );
+
+        /* TODO: *model entities
+         * fog_volume
+         * func_brush
+         * func_brush_lightweight
+         * trigger_no_grapple */
+        /* *trigger_brush_x_plane_y entities */
+        } else if (striEqualPrefix(classname, "trigger_")
+                || striEqual(classname, "envmap_volume")
+                || striEqual(classname, "light_environment_volume")
+                || striEqual(classname, "light_probe_volume")) {
+            Titanfall::EmitTriggerBrushPlaneKeyValues(entity);
         /* props for gamelump */
-        } else if (striEqual(classname, "misc_model")) {
+        } else if (striEqual(classname, "misc_model")) {  // TODO: use prop_static instead
             // EmitProp(entity);
         }
 
