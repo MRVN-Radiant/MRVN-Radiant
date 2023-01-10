@@ -224,18 +224,19 @@ std::vector<Plane3> Titanfall::BuildPlanesFromMinMax( MinMax &minmax ) {
     vertices[7] = Vector3(minmax.maxs.x(), minmax.mins.y(), minmax.mins.z());
 
     // Create planes from AABB
-    Plane3& plane0 = planes.emplace_back();
-    PlaneFromPoints(plane0, vertices[0], vertices[1], vertices[2]);
-    Plane3& plane1 = planes.emplace_back();
-    PlaneFromPoints(plane1, vertices[0], vertices[2], vertices[3]);
-    Plane3& plane2 = planes.emplace_back();
-    PlaneFromPoints(plane2, vertices[0], vertices[3], vertices[1]);
     Plane3& plane3 = planes.emplace_back();
     PlaneFromPoints(plane3, vertices[6], vertices[5], vertices[4]);
-    Plane3& plane4 = planes.emplace_back();
-    PlaneFromPoints(plane4, vertices[7], vertices[6], vertices[4]);
+    Plane3& plane0 = planes.emplace_back();
+    PlaneFromPoints(plane0, vertices[0], vertices[1], vertices[2]);
     Plane3& plane5 = planes.emplace_back();
     PlaneFromPoints(plane5, vertices[5], vertices[7], vertices[4]);
+    Plane3& plane2 = planes.emplace_back();
+    PlaneFromPoints(plane2, vertices[0], vertices[3], vertices[1]);
+    Plane3& plane4 = planes.emplace_back();
+    PlaneFromPoints(plane4, vertices[7], vertices[6], vertices[4]);
+    Plane3& plane1 = planes.emplace_back();
+    PlaneFromPoints(plane1, vertices[0], vertices[2], vertices[3]);
+
     
     return planes;
 }
