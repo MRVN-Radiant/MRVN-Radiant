@@ -81,19 +81,20 @@ struct game_titanfallonline : game_t {
             /* name  contentFlags  contentFlagsClear  surfaceFlags  surfaceFlagsClear  compileFlags  compileFlagsClear */
 
             /* default */
-            {"default",        0,                -1,        0x00100000,           -1,      C_SOLID,                 -1},
+            {"default",        0,                -1,        0x00100000,           -1,       C_SOLID,                -1},
 
             /* compiler */
-            {"nodraw",         0,                 0,        0x00000000,            0,     C_NODRAW,                  0},
+            {"nodraw",         0,                 0,                 0,            0,      C_NODRAW,                 0},
 
             // remap
-            {"sky2d",          0,                 0,          S_SKY_2D,            0,            0,                  0},
-            {"sky",            0,                 0,             S_SKY,            0,            0,                  0},
-            {"trans",          0,                 0,     S_TRANSLUCENT,            0,            0,                  0},
-            {"unlit",          0,                 0,    S_VERTEX_UNLIT,            0,            0,                  0},
-            {"litflat",        0,                 0, S_VERTEX_LIT_FLAT,            0,            0,                  0},
-            {"litbump",        0,                 0, S_VERTEX_LIT_BUMP,            0,            0,                  0},
-            {"unlitts",        0,                 0, S_VERTEX_UNLIT_TS,            0,            0,                  0},
+            {"decal",          0,                 0,     S_TRANSLUCENT,            0,       C_DECAL,                 0},
+            {"sky2d",          0,                 0,          S_SKY_2D,            0,         C_SKY,                 0},
+            {"sky",            0,                 0,             S_SKY,            0,         C_SKY,                 0},
+            {"trans",          0,                 0, S_VERTEX_UNLIT_TS,            0, C_TRANSLUCENT,                 0},
+            {"unlit",          0,                 0,    S_VERTEX_UNLIT,            0,             0,                 0},
+            {"litflat",        0,                 0, S_VERTEX_LIT_FLAT,            0,             0,                 0},
+            {"litbump",        0,                 0, S_VERTEX_LIT_BUMP,            0,             0,                 0},
+            {"unlitts",        0,                 0, S_VERTEX_UNLIT_TS,            0,             0,                 0},
         },
         0
     }{}
@@ -147,19 +148,20 @@ struct game_titanfall2 : game_t {
             /* name  contentFlags  contentFlagsClear  surfaceFlags  surfaceFlagsClear  compileFlags  compileFlagsClear */
 
             /* default */
-            {"default",        0,                -1,        0x00100000,           -1,      C_SOLID,                 -1},
+            {"default",        0,                -1,        0x00100000,           -1,       C_SOLID,                -1},
 
             /* compiler */
-            {"nodraw",         0,                 0,        0x00000000,            0,     C_NODRAW,                  0},
+            {"nodraw",         0,                 0,                 0,            0,      C_NODRAW,                 0},
 
             // remap
-            {"sky2d",          0,                 0,          S_SKY_2D,            0,            0,                  0},
-            {"sky",            0,                 0,             S_SKY,            0,            0,                  0},
-            {"trans",          0,                 0,     S_TRANSLUCENT,            0,            0,                  0},
-            {"unlit",          0,                 0,    S_VERTEX_UNLIT,            0,            0,                  0},
-            {"litflat",        0,                 0, S_VERTEX_LIT_FLAT,            0,            0,                  0},
-            {"litbump",        0,                 0, S_VERTEX_LIT_BUMP,            0,            0,                  0},
-            {"unlitts",        0,                 0, S_VERTEX_UNLIT_TS,            0,            0,                  0},
+            {"decal",          0,                 0,     S_TRANSLUCENT,            0,       C_DECAL,                 0},
+            {"sky2d",          0,                 0,          S_SKY_2D,            0,         C_SKY,                 0},
+            {"sky",            0,                 0,             S_SKY,            0,         C_SKY,                 0},
+            {"trans",          0,                 0, S_VERTEX_UNLIT_TS,            0, C_TRANSLUCENT,                 0},
+            {"unlit",          0,                 0,    S_VERTEX_UNLIT,            0,             0,                 0},
+            {"litflat",        0,                 0, S_VERTEX_LIT_FLAT,            0,             0,                 0},
+            {"litbump",        0,                 0, S_VERTEX_LIT_BUMP,            0,             0,                 0},
+            {"unlitts",        0,                 0, S_VERTEX_UNLIT_TS,            0,             0,                 0},
         },
         0
     }{}
@@ -213,19 +215,20 @@ struct game_apexlegends : game_t {
             /* name  contentFlags  contentFlagsClear  surfaceFlags  surfaceFlagsClear  compileFlags  compileFlagsClear */
 
             /* default */
-            {"default",        0,                -1,        0x00100000,        -1,         C_SOLID,                 -1},
+            {"default",        0,                -1,        0x00100000,           -1,       C_SOLID,                -1},
 
             /* compiler */
-            {"nodraw",         0,                 0,        0x00000000,         0,        C_NODRAW,                  0},
+            {"nodraw",         0,                 0,                 0,            0,      C_NODRAW,                 0},
 
             // remap
-            {"sky2d",          0,                 0,          S_SKY_2D,         0,               0,                  0},
-            {"sky",            0,                 0,             S_SKY,         0,               0,                  0},
-            {"trans",          0,                 0,     S_TRANSLUCENT,         0,               0,                  0},
-            {"unlit",          0,                 0,    S_VERTEX_UNLIT,         0,               0,                  0},
-            {"litflat",        0,                 0, S_VERTEX_LIT_FLAT,         0,               0,                  0},
-            {"litbump",        0,                 0, S_VERTEX_LIT_BUMP,         0,               0,                  0},
-            {"unlitts",        0,                 0, S_VERTEX_UNLIT_TS,         0,               0,                  0},
+            {"decal",          0,                 0,     S_TRANSLUCENT,            0,       C_DECAL,                 0},
+            {"sky2d",          0,                 0,          S_SKY_2D,            0,         C_SKY,                 0},
+            {"sky",            0,                 0,             S_SKY,            0,         C_SKY,                 0},
+            {"trans",          0,                 0, S_VERTEX_UNLIT_TS,            0, C_TRANSLUCENT,                 0},
+            {"unlit",          0,                 0,    S_VERTEX_UNLIT,            0,             0,                 0},
+            {"litflat",        0,                 0, S_VERTEX_LIT_FLAT,            0,             0,                 0},
+            {"litbump",        0,                 0, S_VERTEX_LIT_BUMP,            0,             0,                 0},
+            {"unlitts",        0,                 0, S_VERTEX_UNLIT_TS,            0,             0,                 0},
         },
         0
     }{}
