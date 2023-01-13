@@ -286,10 +286,14 @@ void Titanfall::EmitEntity(const entity_t &e) {
     EmitTriggerBrushPlaneKeyValues()
     Emits brush planes as keyvalues because respawn
 */
-void Titanfall::EmitTriggerBrushPlaneKeyValues(entity_t &e) {
+void Titanfall::EmitTriggerBrushPlaneKeyValues( entity_t &e ) {
+    MinMax minmax;
     std::size_t b = 0;
-    for (const brush_t &brush : e.brushes) {
+    for ( const brush_t &brush : e.brushes ) {
+        minmax.extend( brush.minmax );
+
         for (std::size_t s = 0; s < brush.sides.size(); s++) {
+
             const side_t &side = brush.sides.at(s);
             StringOutputStream key;
             key << "*trigger_brush_" << b << "_plane_" << s;
@@ -297,9 +301,28 @@ void Titanfall::EmitTriggerBrushPlaneKeyValues(entity_t &e) {
             StringOutputStream value;
             value << side.plane.a << " " << side.plane.b << " " << side.plane.c << " " << side.plane.d;
 
-            e.setKeyValue(key.c_str(), value.c_str());
+            e.setKeyValue( key.c_str(), value.c_str() );
         }
         b++;
+    }
+
+    {
+        StringOutputStream key;
+        key << "*trigger_bounds_mins";
+
+        StringOutputStream value;
+        value << minmax.mins.x() << " " << minmax.mins.y() << " " << minmax.mins.z();
+
+        e.setKeyValue( key.c_str(), value.c_str() );
+    }
+    {
+        StringOutputStream key;
+        key << "*trigger_bounds_maxs";
+
+        StringOutputStream value;
+        value << minmax.maxs.x() << " " << minmax.maxs.y() << " " << minmax.maxs.z();
+
+        e.setKeyValue( key.c_str(), value.c_str() );
     }
 }
 
