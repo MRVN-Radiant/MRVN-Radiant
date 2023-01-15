@@ -39,8 +39,7 @@
 #ifndef Q3MAP_VERSION
 #error no Q3MAP_VERSION defined
 #endif
-#define Q3MAP_MOTD  "Your map saw the pretty lights from q3map2's BFG"
-
+#define Q3MAP_MOTD  "Your map saw the pretty lights from remap's BFG"
 
 
 /* -------------------------------------------------------------------------------
@@ -51,7 +50,7 @@
 
 
 /* general */
-#include "version.h"            /* ttimo: might want to guard that if built outside of the GtkRadiant tree */
+#include "version.h"  /* ttimo: might want to guard that if built outside of the GtkRadiant tree */
 
 #include "cmdlib.h"
 #include "qstringops.h"
@@ -123,7 +122,6 @@
 #define WORLDSPAWN_RECV_SHADOWS  1
 #define ENTITY_CAST_SHADOWS      0
 #define ENTITY_RECV_SHADOWS      1
-
 
 /* bsp */
 #define MAX_PATCH_SIZE          32
