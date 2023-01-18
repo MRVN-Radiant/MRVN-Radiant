@@ -27,6 +27,7 @@ void Titanfall::LoadLumpsAndEntities(const char* filename) {
     CopyLump((rbspHeader_t*)header, R1_LUMP_TEXTURE_DATA_STRING_DATA, Titanfall::Bsp::textureDataData);
     CopyLump((rbspHeader_t*)header, R1_LUMP_TEXTURE_DATA_STRING_TABLE, Titanfall::Bsp::textureDataTable);
     CopyLump((rbspHeader_t*)header, R1_LUMP_ENTITY_PARTITIONS, Titanfall::Bsp::entityPartitions);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_TRICOLL_TRIS, Titanfall::Bsp::tricollTriangles);
     CopyLump((rbspHeader_t*)header, R1_LUMP_TRICOLL_HEADERS, Titanfall::Bsp::tricollHeaders);
     CopyLump((rbspHeader_t*)header, R1_LUMP_CM_GRID, Titanfall::Bsp::cmGrid);
     CopyLump((rbspHeader_t*)header, R1_LUMP_CM_GRID_CELLS, Titanfall::Bsp::cmGridCells);
@@ -77,6 +78,9 @@ void Titanfall::ParseLoadedBSP() {
             Titanfall::ParseWorldspawn( e );
         }
     }
+
+
+    entities.insert(entities.end(), Titanfall::Ent::entities.begin(), Titanfall::Ent::entities.end());
 }
 
 
@@ -92,11 +96,103 @@ void Titanfall::ParseWorldspawn( entity_t &entity ) {
         for( uint16_t j = cell.start; j < cell.start + cell.count; j++ ) {
             Titanfall::CMGeoSet_t &set = Titanfall::Bsp::cmGeoSets.at(j);
 
+
             // Tricoll ( patches )
             #if 0
             if( set.collisionShapeType == 64 ) {
                 Titanfall::TricollHeader_t &header = Titanfall::Bsp::tricollHeaders.at(set.collisionShapeIndex);
 
+                int width, height;
+
+                // Guess dimensions
+                // We need to know the dimensions of the patch, but tricoll doesn't save them so we have to guess
+                // This algorithm uses the surface area of the sides of the entire tricoll mesh to guess its
+                // orientation ( patches are usually flat with bumps ). Once we know the orientation we try to match
+                // vertices to corners. We can then use the indicies of these vertices to guess the dimensions.
+                // If our dimensions dont match the totaly num of vertices we skip.
+                #define X 0
+                #define Y 1
+                #define Z 2
+                MinMax minmax;
+                for( int i = 0; i < header.numVerts; i++ ) {
+                    minmax.extend( Titanfall::Bsp::vertices.at( header.firstVert + i ) );
+                }
+
+                // Check surface area
+                float surfaceAreaX, surfaceAreaY, surfaceAreaZ;
+                surfaceAreaX = ( minmax.maxs[Y] - minmax.mins[Y] ) * ( minmax.maxs[Z] - minmax.mins[Z] );
+                surfaceAreaY = ( minmax.maxs[X] - minmax.mins[X] ) * ( minmax.maxs[Z] - minmax.mins[Z] );
+                surfaceAreaZ = ( minmax.maxs[Y] - minmax.mins[Y] ) * ( minmax.maxs[X] - minmax.mins[X] );
+
+                Sys_Printf("%f, %f, %f\n", surfaceAreaX, surfaceAreaY, surfaceAreaZ);
+                // Since we want to only do math in 2D we need to ignore an axis
+                int ignoreAxis = X;
+                if( surfaceAreaY > surfaceAreaX && surfaceAreaY > surfaceAreaZ )
+                    ignoreAxis = Y;
+                if( surfaceAreaZ > surfaceAreaX && surfaceAreaZ > surfaceAreaY )
+                    ignoreAxis = Z;
+                
+                Vector2 cornerLeft, cornerRight;
+                if( ignoreAxis == X ) {
+                    cornerLeft =  Vector2( minmax.mins[Y], minmax.maxs[Z] );
+                    cornerRight = Vector2( minmax.maxs[Y], minmax.maxs[Z] );
+                } else if( ignoreAxis == Y ) {
+                    cornerLeft =  Vector2( minmax.mins[X], minmax.maxs[Z] );
+                    cornerRight = Vector2( minmax.maxs[X], minmax.maxs[Z] );
+                } else {
+                    cornerLeft =  Vector2( minmax.mins[Y], minmax.maxs[X] );
+                    cornerRight = Vector2( minmax.maxs[Y], minmax.maxs[X] );
+                }
+
+                int indexLeft, indexRight;
+                for( int i = 0; i < header.numVerts; i++ ) {
+                    Vector3 vertex3 = Titanfall::Bsp::vertices.at( header.firstVert + i );
+                    Vector2 vertex2;
+                    if( ignoreAxis == X ) {
+                        vertex2 = Vector2( vertex3[Y], vertex3[Z] );
+                    } else if( ignoreAxis == Y ) {
+                        vertex2 = Vector2( vertex3[X], vertex3[Z] );
+                    } else {
+                        vertex2 = Vector2( vertex3[Y], vertex3[X] );
+                    }
+
+                    if( vector2_equal_epsilon( vertex2, cornerLeft, EQUAL_EPSILON) )
+                        indexLeft = i;
+                    if( vector2_equal_epsilon( vertex2, cornerRight, EQUAL_EPSILON) )
+                        indexRight = i;
+                }
+
+                Sys_Printf("%i: %i\n", indexLeft, indexRight);
+
+                height = indexRight - indexLeft;
+                height = height < 0 ? height * -1 : height;
+                height += 1;
+                width = header.numVerts / height;
+
+                #undef X
+                #undef Y
+                #undef Z
+
+                if( width * height != header.numVerts ) {
+                    Sys_FPrintf( SYS_WRN, "Couldn't get patch dimensions from tricoll header( %i * %i != %i )!\n", width, height, header.numVerts );
+                    continue;
+                }
+                
+                // Entity pointcloud ( dont run this on large maps )
+                for( int v = 0; v < header.numVerts; v++ ) {
+                    entity_t& e = Titanfall::Ent::entities.emplace_back();
+                    StringOutputStream cs;
+                    cs << "tricoll_header_" << ignoreAxis << "__" << indexLeft << "_" << indexRight;
+                    e.setKeyValue("classname", cs.c_str());
+                    StringOutputStream ss;
+                    Vector3 &vec = Titanfall::Bsp::vertices.at(header.firstVert + v);
+                    ss << vec.x() << " " << vec.y() << " " << vec.z();
+                    e.setKeyValue("origin", ss.c_str());
+                    //drawVerts[v].xyz = Titanfall::Bsp::vertices.at( header.firstVert + v );
+                }
+                
+
+                /*
                 int width, height;
 
                 // Guess dimensions
@@ -109,7 +205,7 @@ void Titanfall::ParseWorldspawn( entity_t &entity ) {
                             break;
                     }
                 }
-
+                
                 // Check if valid
                 // Editor no likey patches slimmer than 3 verts rn
                 if( width * height != header.numVerts || width < 3 || height < 3 || width > 29 || height > 29 ) {
@@ -117,9 +213,9 @@ void Titanfall::ParseWorldspawn( entity_t &entity ) {
                     continue;
                 }
                 
-
+                */
                 // Build mesh
-                
+                /*
                 mesh_t mesh;
                 mesh.width = width;
                 mesh.height = height;
@@ -142,7 +238,7 @@ void Titanfall::ParseWorldspawn( entity_t &entity ) {
                 pm->mesh = mesh;
 
                 pm->next = entity.patches;
-                entity.patches = pm;
+                entity.patches = pm;*/
             }
             #endif
 

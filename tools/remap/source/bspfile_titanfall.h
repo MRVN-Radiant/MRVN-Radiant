@@ -82,6 +82,14 @@ namespace Titanfall {
         uint32_t  meshCount;
     };
 
+    // 0x42
+    struct TricollTriangle_t{
+        int32_t unk : 5;
+        int32_t idx0 : 9;
+        int32_t idx1 : 9;
+        int32_t idx2 : 9;
+    };
+
     // 0x45
     struct TricollHeader_t {
         int16_t flags;
@@ -276,6 +284,7 @@ namespace Titanfall {
         inline std::vector<char> snd;
         inline std::vector<char> spawn;
         inline std::vector<char> extra;
+        inline std::vector<entity_t> entities;
     }
 
     namespace Bsp {
@@ -288,6 +297,7 @@ namespace Titanfall {
         inline std::vector<Vector3>               vertexNormals;
         inline std::vector<char>                  textureDataData;
         inline std::vector<uint32_t>              textureDataTable;
+        inline std::vector<TricollTriangle_t>     tricollTriangles;
         inline std::vector<TricollHeader_t>       tricollHeaders;
         inline std::vector<VertexUnlit_t>         vertexUnlitVertices;
         inline std::vector<VertexLitFlat_t>       vertexLitFlatVertices;
