@@ -211,51 +211,42 @@ public:
 	RenderablePatchWireframe( PatchTesselation& tess ) : m_tess( tess ){
 	}
 	void render( RenderStateFlags state ) const {
-		{
-#if NV_DRIVER_BUG
-			glVertexPointer( 3, GL_FLOAT, 0, 0 );
-			glDrawArrays( GL_TRIANGLE_FAN, 0, 0 );
-#endif
+		glVertexPointer( 3, GL_FLOAT, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->vertex );
 
-			std::size_t n = 0;
-			glVertexPointer( 3, GL_FLOAT, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->vertex );
-			for ( std::size_t i = 0; i <= m_tess.m_curveTreeV.size(); ++i )
-			{
-				glDrawArrays( GL_LINE_STRIP, GLint( n ), GLsizei( m_tess.m_nArrayWidth ) );
+		unsigned int indices[m_tess.m_nArrayHeight * 2 + (m_tess.m_nArrayWidth-2)*2 + 1];
 
-				if ( i == m_tess.m_curveTreeV.size() ) {
-					break;
-				}
-
-				if ( !BezierCurveTree_isLeaf( m_tess.m_curveTreeV[i] ) ) {
-					glDrawArrays( GL_LINE_STRIP, GLint( m_tess.m_curveTreeV[i]->index ), GLsizei( m_tess.m_nArrayWidth ) );
-				}
-
-				n += ( m_tess.m_arrayHeight[i] * m_tess.m_nArrayWidth );
-
-			}
+		// Renders the outline in the XY view
+		// TODO: Improve this, :)
+		for( std::size_t x = 0; x < m_tess.m_nArrayWidth; x++ ) {
+		indices[x] = x;
 		}
-
-		{
-			const ArbitraryMeshVertex* p = m_tess.m_vertices.data();
-			std::size_t n = m_tess.m_nArrayWidth * sizeof( ArbitraryMeshVertex );
-			for ( std::size_t i = 0; i <= m_tess.m_curveTreeU.size(); ++i )
-			{
-				glVertexPointer( 3, GL_FLOAT, GLsizei( n ), &p->vertex );
-				glDrawArrays( GL_LINE_STRIP, 0, GLsizei( m_tess.m_nArrayHeight ) );
-
-				if ( i == m_tess.m_curveTreeU.size() ) {
-					break;
-				}
-
-				if ( !BezierCurveTree_isLeaf( m_tess.m_curveTreeU[i] ) ) {
-					glVertexPointer( 3, GL_FLOAT, GLsizei( n ), &( m_tess.m_vertices.data() + ( m_tess.m_curveTreeU[i]->index ) )->vertex );
-					glDrawArrays( GL_LINE_STRIP, 0, GLsizei( m_tess.m_nArrayHeight ) );
-				}
-
-				p += m_tess.m_arrayWidth[i];
-			}
+	
+		for( std::size_t y = 0; y < m_tess.m_nArrayHeight - 2; y++ ) {
+			indices[y + m_tess.m_nArrayWidth] = (y + 1) * m_tess.m_nArrayWidth + m_tess.m_nArrayWidth - 1;
 		}
+	
+		for( std::size_t x = m_tess.m_nArrayWidth; x > 0; x-- ) {
+			indices[m_tess.m_nArrayWidth + m_tess.m_nArrayHeight - 2 + m_tess.m_nArrayWidth - x] = (m_tess.m_nArrayHeight - 1) * m_tess.m_nArrayWidth + x - 1;
+		}
+	
+		for( std::size_t y = 0; y < m_tess.m_nArrayHeight - 2; y++ ) {
+			indices[y + m_tess.m_nArrayWidth *2 + m_tess.m_nArrayHeight -2] = (m_tess.m_nArrayHeight -2-y) * m_tess.m_nArrayWidth;
+		}
+		indices[sizeof(indices) / sizeof(int) - 1] = 0;
+		// Draw vertical lines
+		//for (std::size_t y = 0; y < m_tess.m_nArrayHeight; y++) {
+			//for( std::size_t x = 0; x < m_tess.m_nArrayWidth - 1; x++ ) {
+			//	glDrawArrays( GL_LINE_STRIP, y * m_tess.m_nArrayWidth + x, 2 );
+			//}
+		//}
+
+		// Draw horizontal lines
+		//for( std::size_t y = 0; y < m_tess.m_nArrayHeight; y++ ) {
+			//for( std::size_t i = 0; i < m_tess.m_nArrayWidth - 1; i++ ) {
+			//	glDrawArrays( GL_LINE_STRIP, i, 2 );
+			//}
+		//}
+		glDrawElements( GL_LINE_STRIP, sizeof(indices)/sizeof(int), GL_UNSIGNED_INT, indices);
 	}
 };
 
