@@ -82,7 +82,7 @@ void Titanfall::ParseExtraBrushes( entity_t &entity ) {
         int index;
         sscanf( model, "*%i", &index );
         if( Titanfall::Bsp::cmGrid.at(0).xCount * Titanfall::Bsp::cmGrid.at(0).yCount + index < Titanfall::Bsp::cmGridCells.size() )
-            ParseGridCell( entity, Titanfall::Bsp::cmGrid.at(0).xCount * Titanfall::Bsp::cmGrid.at(0).yCount + index );
+            ParseGridCells( entity, Titanfall::Bsp::cmGrid.at(0).xCount * Titanfall::Bsp::cmGrid.at(0).yCount + index, 1 );
         else
             Sys_FPrintf( SYS_ERR, "Tried to index out of grid cell bounds!\n" );
     }
@@ -145,41 +145,38 @@ StringOutputStream key;
         */
 
 void Titanfall::ParseWorldspawn( entity_t &entity ) {
-
     // Create a list of all brush indicies belonging to worldspawn
-    // Loop through gridcells
     std::size_t cells = Titanfall::Bsp::cmGrid.at(0).xCount * Titanfall::Bsp::cmGrid.at(0).yCount + 1;
-    for( std::size_t i = 0; i < cells; i++ ) {
-        ParseGridCell( entity, i );
-    }
+    ParseGridCells( entity, 0, cells );
 }
 
-void Titanfall::ParseGridCell( entity_t &entity, std::size_t index ) {
+void Titanfall::ParseGridCells( entity_t &entity, std::size_t index, std::size_t count ) {
     std::list<int> brushIndicies;
     std::list<int> tricollIndicies;
 
+    for( std::size_t i = 0; i < count; i++ ) {
+        Titanfall::CMGridCell_t &cell = Titanfall::Bsp::cmGridCells.at( i + index );
 
-    Titanfall::CMGridCell_t &cell = Titanfall::Bsp::cmGridCells.at( index );
+        // Loop through GeoSets
+        for( uint16_t j = cell.start; j < cell.start + cell.count; j++ ) {
+            Titanfall::CMGeoSet_t &set = Titanfall::Bsp::cmGeoSets.at(j);
 
-    // Loop through GeoSets
-    for( uint16_t j = cell.start; j < cell.start + cell.count; j++ ) {
-        Titanfall::CMGeoSet_t &set = Titanfall::Bsp::cmGeoSets.at(j);
-
-        // If a geoset indexes more than 1 collision shape we need to go through Primitives
-        if( set.primitiveCount > 1 ) {
-            for( int k = 0; k < set.primitiveCount; k++ ) {
-                Titanfall::CMPrimitive_t &primitive = Titanfall::Bsp::cmPrimitives.at( set.collisionShapeIndex + k );
+            // If a geoset indexes more than 1 collision shape we need to go through Primitives
+            if( set.primitiveCount > 1 ) {
+                for( int k = 0; k < set.primitiveCount; k++ ) {
+                    Titanfall::CMPrimitive_t &primitive = Titanfall::Bsp::cmPrimitives.at( set.collisionShapeIndex + k );
                     
-                if( primitive.collisionShapeType == 0 )
-                    brushIndicies.push_back( primitive.collisionShapeIndex );
-                else if ( primitive.collisionShapeType == 64 )
-                    tricollIndicies.push_back( primitive.collisionShapeIndex );
+                    if( primitive.collisionShapeType == 0 )
+                        brushIndicies.push_back( primitive.collisionShapeIndex );
+                    else if ( primitive.collisionShapeType == 64 )
+                        tricollIndicies.push_back( primitive.collisionShapeIndex );
+                }
+            } else {
+                if( set.collisionShapeType == 0 )
+                    brushIndicies.push_back( set.collisionShapeIndex );
+                else if ( set.collisionShapeType == 64 )
+                    tricollIndicies.push_back( set.collisionShapeIndex );
             }
-        } else {
-            if( set.collisionShapeType == 0 )
-                brushIndicies.push_back( set.collisionShapeIndex );
-            else if ( set.collisionShapeType == 64 )
-                tricollIndicies.push_back( set.collisionShapeIndex );
         }
     }
     
