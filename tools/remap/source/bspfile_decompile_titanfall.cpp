@@ -67,9 +67,11 @@ void Titanfall::ParseLoadedBSP() {
         if ( striEqual( e.classname(), "worldspawn" ) ) {
             Titanfall::ParseWorldspawn( e );
         } else {
-            if( strcmp( e.valueForKey( "model" ), "" ) != 0 ) {
+            const char *model = e.valueForKey( "model" );
+            
+            if( striEqualPrefix( model, "*") && strcmp(model, "") != 0) {
                 int index;
-                sscanf( e.valueForKey( "model" ), "*%i", &index );
+                sscanf( model, "*%i", &index );
                 ParseGridCell( e, Titanfall::Bsp::cmGrid.at(0).xCount * Titanfall::Bsp::cmGrid.at(0).yCount + index );
             }
         }
