@@ -178,6 +178,8 @@ void Titanfall::ParsePatch( entity_t &entity, std::size_t index ) {
     }
 
     int indexLeft, indexRight;
+    float distanceLeft, distanceRight;
+    distanceLeft = distanceRight = 1e30;
     for( int i = 0; i < header.numVerts; i++ ) {
         Vector3 vertex3 = Titanfall::Bsp::vertices.at( header.firstVert + i );
         Vector2 vertex2;
@@ -189,10 +191,13 @@ void Titanfall::ParsePatch( entity_t &entity, std::size_t index ) {
             vertex2 = Vector2( vertex3[Y], vertex3[X] );
         }
 
-        if( vector2_equal_epsilon( vertex2, cornerLeft, EQUAL_EPSILON) )
+        if( vector2_distance_squared( vertex2, cornerLeft ) < distanceLeft ) {
             indexLeft = i;
-        if( vector2_equal_epsilon( vertex2, cornerRight, EQUAL_EPSILON) )
+            distanceLeft = vector2_distance_squared( vertex2, cornerLeft );
+        } else if( vector2_distance_squared( vertex2, cornerRight ) < distanceRight ) {
             indexRight = i;
+            distanceRight = vector2_distance_squared( vertex2, cornerRight );
+        }
     }
 
 
@@ -226,7 +231,10 @@ void Titanfall::ParsePatch( entity_t &entity, std::size_t index ) {
     mesh.height = height;
     bspDrawVert_t *drawVerts = new bspDrawVert_t[header.numVerts];
     for( int v = 0; v < header.numVerts; v++ ) {
-        Vector3 vec = Titanfall::Bsp::vertices.at(header.firstVert + v);
+        Vector3 vec = Titanfall::Bsp::vertices.at( header.firstVert + v );
+
+
+
         drawVerts[v].xyz = vec;
     }
     mesh.verts = drawVerts;
