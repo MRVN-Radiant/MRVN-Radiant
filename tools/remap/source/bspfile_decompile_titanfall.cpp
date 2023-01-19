@@ -162,7 +162,7 @@ void Titanfall::ParseWorldspawn( entity_t &entity ) {
                         indexRight = i;
                 }
 
-                Sys_Printf("%i: %i\n", width, height);
+                //Sys_Printf("%i: %i\n", width, height);
 
                 height = indexRight - indexLeft;
                 height = height < 0 ? height * -1 : height;
@@ -222,7 +222,7 @@ void Titanfall::ParseWorldspawn( entity_t &entity ) {
                 bspDrawVert_t *drawVerts = new bspDrawVert_t[header.numVerts];
                 for( int v = 0; v < header.numVerts; v++ ) {
                     Vector3 vec = Titanfall::Bsp::vertices.at(header.firstVert + v);
-                    Sys_Printf("%f: %f: %f\n", vec[0], vec[1], vec[2]);
+                    //Sys_Printf("%f: %f: %f\n", vec[0], vec[1], vec[2]);
                     drawVerts[v].xyz = vec;
                 }
                 mesh.verts = drawVerts;
