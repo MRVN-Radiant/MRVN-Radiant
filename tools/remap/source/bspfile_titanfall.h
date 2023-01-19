@@ -18,33 +18,15 @@ void CompileR1BSPFile();
 
 
 namespace Titanfall {
-	void EmitEntity( const entity_t &e );
-	void EmitTriggerBrushPlaneKeyValues( entity_t &e );
-	void EmitPlane( const Plane3 &plane );
-	uint32_t EmitTextureData( shaderInfo_t shader );
-	uint32_t EmitVertex( Vector3 &vertex );
-	void BeginModel();
-	void EndModel();
-	void EmitEntityPartitions();
-	std::size_t EmitObjReferences( Shared::visNode_t& node );
-	void EmitVisTree();
-	uint32_t EmitVertexNormal( Vector3 &normal );
-	void EmitVertexUnlit( Shared::Vertex_t &vertex );
-	void EmitVertexLitFlat( Shared::Vertex_t &vertex );
-	void EmitVertexLitBump( Shared::Vertex_t &vertex );
-	void EmitVertexUnlitTS( Shared::Vertex_t &vertex );
-	void EmitVertexBlinnPhong( Shared::Vertex_t &vertex );
-	void EmitMeshes( const entity_t &e );
-	uint16_t EmitMaterialSort( uint32_t index );
-	void EmitCollisionGrid();
-	void EmitBrushes( const entity_t &e );
-	void EmitLevelInfo();
-	void EmitStubs();
-
+    void         SetupGameLump();
     void         BeginModel();
     void         EndModel();
-
+    void         EmitEntity( const entity_t &e );
+	void         EmitTriggerBrushPlaneKeyValues( entity_t &e );
+	void         EmitPlane( const Plane3 &plane );
     void         EmitEntityPartitions();
+    uint32_t     EmitTextureData(shaderInfo_t shader);
+    uint32_t     EmitVertex(Vector3& vertex);
     uint32_t     EmitVertexNormal(Vector3 &normal);
     void         EmitVertexUnlit(Shared::Vertex_t &vertex);
     void         EmitVertexLitFlat(Shared::Vertex_t &vertex);
@@ -80,6 +62,51 @@ namespace Titanfall {
         MinMax minmax;
         uint32_t  firstMesh;
         uint32_t  meshCount;
+    };
+
+    // 0x23
+    // GameLump is the only lump which isn't just a vector
+    // The order in which these structs were defined is the order in which both our and the respawn compiler saves them
+    struct GameLumpHeader_t {
+        uint32_t  version;   // Always 1
+        char      ident[4];  // "prps"
+        uint32_t  gameConst; // r1: 786432; r2: 851968
+        uint32_t  offset;
+        uint32_t  length;
+    };
+
+    struct GameLumpPathHeader_t {
+        uint32_t numPaths;
+    };
+
+    struct GameLumpPath_t {
+        char path[128];
+    };
+
+    struct GameLumpPropHeader_t {
+        uint32_t numProps;
+        uint32_t unk0;
+        uint32_t unk1;
+    };
+
+    struct GameLumpProp_t {
+        Vector3   origin;
+        Vector3   angles;
+        float     scale;
+        uint16_t  modelName;
+        uint8_t   solidMode;
+        uint8_t   flags;
+        int8_t    unk[4];
+        float     fadeScale;
+        Vector3   lightingOrigin;
+        int8_t    cpuLevel[2];
+        int8_t    gpuLevel[2];
+        int8_t    diffuseModulation[4];
+        uint16_t  collisionFlags[2];
+    };
+
+    struct GameLumpUnknownHeader_t {
+        uint32_t unknown;
     };
 
     // 0x42
@@ -267,16 +294,6 @@ namespace Titanfall {
         uint32_t  zero1;
     };
 
-    // Gamelump Stub
-    struct GameLump_Stub_t {
-        uint32_t  version = 1;
-        char      magic[4];
-        uint32_t  const0 = 786432;
-        uint32_t  offset;
-        uint32_t  length = 20;
-        uint32_t  zeros[5] = { 0, 0, 0, 0, 0 };
-    };
-
     namespace Ent {
         inline std::vector<char> env;
         inline std::vector<char> fx;
@@ -295,6 +312,12 @@ namespace Titanfall {
         inline std::vector<Model_t>               models;
         inline std::vector<char>                  entityPartitions;
         inline std::vector<Vector3>               vertexNormals;
+        inline GameLumpHeader_t                   gameLumpHeader;
+        inline GameLumpPathHeader_t               gameLumpPathHeader;
+        inline std::vector<GameLumpPath_t>        gameLumpPaths;
+        inline GameLumpPropHeader_t               gameLumpPropHeader;
+        inline std::vector<GameLumpProp_t>        gameLumpProps;
+        inline GameLumpUnknownHeader_t            gameLumpUnknownHeader;
         inline std::vector<char>                  textureDataData;
         inline std::vector<uint32_t>              textureDataTable;
         inline std::vector<TricollTriangle_t>     tricollTriangles;

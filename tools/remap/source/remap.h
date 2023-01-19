@@ -1434,8 +1434,6 @@ void						EmitVisTree();
 //void						EmitObjReference( Shared::visRef_t ref );
 void						EmitModels();
 void						EmitLevelInfo();
-void						SetUpGameLump();
-void						EmitProp( const entity_t &e );
 void						EmitStubs();
 
 void                        BeginModel( const entity_t& e );

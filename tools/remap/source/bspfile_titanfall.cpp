@@ -79,17 +79,24 @@ void WriteR1BSPFile(const char* filename) {
     // GameLump Stub
     {
         header.lumps[R1_LUMP_GAME_LUMP].offset = ftell(file);
-        header.lumps[R1_LUMP_GAME_LUMP].length = 40;
+        header.lumps[R1_LUMP_GAME_LUMP].length = sizeof(Titanfall::GameLumpHeader_t)
+                                                 + sizeof(Titanfall::GameLumpPathHeader_t)
+                                                 + sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPathHeader.numPaths
+                                                 + sizeof(Titanfall::GameLumpPropHeader_t)
+                                                 + sizeof(Titanfall::GameLumpProp_t) * Titanfall::Bsp::gameLumpPropHeader.numProps
+                                                 + sizeof(Titanfall::GameLumpUnknownHeader_t);
 
-        Titanfall::GameLump_Stub_t gameLump_stub;
-        SafeWrite(file, &gameLump_stub.version, 4);
-        memcpy(gameLump_stub.magic, "prps", 4);
-        SafeWrite(file, &gameLump_stub.magic, 4);
-        SafeWrite(file, &gameLump_stub.const0, 4);
-        gameLump_stub.offset = LittleLong(ftell(file) + 8);
-        SafeWrite(file, &gameLump_stub.offset, 4);
-        SafeWrite(file, &gameLump_stub.length, 4);
-        SafeWrite(file, &gameLump_stub.zeros, 20);
+        Titanfall::Bsp::gameLumpHeader.offset = ftell(file) + sizeof(Titanfall::GameLumpHeader_t);
+        Titanfall::Bsp::gameLumpHeader.length = sizeof(Titanfall::GameLumpPathHeader_t)
+                                                 + sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPathHeader.numPaths
+                                                 + sizeof(Titanfall::GameLumpPropHeader_t)
+                                                 + sizeof(Titanfall::GameLumpProp_t) * Titanfall::Bsp::gameLumpPropHeader.numProps
+                                                 + sizeof(Titanfall::GameLumpUnknownHeader_t);
+
+        SafeWrite(file, &Titanfall::Bsp::gameLumpHeader, sizeof(Titanfall::GameLumpHeader_t));
+        SafeWrite(file, &Titanfall::Bsp::gameLumpPathHeader, sizeof(Titanfall::GameLumpPathHeader_t));
+        SafeWrite(file, &Titanfall::Bsp::gameLumpPropHeader, sizeof(Titanfall::GameLumpPropHeader_t));
+        SafeWrite(file, &Titanfall::Bsp::gameLumpUnknownHeader, sizeof(Titanfall::GameLumpUnknownHeader_t));
     }
     AddLump(file, header.lumps[R1_LUMP_TEXTURE_DATA_STRING_DATA],    Titanfall::Bsp::textureDataData);
     AddLump(file, header.lumps[R1_LUMP_TEXTURE_DATA_STRING_TABLE],   Titanfall::Bsp::textureDataTable);
@@ -106,7 +113,7 @@ void WriteR1BSPFile(const char* filename) {
     AddLump(file, header.lumps[R1_LUMP_LIGHTMAP_HEADERS],            Titanfall::Bsp::lightmapHeaders_stub);  // stub
     AddLump(file, header.lumps[R1_LUMP_CM_GRID],                     Titanfall::Bsp::cmGrid);
     AddLump(file, header.lumps[R1_LUMP_CM_GRID_CELLS],               Titanfall::Bsp::cmGridCells);
-    AddLump(file, header.lumps[R1_LUMP_CM_GEO_SETS],                Titanfall::Bsp::cmGeoSets);
+    AddLump(file, header.lumps[R1_LUMP_CM_GEO_SETS],                 Titanfall::Bsp::cmGeoSets);
     AddLump(file, header.lumps[R1_LUMP_CM_GEO_SET_BOUNDS],           Titanfall::Bsp::cmGeoSetBounds);
     AddLump(file, header.lumps[R1_LUMP_CM_UNIQUE_CONTENTS],          Titanfall::Bsp::cmUniqueContents_stub);  // stub
     AddLump(file, header.lumps[R1_LUMP_CM_BRUSHES],                  Titanfall::Bsp::cmBrushes);
@@ -139,6 +146,8 @@ void WriteR1BSPFile(const char* filename) {
     Compiles a v29 bsp file
 */
 void CompileR1BSPFile() {
+    Titanfall::SetupGameLump();
+
     for (std::size_t entityNum = 0; entityNum < entities.size(); ++entityNum) {
         // Get entity
         entity_t& entity = entities[entityNum];
@@ -408,6 +417,12 @@ uint32_t Titanfall::EmitVertexNormal(Vector3 &normal) {
     return (uint32_t)Titanfall::Bsp::vertexNormals.size() - 1;
 }
 
+
+void Titanfall::SetupGameLump() {
+    Titanfall::Bsp::gameLumpHeader.version = 1;
+    memcpy( &Titanfall::Bsp::gameLumpHeader.ident, "prps", 4 );
+    Titanfall::Bsp::gameLumpHeader.gameConst = 786432;
+}
 
 /*
     BeginModel()
@@ -1000,7 +1015,7 @@ void Titanfall::EmitLevelInfo() {
         li.firstSkyMeshIndex++;
     }
 
-    li.propCount = Titanfall2::GameLump.propCount;
+    li.propCount = Titanfall::Bsp::gameLumpPropHeader.numProps;
 }
 
 

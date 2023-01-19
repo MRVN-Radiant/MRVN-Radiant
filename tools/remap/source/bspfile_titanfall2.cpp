@@ -85,7 +85,7 @@ void WriteR2BSPFile(const char* filename) {
     AddLump(file, header.lumps[R2_LUMP_VERTEX_NORMALS],    Titanfall::Bsp::vertexNormals);
     AddLump(file, header.lumps[R2_LUMP_ENTITY_PARTITIONS], Titanfall::Bsp::entityPartitions);
     /* Game Lump */
-    {
+    /* {
         std::size_t start = ftell(file);
         header.lumps[R2_LUMP_GAME_LUMP].offset = start;
         header.lumps[R2_LUMP_GAME_LUMP].length = 36
@@ -96,18 +96,18 @@ void WriteR2BSPFile(const char* filename) {
                                     + Titanfall2::GameLump.pathCount * sizeof(Titanfall2::GameLump_Path)
                                     + Titanfall2::GameLump.propCount * sizeof(Titanfall2::GameLump_Prop);
         SafeWrite(file, &Titanfall2::GameLump, sizeof(Titanfall2::GameLump));
-        /* need to write vectors separately */
-        /* paths */
+        // need to write vectors separately 
+        // paths
         fseek(file, start + 24, SEEK_SET);
         SafeWrite(file, Titanfall2::GameLump.paths.data(), 128 * Titanfall2::GameLump.pathCount);
-        /* :) */
+        //
         SafeWrite(file, &Titanfall2::GameLump.propCount, 4);
         SafeWrite(file, &Titanfall2::GameLump.propCount, 4);
         SafeWrite(file, &Titanfall2::GameLump.propCount, 4);
-        /* props */
+        // props
         SafeWrite(file, Titanfall2::GameLump.props.data(), 64 * Titanfall2::GameLump.propCount);
         SafeWrite(file, &Titanfall2::GameLump.unk5, 4);
-    }
+    }*/
     AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_DATA],  Titanfall::Bsp::textureDataData);
     AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_TABLE], Titanfall::Bsp::textureDataTable);
     AddLump(file, header.lumps[R2_LUMP_WORLD_LIGHTS],              Titanfall2::Bsp::worldLights_stub);  // stub
@@ -162,7 +162,7 @@ void WriteR2BSPFile(const char* filename) {
    writes a titanfall2 bsp file and it's .ent files
  */
 void CompileR2BSPFile() {
-	SetUpGameLump();
+	//SetUpGameLump();
 
 	for (size_t entityNum = 0; entityNum < entities.size(); ++entityNum)
 	{
@@ -190,7 +190,7 @@ void CompileR2BSPFile() {
 		/* props for gamelump */
 		else if ( striEqual( classname, "misc_model" ) )
 		{
-			EmitProp( entity );
+			//EmitProp( entity );
 		}
 
 
