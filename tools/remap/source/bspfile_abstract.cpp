@@ -117,8 +117,8 @@ void LoadBSPFile(const char *filename) {
     }
 
     /* load it, then byte swap the in-memory version */
-    g_game->load(filename);
-    SwapBSPFile();
+    //g_game->load(filename);
+    //SwapBSPFile();
 }
 
 

@@ -6,7 +6,7 @@
 #include "remap.h"
 #include "lump_names.h"
 
-void                        LoadR5BSPFile(const char* filename);
+void                        LoadR5BSPFile( rbspHeader_t *header, const char *filename );
 void                        WriteR5BSPFile(const char* filename);
 void						CompileR5BSPFile();
 

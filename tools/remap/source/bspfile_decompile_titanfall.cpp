@@ -1,22 +1,7 @@
 #include "bspfile_decompile_titanfall.h"
 
 
-void Titanfall::LoadLumpsAndEntities(const char* filename) {
-	Sys_FPrintf( SYS_VRB, "Loading bsp file: \"%s\"\n", filename );
-
-    // Load file into memory
-    MemBuffer file = LoadFile( filename );
-
-    rbspHeader_t* header = file.data();
-
-    // Make sure magic matches the format we're trying to load
-    if (!force && memcmp( header->ident, g_game->bspIdent, 4)) {
-        Error("%s is not a %s file", filename, g_game->bspIdent);
-    }
-    // TODO: Make this game agnostic so we can for example import tfo maps while apex legends is our game
-    if (!force && header->version != g_game->bspVersion) {
-        Error("%s is version %d, not %d", filename, header->version, g_game->bspVersion);
-    }
+void Titanfall::LoadLumpsAndEntities( rbspHeader_t *header, const char *filename ) {
 
     // Load bsp lumps
     CopyLump((rbspHeader_t*)header, R1_LUMP_ENTITIES, Titanfall::Bsp::entities);

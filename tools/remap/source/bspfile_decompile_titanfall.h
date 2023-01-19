@@ -5,7 +5,7 @@
 #include "lump_names.h"
 
 namespace Titanfall {
-	void LoadLumpsAndEntities(const char* filename);
+	void LoadLumpsAndEntities( rbspHeader_t *header, const char *filename );
 	void ParseLoadedBSP();
 	void ParseWorldspawn( entity_t &entity );
 	void ParseBrush( entity_t &entity, std::size_t index );

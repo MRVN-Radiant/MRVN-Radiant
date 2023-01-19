@@ -24,8 +24,8 @@
    LoadR2BSPFile()
    loads a titanfall2 bsp file
 */
-void LoadR2BSPFile(const char* filename) {
-    Titanfall::LoadLumpsAndEntities( filename );
+void LoadR2BSPFile( rbspHeader_t *header, const char *filename ) {
+    Titanfall::LoadLumpsAndEntities( header, filename );
     Titanfall::ParseLoadedBSP();
 }
 

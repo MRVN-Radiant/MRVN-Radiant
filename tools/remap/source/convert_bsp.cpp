@@ -362,9 +362,28 @@ int ConvertBSPMain( Args& args ){
 	else
 	{
 		path_set_extension( source, ".bsp" );
-		Sys_Printf( "Loading %s\n", source );
-		g_game->load( source );
-		//ParseEntities();
+		Sys_FPrintf( SYS_VRB, "Loading bsp file: \"%s\"\n", source );
+
+		// Load file into memory
+		MemBuffer file = LoadFile( source );
+
+		rbspHeader_t* header = file.data();
+
+
+		// Make sure magic matches the format we're trying to load
+		if (!force && memcmp(header->ident, "rBSP", 4)) {
+			Error("%s is not a %s file", source, g_game->bspIdent);
+		}
+
+		for( const game_t &game : g_games ) {
+			if( header->version == game.bspVersion ) {
+				g_game = &game;
+				Sys_FPrintf( SYS_VRB, "Detected game: %s\n", g_game->arg );
+				break;
+			}
+		}
+
+		g_game->load( header, source );
 	}
 	
 	/* bsp format convert? */

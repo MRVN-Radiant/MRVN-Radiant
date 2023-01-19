@@ -235,8 +235,8 @@ struct game_apexlegends : game_t
 };
 
 
-const std::vector<game_t> g_games = { game_titanfall2(),
-									  game_apexlegends(),
-									  game_titanfallonline()
+const std::vector<game_t> g_games = { game_titanfallonline(),
+                                      game_titanfall2(),
+									  game_apexlegends()
 									};
 const game_t *g_game = &g_games[0];
