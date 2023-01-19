@@ -310,7 +310,7 @@ static int ConvertBSPToMap_Ext( char *bspName, bool brushPrimitives )
 				fprintf(f, "( ");
 				for( int y = 0; y < patchMesh.height; y++ ) {
 					bspDrawVert_t &vert = patchMesh.verts[x * patchMesh.height + y];
-					fprintf(f, "( %f %f %f %f %f ) ", vert.xyz[0], vert.xyz[1], vert.xyz[2], 0.0f, 0.0f);
+					fprintf(f, "( %f %f %f %f %f ) ", vert.xyz[0], vert.xyz[1], vert.xyz[2], vert.st[0], vert.st[1]);
 				}
 				fprintf(f, ")\n");
 			}
