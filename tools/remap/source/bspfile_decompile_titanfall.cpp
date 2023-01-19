@@ -54,6 +54,8 @@ void Titanfall::LoadLumpsAndEntities( rbspHeader_t *header, const char *filename
             LoadEntFile( name.c_str(), Titanfall::Bsp::entities );
         }
     }
+
+    Titanfall::LoadAndParseGameLump( header );
 }
 
 
@@ -73,6 +75,40 @@ void Titanfall::ParseLoadedBSP() {
 
 
     entities.insert(entities.end(), Titanfall::Ent::entities.begin(), Titanfall::Ent::entities.end());
+}
+
+void Titanfall::LoadAndParseGameLump(rbspHeader_t* header) {
+    // Load gamelump
+    int offset = header->lumps[R1_LUMP_GAME_LUMP].offset;
+    int length = header->lumps[R1_LUMP_GAME_LUMP].length;
+    
+    Titanfall::Bsp::gameLumpHeader = *(Titanfall::GameLumpHeader_t*)((byte*)header + offset);
+    
+    offset = Titanfall::Bsp::gameLumpHeader.offset;
+    Titanfall::Bsp::gameLumpPathHeader = *(Titanfall::GameLumpPathHeader_t*)((byte*)header + offset);
+
+    offset += sizeof(Titanfall::GameLumpPathHeader_t);
+    length = Titanfall::Bsp::gameLumpPathHeader.numPaths * sizeof(Titanfall::GameLumpPath_t);
+    Titanfall::Bsp::gameLumpPaths = { (Titanfall::GameLumpPath_t*)((byte*)header + offset), (Titanfall::GameLumpPath_t*)((byte*)header + offset + length) };
+
+    offset += Titanfall::Bsp::gameLumpPaths.size() * sizeof(Titanfall::GameLumpPath_t);
+    Titanfall::Bsp::gameLumpPropHeader = *(Titanfall::GameLumpPropHeader_t*)((byte*)header + offset);
+    
+    offset += sizeof(Titanfall::GameLumpPropHeader_t);
+    length = Titanfall::Bsp::gameLumpPropHeader.numProps * sizeof(Titanfall::GameLumpProp_t);
+    Titanfall::Bsp::gameLumpProps = { (Titanfall::GameLumpProp_t*)((byte*)header + offset), (Titanfall::GameLumpProp_t*)((byte*)header + offset + length) };
+    
+
+    // Parse gamelump
+    for( Titanfall::GameLumpProp_t &prop : Titanfall::Bsp::gameLumpProps ) {
+        entity_t &model = Titanfall::Ent::entities.emplace_back();
+
+        model.setKeyValue( "classname", "misc_model" );
+        model.setKeyValue( "model", Titanfall::Bsp::gameLumpPaths.at( prop.modelName ).path );
+        StringOutputStream ss;
+        ss << prop.origin[0] << " " << prop.origin[1] << " " << prop.origin[2];
+        model.setKeyValue( "origin", ss.c_str() );
+    }
 }
 
 void Titanfall::ParseExtraBrushes( entity_t &entity ) {
