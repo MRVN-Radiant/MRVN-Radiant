@@ -67,13 +67,7 @@ void Titanfall::ParseLoadedBSP() {
         if ( striEqual( e.classname(), "worldspawn" ) ) {
             Titanfall::ParseWorldspawn( e );
         } else {
-            const char *model = e.valueForKey( "model" );
-            
-            if( striEqualPrefix( model, "*") && strcmp(model, "") != 0) {
-                int index;
-                sscanf( model, "*%i", &index );
-                ParseGridCell( e, Titanfall::Bsp::cmGrid.at(0).xCount * Titanfall::Bsp::cmGrid.at(0).yCount + index );
-            }
+            ParseExtraBrushes( e );
         }
     }
 
@@ -81,6 +75,74 @@ void Titanfall::ParseLoadedBSP() {
     entities.insert(entities.end(), Titanfall::Ent::entities.begin(), Titanfall::Ent::entities.end());
 }
 
+void Titanfall::ParseExtraBrushes( entity_t &entity ) {
+    const char *model = entity.valueForKey( "model" );
+            
+    if( striEqualPrefix( model, "*") && strcmp(model, "") != 0) {
+        int index;
+        sscanf( model, "*%i", &index );
+        if( Titanfall::Bsp::cmGrid.at(0).xCount * Titanfall::Bsp::cmGrid.at(0).yCount + index < Titanfall::Bsp::cmGridCells.size() )
+            ParseGridCell( entity, Titanfall::Bsp::cmGrid.at(0).xCount * Titanfall::Bsp::cmGrid.at(0).yCount + index );
+        else
+            Sys_FPrintf( SYS_ERR, "Tried to index out of grid cell bounds!\n" );
+    }
+    
+    int brushNum, planeNum;
+    brushNum = planeNum = 0;
+    while( 1 ) {
+        StringOutputStream key;
+        key << "*trigger_brush_" << brushNum << "_plane_" << planeNum;
+
+        const char *psPlane = entity.valueForKey( key.c_str() );
+        if( strcmp( psPlane, "" ) == 0 )
+            return;
+
+        
+
+        brush_t &brush = entity.brushes.emplace_back();
+        
+        while( 1 ) {
+            Plane3 plane;
+            sscanf( psPlane, "%d %d %d %d", &plane.a, &plane.b, &plane.c, &plane.d );
+            Sys_Printf("%d %d %d %d\n", plane.a, plane.b, plane.c, plane.d);
+            
+            side_t &side = brush.sides.emplace_back();
+            side.plane = plane;
+            side.shaderInfo = ShaderInfoForShader( "tools/toolstrigger" );
+
+            key.clear();
+            planeNum++;
+
+            key << "*trigger_brush_" << brushNum << "_plane_" << planeNum;
+
+            
+            const char *psPlane = entity.valueForKey( key.c_str() );
+            if( strcmp( psPlane, "" ) == 0 )
+                break;
+        }
+
+        planeNum = 0;
+        brushNum++;
+    }
+}
+
+/*
+StringOutputStream key;
+        key << "*trigger_brush_" << brushNum << "_plane_" << planeNum;
+
+        const char *psPlane = entity.valueForKey( key );
+        if( strcmp( psPlane, "" ) == 0 )
+            break;
+
+        Plane3 plane;
+        sscanf( psPlane, "%d %d %d %d", plane.a, plane.b, plane.c, plane.d );
+
+        //brush_t &b = entity.brushes.emplace_back();
+        //Plane3 &plane = planes.at(p);
+
+        //side_t &side = b.sides.emplace_back();
+        //side.plane = plane;
+        */
 
 void Titanfall::ParseWorldspawn( entity_t &entity ) {
 

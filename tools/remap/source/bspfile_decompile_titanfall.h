@@ -7,6 +7,7 @@
 namespace Titanfall {
 	void LoadLumpsAndEntities( rbspHeader_t *header, const char *filename );
 	void ParseLoadedBSP();
+	void ParseExtraBrushes( entity_t &entity );
 	void ParseWorldspawn( entity_t &entity );
 	void ParseGridCell( entity_t &entity, std::size_t index );
 	void ParseBrush( entity_t &entity, std::size_t index );
