@@ -74,8 +74,8 @@ enum EPatchType
 extern int g_PatchSubdivideThreshold;
 
 
-#define MIN_PATCH_WIDTH 3
-#define MIN_PATCH_HEIGHT 3
+#define MIN_PATCH_WIDTH 2
+#define MIN_PATCH_HEIGHT 2
 
 extern std::size_t MAX_PATCH_WIDTH;
 extern std::size_t MAX_PATCH_HEIGHT;

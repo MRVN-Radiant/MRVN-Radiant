@@ -157,9 +157,9 @@ void BezierCurveTree_FromCurveList( BezierCurveTree *pTree, std::forward_list<Be
 
 
 void Patch::setDims( std::size_t w, std::size_t h ){
-	if ( ( w % 2 ) == 0 ) {
+	/*if ((w % 2) == 0) {
 		w -= 1;
-	}
+	}*/
 	ASSERT_MESSAGE( w <= MAX_PATCH_WIDTH, "patch too wide" );
 	if ( w > MAX_PATCH_WIDTH ) {
 		w = MAX_PATCH_WIDTH;
@@ -168,9 +168,9 @@ void Patch::setDims( std::size_t w, std::size_t h ){
 		w = MIN_PATCH_WIDTH;
 	}
 
-	if ( ( h % 2 ) == 0 ) {
+	/*if ((h % 2) == 0) {
 		m_height -= 1;
-	}
+	}*/
 	ASSERT_MESSAGE( h <= MAX_PATCH_HEIGHT, "patch too tall" );
 	if ( h > MAX_PATCH_HEIGHT ) {
 		h = MAX_PATCH_HEIGHT;

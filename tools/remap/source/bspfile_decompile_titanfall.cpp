@@ -98,7 +98,7 @@ void Titanfall::ParseWorldspawn( entity_t &entity ) {
 
 
             // Tricoll ( patches )
-            #if 0
+            #if 1
             if( set.collisionShapeType == 64 ) {
                 Titanfall::TricollHeader_t &header = Titanfall::Bsp::tricollHeaders.at(set.collisionShapeIndex);
 
@@ -124,7 +124,7 @@ void Titanfall::ParseWorldspawn( entity_t &entity ) {
                 surfaceAreaY = ( minmax.maxs[X] - minmax.mins[X] ) * ( minmax.maxs[Z] - minmax.mins[Z] );
                 surfaceAreaZ = ( minmax.maxs[Y] - minmax.mins[Y] ) * ( minmax.maxs[X] - minmax.mins[X] );
 
-                Sys_Printf("%f, %f, %f\n", surfaceAreaX, surfaceAreaY, surfaceAreaZ);
+                //Sys_Printf("%f, %f, %f\n", surfaceAreaX, surfaceAreaY, surfaceAreaZ);
                 // Since we want to only do math in 2D we need to ignore an axis
                 int ignoreAxis = X;
                 if( surfaceAreaY > surfaceAreaX && surfaceAreaY > surfaceAreaZ )
@@ -162,7 +162,7 @@ void Titanfall::ParseWorldspawn( entity_t &entity ) {
                         indexRight = i;
                 }
 
-                Sys_Printf("%i: %i\n", indexLeft, indexRight);
+                Sys_Printf("%i: %i\n", width, height);
 
                 height = indexRight - indexLeft;
                 height = height < 0 ? height * -1 : height;
@@ -173,13 +173,13 @@ void Titanfall::ParseWorldspawn( entity_t &entity ) {
                 #undef Y
                 #undef Z
 
-                if( width * height != header.numVerts ) {
-                    Sys_FPrintf( SYS_WRN, "Couldn't get patch dimensions from tricoll header( %i * %i != %i )!\n", width, height, header.numVerts );
+                if( width * height != header.numVerts || width < 2 || height < 2 ) {
+                    Sys_FPrintf( SYS_WRN, "Couldn't get patch dimensions from tricoll header( %i * %i != %i )!\n\n", width, height, header.numVerts );
                     continue;
                 }
                 
                 // Entity pointcloud ( dont run this on large maps )
-                for( int v = 0; v < header.numVerts; v++ ) {
+                /*for (int v = 0; v < header.numVerts; v++) {
                     entity_t& e = Titanfall::Ent::entities.emplace_back();
                     StringOutputStream cs;
                     cs << "tricoll_header_" << ignoreAxis << "__" << indexLeft << "_" << indexRight;
@@ -189,7 +189,7 @@ void Titanfall::ParseWorldspawn( entity_t &entity ) {
                     ss << vec.x() << " " << vec.y() << " " << vec.z();
                     e.setKeyValue("origin", ss.c_str());
                     //drawVerts[v].xyz = Titanfall::Bsp::vertices.at( header.firstVert + v );
-                }
+                }*/
                 
 
                 /*
@@ -215,13 +215,15 @@ void Titanfall::ParseWorldspawn( entity_t &entity ) {
                 
                 */
                 // Build mesh
-                /*
+                
                 mesh_t mesh;
                 mesh.width = width;
                 mesh.height = height;
-                bspDrawVert_t drawVerts[header.numVerts];
+                bspDrawVert_t *drawVerts = new bspDrawVert_t[header.numVerts];
                 for( int v = 0; v < header.numVerts; v++ ) {
-                    drawVerts[v].xyz = Titanfall::Bsp::vertices.at( header.firstVert + v );
+                    Vector3 vec = Titanfall::Bsp::vertices.at(header.firstVert + v);
+                    Sys_Printf("%f: %f: %f\n", vec[0], vec[1], vec[2]);
+                    drawVerts[v].xyz = vec;
                 }
                 mesh.verts = drawVerts;
 
@@ -238,7 +240,7 @@ void Titanfall::ParseWorldspawn( entity_t &entity ) {
                 pm->mesh = mesh;
 
                 pm->next = entity.patches;
-                entity.patches = pm;*/
+                entity.patches = pm;
             }
             #endif
 
