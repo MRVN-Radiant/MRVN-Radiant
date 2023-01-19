@@ -103,20 +103,19 @@ void Titanfall::ParseExtraBrushes( entity_t &entity ) {
         
         while( 1 ) {
             Plane3 plane;
-            sscanf( psPlane, "%d %d %d %d", &plane.a, &plane.b, &plane.c, &plane.d );
-            Sys_Printf("%d %d %d %d\n", plane.a, plane.b, plane.c, plane.d);
+            float a, b, c, d;
+            sscanf( psPlane, "%f %f %f %f", &a, &b, &c, &d );
             
             side_t &side = brush.sides.emplace_back();
-            side.plane = plane;
+            side.plane.a = a; side.plane.b = b; side.plane.c = c; side.plane.d = d;
             side.shaderInfo = ShaderInfoForShader( "tools/toolstrigger" );
+
 
             key.clear();
             planeNum++;
-
             key << "*trigger_brush_" << brushNum << "_plane_" << planeNum;
-
             
-            const char *psPlane = entity.valueForKey( key.c_str() );
+            psPlane = entity.valueForKey( key.c_str() );
             if( strcmp( psPlane, "" ) == 0 )
                 break;
         }
@@ -125,24 +124,6 @@ void Titanfall::ParseExtraBrushes( entity_t &entity ) {
         brushNum++;
     }
 }
-
-/*
-StringOutputStream key;
-        key << "*trigger_brush_" << brushNum << "_plane_" << planeNum;
-
-        const char *psPlane = entity.valueForKey( key );
-        if( strcmp( psPlane, "" ) == 0 )
-            break;
-
-        Plane3 plane;
-        sscanf( psPlane, "%d %d %d %d", plane.a, plane.b, plane.c, plane.d );
-
-        //brush_t &b = entity.brushes.emplace_back();
-        //Plane3 &plane = planes.at(p);
-
-        //side_t &side = b.sides.emplace_back();
-        //side.plane = plane;
-        */
 
 void Titanfall::ParseWorldspawn( entity_t &entity ) {
     // Create a list of all brush indicies belonging to worldspawn
