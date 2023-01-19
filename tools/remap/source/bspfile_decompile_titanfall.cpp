@@ -242,6 +242,7 @@ void Titanfall::ParsePatch( entity_t &entity, std::size_t index ) {
 
     // p0358 <3, my first favourite polish femboy
     std::string name = std::string( table.begin() + nameStart, table.begin() + nameStart + strlen( table.c_str() + nameStart ) );
+    std::transform(name.begin(), name.end(), name.begin(), [](unsigned char c) { return std::tolower(c); });
 
     std::replace(name.begin(), name.end(), '\\', '/');
     pm->shaderInfo = ShaderInfoForShader(name.c_str());
@@ -288,7 +289,7 @@ void Titanfall::ParseBrush( entity_t &entity, std::size_t index ) {
 
         // p0358 <3, my first favourite polish femboy
         std::string name = std::string( table.begin() + nameStart, table.begin() + nameStart + strlen( table.c_str() + nameStart ) );
-
+        std::transform( name.begin(), name.end(), name.begin(), [](unsigned char c) { return std::tolower(c); } );
 
         std::replace(name.begin(), name.end(), '\\', '/');
             
