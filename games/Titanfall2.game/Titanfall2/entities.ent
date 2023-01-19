@@ -361,4 +361,10 @@ Triggers the out of bounds timer when player is inside
 CLIENTS spawnflag must be set
 </group>
 
+<group name="trigger_multiple">
+-------- KEYS --------
+-------- SPAWNFLAGS --------
+-------- NOTES --------
+</group>
+
 </classes>

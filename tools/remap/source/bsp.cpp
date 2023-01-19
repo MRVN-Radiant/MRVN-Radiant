@@ -30,6 +30,7 @@
 
 /* dependencies */
 #include "remap.h"
+#include "bspfile_abstract.h"
 
 
 
@@ -553,35 +554,14 @@ static void OnlyEnts( const char *filename ){
 	/* note it */
 	Sys_Printf( "--- OnlyEnts ---\n" );
 
-	auto out = StringOutputStream( 256 )( source, ".bsp" );
-	LoadBSPFile( out );
-
-	ParseEntities();
-	const CopiedString save_cmdline( entities[ 0 ].valueForKey( "_q3map2_cmdline" ) );
-	const CopiedString save_version( entities[ 0 ].valueForKey( "_q3map2_version" ) );
-	const CopiedString save_gridsize( entities[ 0 ].valueForKey( "gridsize" ) );
-
-	entities.clear();
-
-	LoadShaderInfo();
 	LoadMapFile( filename, false, false );
-	SetModelNumbers();
-	SetLightStyles();
-
-	if ( !save_cmdline.empty() ) {
-		entities[0].setKeyValue( "_q3map2_cmdline", save_cmdline.c_str() );
+	
+	Sys_Printf( "Writing entities...\n" );
+	for( entity_t &entity : entities ) {
+		Titanfall::EmitExtraEntity( entity );
 	}
-	if ( !save_version.empty() ) {
-		entities[0].setKeyValue( "_q3map2_version", save_version.c_str() );
-	}
-	if ( !save_gridsize.empty() ) {
-		entities[0].setKeyValue( "gridsize", save_gridsize.c_str() );
-	}
-
-	numBSPEntities = entities.size();
-	UnparseEntities();
-
-	WriteBSPFile( out );
+	
+	WriteEntFiles( filename );
 }
 
 

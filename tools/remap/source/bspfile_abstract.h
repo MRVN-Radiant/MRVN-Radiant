@@ -30,6 +30,8 @@
 #include "bspfile_titanfall2.h"
 #include "bspfile_apex_legends.h"
 
+#include "bspfile_decompile_titanfall.h"
+
 
 /*
    AddLump()

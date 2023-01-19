@@ -292,6 +292,14 @@ inline double vector2_cross( const BasicVector2<Element>& self, const BasicVecto
 }
 
 template<typename Element>
+inline double vector2_distance_squared( const BasicVector2<Element>& vec0, const BasicVector2<Element>& vec1 ){
+	BasicVector2<Element> distance;
+	distance[0] = vec0[0] - vec1[0];
+	distance[1] = vec0[1] - vec1[1];
+	return distance[0] * distance[0] + distance[1] * distance[1];
+}
+
+template<typename Element>
 inline Element float_divided( Element f, Element other ){
 	//ASSERT_MESSAGE(other != 0, "float_divided: invalid divisor");
 	return f / other;

@@ -18,223 +18,15 @@
 #include <ctime>
 
 
-/* constants */
-#define R2_LUMP_ENTITIES                        0x00
-#define R2_LUMP_PLANES                          0x01
-#define R2_LUMP_TEXTURE_DATA                    0x02
-#define R2_LUMP_VERTICES                        0x03
-#define R2_LUMP_LIGHTPROBE_PARENT_INFOS         0x04
-#define R2_LUMP_SHADOW_ENVIRONMENTS             0x05
-#define R2_LUMP_LIGHTPROBE_BSP_NODES            0x06
-#define R2_LUMP_LIGHTPROBE_BSP_REF_IDS          0x07
-#define R2_LUMP_MODELS                          0x0E
-#define R2_LUMP_ENTITY_PARTITIONS               0x18
-#define R2_LUMP_PHYSICS_COLLIDE                 0x1D
-#define R2_LUMP_VERTEX_NORMALS                  0x1E
-#define R2_LUMP_GAME_LUMP                       0x23
-#define R2_LUMP_LEAF_WATER_DATA                 0x24
-#define R2_LUMP_PAKFILE                         0x28
-#define R2_LUMP_CUBEMAPS                        0x2A
-#define R2_LUMP_TEXTURE_DATA_STRING_DATA        0x2B
-#define R2_LUMP_TEXTURE_DATA_STRING_TABLE       0x2C
-#define R2_LUMP_WORLD_LIGHTS                    0x36
-#define R2_LUMP_WORLD_LIGHT_PARENT_INFOS        0x37
-#define R2_LUMP_PHYSICS_LEVEL                   0x3E
-#define R2_LUMP_TRICOLL_TRIS                    0x42
-#define R2_LUMP_TRICOLL_NODES                   0x44
-#define R2_LUMP_TRICOLL_HEADERS                 0x45
-#define R2_LUMP_PHYSICS_TRIANGLES               0x46
-#define R2_LUMP_VERTEX_UNLIT                    0x47
-#define R2_LUMP_VERTEX_LIT_FLAT                 0x48
-#define R2_LUMP_VERTEX_LIT_BUMP                 0x49
-#define R2_LUMP_VERTEX_UNLIT_TS                 0x4A
-#define R2_LUMP_VERTEX_BLINN_PHONG              0x4B
-#define R2_LUMP_VERTEX_RESERVED_5               0x4C
-#define R2_LUMP_VERTEX_RESERVED_6               0x4D
-#define R2_LUMP_VERTEX_RESERVED_7               0x4E
-#define R2_LUMP_MESH_INDICES                    0x4F
-#define R2_LUMP_MESHES                          0x50
-#define R2_LUMP_MESH_BOUNDS                     0x51
-#define R2_LUMP_MATERIAL_SORT                   0x52
-#define R2_LUMP_LIGHTMAP_HEADERS                0x53
-#define R2_LUMP_CM_GRID                         0x55
-#define R2_LUMP_CM_GRID_CELLS                   0x56
-#define R2_LUMP_CM_GRID_SETS                    0x57
-#define R2_LUMP_CM_GEO_SET_BOUNDS               0x58
-#define R2_LUMP_CM_PRIMITIVES                   0x59
-#define R2_LUMP_CM_PRIMITIVE_BOUNDS             0x5A
-#define R2_LUMP_CM_UNIQUE_CONTENTS              0x5B
-#define R2_LUMP_CM_BRUSHES                      0x5C
-#define R2_LUMP_CM_BRUSH_SIDE_PLANES            0x5D
-#define R2_LUMP_CM_BRUSH_SIDE_PROPS             0x5E
-#define R2_LUMP_CM_BRUSH_TEX_VECS               0x5F
-#define R2_LUMP_TRICOLL_BEVEL_STARTS            0x60
-#define R2_LUMP_TRICOLL_BEVEL_INDICES           0x61
-#define R2_LUMP_LIGHTMAP_DATA_SKY               0x62
-#define R2_LUMP_CSM_AABB_NODES                  0x63
-#define R2_LUMP_CSM_OBJ_REFERENCES              0x64
-#define R2_LUMP_LIGHTPROBES                     0x65
-#define R2_LUMP_STATIC_PROP_LIGHTPROBE_INDICES  0x66
-#define R2_LUMP_LIGHTPROBE_TREE                 0x67
-#define R2_LUMP_LIGHTPROBE_REFERENCES           0x68
-#define R2_LUMP_LIGHTMAP_DATA_REAL_TIME_LIGHTS  0x69
-#define R2_LUMP_CELL_BSP_NODES                  0x6A
-#define R2_LUMP_CELLS                           0x6B
-#define R2_LUMP_PORTALS                         0x6C
-#define R2_LUMP_PORTAL_VERTICES                 0x6D
-#define R2_LUMP_PORTAL_EDGES                    0x6E
-#define R2_LUMP_PORTAL_VERTEX_EDGES             0x6F
-#define R2_LUMP_PORTAL_VERTEX_REFERENCES        0x70
-#define R2_LUMP_PORTAL_EDGE_REGERENCES          0x71
-#define R2_LUMP_PORTAL_EDGE_INTERSECT_EDGE      0x72
-#define R2_LUMP_PORTAL_EDGE_INTERSECT_AT_VERTEX 0x73
-#define R2_LUMP_PORTAL_EDGE_INTERSECT_HEADER    0x74
-#define R2_LUMP_OCCLUSION_MESH_VERTICES         0x75
-#define R2_LUMP_OCCLUSION_MESH_INDICES          0x76
-#define R2_LUMP_CELL_AABB_NODES                 0x77
-#define R2_LUMP_OBJ_REFERENCES                  0x78
-#define R2_LUMP_OBJ_REFERENCE_BOUNDS            0x79
-#define R2_LUMP_LIGHTMAP_DATA_RTL_PAGE          0x7A
-#define R2_LUMP_LEVEL_INFO                      0x7B
-#define R2_LUMP_SHADOW_MESH_OPAQUE_VERTICES     0x7C
-#define R2_LUMP_SHADOW_MESH_ALPHA_VERTICES      0x7D
-#define R2_LUMP_SHADOW_MESH_INDICES             0x7E
-#define R2_LUMP_SHADOW_MESHES                   0x7F
-
 
 /* funcs */
 /*
    LoadR2BSPFile()
    loads a titanfall2 bsp file
 */
-void LoadR2BSPFile(const char* filename) {
-    Sys_FPrintf( SYS_VRB, "Loading bsp file: \"%s\"\n", filename );
-
-    // Load file into memory
-    MemBuffer file = LoadFile(filename);
-
-    rbspHeader_t* header = file.data();
-
-    // Make sure magic matches the format we're trying to load
-    if (!force && memcmp( header->ident, g_game->bspIdent, 4)) {
-        Error("%s is not a %s file", filename, g_game->bspIdent);
-    }
-    // TODO: Make this game agnostic so we can for example import tfo maps while apex legends is our game
-    if (!force && header->version != g_game->bspVersion) {
-        Error("%s is version %d, not %d", filename, header->version, g_game->bspVersion);
-    }
-
-    // Load lumps
-    CopyLump((rbspHeader_t*)header, R2_LUMP_ENTITIES,             Titanfall::Bsp::entities);
-    CopyLump((rbspHeader_t*)header, R2_LUMP_PLANES,               Titanfall::Bsp::planes);
-    CopyLump((rbspHeader_t*)header, R2_LUMP_ENTITY_PARTITIONS,    Titanfall::Bsp::entityPartitions);
-    CopyLump((rbspHeader_t*)header, R2_LUMP_CM_GRID,              Titanfall::Bsp::cmGrid);
-    CopyLump((rbspHeader_t*)header, R2_LUMP_CM_BRUSHES,           Titanfall::Bsp::cmBrushes);
-    CopyLump((rbspHeader_t*)header, R2_LUMP_CM_BRUSH_SIDE_PLANES, Titanfall::Bsp::cmBrushSidePlaneOffsets);
-    CopyLump((rbspHeader_t*)header, R2_LUMP_CM_BRUSH_SIDE_PROPS,  Titanfall::Bsp::cmBrushSideProperties);
-
-    // Load all .ent files referenced in bsp if they exist
-    // TODO: Actually do this ^
-    #if 1
-    if (header->lumps[R2_LUMP_ENTITY_PARTITIONS].length) {
-        /* Spawn */
-        {
-            auto name = StringOutputStream(256)(PathExtensionless(filename), "_spawn.ent");
-            LoadEntFile( name.c_str(), Titanfall::Bsp::entities );
-        }
-        /* Snd */
-        {
-            auto name = StringOutputStream(256)(PathExtensionless(filename), "_snd.ent");
-            LoadEntFile( name.c_str(), Titanfall::Bsp::entities );
-        }
-        /* Script */
-        {
-            auto name = StringOutputStream(256)(PathExtensionless(filename), "_script.ent");
-            LoadEntFile(name.c_str(), Titanfall::Bsp::entities);
-        }
-        /* Fx */
-        {
-            auto name = StringOutputStream(256)(PathExtensionless(filename), "_fx.ent");
-            LoadEntFile(name.c_str(), Titanfall::Bsp::entities);
-        }
-        /* Env */
-        {
-            auto name = StringOutputStream(256)(PathExtensionless(filename), "_env.ent");
-            LoadEntFile(name.c_str(), Titanfall::Bsp::entities);
-        }
-    }
-    #endif
-
-    // Parse entities into entities vector
-    ParseEntities();
-
-    // Make worldspawn if we have 0 entities
-    // This should never happen
-    if (entities.size() == 0) {
-        entity_t &worldspawn = entities.emplace_back();
-        worldspawn.setKeyValue( "classname", "worldspawn" );
-    }
-
-    for (Titanfall::CMBrush_t &bspBrush : Titanfall::Bsp::cmBrushes) {
-        Vector3 mins = bspBrush.origin - bspBrush.extents;
-        Vector3 maxs = bspBrush.origin + bspBrush.extents;
-
-        // Create the base 6 planes from the brush AABB
-        std::vector<Plane3> planes;
-        {
-            Vector3 vertices[8];
-            vertices[0] = maxs;
-            vertices[1] = Vector3(maxs.x(), maxs.y(), mins.z());
-            vertices[2] = Vector3(maxs.x(), mins.y(), maxs.z());
-            vertices[3] = Vector3(mins.x(), maxs.y(), maxs.z());
-            vertices[4] = mins;
-            vertices[5] = Vector3(mins.x(), mins.y(), maxs.z());
-            vertices[6] = Vector3(mins.x(), maxs.y(), mins.z());
-            vertices[7] = Vector3(maxs.x(), mins.y(), mins.z());
-
-            // Create planes from AABB
-            Plane3& plane0 = planes.emplace_back();
-            PlaneFromPoints(plane0, vertices[0], vertices[1], vertices[2]);
-            Plane3& plane1 = planes.emplace_back();
-            PlaneFromPoints(plane1, vertices[0], vertices[2], vertices[3]);
-            Plane3& plane2 = planes.emplace_back();
-            PlaneFromPoints(plane2, vertices[0], vertices[3], vertices[1]);
-            Plane3& plane3 = planes.emplace_back();
-            PlaneFromPoints(plane3, vertices[6], vertices[5], vertices[4]);
-            Plane3& plane4 = planes.emplace_back();
-            PlaneFromPoints(plane4, vertices[7], vertices[6], vertices[4]);
-            Plane3& plane5 = planes.emplace_back();
-            PlaneFromPoints(plane5, vertices[5], vertices[7], vertices[4]);
-        }
-
-        /* NOTE: This doesnt work :) */
-        // Add extra planes to brush
-        // for (uint16_t i = 0; i < bspBrush.planeCount; i++) {
-        //     if (bspBrush.sidePlaneIndex
-        //       + Titanfall::Bsp::cmBrushSidePlaneOffsets.at(bspBrush.sidePlaneIndex)
-        //       + Titanfall::Bsp::cmGrid[0].brushSidePlaneOffset > 72)
-        //             break;
-
-        //     Plane3 &plane = planes.emplace_back();
-        //     plane = Plane3(Titanfall::Bsp::planes.at(bspBrush.sidePlaneIndex
-        //                 + Titanfall::Bsp::cmBrushSidePlaneOffsets.at(bspBrush.sidePlaneIndex)
-        //                 + Titanfall::Bsp::cmGrid[0].brushSidePlaneOffset));
-        // }
-
-        // Make brush and fill it with sides
-        brush_t &brush = entities.data()[0].brushes.emplace_back();
-
-        for (Plane3 plane : planes) {
-            side_t& side = brush.sides.emplace_back();
-            side.plane = plane;
-
-            String512 textureName;
-            textureName = "NULL";
-
-            side.shaderInfo = new shaderInfo_t;
-            side.shaderInfo->shader = textureName;
-        }
-    }
+void LoadR2BSPFile( rbspHeader_t *header, const char *filename ) {
+    Titanfall::LoadLumpsAndEntities( header, filename );
+    Titanfall::ParseLoadedBSP();
 }
 
 
@@ -293,7 +85,7 @@ void WriteR2BSPFile(const char* filename) {
     AddLump(file, header.lumps[R2_LUMP_VERTEX_NORMALS],    Titanfall::Bsp::vertexNormals);
     AddLump(file, header.lumps[R2_LUMP_ENTITY_PARTITIONS], Titanfall::Bsp::entityPartitions);
     /* Game Lump */
-    {
+    /* {
         std::size_t start = ftell(file);
         header.lumps[R2_LUMP_GAME_LUMP].offset = start;
         header.lumps[R2_LUMP_GAME_LUMP].length = 36
@@ -304,18 +96,18 @@ void WriteR2BSPFile(const char* filename) {
                                     + Titanfall2::GameLump.pathCount * sizeof(Titanfall2::GameLump_Path)
                                     + Titanfall2::GameLump.propCount * sizeof(Titanfall2::GameLump_Prop);
         SafeWrite(file, &Titanfall2::GameLump, sizeof(Titanfall2::GameLump));
-        /* need to write vectors separately */
-        /* paths */
+        // need to write vectors separately 
+        // paths
         fseek(file, start + 24, SEEK_SET);
         SafeWrite(file, Titanfall2::GameLump.paths.data(), 128 * Titanfall2::GameLump.pathCount);
-        /* :) */
+        //
         SafeWrite(file, &Titanfall2::GameLump.propCount, 4);
         SafeWrite(file, &Titanfall2::GameLump.propCount, 4);
         SafeWrite(file, &Titanfall2::GameLump.propCount, 4);
-        /* props */
+        // props
         SafeWrite(file, Titanfall2::GameLump.props.data(), 64 * Titanfall2::GameLump.propCount);
         SafeWrite(file, &Titanfall2::GameLump.unk5, 4);
-    }
+    }*/
     AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_DATA],  Titanfall::Bsp::textureDataData);
     AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_TABLE], Titanfall::Bsp::textureDataTable);
     AddLump(file, header.lumps[R2_LUMP_WORLD_LIGHTS],              Titanfall2::Bsp::worldLights_stub);  // stub
@@ -334,7 +126,7 @@ void WriteR2BSPFile(const char* filename) {
     AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_HEADERS],          Titanfall2::Bsp::lightMapHeaders_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_CM_GRID],                   Titanfall::Bsp::cmGrid);
     AddLump(file, header.lumps[R2_LUMP_CM_GRID_CELLS],             Titanfall::Bsp::cmGridCells);
-    AddLump(file, header.lumps[R2_LUMP_CM_GRID_SETS],              Titanfall::Bsp::cmGeoSets);
+    AddLump(file, header.lumps[R2_LUMP_CM_GEO_SETS],              Titanfall::Bsp::cmGeoSets);
     AddLump(file, header.lumps[R2_LUMP_CM_GEO_SET_BOUNDS],         Titanfall::Bsp::cmGeoSetBounds);
     // AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVES],             Titanfall::Bsp::cmPrimitives_stub);  // stub
     // AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVE_BOUNDS],       Titanfall::Bsp::cmPrimitiveBounds_stub);  // stub
@@ -369,9 +161,8 @@ void WriteR2BSPFile(const char* filename) {
    CompileR2BSPFile()
    writes a titanfall2 bsp file and it's .ent files
  */
-void CompileR2BSPFile()
-{
-	SetUpGameLump();
+void CompileR2BSPFile() {
+	//SetUpGameLump();
 
 	for (size_t entityNum = 0; entityNum < entities.size(); ++entityNum)
 	{
@@ -399,7 +190,7 @@ void CompileR2BSPFile()
 		/* props for gamelump */
 		else if ( striEqual( classname, "misc_model" ) )
 		{
-			EmitProp( entity );
+			//EmitProp( entity );
 		}
 
 

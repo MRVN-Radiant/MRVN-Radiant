@@ -1656,7 +1656,7 @@ void Map_RegionBrush(){
 //================
 //
 bool Map_ImportFile( const char* filename ){
-	ScopeDisableScreenUpdates disableScreenUpdates( "Processing...", "Loading Map" );
+	//ScopeDisableScreenUpdates disableScreenUpdates( "Processing...", "Loading Map" );
 
 	bool success = false;
 
@@ -1711,7 +1711,7 @@ tryDecompile:
 		str << ' ' << makeQuoted( filename );
 
 		// run
-		Q_Exec( NULL, str.c_str(), NULL, false, true );
+		Q_Exec( NULL, str.c_str(), NULL, true, true );
 
 		// rebuild filename as "filenamewithoutext_converted.map"
 		str( PathExtensionless( filename ), "_converted.map" );

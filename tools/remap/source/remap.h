@@ -217,19 +217,6 @@ enum class EBrushType {
 #define LIGHTMAP_HEIGHT         128
 
 
-struct bspLump_t {
-    int offset, length, lumpVer, padding;
-};
-
-
-struct rbspHeader_t {
-    char  ident[4];    /* rBSP */
-    int   version;     /* 37 for r2 */
-    int   mapVersion;  /* 30 */
-    int   maxLump;     /* 127 */
-
-    bspLump_t  lumps[128];
-};
 
 
 using bspPlane_t = Plane3f;
@@ -1447,8 +1434,6 @@ void						EmitVisTree();
 //void						EmitObjReference( Shared::visRef_t ref );
 void						EmitModels();
 void						EmitLevelInfo();
-void						SetUpGameLump();
-void						EmitProp( const entity_t &e );
 void						EmitStubs();
 
 void                        BeginModel( const entity_t& e );

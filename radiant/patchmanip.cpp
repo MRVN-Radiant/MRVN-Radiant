@@ -46,7 +46,7 @@
 
 PatchCreator* g_patchCreator = 0;
 
-void Scene_PatchConstructPrefab( scene::Graph& graph, const AABB aabb, const char* shader, EPatchPrefab eType, int axis, std::size_t width = 3, std::size_t height = 3, bool redisperse = false ){
+void Scene_PatchConstructPrefab( scene::Graph& graph, const AABB aabb, const char* shader, EPatchPrefab eType, int axis, std::size_t width = 2, std::size_t height = 2, bool redisperse = false ){
 	Select_Delete();
 	GlobalSelectionSystem().setSelectedAll( false );
 
@@ -607,7 +607,7 @@ void Patch_Cone(){
 void Patch_Plane(){
 	UndoableCommand undo( "patchCreatePlane" );
 
-	DoNewPatchDlg( ePlane, 3, 3, 3, 3, 0, 0 );
+	DoNewPatchDlg( ePlane, 2, 2, 2, 2, 0, 0 );
 }
 
 void Patch_InsertFirstColumn(){
@@ -976,9 +976,8 @@ void Patch_constructMenu( GtkMenu* menu ){
 
 void DoNewPatchDlg( EPatchPrefab prefab, int minrows, int mincols, int defrows, int defcols, int maxrows, int maxcols ){
 	ModalDialog dialog;
-	GtkComboBox* width;
-	GtkComboBox* height;
 	GtkWidget* redisperseCheckBox;
+	GtkSpinButton *width, *height;
 
 	GtkWindow* window = create_dialog_window( MainFrame_getWindow(), "Patch density", G_CALLBACK( dialog_delete_callback ), &dialog );
 
@@ -1009,56 +1008,20 @@ void DoNewPatchDlg( EPatchPrefab prefab, int minrows, int mincols, int defrows, 
 			}
 
 			{
-				GtkComboBoxText* combo = GTK_COMBO_BOX_TEXT( gtk_combo_box_text_new() );
-#define D_ITEM( x ) if ( x >= mincols && ( !maxcols || x <= maxcols ) ) gtk_combo_box_text_append_text( combo, # x )
-				D_ITEM( 3 );
-				D_ITEM( 5 );
-				D_ITEM( 7 );
-				D_ITEM( 9 );
-				D_ITEM( 11 );
-				D_ITEM( 13 );
-				D_ITEM( 15 );
-				D_ITEM( 17 );
-				D_ITEM( 19 );
-				D_ITEM( 21 );
-				D_ITEM( 23 );
-				D_ITEM( 25 );
-				D_ITEM( 27 );
-				D_ITEM( 29 );
-				D_ITEM( 31 ); // MAX_PATCH_SIZE is 32, so we should be able to do 31...
-#undef D_ITEM
-				gtk_widget_show( GTK_WIDGET( combo ) );
-				gtk_table_attach( table, GTK_WIDGET( combo ), 1, 2, 0, 1,
+				GtkWidget *spin = gtk_spin_button_new_with_range( MIN_PATCH_WIDTH, MAX_PATCH_WIDTH, 1 );
+				gtk_widget_show( GTK_WIDGET( spin ) );
+				gtk_table_attach( table, GTK_WIDGET( spin ), 1, 2, 0, 1,
 				                  (GtkAttachOptions) ( GTK_EXPAND | GTK_FILL ),
 				                  (GtkAttachOptions) ( 0 ), 0, 0 );
-
-				width = GTK_COMBO_BOX( combo );
+				width = GTK_SPIN_BUTTON( spin );
 			}
 			{
-				GtkComboBoxText* combo = GTK_COMBO_BOX_TEXT( gtk_combo_box_text_new() );
-#define D_ITEM( x ) if ( x >= minrows && ( !maxrows || x <= maxrows ) ) gtk_combo_box_text_append_text( combo, # x )
-				D_ITEM( 3 );
-				D_ITEM( 5 );
-				D_ITEM( 7 );
-				D_ITEM( 9 );
-				D_ITEM( 11 );
-				D_ITEM( 13 );
-				D_ITEM( 15 );
-				D_ITEM( 17 );
-				D_ITEM( 19 );
-				D_ITEM( 21 );
-				D_ITEM( 23 );
-				D_ITEM( 25 );
-				D_ITEM( 27 );
-				D_ITEM( 29 );
-				D_ITEM( 31 ); // MAX_PATCH_SIZE is 32, so we should be able to do 31...
-#undef D_ITEM
-				gtk_widget_show( GTK_WIDGET( combo ) );
-				gtk_table_attach( table, GTK_WIDGET( combo ), 1, 2, 1, 2,
+				GtkWidget *spin = gtk_spin_button_new_with_range( MIN_PATCH_HEIGHT, MAX_PATCH_HEIGHT, 1 );
+				gtk_widget_show( GTK_WIDGET( spin ) );
+				gtk_table_attach( table, GTK_WIDGET( spin ), 1, 2, 1, 2,
 				                  (GtkAttachOptions) ( GTK_EXPAND | GTK_FILL ),
 				                  (GtkAttachOptions) ( 0 ), 0, 0 );
-
-				height = GTK_COMBO_BOX( combo );
+				height = GTK_SPIN_BUTTON( spin );
 			}
 
 			if( prefab != ePlane ){
@@ -1093,12 +1056,10 @@ void DoNewPatchDlg( EPatchPrefab prefab, int minrows, int mincols, int defrows, 
 	}
 
 	// Initialize dialog
-	gtk_combo_box_set_active( width, ( defcols - mincols ) / 2 );
-	gtk_combo_box_set_active( height, ( defrows - minrows ) / 2 );
 
 	if ( modal_dialog_show( window, dialog ) == eIDOK ) {
-		int w = gtk_combo_box_get_active( width ) * 2 + mincols;
-		int h = gtk_combo_box_get_active( height ) * 2 + minrows;
+		int w = gtk_spin_button_get_value_as_int( width );
+		int h = gtk_spin_button_get_value_as_int( height );
 		bool redisperse = false;
 		if( prefab != ePlane ){
 			redisperse = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( redisperseCheckBox ) ) ? true : false;

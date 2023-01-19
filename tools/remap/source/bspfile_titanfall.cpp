@@ -16,89 +16,15 @@
 #include <ctime>
 
 
-/* constants */
-#define R1_LUMP_ENTITIES                                0x00
-#define R1_LUMP_PLANES                                  0x01
-#define R1_LUMP_TEXTURE_DATA                            0x02
-#define R1_LUMP_VERTICES                                0x03
-#define R1_LUMP_MODELS                                  0x0E
-#define R1_LUMP_ENTITY_PARTITIONS                       0x18
-#define R1_LUMP_PHYSICS_COLLIDE                         0x1D
-#define R1_LUMP_VERTEX_NORMALS                          0x1E
-#define R1_LUMP_GAME_LUMP                               0x23
-#define R1_LUMP_LEAF_WATER_DATA                         0x24
-#define R1_LUMP_PAKFILE                                 0x28
-#define R1_LUMP_CUBEMAPS                                0x2A
-#define R1_LUMP_TEXTURE_DATA_STRING_DATA                0x2B
-#define R1_LUMP_TEXTURE_DATA_STRING_TABLE               0x2C
-#define R1_LUMP_WORLD_LIGHTS                            0x36
-#define R1_LUMP_PHYSICS_LEVEL                           0x3E
-#define R1_LUMP_TRICOLL_TRIS                            0x42
-#define R1_LUMP_TRICOLL_NODES                           0x44
-#define R1_LUMP_TRICOLL_HEADERS                         0x45
-#define R1_LUMP_PHYSICS_TRIANGLES                       0x46
-#define R1_LUMP_VERTEX_UNLIT                            0x47
-#define R1_LUMP_VERTEX_LIT_FLAT                         0x48
-#define R1_LUMP_VERTEX_LIT_BUMP                         0x49
-#define R1_LUMP_VERTEX_UNLIT_TS                         0x4A
-#define R1_LUMP_VERTEX_BLINN_PHONG                      0x4B
-#define R1_LUMP_VERTEX_RESERVED_5                       0x4C
-#define R1_LUMP_VERTEX_RESERVED_6                       0x4D
-#define R1_LUMP_VERTEX_RESERVED_7                       0x4E
-#define R1_LUMP_MESH_INDICES                            0x4F
-#define R1_LUMP_MESHES                                  0x50
-#define R1_LUMP_MESH_BOUNDS                             0x51
-#define R1_LUMP_MATERIAL_SORT                           0x52
-#define R1_LUMP_LIGHTMAP_HEADERS                        0x53
-#define R1_LUMP_CM_GRID                                 0x55
-#define R1_LUMP_CM_GRID_CELLS                           0x56
-#define R1_LUMP_CM_GRID_SETS                            0x57
-#define R1_LUMP_CM_GEO_SET_BOUNDS                       0x58
-#define R1_LUMP_CM_PRIMITIVES                           0x59
-#define R1_LUMP_CM_PRIMITIVE_BOUNDS                     0x5A
-#define R1_LUMP_CM_UNIQUE_CONTENTS                      0x5B
-#define R1_LUMP_CM_BRUSHES                              0x5C
-#define R1_LUMP_CM_BRUSH_SIDE_PLANE_OFFSETS             0x5D
-#define R1_LUMP_CM_BRUSH_SIDE_PROPS                     0x5E
-#define R1_LUMP_CM_BRUSH_TEX_VECS                       0x5F
-#define R1_LUMP_TRICOLL_BEVEL_STARTS                    0x60
-#define R1_LUMP_TRICOLL_BEVEL_INDICES                   0x61
-#define R1_LUMP_LIGHTMAP_DATA_SKY                       0x62
-#define R1_LUMP_CSM_AABB_NODES                          0x63
-#define R1_LUMP_CSM_OBJ_REFERENCES                      0x64
-#define R1_LUMP_LIGHTPROBES                             0x65
-#define R1_LUMP_STATIC_PROP_LIGHTPROBE_INDICES          0x66
-#define R1_LUMP_LIGHTPROBE_TREE                         0x67
-#define R1_LUMP_LIGHTPROBE_REFERENCES                   0x68
-#define R1_LUMP_LIGHTMAP_DATA_REAL_TIME_LIGHTS          0x69
-#define R1_LUMP_CELL_BSP_NODES                          0x6A
-#define R1_LUMP_CELLS                                   0x6B
-#define R1_LUMP_PORTALS                                 0x6C
-#define R1_LUMP_PORTAL_VERTICES                         0x6D
-#define R1_LUMP_PORTAL_EDGES                            0x6E
-#define R1_LUMP_PORTAL_VERTEX_EDGES                     0x6F
-#define R1_LUMP_PORTAL_VERTEX_REFERENCES                0x70
-#define R1_LUMP_PORTAL_EDGE_REGERENCES                  0x71
-#define R1_LUMP_PORTAL_EDGE_INTERSECT_AT_EDGE           0x72
-#define R1_LUMP_PORTAL_EDGE_INTERSECT_AT_VERTEX         0x73
-#define R1_LUMP_PORTAL_EDGE_INTERSECT_HEADER            0x74
-#define R1_LUMP_OCCLUSION_MESH_VERTICES                 0x75
-#define R1_LUMP_OCCLUSION_MESH_INDICES                  0x76
-#define R1_LUMP_CELL_AABB_NODES                         0x77
-#define R1_LUMP_OBJ_REFERENCES                          0x78
-#define R1_LUMP_OBJ_REFERENCE_BOUNDS                    0x79
-#define R1_LUMP_LEVEL_INFO                              0x7B
-#define R1_LUMP_SHADOW_MESH_OPAQUE_VERTICES             0x7C
-#define R1_LUMP_SHADOW_MESH_ALPHA_VERTICES              0x7D
-#define R1_LUMP_SHADOW_MESH_INDICES                     0x7E
-#define R1_LUMP_SHADOW_MESHES                           0x7F
-
 
 /*
    LoadR2BSPFile()
    loads a r1 bsp file
 */
-void LoadR1BSPFile(const char* filename) {}
+void LoadR1BSPFile( rbspHeader_t *header, const char *filename ) {
+    Titanfall::LoadLumpsAndEntities( header, filename );
+    Titanfall::ParseLoadedBSP();
+}
 
 
 /*
@@ -153,17 +79,24 @@ void WriteR1BSPFile(const char* filename) {
     // GameLump Stub
     {
         header.lumps[R1_LUMP_GAME_LUMP].offset = ftell(file);
-        header.lumps[R1_LUMP_GAME_LUMP].length = 40;
+        header.lumps[R1_LUMP_GAME_LUMP].length = sizeof(Titanfall::GameLumpHeader_t)
+                                                 + sizeof(Titanfall::GameLumpPathHeader_t)
+                                                 + sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPathHeader.numPaths
+                                                 + sizeof(Titanfall::GameLumpPropHeader_t)
+                                                 + sizeof(Titanfall::GameLumpProp_t) * Titanfall::Bsp::gameLumpPropHeader.numProps
+                                                 + sizeof(Titanfall::GameLumpUnknownHeader_t);
 
-        Titanfall::GameLump_Stub_t gameLump_stub;
-        SafeWrite(file, &gameLump_stub.version, 4);
-        memcpy(gameLump_stub.magic, "prps", 4);
-        SafeWrite(file, &gameLump_stub.magic, 4);
-        SafeWrite(file, &gameLump_stub.const0, 4);
-        gameLump_stub.offset = LittleLong(ftell(file) + 8);
-        SafeWrite(file, &gameLump_stub.offset, 4);
-        SafeWrite(file, &gameLump_stub.length, 4);
-        SafeWrite(file, &gameLump_stub.zeros, 20);
+        Titanfall::Bsp::gameLumpHeader.offset = ftell(file) + sizeof(Titanfall::GameLumpHeader_t);
+        Titanfall::Bsp::gameLumpHeader.length = sizeof(Titanfall::GameLumpPathHeader_t)
+                                                 + sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPathHeader.numPaths
+                                                 + sizeof(Titanfall::GameLumpPropHeader_t)
+                                                 + sizeof(Titanfall::GameLumpProp_t) * Titanfall::Bsp::gameLumpPropHeader.numProps
+                                                 + sizeof(Titanfall::GameLumpUnknownHeader_t);
+
+        SafeWrite(file, &Titanfall::Bsp::gameLumpHeader, sizeof(Titanfall::GameLumpHeader_t));
+        SafeWrite(file, &Titanfall::Bsp::gameLumpPathHeader, sizeof(Titanfall::GameLumpPathHeader_t));
+        SafeWrite(file, &Titanfall::Bsp::gameLumpPropHeader, sizeof(Titanfall::GameLumpPropHeader_t));
+        SafeWrite(file, &Titanfall::Bsp::gameLumpUnknownHeader, sizeof(Titanfall::GameLumpUnknownHeader_t));
     }
     AddLump(file, header.lumps[R1_LUMP_TEXTURE_DATA_STRING_DATA],    Titanfall::Bsp::textureDataData);
     AddLump(file, header.lumps[R1_LUMP_TEXTURE_DATA_STRING_TABLE],   Titanfall::Bsp::textureDataTable);
@@ -180,7 +113,7 @@ void WriteR1BSPFile(const char* filename) {
     AddLump(file, header.lumps[R1_LUMP_LIGHTMAP_HEADERS],            Titanfall::Bsp::lightmapHeaders_stub);  // stub
     AddLump(file, header.lumps[R1_LUMP_CM_GRID],                     Titanfall::Bsp::cmGrid);
     AddLump(file, header.lumps[R1_LUMP_CM_GRID_CELLS],               Titanfall::Bsp::cmGridCells);
-    AddLump(file, header.lumps[R1_LUMP_CM_GRID_SETS],                Titanfall::Bsp::cmGeoSets);
+    AddLump(file, header.lumps[R1_LUMP_CM_GEO_SETS],                 Titanfall::Bsp::cmGeoSets);
     AddLump(file, header.lumps[R1_LUMP_CM_GEO_SET_BOUNDS],           Titanfall::Bsp::cmGeoSetBounds);
     AddLump(file, header.lumps[R1_LUMP_CM_UNIQUE_CONTENTS],          Titanfall::Bsp::cmUniqueContents_stub);  // stub
     AddLump(file, header.lumps[R1_LUMP_CM_BRUSHES],                  Titanfall::Bsp::cmBrushes);
@@ -213,6 +146,8 @@ void WriteR1BSPFile(const char* filename) {
     Compiles a v29 bsp file
 */
 void CompileR1BSPFile() {
+    Titanfall::SetupGameLump();
+
     for (std::size_t entityNum = 0; entityNum < entities.size(); ++entityNum) {
         // Get entity
         entity_t& entity = entities[entityNum];
@@ -360,10 +295,14 @@ void Titanfall::EmitEntity(const entity_t &e) {
     EmitTriggerBrushPlaneKeyValues()
     Emits brush planes as keyvalues because respawn
 */
-void Titanfall::EmitTriggerBrushPlaneKeyValues(entity_t &e) {
+void Titanfall::EmitTriggerBrushPlaneKeyValues( entity_t &e ) {
+    MinMax minmax;
     std::size_t b = 0;
-    for (const brush_t &brush : e.brushes) {
+    for ( const brush_t &brush : e.brushes ) {
+        minmax.extend( brush.minmax );
+
         for (std::size_t s = 0; s < brush.sides.size(); s++) {
+
             const side_t &side = brush.sides.at(s);
             StringOutputStream key;
             key << "*trigger_brush_" << b << "_plane_" << s;
@@ -371,9 +310,28 @@ void Titanfall::EmitTriggerBrushPlaneKeyValues(entity_t &e) {
             StringOutputStream value;
             value << side.plane.a << " " << side.plane.b << " " << side.plane.c << " " << side.plane.d;
 
-            e.setKeyValue(key.c_str(), value.c_str());
+            e.setKeyValue( key.c_str(), value.c_str() );
         }
         b++;
+    }
+
+    {
+        StringOutputStream key;
+        key << "*trigger_bounds_mins";
+
+        StringOutputStream value;
+        value << minmax.mins.x() << " " << minmax.mins.y() << " " << minmax.mins.z();
+
+        e.setKeyValue( key.c_str(), value.c_str() );
+    }
+    {
+        StringOutputStream key;
+        key << "*trigger_bounds_maxs";
+
+        StringOutputStream value;
+        value << minmax.maxs.x() << " " << minmax.maxs.y() << " " << minmax.maxs.z();
+
+        e.setKeyValue( key.c_str(), value.c_str() );
     }
 }
 
@@ -459,6 +417,12 @@ uint32_t Titanfall::EmitVertexNormal(Vector3 &normal) {
     return (uint32_t)Titanfall::Bsp::vertexNormals.size() - 1;
 }
 
+
+void Titanfall::SetupGameLump() {
+    Titanfall::Bsp::gameLumpHeader.version = 1;
+    memcpy( &Titanfall::Bsp::gameLumpHeader.ident, "prps", 4 );
+    Titanfall::Bsp::gameLumpHeader.gameConst = 786432;
+}
 
 /*
     BeginModel()
@@ -886,8 +850,8 @@ void Titanfall::EmitCollisionGrid() {
                 }
 
                 Titanfall::CMGeoSet_t& set = Titanfall::Bsp::cmGeoSets.emplace_back();
-                set.unknown0 = 0;
-                set.unknown1 = 1;
+                set.straddleGroup = 0;
+                set.primitiveCount = 1;
                 set.unknown2 = 0;
                 set.collisionShapeIndex = index;
 
@@ -977,7 +941,7 @@ void Titanfall::EmitBrushes(const entity_t& e) {
                 Titanfall::Bsp::cmBrushSideProperties.emplace_back(1);
             } else {
                 test++;
-                Titanfall::Bsp::cmBrushSideProperties.emplace_back(0x4000);
+                Titanfall::Bsp::cmBrushSideProperties.emplace_back(MASK_DISCARD);
             }
         }
 
@@ -1051,7 +1015,7 @@ void Titanfall::EmitLevelInfo() {
         li.firstSkyMeshIndex++;
     }
 
-    li.propCount = Titanfall2::GameLump.propCount;
+    li.propCount = Titanfall::Bsp::gameLumpPropHeader.numProps;
 }
 
 
@@ -1272,4 +1236,26 @@ void Titanfall::EmitStubs() {
         };
         Titanfall::Bsp::cells_stub = { data.begin(), data.end() };
     }
+}
+
+/*
+    EmitExtraEntity
+    Emits an entity into Titanfall::Ent::extra, only used when -onlyentities argument is used
+*/
+void Titanfall::EmitExtraEntity( entity_t &e ) {
+    if( striEqual( e.classname(), "worldspawn" ) )
+        return;
+
+    Titanfall::EmitTriggerBrushPlaneKeyValues( e );
+
+    StringOutputStream  data;
+    data << "{\n";
+    for( const epair_t& pair : e.epairs ) {
+        data << "\"" << pair.key.c_str() << "\" \"" << pair.value.c_str() << "\"\n";
+    }
+    data << "}\n";
+
+    std::vector<char> str = { data.begin(), data.end() };
+
+    Titanfall::Ent::extra.insert( Titanfall::Ent::extra.end(), str.begin(), str.end() );
 }
