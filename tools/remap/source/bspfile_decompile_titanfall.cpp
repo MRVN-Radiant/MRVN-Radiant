@@ -234,7 +234,17 @@ void Titanfall::ParsePatch( entity_t &entity, std::size_t index ) {
     // Create patch
     parseMesh_t* pm = safe_calloc(sizeof(*pm));
 
-    pm->shaderInfo = ShaderInfoForShader("NULL");
+
+    Titanfall::TextureData_t &textureData = Titanfall::Bsp::textureData.at( header.texdata & MASK_TEXTURE_DATA );
+    uint32_t nameStart = Titanfall::Bsp::textureDataTable.at( textureData.name_index );
+
+    std::string table = std::string( Titanfall::Bsp::textureDataData.begin(), Titanfall::Bsp::textureDataData.end() );
+
+    // p0358 <3, my first favourite polish femboy
+    std::string name = std::string( table.begin() + nameStart, table.begin() + nameStart + strlen( table.c_str() + nameStart ) );
+
+    std::replace(name.begin(), name.end(), '\\', '/');
+    pm->shaderInfo = ShaderInfoForShader(name.c_str());
 
     pm->mesh = mesh;
 
