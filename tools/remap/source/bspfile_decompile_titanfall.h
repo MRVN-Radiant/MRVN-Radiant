@@ -8,6 +8,7 @@ namespace Titanfall {
 	void LoadLumpsAndEntities( rbspHeader_t *header, const char *filename );
 	void ParseLoadedBSP();
 	void ParseWorldspawn( entity_t &entity );
+	void ParseGridCell( entity_t &entity, std::size_t index );
 	void ParseBrush( entity_t &entity, std::size_t index );
 	void ParsePatch( entity_t &entity, std::size_t index );
 	std::vector<Plane3> BuildPlanesFromMinMax( MinMax &minmax );
