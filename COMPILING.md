@@ -57,7 +57,7 @@ Setup environment:
 - Open the MingW shell
 - Run:
   1. `pacman -S  {make,diffutils,gcc,binutils,pkg-config,unzip,git-core,subversion}`
-  2. `pacman -S mingw-w64-x86_64-{openjpeg,gtk2,glib2,mesa,libxml2,libpng,gtkglext,zlib}`
+  2. `pacman -S mingw-w64-x86_64-{openjpeg,gtk2,glib2,libxml2,libpng,gtkglext,zlib}`
 
 <!-->
 OSX(using X-windows)(UNTESTED)
