@@ -29,5 +29,3 @@ MRVNRadiant is a fork of NetRadiant-custom (GtkRadiant 1.4 &rarr; massive rewrit
 ## Other tools
 - [bsp_tool](https://github.com/snake-biscuits/bsp_tool)
     - A Python library for analyzing .bsp files
-<!-->- [rbsp-explorer](https://gitlab.com/F1FTY/rbsp-explorer)
-    - OpenGL / ImGui respawn bsp explorer<!-->
