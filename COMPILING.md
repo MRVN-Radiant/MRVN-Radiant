@@ -24,32 +24,6 @@ Dependencies:
 - zlib >= 1.2.0 (for archivezip module)
 - libpng >= 1.2.0 (for imagepng module)
 
-<!-->
-Win32 (using MSYS2)(recommended)
-==================
-
-Environment:
-- MSYS2 (http://www.msys2.org/)
-- from msys2_shell:
-  pacman -S --needed base-devel
-    32 bit:
-  pacman -S --needed mingw-w64-i686-{toolchain,gtk2,gtkglext}
-    64 bit:
-  pacman -S mingw-w64-x86_64-{toolchain,gtk2,gtkglext}
-    these are only strictly required for gamepacks:
-  pacman -S --needed unzip svn git
-
-build:
-- Start respective mingw shell
-- Switch to the directory with NetRadiant-custom source
-- Typical release build:
-  `make MAKEFILE_CONF=msys2-Makefile.conf BUILD=release -j$(nproc)`
-- Typical developer's build:
-  `make MAKEFILE_CONF=msys2-Makefile.conf DEPENDENCIES_CHECK=off INSTALL_DLLS=no BUILD=debug RADIANT_ABOUTMSG="MRVN-radiant dev build" -j$(nproc)`
-- run:
-- in the "install" directory, double click radiant.exe
-<!-->
-
 ### 2. Windows (using Msys/MinGW)
 
 Setup environment:
