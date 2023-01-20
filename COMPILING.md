@@ -3,7 +3,7 @@
 #### Index:
 1. [Getting the source](#getting-the-source)
 2. [Setting up your environment](#setting-up-your-environment)
-3. [Building][#building]
+3. [Building](#building)
 
 ## Getting the source
 The latest source is available from the git repository:
