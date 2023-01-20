@@ -33,34 +33,6 @@ Setup environment:
   1. `pacman -S  {make,diffutils,gcc,binutils,pkg-config,unzip,git-core,subversion}`
   2. `pacman -S mingw-w64-x86_64-{openjpeg,gtk2,glib2,libxml2,libpng,gtkglext,zlib}`
 
-<!-->
-OSX(using X-windows)(UNTESTED)
-====================
-
-environment:
-- OS X 10.5 or 10.6
-- Xcode developer tools installed (OSX DVD)
-- X11 (from the OS X DVD)
-- MacPorts or fink or homebrew installed
-- the following packages installed:
-Macports (reported as working in 10.15.3):
-  gtkglext pkgconfig glib2-devel libxml2 gtk2 pango atk gettext wget
-Fink:
-  gtkglext1 pkgconfig glib2-dev libxml2 gtk+2 gtk+2-dev pango1-xft2-ft219-dev atk1 gettext-dev wget
-homebrew (does not work due to X11->Quartz switch, requires patched gtkglext):
-  gtk+ gtkglext
-
-build:
-run 'make'
-
-homebrew build:
-run 'export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
-make'
-
-run:
-Switch into the install folder, and run NetRadiant.app
-<!-->
-
 ## Building
 When building for the first time it is recommended to run `make DEPENDENCIES_CHECK=on INSTALL_DLLS=yes` as this will check for all dependencies and install required libraries on windows.
 
