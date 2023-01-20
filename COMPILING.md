@@ -1,46 +1,34 @@
+# Developer documentation for MRVN-Radiant
 
-Developer documentation for MRVN-radiant
-======================================
+#### Index:
+1. [Getting the source](#getting-the-source)
+2. [Setting up your environment](#setting-up-your-environment)
+3. [Building][#building]
 
-Getting the source
-==================
-
+## Getting the source
 The latest source is available from the git repository:
+  - https://github.com/MRVN-Radiant/MRVN-Radiant
 
-  - https://github.com/F1F7Y/MRVN-radiant
+## Setting up your environment
 
-Libs for Windows:
-
-  - https://www.dropbox.com/s/hcgkwzzmja3m6c0/netradiant-custom-extra-win.zip
-
-
-
-Linux(using X-windows)
-======================
-
-environment:
+### 1. Linux(using X-windows)
+Environment:
 - gcc >= version 3.1 (preferably)
 - GNU make
 - svn >= 1.1 (some build steps use svn)
 
-dependencies:
+Dependencies:
 - gtk+ >= 2.4.0 (requires glib, atk, pango, iconv, etc)
 - gtkglext >= 1.0.0 (requires opengl)
 - libxml2 >= 2.0.0
 - zlib >= 1.2.0 (for archivezip module)
 - libpng >= 1.2.0 (for imagepng module)
 
-build:
-run 'make'
-
-run:
-Execute 'install/radiant.x86'
-
-
+<!-->
 Win32 (using MSYS2)(recommended)
 ==================
 
-environment:
+Environment:
 - MSYS2 (http://www.msys2.org/)
 - from msys2_shell:
   pacman -S --needed base-devel
@@ -60,36 +48,18 @@ build:
   `make MAKEFILE_CONF=msys2-Makefile.conf DEPENDENCIES_CHECK=off INSTALL_DLLS=no BUILD=debug RADIANT_ABOUTMSG="MRVN-radiant dev build" -j$(nproc)`
 - run:
 - in the "install" directory, double click radiant.exe
+<!-->
 
+### 2. Windows (using Msys/MinGW)
 
-Win32 (using MinGW)
-==================
+Setup environment:
+- Install [msys2](https://www.msys2.org/) and follow installation steps on their website
+- Open the MingW shell
+- Run:
+  1. `pacman -S  {make,diffutils,gcc,binutils,pkg-config,unzip,git-core,subversion}`
+  2. `pacman -S mingw-w64-x86_64-{openjpeg,gtk2,glib2,mesa,libxml2,libpng,gtkglext,zlib}`
 
-environment:
-- MinGW (http://www.mingw.org/wiki/Getting_Started)
-  Install this to c:\mingw, and select the components C compiler, C++ compiler
-  and MSYS Basic System
-- Start the MSYS shell once, then exit it
-- Prepackaged Radiant dependencies (Gtk and other stuff):
-  http://www.icculus.org/netradiant/files/netradiant-dependencies-mingw32-20101211-7z.exe
-  Extract this one to
-  c:\mingw\msys\1.0\home\username
-  (if you do this with 7zip, keep the "netradiant-dependencies-mingw32" folder
-  name of the contents)
-- now download the source from the MSYS shell, if you don't already have it:
-  ~/netradiant-dependencies-mingw32/util/bin/git clone git://git.icculus.org/divverent/netradiant.git
-
-build:
-- Start the MSYS shell
-- Switch to the directory with NetRadiant-custom source
-- `make MAKEFILE_CONF=mingw-Makefile.conf`
-
-run:
-- in the "install" directory, double click radiant.exe
-- if you get a DLL not found error, copy the DLL from either c:\mingw\bin or
-  from c:\mingw\msys\1.0\bin to the "install" directory
-
-
+<!-->
 OSX(using X-windows)(UNTESTED)
 ====================
 
@@ -115,3 +85,14 @@ make'
 
 run:
 Switch into the install folder, and run NetRadiant.app
+<!-->
+
+## Building
+When building for the first time it is recommended to run `make DEPENDENCIES_CHECK=on INSTALL_DLLS=yes` as this will check for all dependencies and install required libraries on windows.
+
+#### Makefile arguments:
+A list of arguments you can supply when running `make`
+- `DEPENDENCIES_CHECK=on/off/verbose` - Enables the dependency check
+- `INSTALL_DLLS=yes/no` - Downloads dlls on windows after build
+- `BUILD=debug/release` - Build type
+- `RADIANT_ABOUTMSG="MRVN-Radiant dev build"` - About message
