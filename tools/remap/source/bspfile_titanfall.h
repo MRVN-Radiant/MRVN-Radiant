@@ -33,12 +33,16 @@ namespace Titanfall {
     void         EmitVertexUnlitTS(Shared::Vertex_t &vertex);
     void         EmitVertexBlinnPhong(Shared::Vertex_t &vertex);
     void         EmitMeshes(const entity_t &e);
+    std::size_t  EmitObjReferences(Shared::visNode_t &node);
+    int          EmitVisChildrenOfTreeNode(Shared::visNode_t node);
+    void         EmitVisTree();
     uint16_t     EmitMaterialSort(uint32_t index);
     void         EmitCollisionGrid();
     void         EmitBrushes(const entity_t &e);
     void         EmitLevelInfo();
     void         EmitStubs();
     void         EmitExtraEntity(entity_t &e);
+
 
     /* Lump Structs */
     // 0x02

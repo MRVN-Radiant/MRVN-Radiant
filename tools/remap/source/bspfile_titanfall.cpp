@@ -1024,7 +1024,7 @@ void Titanfall::EmitPlane(const Plane3 &plane) {
 void Titanfall::EmitLevelInfo() {
     // NOTE: mesh counts already set by EmitMeshes
     Titanfall::LevelInfo_t &li = Titanfall::Bsp::levelInfo.at(0);
-    li.propCount = Titanfall2::GameLump.propCount;
+    li.propCount = Titanfall::Bsp::gameLumpPropHeader.numProps;
     // TODO: unk2 sun vector from last light_environment
     li.unk2 = { 0.1, 0.8, -0.6 };  // placeholder
 }
