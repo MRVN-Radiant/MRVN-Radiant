@@ -79,18 +79,18 @@ void WriteR1BSPFile(const char *filename) {
     {
         header.lumps[R1_LUMP_GAME_LUMP].offset = ftell(file);
         header.lumps[R1_LUMP_GAME_LUMP].length = sizeof(Titanfall::GameLumpHeader_t)
-                                                 + sizeof(Titanfall::GameLumpPathHeader_t)
-                                                 + sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPathHeader.numPaths
-                                                 + sizeof(Titanfall::GameLumpPropHeader_t)
-                                                 + sizeof(Titanfall::GameLumpProp_t) * Titanfall::Bsp::gameLumpPropHeader.numProps
-                                                 + sizeof(Titanfall::GameLumpUnknownHeader_t);
+                                               + sizeof(Titanfall::GameLumpPathHeader_t)
+                                               + sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPathHeader.numPaths
+                                               + sizeof(Titanfall::GameLumpPropHeader_t)
+                                               + sizeof(Titanfall::GameLumpProp_t) * Titanfall::Bsp::gameLumpPropHeader.numProps
+                                               + sizeof(Titanfall::GameLumpUnknownHeader_t);
 
         Titanfall::Bsp::gameLumpHeader.offset = ftell(file) + sizeof(Titanfall::GameLumpHeader_t);
         Titanfall::Bsp::gameLumpHeader.length = sizeof(Titanfall::GameLumpPathHeader_t)
-                                                 + sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPathHeader.numPaths
-                                                 + sizeof(Titanfall::GameLumpPropHeader_t)
-                                                 + sizeof(Titanfall::GameLumpProp_t) * Titanfall::Bsp::gameLumpPropHeader.numProps
-                                                 + sizeof(Titanfall::GameLumpUnknownHeader_t);
+                                              + sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPathHeader.numPaths
+                                              + sizeof(Titanfall::GameLumpPropHeader_t)
+                                              + sizeof(Titanfall::GameLumpProp_t) * Titanfall::Bsp::gameLumpPropHeader.numProps
+                                              + sizeof(Titanfall::GameLumpUnknownHeader_t);
 
         SafeWrite(file, &Titanfall::Bsp::gameLumpHeader, sizeof(Titanfall::GameLumpHeader_t));
         SafeWrite(file, &Titanfall::Bsp::gameLumpPathHeader, sizeof(Titanfall::GameLumpPathHeader_t));
@@ -294,43 +294,42 @@ void Titanfall::EmitEntity(const entity_t &e) {
     EmitTriggerBrushPlaneKeyValues()
     Emits brush planes as keyvalues because respawn
 */
-void Titanfall::EmitTriggerBrushPlaneKeyValues( entity_t &e ) {
-    MinMax minmax;
-    std::size_t b = 0;
-    for ( const brush_t &brush : e.brushes ) {
-        minmax.extend( brush.minmax );
+void Titanfall::EmitTriggerBrushPlaneKeyValues(entity_t &e) {
+    MinMax  minmax;
+    std::size_t  b = 0;
+    for (const brush_t &brush : e.brushes) {
+        minmax.extend(brush.minmax);
 
         for (std::size_t s = 0; s < brush.sides.size(); s++) {
-
             const side_t &side = brush.sides.at(s);
-            StringOutputStream key;
+            StringOutputStream  key;
             key << "*trigger_brush_" << b << "_plane_" << s;
 
-            StringOutputStream value;
+            StringOutputStream  value;
             value << side.plane.a << " " << side.plane.b << " " << side.plane.c << " " << side.plane.d;
 
-            e.setKeyValue( key.c_str(), value.c_str() );
+            e.setKeyValue(key.c_str(), value.c_str());
         }
         b++;
     }
 
     {
-        StringOutputStream key;
+        StringOutputStream  key;
         key << "*trigger_bounds_mins";
 
-        StringOutputStream value;
+        StringOutputStream  value;
         value << minmax.mins.x() << " " << minmax.mins.y() << " " << minmax.mins.z();
 
-        e.setKeyValue( key.c_str(), value.c_str() );
+        e.setKeyValue(key.c_str(), value.c_str());
     }
     {
-        StringOutputStream key;
+        StringOutputStream  key;
         key << "*trigger_bounds_maxs";
 
-        StringOutputStream value;
+        StringOutputStream  value;
         value << minmax.maxs.x() << " " << minmax.maxs.y() << " " << minmax.maxs.z();
 
-        e.setKeyValue( key.c_str(), value.c_str() );
+        e.setKeyValue(key.c_str(), value.c_str());
     }
 }
 
@@ -340,8 +339,8 @@ void Titanfall::EmitTriggerBrushPlaneKeyValues( entity_t &e ) {
     Emits texture data and returns its index
 */
 uint32_t Titanfall::EmitTextureData(shaderInfo_t shader) {
-    std::string tex = shader.shader.c_str();
-    std::size_t index;
+    std::string  tex = shader.shader.c_str();
+    std::size_t  index;
 
     // Strip 'textures/'
     tex.erase(tex.begin(), tex.begin() + strlen("textures/"));
@@ -453,7 +452,7 @@ void Titanfall::EndModel() {
     Writes entitiy partitions respawn uses
 */
 void Titanfall::EmitEntityPartitions() {
-    std::string partitions = "01*";
+    std::string  partitions = "01*";
 
     if (Titanfall::Ent::env.size()) {
         partitions += " env";
@@ -480,52 +479,52 @@ void Titanfall::EmitEntityPartitions() {
 
 
 /*
-        EmitObjReferences
-        Emits obj references and returns an index to the first one
+    EmitObjReferences
+    Emits obj references and returns an index to the first one
 */
 std::size_t Titanfall::EmitObjReferences(Shared::visNode_t &node) {
-        // Stores which indicies were found
-        std::list<std::size_t> indicies;
-        // Try to check for duplicates
-        for (Shared::visRef_t &ref : node.refs) {
-            for (std::size_t i = 0; i < Titanfall::Bsp::objReferences.size(); i++) {
-                uint16_t &tf = Titanfall::Bsp::objReferences.at(i);
-                if (tf == ref.index) {
-                    indicies.push_back(i);
-                }
+    // Stores which indicies were found
+    std::list<std::size_t>  indicies;
+    // Try to check for duplicates
+    for (Shared::visRef_t &ref : node.refs) {
+        for (std::size_t i = 0; i < Titanfall::Bsp::objReferences.size(); i++) {
+            uint16_t &tf = Titanfall::Bsp::objReferences.at(i);
+            if (tf == ref.index) {
+                indicies.push_back(i);
             }
         }
-        indicies.sort();
+    }
+    indicies.sort();
 
-        // We found all, now check if they're next to each other
-        if (indicies.size() == node.refs.size()) {
-            std::size_t lastIndex = -1;
-            for (std::size_t &i : indicies) {
-                if (lastIndex == -1) {
-                    lastIndex = i;
-                    continue;
-                }
-
-                if (i != lastIndex + 1) {
-                    lastIndex = -1;
-                    break;
-                }
+    // We found all, now check if they're next to each other
+    if (indicies.size() == node.refs.size()) {
+        std::size_t  lastIndex = -1;
+        for (std::size_t &i : indicies) {
+            if (lastIndex == -1) {
+                lastIndex = i;
+                continue;
             }
 
-            if (lastIndex != -1) {
-                return indicies.front();
+            if (i != lastIndex + 1) {
+                lastIndex = -1;
+                break;
             }
         }
 
-        for (Shared::visRef_t &ref : node.refs) {
-            Titanfall::ObjReferenceBounds_t &rb = Titanfall::Bsp::objReferenceBounds.emplace_back();
-            rb.maxs = ref.minmax.maxs;
-            rb.mins = ref.minmax.mins;
-
-            Titanfall::Bsp::objReferences.emplace_back(ref.index);
+        if (lastIndex != -1) {
+            return indicies.front();
         }
+    }
 
-        return Titanfall::Bsp::objReferences.size() - node.refs.size();
+    for (Shared::visRef_t &ref : node.refs) {
+        Titanfall::ObjReferenceBounds_t &rb = Titanfall::Bsp::objReferenceBounds.emplace_back();
+        rb.maxs = ref.minmax.maxs;
+        rb.mins = ref.minmax.mins;
+
+        Titanfall::Bsp::objReferences.emplace_back(ref.index);
+    }
+
+    return Titanfall::Bsp::objReferences.size() - node.refs.size();
 }
 
 
@@ -534,7 +533,7 @@ std::size_t Titanfall::EmitObjReferences(Shared::visNode_t &node) {
     Calculates the total number of obj refs under a vistree node
 */
 uint16_t GetTotalVisRefCount(Shared::visNode_t node) {
-    uint16_t count = node.refs.size();
+    uint16_t  count = node.refs.size();
 
     for (Shared::visNode_t &n : node.children) {
         count += GetTotalVisRefCount(n);
@@ -549,7 +548,7 @@ uint16_t GetTotalVisRefCount(Shared::visNode_t node) {
     Calculates the total child count of node
 */
 uint16_t GetTotalVisNodeChildCount(Shared::visNode_t node) {
-    uint16_t count = node.children.size();
+    uint16_t  count = node.children.size();
 
     for (Shared::visNode_t &n : node.children) {
         count += GetTotalVisNodeChildCount(n);
@@ -564,7 +563,7 @@ uint16_t GetTotalVisNodeChildCount(Shared::visNode_t node) {
     Emits children of a vis tree node
 */
 int Titanfall::EmitVisChildrenOfTreeNode(Shared::visNode_t node) {
-    int index = Titanfall::Bsp::cellAABBNodes.size();  // Index of first child of node
+    int  index = Titanfall::Bsp::cellAABBNodes.size();  // Index of first child of node
 
     for (std::size_t i = 0; i < node.children.size(); i++) {
         Shared::visNode_t &n = node.children.at(i);
@@ -582,7 +581,7 @@ int Titanfall::EmitVisChildrenOfTreeNode(Shared::visNode_t node) {
     }
 
     for (std::size_t i = 0; i < node.children.size(); i++) {
-        int firstChild = EmitVisChildrenOfTreeNode(node.children.at(i));
+        int  firstChild = EmitVisChildrenOfTreeNode(node.children.at(i));
 
         Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.at(index + i);
         bn.firstChild = firstChild;
@@ -679,7 +678,7 @@ void Titanfall::EmitVertexBlinnPhong(Shared::Vertex_t &vertex) {
     writes the mesh list to the bsp
 */
 void Titanfall::EmitMeshes(const entity_t &e) {
-    // ALSO: LevelInfo, TextureData, TextureDataStringData, TextureDataStringTable, MaterialSort,
+    // ALSO: TextureData, TextureDataStringData, TextureDataStringTable, MaterialSort,
     // -- VertexReservedX, Vertices, VertexNormals & MeshBounds
     // NOTE: we don't actually build meshes from const entity_t &e
     // -- Shared::meshes has every mesh from brushes & patches built & merged before EmitMeshes get called
@@ -993,7 +992,7 @@ void Titanfall::EmitLevelInfo() {
     Titanfall::LevelInfo_t &li = Titanfall::Bsp::levelInfo.emplace_back();
 
     // mesh counts
-#if 0
+#if 0  /* crashing, this didn't happen when we sorted meshes in Titanfall::EmitMeshes... */
     // TODO: Add decal support
     li.firstDecalMeshIndex = 0;
     for (Shared::Mesh_t &mesh : Shared::meshes) {  // same indices as Titanfall::Bsp::meshes, more metadata
