@@ -684,40 +684,8 @@ void Titanfall::EmitMeshes(const entity_t &e) {
     // NOTE: we don't actually build meshes from const entity_t &e
     // -- Shared::meshes has every mesh from brushes & patches built & merged before EmitMeshes get called
 
-    // sort Shared::meshes
-    std::vector<Shared::Mesh_t>  opaque_meshes;
-    std::vector<Shared::Mesh_t>  decal_meshes;
-    std::vector<Shared::Mesh_t>  trans_meshes;
-    std::vector<Shared::Mesh_t>  sky_meshes;
-
-    for (const Shared::Mesh_t &mesh : Shared::meshes) {
-        if (mesh.shaderInfo->compileFlags & C_SKY) {
-            sky_meshes.push_back(mesh);
-        } else if (mesh.shaderInfo->compileFlags & C_DECAL) {
-            decal_meshes.push_back(mesh);
-        } else if (mesh.shaderInfo->compileFlags & C_TRANSLUCENT) {
-            trans_meshes.push_back(mesh);
-        } else {
-            opaque_meshes.push_back(mesh);
-        }
-    }
-
-    std::vector<Shared::Mesh_t>  sorted_meshes;
-    #define COPY_MESHES(x)  sorted_meshes.insert(sorted_meshes.end(), x.begin(), x.end())
-    COPY_MESHES(opaque_meshes);
-    COPY_MESHES(decal_meshes);
-    COPY_MESHES(trans_meshes);
-    COPY_MESHES(sky_meshes);
-    #undef COPY_MESHES
-
-    // LevelInfo
-    Titanfall::LevelInfo_t &li = Titanfall::Bsp::levelInfo.emplace_back();
-    li.firstDecalMeshIndex = opaque_meshes.size();
-    li.firstTransMeshIndex = li.firstDecalMeshIndex + decal_meshes.size();
-    li.firstSkyMeshIndex = li.firstTransMeshIndex + trans_meshes.size();
-
     // Emit Bsp::meshes
-    for (const Shared::Mesh_t &mesh : sorted_meshes) {
+    for (const Shared::Mesh_t &mesh : Shared::meshes) {
         Titanfall::Mesh_t &m = Titanfall::Bsp::meshes.emplace_back();
         m.const0 = 4294967040;  // :)
         m.flags = mesh.shaderInfo->surfaceFlags;
@@ -1022,8 +990,34 @@ void Titanfall::EmitPlane(const Plane3 &plane) {
     EmitLevelInfo()
 */
 void Titanfall::EmitLevelInfo() {
-    // NOTE: mesh counts already set by EmitMeshes
-    Titanfall::LevelInfo_t &li = Titanfall::Bsp::levelInfo.at(0);
+    Titanfall::LevelInfo_t &li = Titanfall::Bsp::levelInfo.emplace_back();
+
+    // mesh counts
+#if 0
+    // TODO: Add decal support
+    li.firstDecalMeshIndex = 0;
+    for (Shared::Mesh_t &mesh : Shared::meshes) {  // same indices as Titanfall::Bsp::meshes, more metadata
+        if (mesh.shaderInfo->compileFlags & C_DECAL) { break; }
+        li.firstDecalMeshIndex++;
+    }
+
+    // TODO: start from firstDecalMeshIndex
+    li.firstTransMeshIndex = 0;
+    for (Titanfall::Mesh_t &mesh : Titanfall::Bsp::meshes) {
+        if (mesh.flags & S_TRANSLUCENT) { break; }
+        li.firstTransMeshIndex++;
+    }
+
+    // TODO: start from firstTransMeshIndex
+    li.firstSkyMeshIndex = 0;
+    for (Titanfall::Mesh_t &mesh : Titanfall::Bsp::meshes) {
+        if ((mesh.flags & S_SKY) || (mesh.flags & S_SKY_2D)) { break; }
+        li.firstSkyMeshIndex++;
+    }
+#else
+    li.firstDecalMeshIndex = li.firstTransMeshIndex = li.firstSkyMeshIndex = Shared::meshes.size();
+#endif
+
     li.propCount = Titanfall::Bsp::gameLumpPropHeader.numProps;
     // TODO: unk2 sun vector from last light_environment
     li.unk2 = { 0.1, 0.8, -0.6 };  // placeholder

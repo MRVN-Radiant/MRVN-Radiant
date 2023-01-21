@@ -3,20 +3,9 @@
 
 
 /*
-    EmitMeshes()
-    Emits shared meshes for a given entity
+    MakeMeshes()
+    Makes the initial shared meshes for a given entity
 */
-// TODO: pre-sort meshes into: opaque, decal, transparent, skybox
-// -- surfaceparm compile flags, default opaque
-// -- surfaceparm decal
-// -- surfaceparm trans
-// -- surfaceparm sky | sky2d
-
-// Shared::meshes -> std::vector<Shared::Mesh_t>  opaque_meshes
-// Shared::meshes -> std::vector<Shared::Mesh_t>  decal_meshes
-// Shared::meshes -> std::vector<Shared::Mesh_t>  trans_meshes
-// Shared::meshes -> std::vector<Shared::Mesh_t>  sky_meshes
-// NOTE: meshes are worldspawn only rn, which makes things simple...
 void Shared::MakeMeshes(const entity_t &e) {
     // Multiple entities can have meshes, make sure we clear before making new meshes
     Shared::meshes.clear();
@@ -171,6 +160,33 @@ void Shared::MakeMeshes(const entity_t &e) {
         iterationsSinceCombine++;
         index++;
     }
+
+    // sort meshes
+    std::vector<Shared::Mesh_t>  opaque_meshes;
+    std::vector<Shared::Mesh_t>  decal_meshes;
+    std::vector<Shared::Mesh_t>  trans_meshes;
+    std::vector<Shared::Mesh_t>  sky_meshes;
+
+    for (const Shared::Mesh_t &mesh : Shared::meshes) {
+        if (mesh.shaderInfo->compileFlags & C_SKY) {
+            sky_meshes.push_back(mesh);
+        } else if (mesh.shaderInfo->compileFlags & C_DECAL) {
+            decal_meshes.push_back(mesh);
+        } else if (mesh.shaderInfo->compileFlags & C_TRANSLUCENT) {
+            trans_meshes.push_back(mesh);
+        } else {
+            opaque_meshes.push_back(mesh);
+        }
+    }
+
+    // rebuild Shared::meshes from the sorted groups
+    Shared::meshes.clear();
+    #define COPY_MESHES(x)  Shared::meshes.insert(Shared::meshes.end(), x.begin(), x.end())
+    COPY_MESHES(opaque_meshes);
+    COPY_MESHES(decal_meshes);
+    COPY_MESHES(trans_meshes);
+    COPY_MESHES(sky_meshes);
+    #undef COPY_MESHES
 
     Sys_Printf("%9zu shared meshes\n", Shared::meshes.size());
 }
