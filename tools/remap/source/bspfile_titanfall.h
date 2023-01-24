@@ -7,8 +7,8 @@
 #include "lump_names.h"
 
 
-void LoadR1BSPFile( rbspHeader_t *header, const char *filename );
-void WriteR1BSPFile(const char* filename);
+void LoadR1BSPFile(rbspHeader_t *header, const char *filename);
+void WriteR1BSPFile(const char *filename);
 void CompileR1BSPFile();
 
 
@@ -16,17 +16,16 @@ void CompileR1BSPFile();
 #define MASK_DISCARD 0x4000
 
 
-
 namespace Titanfall {
     void         SetupGameLump();
     void         BeginModel();
     void         EndModel();
-    void         EmitEntity( const entity_t &e );
-	void         EmitTriggerBrushPlaneKeyValues( entity_t &e );
-	void         EmitPlane( const Plane3 &plane );
+    void         EmitEntity(const entity_t &e);
+    void         EmitTriggerBrushPlaneKeyValues(entity_t &e);
+    void         EmitPlane(const Plane3 &plane);
     void         EmitEntityPartitions();
     uint32_t     EmitTextureData(shaderInfo_t shader);
-    uint32_t     EmitVertex(Vector3& vertex);
+    uint32_t     EmitVertex(Vector3 &vertex);
     uint32_t     EmitVertexNormal(Vector3 &normal);
     void         EmitVertexUnlit(Shared::Vertex_t &vertex);
     void         EmitVertexLitFlat(Shared::Vertex_t &vertex);
@@ -34,7 +33,7 @@ namespace Titanfall {
     void         EmitVertexUnlitTS(Shared::Vertex_t &vertex);
     void         EmitVertexBlinnPhong(Shared::Vertex_t &vertex);
     void         EmitMeshes(const entity_t &e);
-    std::size_t  EmitObjReferences(Shared::visNode_t& node);
+    std::size_t  EmitObjReferences(Shared::visNode_t &node);
     int          EmitVisChildrenOfTreeNode(Shared::visNode_t node);
     void         EmitVisTree();
     uint16_t     EmitMaterialSort(uint32_t index);
@@ -42,8 +41,8 @@ namespace Titanfall {
     void         EmitBrushes(const entity_t &e);
     void         EmitLevelInfo();
     void         EmitStubs();
+    void         EmitExtraEntity(entity_t &e);
 
-    void         EmitExtraEntity( entity_t &e ); 
 
     /* Lump Structs */
     // 0x02
@@ -295,13 +294,13 @@ namespace Titanfall {
     };
 
     namespace Ent {
-        inline std::vector<char> env;
-        inline std::vector<char> fx;
-        inline std::vector<char> script;
-        inline std::vector<char> snd;
-        inline std::vector<char> spawn;
-        inline std::vector<char> extra;
-        inline std::vector<entity_t> entities;
+        inline std::vector<char>      env;
+        inline std::vector<char>      fx;
+        inline std::vector<char>      script;
+        inline std::vector<char>      snd;
+        inline std::vector<char>      spawn;
+        inline std::vector<char>      extra;
+        inline std::vector<entity_t>  entities;
     }
 
     namespace Bsp {

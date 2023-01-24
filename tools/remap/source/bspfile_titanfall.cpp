@@ -16,13 +16,12 @@
 #include <ctime>
 
 
-
 /*
    LoadR2BSPFile()
    loads a r1 bsp file
 */
-void LoadR1BSPFile( rbspHeader_t *header, const char *filename ) {
-    Titanfall::LoadLumpsAndEntities( header, filename );
+void LoadR1BSPFile(rbspHeader_t *header, const char *filename) {
+    Titanfall::LoadLumpsAndEntities(header, filename);
     Titanfall::ParseLoadedBSP();
 }
 
@@ -31,8 +30,8 @@ void LoadR1BSPFile( rbspHeader_t *header, const char *filename ) {
    WriteR2BSPFile()
    writes a r1 bsp file
 */
-void WriteR1BSPFile(const char* filename) {
-    rbspHeader_t header{};
+void WriteR1BSPFile(const char *filename) {
+    rbspHeader_t  header {};
 
     // Set up header
     memcpy(header.ident, g_game->bspIdent, 4);
@@ -47,7 +46,7 @@ void WriteR1BSPFile(const char* filename) {
     header.lumps[0x53].lumpVer = 1;
 
     // write initial header
-    FILE* file = SafeOpenWrite(filename);
+    FILE *file = SafeOpenWrite(filename);
     SafeWrite(file, &header, sizeof(header));
 
     {
@@ -80,18 +79,18 @@ void WriteR1BSPFile(const char* filename) {
     {
         header.lumps[R1_LUMP_GAME_LUMP].offset = ftell(file);
         header.lumps[R1_LUMP_GAME_LUMP].length = sizeof(Titanfall::GameLumpHeader_t)
-                                                 + sizeof(Titanfall::GameLumpPathHeader_t)
-                                                 + sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPathHeader.numPaths
-                                                 + sizeof(Titanfall::GameLumpPropHeader_t)
-                                                 + sizeof(Titanfall::GameLumpProp_t) * Titanfall::Bsp::gameLumpPropHeader.numProps
-                                                 + sizeof(Titanfall::GameLumpUnknownHeader_t);
+                                               + sizeof(Titanfall::GameLumpPathHeader_t)
+                                               + sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPathHeader.numPaths
+                                               + sizeof(Titanfall::GameLumpPropHeader_t)
+                                               + sizeof(Titanfall::GameLumpProp_t) * Titanfall::Bsp::gameLumpPropHeader.numProps
+                                               + sizeof(Titanfall::GameLumpUnknownHeader_t);
 
         Titanfall::Bsp::gameLumpHeader.offset = ftell(file) + sizeof(Titanfall::GameLumpHeader_t);
         Titanfall::Bsp::gameLumpHeader.length = sizeof(Titanfall::GameLumpPathHeader_t)
-                                                 + sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPathHeader.numPaths
-                                                 + sizeof(Titanfall::GameLumpPropHeader_t)
-                                                 + sizeof(Titanfall::GameLumpProp_t) * Titanfall::Bsp::gameLumpPropHeader.numProps
-                                                 + sizeof(Titanfall::GameLumpUnknownHeader_t);
+                                              + sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPathHeader.numPaths
+                                              + sizeof(Titanfall::GameLumpPropHeader_t)
+                                              + sizeof(Titanfall::GameLumpProp_t) * Titanfall::Bsp::gameLumpPropHeader.numProps
+                                              + sizeof(Titanfall::GameLumpUnknownHeader_t);
 
         SafeWrite(file, &Titanfall::Bsp::gameLumpHeader, sizeof(Titanfall::GameLumpHeader_t));
         SafeWrite(file, &Titanfall::Bsp::gameLumpPathHeader, sizeof(Titanfall::GameLumpPathHeader_t));
@@ -150,8 +149,8 @@ void CompileR1BSPFile() {
 
     for (std::size_t entityNum = 0; entityNum < entities.size(); ++entityNum) {
         // Get entity
-        entity_t& entity = entities[entityNum];
-        const char* classname = entity.classname();
+        entity_t &entity = entities[entityNum];
+        const char *classname = entity.classname();
 
         Titanfall::EmitEntity(entity);
 
@@ -171,10 +170,10 @@ void CompileR1BSPFile() {
 
     Titanfall::EmitEntityPartitions();
 
-	Shared::MakeVisReferences();
-	Shared::visRoot = Shared::MakeVisTree(Shared::visRefs, 1e30f);
-	Shared::MergeVisTree(Shared::visRoot);
-	Titanfall::EmitVisTree();
+    Shared::MakeVisReferences();
+    Shared::visRoot = Shared::MakeVisTree(Shared::visRefs, 1e30f);
+    Shared::MergeVisTree(Shared::visRoot);
+    Titanfall::EmitVisTree();
 
     Titanfall::EmitLevelInfo();
 
@@ -258,7 +257,7 @@ void Titanfall::EmitEntity(const entity_t &e) {
     // write
     StringOutputStream  data;
     data << "{\n";
-    for (const epair_t& pair : e2.epairs) {  // e2 to get editorclass changes
+    for (const epair_t &pair : e2.epairs) {  // e2 to get editorclass changes
         data << "\"" << pair.key.c_str() << "\" \"" << pair.value.c_str() << "\"\n";
     }
     data << "}\n";
@@ -295,43 +294,42 @@ void Titanfall::EmitEntity(const entity_t &e) {
     EmitTriggerBrushPlaneKeyValues()
     Emits brush planes as keyvalues because respawn
 */
-void Titanfall::EmitTriggerBrushPlaneKeyValues( entity_t &e ) {
-    MinMax minmax;
-    std::size_t b = 0;
-    for ( const brush_t &brush : e.brushes ) {
-        minmax.extend( brush.minmax );
+void Titanfall::EmitTriggerBrushPlaneKeyValues(entity_t &e) {
+    MinMax  minmax;
+    std::size_t  b = 0;
+    for (const brush_t &brush : e.brushes) {
+        minmax.extend(brush.minmax);
 
         for (std::size_t s = 0; s < brush.sides.size(); s++) {
-
             const side_t &side = brush.sides.at(s);
-            StringOutputStream key;
+            StringOutputStream  key;
             key << "*trigger_brush_" << b << "_plane_" << s;
 
-            StringOutputStream value;
+            StringOutputStream  value;
             value << side.plane.a << " " << side.plane.b << " " << side.plane.c << " " << side.plane.d;
 
-            e.setKeyValue( key.c_str(), value.c_str() );
+            e.setKeyValue(key.c_str(), value.c_str());
         }
         b++;
     }
 
     {
-        StringOutputStream key;
+        StringOutputStream  key;
         key << "*trigger_bounds_mins";
 
-        StringOutputStream value;
+        StringOutputStream  value;
         value << minmax.mins.x() << " " << minmax.mins.y() << " " << minmax.mins.z();
 
-        e.setKeyValue( key.c_str(), value.c_str() );
+        e.setKeyValue(key.c_str(), value.c_str());
     }
     {
-        StringOutputStream key;
+        StringOutputStream  key;
         key << "*trigger_bounds_maxs";
 
-        StringOutputStream value;
+        StringOutputStream  value;
         value << minmax.maxs.x() << " " << minmax.maxs.y() << " " << minmax.maxs.z();
 
-        e.setKeyValue( key.c_str(), value.c_str() );
+        e.setKeyValue(key.c_str(), value.c_str());
     }
 }
 
@@ -341,8 +339,8 @@ void Titanfall::EmitTriggerBrushPlaneKeyValues( entity_t &e ) {
     Emits texture data and returns its index
 */
 uint32_t Titanfall::EmitTextureData(shaderInfo_t shader) {
-    std::string tex = shader.shader.c_str();
-    std::size_t index;
+    std::string  tex = shader.shader.c_str();
+    std::size_t  index;
 
     // Strip 'textures/'
     tex.erase(tex.begin(), tex.begin() + strlen("textures/"));
@@ -368,9 +366,9 @@ uint32_t Titanfall::EmitTextureData(shaderInfo_t shader) {
     index = Titanfall::Bsp::textureData.size();
 
     // Add to Table
-    StringOutputStream data;
+    StringOutputStream  data;
     data << tex.c_str();
-    std::vector<char> str = { data.begin(), data.end() + 1 };
+    std::vector<char>  str = { data.begin(), data.end() + 1 };
 
     Titanfall::Bsp::textureDataTable.emplace_back(Titanfall::Bsp::textureDataData.size());
     Titanfall::Bsp::textureDataData.insert(Titanfall::Bsp::textureDataData.end(), str.begin(), str.end());
@@ -454,7 +452,7 @@ void Titanfall::EndModel() {
     Writes entitiy partitions respawn uses
 */
 void Titanfall::EmitEntityPartitions() {
-    std::string partitions = "01*";
+    std::string  partitions = "01*";
 
     if (Titanfall::Ent::env.size()) {
         partitions += " env";
@@ -481,139 +479,143 @@ void Titanfall::EmitEntityPartitions() {
 
 
 /*
-	EmitObjReferences
-	Emits obj references and returns an index to the first one
+    EmitObjReferences
+    Emits obj references and returns an index to the first one
 */
-std::size_t Titanfall::EmitObjReferences( Shared::visNode_t &node ) {
-	// Stores which indicies were found
-	std::list<std::size_t> indicies;
-	// Try to check for duplicates
-	for ( Shared::visRef_t &ref : node.refs ) {
-		for( std::size_t i = 0; i < Titanfall::Bsp::objReferences.size(); i++) {
-			uint16_t &tf = Titanfall::Bsp::objReferences.at(i);
-			if( tf == ref.index )
-				indicies.push_back(i);
-		}
-	}
-	indicies.sort();
+std::size_t Titanfall::EmitObjReferences(Shared::visNode_t &node) {
+    // Stores which indicies were found
+    std::list<std::size_t>  indicies;
+    // Try to check for duplicates
+    for (Shared::visRef_t &ref : node.refs) {
+        for (std::size_t i = 0; i < Titanfall::Bsp::objReferences.size(); i++) {
+            uint16_t &tf = Titanfall::Bsp::objReferences.at(i);
+            if (tf == ref.index) {
+                indicies.push_back(i);
+            }
+        }
+    }
+    indicies.sort();
 
-	// We found all, now check if they're next to each other
-	if( indicies.size() == node.refs.size() ) {
-		std::size_t lastIndex = -1;
-		for( std::size_t &i : indicies ) {
-			if( lastIndex == -1 ) {
-				lastIndex = i;
-				continue;
-			}
-			
-			if( i != lastIndex + 1 ) {
-				lastIndex = -1;
-				break;
-			}
-		}
+    // We found all, now check if they're next to each other
+    if (indicies.size() == node.refs.size()) {
+        std::size_t  lastIndex = -1;
+        for (std::size_t &i : indicies) {
+            if (lastIndex == -1) {
+                lastIndex = i;
+                continue;
+            }
 
-		if( lastIndex != -1 ) {
-			return indicies.front();
-		}
-	}
+            if (i != lastIndex + 1) {
+                lastIndex = -1;
+                break;
+            }
+        }
 
+        if (lastIndex != -1) {
+            return indicies.front();
+        }
+    }
 
-	for( Shared::visRef_t& ref : node.refs ) {
-		Titanfall::ObjReferenceBounds_t& rb = Titanfall::Bsp::objReferenceBounds.emplace_back();
-		rb.maxs = ref.minmax.maxs;
-		rb.mins = ref.minmax.mins;
+    for (Shared::visRef_t &ref : node.refs) {
+        Titanfall::ObjReferenceBounds_t &rb = Titanfall::Bsp::objReferenceBounds.emplace_back();
+        rb.maxs = ref.minmax.maxs;
+        rb.mins = ref.minmax.mins;
 
-		Titanfall::Bsp::objReferences.emplace_back(ref.index);
-	}
-	
+        Titanfall::Bsp::objReferences.emplace_back(ref.index);
+    }
 
-	return Titanfall::Bsp::objReferences.size() - node.refs.size();
+    return Titanfall::Bsp::objReferences.size() - node.refs.size();
 }
 
+
 /*
-	GetTotalVisRefCount
-	Calculates the total number of obj refs under a vistree node
+    GetTotalVisRefCount
+    Calculates the total number of obj refs under a vistree node
 */
-uint16_t GetTotalVisRefCount( Shared::visNode_t node ) {
-	uint16_t count = node.refs.size();
+uint16_t GetTotalVisRefCount(Shared::visNode_t node) {
+    uint16_t  count = node.refs.size();
 
-	for ( Shared::visNode_t& n : node.children )
-		count += GetTotalVisRefCount( n );
+    for (Shared::visNode_t &n : node.children) {
+        count += GetTotalVisRefCount(n);
+    }
 
-	return count;
+    return count;
 }
 
+
 /*
-	GetTotalVisNodeChildCount
-	Calculates the total child count of node
+    GetTotalVisNodeChildCount
+    Calculates the total child count of node
 */
-uint16_t GetTotalVisNodeChildCount( Shared::visNode_t node ) {
-	uint16_t count = node.children.size();
+uint16_t GetTotalVisNodeChildCount(Shared::visNode_t node) {
+    uint16_t  count = node.children.size();
 
-	for ( Shared::visNode_t& n : node.children )
-		count += GetTotalVisNodeChildCount( n );
+    for (Shared::visNode_t &n : node.children) {
+        count += GetTotalVisNodeChildCount(n);
+    }
 
-	return count;
+    return count;
 }
 
+
 /*
-	EmitVisChildrenOfTreeNode
-	Emits children of a vis tree node
+    EmitVisChildrenOfTreeNode
+    Emits children of a vis tree node
 */
-int Titanfall::EmitVisChildrenOfTreeNode( Shared::visNode_t node ) {
-	int index = Titanfall::Bsp::cellAABBNodes.size(); // Index of first child of node
+int Titanfall::EmitVisChildrenOfTreeNode(Shared::visNode_t node) {
+    int  index = Titanfall::Bsp::cellAABBNodes.size();  // Index of first child of node
 
-	for( std::size_t i = 0; i < node.children.size(); i++ ) {
-		Shared::visNode_t &n = node.children.at( i );
+    for (std::size_t i = 0; i < node.children.size(); i++) {
+        Shared::visNode_t &n = node.children.at(i);
 
-		Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
-		bn.maxs = n.minmax.maxs;
-		bn.mins = n.minmax.mins;
-		bn.childCount = n.children.size();
-		bn.totalRefCount = GetTotalVisRefCount( n );
+        Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
+        bn.maxs = n.minmax.maxs;
+        bn.mins = n.minmax.mins;
+        bn.childCount = n.children.size();
+        bn.totalRefCount = GetTotalVisRefCount(n);
 
-		if (n.refs.size())
-		{
-			bn.objRef = Titanfall::EmitObjReferences(n);
-			bn.objRefCount = n.refs.size();
-		}
-	}
-	
-	for( std::size_t i = 0; i < node.children.size(); i++ ) {
-		int firstChild = EmitVisChildrenOfTreeNode( node.children.at( i ) );
+        if (n.refs.size()) {
+            bn.objRef = Titanfall::EmitObjReferences(n);
+            bn.objRefCount = n.refs.size();
+        }
+    }
 
-		Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.at( index + i );
-		bn.firstChild = firstChild;
-	}
+    for (std::size_t i = 0; i < node.children.size(); i++) {
+        int  firstChild = EmitVisChildrenOfTreeNode(node.children.at(i));
 
-	return index;
+        Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.at(index + i);
+        bn.firstChild = firstChild;
+    }
+
+    return index;
 }
 
+
 /*
-	EmitVisTree
-	Emits vistree 
+    EmitVisTree
+    Emits vistree
 */
 void Titanfall::EmitVisTree() {
-	Shared::visNode_t &root = Shared::visRoot;
+    Shared::visNode_t &root = Shared::visRoot;
 
-	Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
-	bn.maxs = root.minmax.maxs;
-	bn.mins = root.minmax.mins;
-	bn.firstChild = Titanfall::Bsp::cellAABBNodes.size();
-	bn.childCount = root.children.size();
-	bn.totalRefCount = GetTotalVisRefCount( root );
-	if ( root.refs.size() )
-	{
-		bn.objRef = EmitObjReferences( root );
-		bn.objRefCount = root.refs.size();
-	}
+    Titanfall::CellAABBNode_t &bn = Titanfall::Bsp::cellAABBNodes.emplace_back();
+    bn.maxs = root.minmax.maxs;
+    bn.mins = root.minmax.mins;
+    bn.firstChild = Titanfall::Bsp::cellAABBNodes.size();
+    bn.childCount = root.children.size();
+    bn.totalRefCount = GetTotalVisRefCount(root);
+    if (root.refs.size()) {
+        bn.objRef = EmitObjReferences(root);
+        bn.objRefCount = root.refs.size();
+    }
 
-	EmitVisChildrenOfTreeNode( Shared::visRoot );
+    EmitVisChildrenOfTreeNode(Shared::visRoot);
 }
 
+
 /*
-	EmitVertexUnlit
-	Saves a vertex into Titanfall::Bsp::vertexUnlitVertices
+    EmitVertexUnlit
+    Saves a vertex into Titanfall::Bsp::vertexUnlitVertices
 */
 void Titanfall::EmitVertexUnlit(Shared::Vertex_t &vertex) {
     Titanfall::VertexUnlit_t &ul = Titanfall::Bsp::vertexUnlitVertices.emplace_back();
@@ -676,33 +678,39 @@ void Titanfall::EmitVertexBlinnPhong(Shared::Vertex_t &vertex) {
     writes the mesh list to the bsp
 */
 void Titanfall::EmitMeshes(const entity_t &e) {
-    for (const Shared::Mesh_t &mesh : Shared::meshes) {
-        Titanfall::Mesh_t &bm = Titanfall::Bsp::meshes.emplace_back();
-        bm.const0 = 4294967040;  // :)
-        bm.flags = mesh.shaderInfo->surfaceFlags;
-        bm.firstVertex = Titanfall::Bsp::vertexLitBumpVertices.size();
-        bm.vertexCount = mesh.vertices.size();
-        bm.triOffset = Titanfall::Bsp::meshIndices.size();
-        bm.triCount = mesh.triangles.size() / 3;
+    // ALSO: TextureData, TextureDataStringData, TextureDataStringTable, MaterialSort,
+    // -- VertexReservedX, Vertices, VertexNormals & MeshBounds
+    // NOTE: we don't actually build meshes from const entity_t &e
+    // -- Shared::meshes has every mesh from brushes & patches built & merged before EmitMeshes get called
 
-        // Emit textrue related structs
-        uint32_t textureIndex = Titanfall::EmitTextureData(*mesh.shaderInfo);
-        bm.materialOffset = Titanfall::EmitMaterialSort(textureIndex);
-        MinMax aabb;
+    // Emit Bsp::meshes
+    for (const Shared::Mesh_t &mesh : Shared::meshes) {
+        Titanfall::Mesh_t &m = Titanfall::Bsp::meshes.emplace_back();
+        m.const0 = 4294967040;  // :)
+        m.flags = mesh.shaderInfo->surfaceFlags;
+        m.firstVertex = Titanfall::Bsp::vertexLitBumpVertices.size();
+        m.vertexCount = mesh.vertices.size();
+        m.triOffset = Titanfall::Bsp::meshIndices.size();
+        m.triCount = mesh.triangles.size() / 3;
+        // TODO: vertexType from mesh.shaderInfo->surfaceFlags?
+
+        // Emit texture related structs
+        uint32_t  textureIndex = Titanfall::EmitTextureData(*mesh.shaderInfo);
+        m.materialOffset = Titanfall::EmitMaterialSort(textureIndex);
+        MinMax  aabb;
 
         // Save vertices and vertexnormals
         for (std::size_t i = 0; i < mesh.vertices.size(); i++) {
-            Shared::Vertex_t vertex = mesh.vertices.at(i);
+            Shared::Vertex_t  vertex = mesh.vertices.at(i);
 
-            // Check against aabb
             aabb.extend(vertex.xyz);
 
-            if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) {
+            if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) {
+                Titanfall::EmitVertexUnlitTS(vertex);
+            } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) {
                 Titanfall::EmitVertexLitBump(vertex);
             } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) {
                 Titanfall::EmitVertexUnlit(vertex);
-            } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) {
-                Titanfall::EmitVertexUnlitTS(vertex);
             } else {
                 Titanfall::EmitVertexLitFlat(vertex);
             }
@@ -711,50 +719,54 @@ void Titanfall::EmitMeshes(const entity_t &e) {
         // Save triangles
         for (uint16_t triangle : mesh.triangles) {
             uint32_t totalVertices = 0;
-            if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) {
+            if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) {
+                totalVertices = Titanfall::Bsp::vertexUnlitTSVertices.size();
+            } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) {
                 totalVertices = Titanfall::Bsp::vertexLitBumpVertices.size();
             } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) {
                 totalVertices = Titanfall::Bsp::vertexUnlitVertices.size();
-            } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) {
-                totalVertices = Titanfall::Bsp::vertexUnlitTSVertices.size();
             } else {
                 totalVertices = Titanfall::Bsp::vertexLitFlatVertices.size();
             }
 
+            // match emitted vertices to current base mesh
             for (uint32_t j = 0; j < totalVertices; j++) {
-                uint32_t vertexIndex = 0;
-                uint32_t normalIndex = 0;
+                uint32_t  vertexIndex;
+                uint32_t  normalIndex;
+                Vector2   uv0;
 
-                if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) {
+                if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) {
+                    vertexIndex = Titanfall::Bsp::vertexUnlitTSVertices.at(j).vertexIndex;
+                    normalIndex = Titanfall::Bsp::vertexUnlitTSVertices.at(j).normalIndex;
+                    uv0 = Titanfall::Bsp::vertexUnlitTSVertices.at(j).uv0;
+                } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) {
                     vertexIndex = Titanfall::Bsp::vertexLitBumpVertices.at(j).vertexIndex;
                     normalIndex = Titanfall::Bsp::vertexLitBumpVertices.at(j).normalIndex;
+                    uv0 = Titanfall::Bsp::vertexLitBumpVertices.at(j).uv0;
                 } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) {
                     vertexIndex = Titanfall::Bsp::vertexUnlitVertices.at(j).vertexIndex;
                     normalIndex = Titanfall::Bsp::vertexUnlitVertices.at(j).normalIndex;
-                } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) {
-                    vertexIndex = Titanfall::Bsp::vertexUnlitTSVertices.at(j).vertexIndex;
-                    normalIndex = Titanfall::Bsp::vertexUnlitTSVertices.at(j).normalIndex;
+                    uv0 = Titanfall::Bsp::vertexUnlitVertices.at(j).uv0;
                 } else {
                     vertexIndex = Titanfall::Bsp::vertexLitFlatVertices.at(j).vertexIndex;
                     normalIndex = Titanfall::Bsp::vertexLitFlatVertices.at(j).normalIndex;
+                    uv0 = Titanfall::Bsp::vertexLitFlatVertices.at(j).uv0;
                 }
 
-                if (!VectorCompare(Titanfall::Bsp::vertices.at(vertexIndex), mesh.vertices.at(triangle).xyz)) {
-                    continue;
+                if (!VectorCompare(Titanfall::Bsp::vertices.at(vertexIndex), mesh.vertices.at(triangle).xyz)
+                 || !VectorCompare(Titanfall::Bsp::vertexNormals.at(normalIndex), mesh.vertices.at(triangle).normal)
+                 || !vector2_equal_epsilon(uv0, mesh.vertices.at(triangle).st, 1e-4f)) {
+                    continue;  // this vertex doesn't match, on to the next
                 }
 
-                if (!VectorCompare(Titanfall::Bsp::vertexNormals.at(normalIndex), mesh.vertices.at(triangle).normal)) {
-                    continue;
-                }
-
-                uint16_t& index = Titanfall::Bsp::meshIndices.emplace_back();
+                uint16_t &index = Titanfall::Bsp::meshIndices.emplace_back();
                 index = j;
                 break;
             }
         }
 
         // Save MeshBounds
-        Titanfall::MeshBounds_t& mb = Titanfall::Bsp::meshBounds.emplace_back();
+        Titanfall::MeshBounds_t &mb = Titanfall::Bsp::meshBounds.emplace_back();
         mb.origin = (aabb.maxs + aabb.mins) / 2;
         mb.extents = (aabb.maxs - aabb.mins) / 2;
     }
@@ -802,7 +814,7 @@ void Titanfall::EmitCollisionGrid() {
         scale = scale < 256 ? 256 : scale;
     }
 
-    Titanfall::CMGrid_t& grid = Titanfall::Bsp::cmGrid.emplace_back();
+    Titanfall::CMGrid_t &grid = Titanfall::Bsp::cmGrid.emplace_back();
     grid.scale = scale;
     grid.xOffset = floor(Titanfall::Bsp::models[0].minmax.mins.x() / grid.scale) - 1;
     grid.yOffset = floor(Titanfall::Bsp::models[0].minmax.mins.y() / grid.scale) - 1;
@@ -833,7 +845,7 @@ void Titanfall::EmitCollisionGrid() {
             //            cellMinmax.mins.x(), cellMinmax.mins.y(), cellMinmax.mins.z(),
             //            cellMinmax.maxs.x(), cellMinmax.maxs.y(), cellMinmax.maxs.z());
 
-            Titanfall::CMGridCell_t& cell = Titanfall::Bsp::cmGridCells.emplace_back();
+            Titanfall::CMGridCell_t &cell = Titanfall::Bsp::cmGridCells.emplace_back();
             cell.start = Titanfall::Bsp::cmGeoSets.size();
 
             // Check brushes
@@ -849,13 +861,13 @@ void Titanfall::EmitCollisionGrid() {
                     continue;
                 }
 
-                Titanfall::CMGeoSet_t& set = Titanfall::Bsp::cmGeoSets.emplace_back();
+                Titanfall::CMGeoSet_t &set = Titanfall::Bsp::cmGeoSets.emplace_back();
                 set.straddleGroup = 0;
                 set.primitiveCount = 1;
                 set.unknown2 = 0;
                 set.collisionShapeIndex = index;
 
-                Titanfall::CMBound_t& bound = Titanfall::Bsp::cmGeoSetBounds.emplace_back();
+                Titanfall::CMBound_t &bound = Titanfall::Bsp::cmGeoSetBounds.emplace_back();
                 bound.unknown1 = 128;
                 bound.origin = brush.origin;
                 // The + 1.0f fixes the infinitely falling in one place while touching a floor bug
@@ -868,7 +880,7 @@ void Titanfall::EmitCollisionGrid() {
 
     // Make GridCells for Models, why respawn ?
     for (Titanfall::Model_t &model : Titanfall::Bsp::models) {
-        Titanfall::CMGridCell_t& cell = Titanfall::Bsp::cmGridCells.emplace_back();
+        Titanfall::CMGridCell_t &cell = Titanfall::Bsp::cmGridCells.emplace_back();
         cell.start = Titanfall::Bsp::cmGeoSets.size();
         cell.count = 0;
     }
@@ -879,10 +891,10 @@ void Titanfall::EmitCollisionGrid() {
     EmitBrushes()
     Emits brushes of entity into bsp
 */
-void Titanfall::EmitBrushes(const entity_t& e) {
+void Titanfall::EmitBrushes(const entity_t &e) {
     uint16_t index = 0;
-    for (const brush_t& brush : e.brushes) {
-        Titanfall::CMBrush_t& b = Titanfall::Bsp::cmBrushes.emplace_back();
+    for (const brush_t &brush : e.brushes) {
+        Titanfall::CMBrush_t &b = Titanfall::Bsp::cmBrushes.emplace_back();
 
         b.extents = (brush.minmax.maxs - brush.minmax.mins) / 2;
         b.origin = brush.minmax.maxs - b.extents;
@@ -890,8 +902,8 @@ void Titanfall::EmitBrushes(const entity_t& e) {
         b.planeCount = 0;
         b.unknown = 0;
 
-        std::vector<side_t> axialSides;
-        std::vector<side_t> cuttingSides;
+        std::vector<side_t>  axialSides;
+        std::vector<side_t>  cuttingSides;
         // +X -X +Y -Y +Z -Z
         bool axials[6];
         // The bsp brushes are AABBs + cutting planes
@@ -958,7 +970,7 @@ void Titanfall::EmitBrushes(const entity_t& e) {
             Titanfall::EmitPlane(side.plane);
             b.planeCount++;
             Titanfall::Bsp::cmBrushSideProperties.emplace_back(1);
-            uint16_t& so = Titanfall::Bsp::cmBrushSidePlaneOffsets.emplace_back();
+            uint16_t &so = Titanfall::Bsp::cmBrushSidePlaneOffsets.emplace_back();
             so = 0;
         }
 
@@ -986,36 +998,35 @@ void Titanfall::EmitPlane(const Plane3 &plane) {
 void Titanfall::EmitLevelInfo() {
     Titanfall::LevelInfo_t &li = Titanfall::Bsp::levelInfo.emplace_back();
 
-    li.firstDecalMeshIndex = li.firstTransMeshIndex = li.firstSkyMeshIndex = 0;
-
+    // mesh counts
+#if 0  /* crashing, this didn't happen when we sorted meshes in Titanfall::EmitMeshes... */
     // TODO: Add decal support
-    for (Titanfall::Mesh_t &mesh : Titanfall::Bsp::meshes) {
-        // if (mesh.flags & S_SKY) {
-        //     break;
-        // }
-
+    li.firstDecalMeshIndex = 0;
+    for (Shared::Mesh_t &mesh : Shared::meshes) {  // same indices as Titanfall::Bsp::meshes, more metadata
+        if (mesh.shaderInfo->compileFlags & C_DECAL) { break; }
         li.firstDecalMeshIndex++;
     }
 
+    // TODO: start from firstDecalMeshIndex
+    li.firstTransMeshIndex = 0;
     for (Titanfall::Mesh_t &mesh : Titanfall::Bsp::meshes) {
-        // if (mesh.flags & S_TRANSLUCENT) {
-        //     break;
-        // }
-
+        if (mesh.flags & S_TRANSLUCENT) { break; }
         li.firstTransMeshIndex++;
     }
 
+    // TODO: start from firstTransMeshIndex
+    li.firstSkyMeshIndex = 0;
     for (Titanfall::Mesh_t &mesh : Titanfall::Bsp::meshes) {
-        // TODO: game shits itself when this is uncommented and your mesh is at the beginning of the vector
-        //       Respawn probably sort their meshes by flags ?? VERIFY
-        // if (mesh.flags & S_SKY) {
-        //     break;
-        // }
-
+        if ((mesh.flags & S_SKY) || (mesh.flags & S_SKY_2D)) { break; }
         li.firstSkyMeshIndex++;
     }
+#else
+    li.firstDecalMeshIndex = li.firstTransMeshIndex = li.firstSkyMeshIndex = Shared::meshes.size();
+#endif
 
     li.propCount = Titanfall::Bsp::gameLumpPropHeader.numProps;
+    // TODO: unk2 sun vector from last light_environment
+    li.unk2 = { 0.1, 0.8, -0.6 };  // placeholder
 }
 
 
