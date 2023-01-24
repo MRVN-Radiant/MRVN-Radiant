@@ -701,9 +701,8 @@ void Titanfall::EmitMeshes(const entity_t &e) {
 
         // Save vertices and vertexnormals
         for (std::size_t i = 0; i < mesh.vertices.size(); i++) {
-            Shared::Vertex_t vertex = mesh.vertices.at(i);
+            Shared::Vertex_t  vertex = mesh.vertices.at(i);
 
-            // Check against aabb
             aabb.extend(vertex.xyz);
 
             if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) {
@@ -730,26 +729,34 @@ void Titanfall::EmitMeshes(const entity_t &e) {
                 totalVertices = Titanfall::Bsp::vertexLitFlatVertices.size();
             }
 
+            // match emitted vertices to current base mesh
             for (uint32_t j = 0; j < totalVertices; j++) {
-                uint32_t vertexIndex = 0;
-                uint32_t normalIndex = 0;
+                uint32_t  vertexIndex;
+                uint32_t  normalIndex;
+                Vector2   uv0;
+
                 if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) {
                     vertexIndex = Titanfall::Bsp::vertexUnlitTSVertices.at(j).vertexIndex;
                     normalIndex = Titanfall::Bsp::vertexUnlitTSVertices.at(j).normalIndex;
+                    uv0 = Titanfall::Bsp::vertexUnlitTSVertices.at(j).uv0;
                 } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) {
                     vertexIndex = Titanfall::Bsp::vertexLitBumpVertices.at(j).vertexIndex;
                     normalIndex = Titanfall::Bsp::vertexLitBumpVertices.at(j).normalIndex;
+                    uv0 = Titanfall::Bsp::vertexLitBumpVertices.at(j).uv0;
                 } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) {
                     vertexIndex = Titanfall::Bsp::vertexUnlitVertices.at(j).vertexIndex;
                     normalIndex = Titanfall::Bsp::vertexUnlitVertices.at(j).normalIndex;
+                    uv0 = Titanfall::Bsp::vertexUnlitVertices.at(j).uv0;
                 } else {
                     vertexIndex = Titanfall::Bsp::vertexLitFlatVertices.at(j).vertexIndex;
                     normalIndex = Titanfall::Bsp::vertexLitFlatVertices.at(j).normalIndex;
+                    uv0 = Titanfall::Bsp::vertexLitFlatVertices.at(j).uv0;
                 }
 
                 if (!VectorCompare(Titanfall::Bsp::vertices.at(vertexIndex), mesh.vertices.at(triangle).xyz)
-                 || !VectorCompare(Titanfall::Bsp::vertexNormals.at(normalIndex), mesh.vertices.at(triangle).normal)) {
-                    continue;
+                 || !VectorCompare(Titanfall::Bsp::vertexNormals.at(normalIndex), mesh.vertices.at(triangle).normal)
+                 || !vector2_equal_epsilon(uv0, mesh.vertices.at(triangle).st, 1e-4f)) {
+                    continue;  // this vertex doesn't match, on to the next
                 }
 
                 uint16_t &index = Titanfall::Bsp::meshIndices.emplace_back();

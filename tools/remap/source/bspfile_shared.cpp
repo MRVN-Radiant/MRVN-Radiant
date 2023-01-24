@@ -60,7 +60,7 @@ void Shared::MakeMeshes(const entity_t &e) {
             // Create triangles for side
             for (std::size_t i = 0; i < side.winding.size() - 2; i++) {
                 for (int j = 0; j < 3; j++) {
-                    int vert_index = j == 0 ? 0 : i + j;
+                    int vert_index = (j == 0) ? 0 : i + j;
                     mesh.triangles.emplace_back(vert_index);
                 }
             }
