@@ -160,8 +160,7 @@ void WriteR2BSPFile(const char *filename) {
    CompileR2BSPFile()
    Compiles a Titanfall 2 bsp file and sorts entities into ent files
 */
-void CompileR2BSPFile()
-{
+void CompileR2BSPFile() {
     for (entity_t &entity : entities) {
         const char *pszClassname = entity.classname();
 
@@ -172,6 +171,8 @@ void CompileR2BSPFile()
             Titanfall::BeginModel();
 
             Shared::MakeMeshes(entity);
+            Shared::MakeVisReferences();
+
             Titanfall::EmitMeshes(entity);
 
             Titanfall::EmitBrushes(entity);
@@ -183,10 +184,11 @@ void CompileR2BSPFile()
             // EmitProp(entity);
             continue; // Don't emit as entity
         } else {
+            // TODO: Some entities may not support keyvalue brush definitions, test
             if( g_bExternalModels ) {
                 Titanfall::EmitTriggerBrushPlaneKeyValues(entity);
             } else {
-                
+
             }
         }
 
@@ -195,21 +197,18 @@ void CompileR2BSPFile()
         #undef ENT_IS
     }
 
-    /* */
+    // Write entity partitions we used
     Titanfall::EmitEntityPartitions();
 
-    Titanfall::EmitCollisionGrid();
-
-    /* */
-    Shared::MakeVisReferences();
+    // Generate vis tree for worldspawn, we do this here as we'll need portals once we reverse further
     Shared::visRoot = Shared::MakeVisTree(Shared::visRefs, 1e30f);
     Shared::MergeVisTree(Shared::visRoot);
     Titanfall::EmitVisTree();
 
-    /* Emit LevelInfo */
+    // Emit level info
     Titanfall::EmitLevelInfo();
 
-    /* Generate unknown lumps */
+    // Emit lumps we dont generate yet, but need for the map to load
     Titanfall2::EmitStubs();
     Titanfall::EmitStubs();
 }

@@ -142,10 +142,9 @@ void WriteR1BSPFile(const char *filename) {
 
 /*
     CompileR1BSPFile
-    Compiles a v29 bsp file
+    Compiles a Titanfall 1 bsp file and sorts entition into ent files
 */
-void CompileR1BSPFile()
-{
+void CompileR1BSPFile() {
     Titanfall::SetupGameLump();
 
     for (entity_t &entity : entities) {
@@ -156,8 +155,9 @@ void CompileR1BSPFile()
         // Visible geo
         if (ENT_IS("worldspawn")) { // "worldspawn" is most of the map, should always be the 1st entity
             Titanfall::BeginModel();
-            // Generate bsp meshes from map brushes
+
             Shared::MakeMeshes(entity);
+            Shared::MakeVisReferences();
 
             Titanfall::EmitMeshes(entity);
 
@@ -171,17 +171,20 @@ void CompileR1BSPFile()
         #undef ENT_IS
     }
 
+    // Write entity partitions we used
     Titanfall::EmitEntityPartitions();
 
-    Shared::MakeVisReferences();
+    // Generate vis tree for worldspawn, we do this here as we'll need portals once we reverse further
     Shared::visRoot = Shared::MakeVisTree(Shared::visRefs, 1e30f);
     Shared::MergeVisTree(Shared::visRoot);
     Titanfall::EmitVisTree();
 
+    // Emit level info
     Titanfall::EmitLevelInfo();
 
     Titanfall::EmitCollisionGrid();
 
+    // Emit lumps we dont generate yet, but need for the map to load
     Titanfall::EmitStubs();
 }
 
