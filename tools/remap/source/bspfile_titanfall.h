@@ -233,14 +233,14 @@ namespace Titanfall {
     struct CMGeoSet_t {
         uint16_t  straddleGroup;
         uint16_t  primitiveCount;
-        uint32_t  unknown2 : 8;
+        uint32_t  uniqueContentsIndex : 8;
         uint32_t  collisionShapeIndex : 16;
         uint32_t  collisionShapeType : 8;
     };
 
     // 0x59
     struct CMPrimitive_t {
-        uint32_t  unknown2 : 8;
+        uint32_t  uniqueContentsIndex : 8;
         uint32_t  collisionShapeIndex : 16;
         uint32_t  collisionShapeType : 8;
     };
