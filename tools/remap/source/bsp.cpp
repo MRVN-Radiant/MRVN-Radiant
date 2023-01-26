@@ -606,10 +606,6 @@ int BSPMain( Args& args ){
 	const char *fileName = args.takeBack();
 	auto argsToInject = args.getVector();
 	{
-		while ( args.takeArg( "-onlyents" ) ) {
-			Sys_Printf( "Running entity-only compile\n" );
-			onlyents = true;
-		}
 		while ( args.takeArg( "-tempname" ) ) {
 			strcpy( tempSource, args.takeNext() );
 		}
@@ -816,6 +812,21 @@ int BSPMain( Args& args ){
 		{
 			Sys_Warning( "Unknown option \"%s\"\n", args.takeFront() );
 		}
+
+		// Remap args
+		while ( args.takeArg( "-onlyents" ) ) {
+			Sys_Printf( "Running entity-only compile\n" );
+			onlyents = true;
+		}
+		while ( args.takeArg( "-externalmodels" ) ) {
+			Sys_Printf( "External models enabled\n" );
+			g_bExternalModels = true;
+		}
+	}
+
+	// Check arg game compatibility
+	if(strncmp(g_game->arg, "titanfallonline", 16) == 0 && g_bExternalModels) {
+		Sys_Warning( "Game: \"titanfallonline\" doesn't support the \"-externalmodels\" flag!\n" );
 	}
 
 	/* copy source name */

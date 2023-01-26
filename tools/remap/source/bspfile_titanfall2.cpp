@@ -183,7 +183,11 @@ void CompileR2BSPFile()
             // EmitProp(entity);
             continue; // Don't emit as entity
         } else {
-            Titanfall::EmitTriggerBrushPlaneKeyValues(entity);
+            if( g_bExternalModels ) {
+                Titanfall::EmitTriggerBrushPlaneKeyValues(entity);
+            } else {
+                
+            }
         }
 
         Titanfall::EmitEntity(entity);
