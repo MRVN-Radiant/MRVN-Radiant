@@ -864,7 +864,7 @@ void Titanfall::EmitCollisionGrid() {
                 Titanfall::CMGeoSet_t &set = Titanfall::Bsp::cmGeoSets.emplace_back();
                 set.straddleGroup = 0;
                 set.primitiveCount = 1;
-                set.unknown2 = 0;
+                set.uniqueContentsIndex = 0;
                 set.collisionShapeIndex = index;
 
                 Titanfall::CMBound_t &bound = Titanfall::Bsp::cmGeoSetBounds.emplace_back();
