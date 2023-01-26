@@ -144,18 +144,17 @@ void WriteR1BSPFile(const char *filename) {
     CompileR1BSPFile
     Compiles a v29 bsp file
 */
-void CompileR1BSPFile() {
+void CompileR1BSPFile()
+{
     Titanfall::SetupGameLump();
 
-    for (std::size_t entityNum = 0; entityNum < entities.size(); ++entityNum) {
-        // Get entity
-        entity_t &entity = entities[entityNum];
-        const char *classname = entity.classname();
+    for (entity_t &entity : entities) {
+        const char *pszClassname = entity.classname();
 
-        Titanfall::EmitEntity(entity);
+        #define ENT_IS(classname) striEqual(pszClassname, classname)
 
         // Visible geo
-        if (striEqual(classname, "worldspawn")) {
+        if (ENT_IS("worldspawn")) { // "worldspawn" is most of the map, should always be the 1st entity
             Titanfall::BeginModel();
             // Generate bsp meshes from map brushes
             Shared::MakeMeshes(entity);
@@ -166,6 +165,10 @@ void CompileR1BSPFile() {
 
             Titanfall::EndModel();
         }
+
+        Titanfall::EmitEntity(entity);
+
+        #undef ENT_IS
     }
 
     Titanfall::EmitEntityPartitions();
