@@ -97,6 +97,9 @@ struct MinMax___
 	BasicVector3<T> origin() const {
 		return ( mins + maxs ) * 0.5;
 	}
+	BasicVector3<T> extents() const {
+		return ( maxs - mins ) * 0.5;
+	}
 };
 
 using MinMax = MinMax___<float>;
