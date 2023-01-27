@@ -367,4 +367,14 @@ CLIENTS spawnflag must be set
 -------- NOTES --------
 </group>
 
+<!--
+=============================================================================
+ Func_brush Ents
+=============================================================================
+-->
+
+<group name="func_brush" color="1 0 1">
+<string key="script_name" name="script_name">New in Titanfall; TODO: identify</string>
+</group>
+
 </classes>
