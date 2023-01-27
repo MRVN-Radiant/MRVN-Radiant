@@ -18,7 +18,7 @@ void CompileR1BSPFile();
 
 namespace Titanfall {
     void         SetupGameLump();
-    void         BeginModel();
+    void         BeginModel(entity_t &entity);
     void         EndModel();
     void         EmitEntity(const entity_t &e);
     void         EmitTriggerBrushPlaneKeyValues(entity_t &e);
@@ -38,6 +38,7 @@ namespace Titanfall {
     void         EmitVisTree();
     uint16_t     EmitMaterialSort(uint32_t index);
     void         EmitCollisionGrid(entity_t &e);
+    void         EmitModelGridCell(entity_t &e);
     void         EmitBrush(const brush_t &e);
     void         EmitGeoSet(MinMax minmax, int index);
     void         EmitLevelInfo();

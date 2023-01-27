@@ -155,7 +155,7 @@ void CompileR1BSPFile() {
 
         // Visible geo
         if (ENT_IS("worldspawn")) { // "worldspawn" is most of the map, should always be the 1st entity
-            Titanfall::BeginModel();
+            Titanfall::BeginModel(entity);
 
             Shared::MakeMeshes(entity);
             Shared::MakeVisReferences();
@@ -165,6 +165,18 @@ void CompileR1BSPFile() {
             Titanfall::EmitCollisionGrid(entity);
 
             Titanfall::EndModel();
+        } else if (ENT_IS("misc_model")) { // Compile as static props into gamelump
+            // TODO: use prop_static instead
+            // EmitProp(entity);
+            continue; // Don't emit as entity
+        } else {
+            if( entity.brushes.size() ) {
+                Titanfall::BeginModel(entity);
+                Shared::MakeMeshes(entity);
+                Titanfall::EmitMeshes(entity);
+                Titanfall::EmitModelGridCell(entity);
+                Titanfall::EndModel();
+            }
         }
 
         Titanfall::EmitEntity(entity);
@@ -431,9 +443,16 @@ void Titanfall::SetupGameLump() {
     BeginModel()
     Creates a new model entry
 */
-void Titanfall::BeginModel() {
+void Titanfall::BeginModel(entity_t &entity) {
     Titanfall::Model_t &model = Titanfall::Bsp::models.emplace_back();
     model.firstMesh = (uint32_t)Titanfall::Bsp::meshes.size();
+
+    StringOutputStream ss;
+    ss << "*" << Titanfall::Bsp::models.size() - 1;
+
+    if( entity.mapEntityNum != 0 ) {
+        entity.setKeyValue("model", ss.c_str());
+    }
 }
 
 
@@ -910,6 +929,32 @@ void Titanfall::EmitCollisionGrid( entity_t &e ) {
 
     for( std::size_t i = 0; i < modelBrushes.size(); i++ ) {
         Titanfall::CMBrush_t &brush = Titanfall::Bsp::cmBrushes.at(gridBrushes.size() + i);
+
+        MinMax brushMinmax;
+        brushMinmax.mins = brush.origin - brush.extents;
+        brushMinmax.maxs = brush.origin + brush.extents;
+
+        Titanfall::EmitGeoSet(brushMinmax, brush.index);
+    }
+
+    cell.count = Titanfall::Bsp::cmGeoSets.size() - cell.start;
+}
+
+/*
+    EmitModelGridCell()
+    Emits brushes of entity into bsp
+*/
+void Titanfall::EmitModelGridCell( entity_t &e ) {
+    std::size_t offset = Titanfall::Bsp::cmBrushes.size();
+
+    for( brush_t &brush : e.brushes )
+        Titanfall::EmitBrush( brush );
+
+    Titanfall::CMGridCell_t &cell = Titanfall::Bsp::cmGridCells.emplace_back();
+    cell.start = Titanfall::Bsp::cmGeoSets.size();
+
+    for( std::size_t i = 0; i < e.brushes.size(); i++ ) {
+        Titanfall::CMBrush_t &brush = Titanfall::Bsp::cmBrushes.at(offset + i);
 
         MinMax brushMinmax;
         brushMinmax.mins = brush.origin - brush.extents;

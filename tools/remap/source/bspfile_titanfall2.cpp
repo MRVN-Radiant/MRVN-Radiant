@@ -168,7 +168,7 @@ void CompileR2BSPFile() {
 
         // NOTE: entities' classnames are editorclasses until we call EmitEntity
         if (ENT_IS("worldspawn")) { // "worldspawn" is most of the map, should always be the 1st entity
-            Titanfall::BeginModel();
+            Titanfall::BeginModel(entity);
 
             Shared::MakeMeshes(entity);
             Shared::MakeVisReferences();
@@ -188,7 +188,13 @@ void CompileR2BSPFile() {
             if( g_bExternalModels ) {
                 Titanfall::EmitTriggerBrushPlaneKeyValues(entity);
             } else {
-
+                if( entity.brushes.size() ) {
+                    Titanfall::BeginModel(entity);
+                    //Shared::MakeMeshes(entity);
+                    //Titanfall::EmitMeshes(entity);
+                    Titanfall::EmitModelGridCell(entity);
+                    Titanfall::EndModel();
+                }
             }
         }
 
