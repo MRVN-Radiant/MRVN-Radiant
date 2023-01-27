@@ -37,8 +37,9 @@ namespace Titanfall {
     int          EmitVisChildrenOfTreeNode(Shared::visNode_t node);
     void         EmitVisTree();
     uint16_t     EmitMaterialSort(uint32_t index);
-    void         EmitCollisionGrid();
-    void         EmitBrushes(const entity_t &e);
+    void         EmitCollisionGrid(entity_t &e);
+    void         EmitBrush(const brush_t &e);
+    void         EmitGeoSet(MinMax minmax, int index);
     void         EmitLevelInfo();
     void         EmitStubs();
     void         EmitExtraEntity(entity_t &e);
@@ -219,7 +220,7 @@ namespace Titanfall {
         int32_t   yOffset;
         int32_t   xCount;
         int32_t   yCount;
-        int32_t   unk2;
+        int32_t   straddleGroupCount;
         uint32_t  brushSidePlaneOffset;
     };
 

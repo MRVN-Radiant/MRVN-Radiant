@@ -13,6 +13,7 @@
 
 /* dependencies */
 #include "bspfile_abstract.h"
+#include <algorithm>
 #include <ctime>
 
 
@@ -161,7 +162,7 @@ void CompileR1BSPFile() {
 
             Titanfall::EmitMeshes(entity);
 
-            Titanfall::EmitBrushes(entity);
+            Titanfall::EmitCollisionGrid(entity);
 
             Titanfall::EndModel();
         }
@@ -181,8 +182,6 @@ void CompileR1BSPFile() {
 
     // Emit level info
     Titanfall::EmitLevelInfo();
-
-    Titanfall::EmitCollisionGrid();
 
     // Emit lumps we dont generate yet, but need for the map to load
     Titanfall::EmitStubs();
@@ -805,28 +804,56 @@ uint16_t Titanfall::EmitMaterialSort(uint32_t index) {
     EmitCollisionGrid()
     Emits brushes of entity into bsp
 */
-void Titanfall::EmitCollisionGrid() {
+void Titanfall::EmitCollisionGrid( entity_t &e ) {
+    std::vector<brush_t*> gridBrushes;
+    std::vector<brush_t*> modelBrushes;
+
+    MinMax gridSize;
+
+    // Sort brushes
+    for( brush_t &brush : e.brushes ) {
+        int skySides = 0;
+
+        for( const side_t &side : brush.sides ) {
+            if( side.bevel )
+                continue;
+
+            if( (side.shaderInfo->compileFlags & C_SKY) == C_SKY )
+                skySides++;
+        }
+
+        if( skySides ) {
+            modelBrushes.emplace_back( &brush );
+            continue;
+        }
+
+        gridBrushes.emplace_back( &brush );
+        gridSize.extend( brush.minmax );
+    }
+
+    Sys_Warning( "Grid brushes: %li\n", gridBrushes.size() );
+    Sys_Warning( "Model brushes: %li\n", modelBrushes.size() );
+
+    // Emit grid brushes
+    for( brush_t *brush : gridBrushes )
+        Titanfall::EmitBrush( *brush );
+
+
     // Worldspawn size
-    Vector3 size = Titanfall::Bsp::models[0].minmax.maxs - Titanfall::Bsp::models[0].minmax.mins;
+    Vector3 size = gridSize.maxs - gridSize.mins;
+
+     
 
     // Choose scale
     float scale = 256;
-    {
-        // 128 Is an arbitrary limit, I think there's one between 128 and 190 but havent tested much
-        float xScale = size.x() / 128;
-        float yScale = size.y() / 128;
-
-        scale = ceil(xScale > yScale ? xScale : yScale);
-        scale = scale < 256 ? 256 : scale;
-    }
 
     Titanfall::CMGrid_t &grid = Titanfall::Bsp::cmGrid.emplace_back();
     grid.scale = scale;
-    grid.xOffset = floor(Titanfall::Bsp::models[0].minmax.mins.x() / grid.scale) - 1;
-    grid.yOffset = floor(Titanfall::Bsp::models[0].minmax.mins.y() / grid.scale) - 1;
+    grid.xOffset = floor(gridSize.mins.x() / grid.scale) - 1;
+    grid.yOffset = floor(gridSize.mins.y() / grid.scale) - 1;
     grid.xCount = ceil(size.x() / grid.scale) + 2;
     grid.yCount = ceil(size.y() / grid.scale) + 2;
-    grid.unk2 = Titanfall::Bsp::cmBrushes.size();
+    grid.straddleGroupCount = 0;
     grid.brushSidePlaneOffset = 0;
 
     // Make GridCells
@@ -835,10 +862,10 @@ void Titanfall::EmitCollisionGrid() {
             MinMax cellMinmax;
             cellMinmax.mins = Vector3((x + grid.xOffset) * grid.scale,
                                       (y + grid.yOffset) * grid.scale,
-                                      Titanfall::Bsp::models[0].minmax.mins.z());
+                                       gridSize.mins.z());
             cellMinmax.maxs = Vector3((x + grid.xOffset + 1) * grid.scale,
                                       (y + grid.yOffset + 1) * grid.scale,
-                                      Titanfall::Bsp::models[0].minmax.maxs.z());
+                                       gridSize.maxs.z());
 
             // Sys_Printf("Worldspawn: %f %f %f : %f %f %f\n",
             //            Titanfall::Bsp::models[0].minmax.mins.x(),
@@ -867,126 +894,141 @@ void Titanfall::EmitCollisionGrid() {
                     continue;
                 }
 
-                Titanfall::CMGeoSet_t &set = Titanfall::Bsp::cmGeoSets.emplace_back();
-                set.straddleGroup = 0;
-                set.primitiveCount = 1;
-                set.uniqueContentsIndex = 0;
-                set.collisionShapeIndex = index;
-
-                Titanfall::CMBound_t &bound = Titanfall::Bsp::cmGeoSetBounds.emplace_back();
-                bound.unknown1 = 128;
-                bound.origin = brush.origin;
-                // The + 1.0f fixes the infinitely falling in one place while touching a floor bug
-                bound.extents = Vector3(brush.extents.x() + 1.0f, brush.extents.y() + 1.0f, brush.extents.z() + 1.0f);
+                Titanfall::EmitGeoSet(brushMinmax, brush.index);
             }
 
             cell.count = Titanfall::Bsp::cmGeoSets.size() - cell.start;
         }
     }
 
-    // Make GridCells for Models, why respawn ?
-    for (Titanfall::Model_t &model : Titanfall::Bsp::models) {
-        Titanfall::CMGridCell_t &cell = Titanfall::Bsp::cmGridCells.emplace_back();
-        cell.start = Titanfall::Bsp::cmGeoSets.size();
-        cell.count = 0;
+    // Emit model brushes
+    for( brush_t *brush : modelBrushes )
+        Titanfall::EmitBrush( *brush );
+
+    Titanfall::CMGridCell_t &cell = Titanfall::Bsp::cmGridCells.emplace_back();
+    cell.start = Titanfall::Bsp::cmGeoSets.size();
+
+    for( std::size_t i = 0; i < modelBrushes.size(); i++ ) {
+        Titanfall::CMBrush_t &brush = Titanfall::Bsp::cmBrushes.at(gridBrushes.size() + i);
+
+        MinMax brushMinmax;
+        brushMinmax.mins = brush.origin - brush.extents;
+        brushMinmax.maxs = brush.origin + brush.extents;
+
+        Titanfall::EmitGeoSet(brushMinmax, brush.index);
     }
+
+    cell.count = Titanfall::Bsp::cmGeoSets.size() - cell.start;
 }
 
+/*
+    EmitGeoSet()
+    Emits a geo set into bsp
+*/
+void Titanfall::EmitGeoSet(MinMax minmax, int index) {
+    Titanfall::CMGeoSet_t &set = Titanfall::Bsp::cmGeoSets.emplace_back();
+    set.straddleGroup = 0;
+    set.primitiveCount = 1;
+    set.uniqueContentsIndex = 0;
+    set.collisionShapeIndex = index;
+
+    Titanfall::CMBound_t &bound = Titanfall::Bsp::cmGeoSetBounds.emplace_back();
+    bound.unknown1 = 128;
+    bound.origin = minmax.origin();
+    // The + 1.0f fixes the infinitely falling in one place while touching a floor bug
+    bound.extents = Vector3(minmax.extents().x() + 2.0f, minmax.extents().y() + 2.0f, minmax.extents().z() + 2.0f);
+}
 
 /*
-    EmitBrushes()
-    Emits brushes of entity into bsp
+    EmitBrush()
+    Emits a brush into bsp
 */
-void Titanfall::EmitBrushes(const entity_t &e) {
-    uint16_t index = 0;
-    for (const brush_t &brush : e.brushes) {
-        Titanfall::CMBrush_t &b = Titanfall::Bsp::cmBrushes.emplace_back();
+void Titanfall::EmitBrush(const brush_t &brush) {
+    Titanfall::CMBrush_t &b = Titanfall::Bsp::cmBrushes.emplace_back();
 
-        b.extents = (brush.minmax.maxs - brush.minmax.mins) / 2;
-        b.origin = brush.minmax.maxs - b.extents;
-        b.index = index;
-        b.planeCount = 0;
-        b.unknown = 0;
+    b.extents = brush.minmax.extents();
+    b.origin = brush.minmax.origin();
+    b.index = Titanfall::Bsp::cmBrushes.size() - 1;
+    b.planeCount = 0;
+    b.unknown = 0;
 
-        std::vector<side_t>  axialSides;
-        std::vector<side_t>  cuttingSides;
-        // +X -X +Y -Y +Z -Z
-        bool axials[6];
-        // The bsp brushes are AABBs + cutting planes
-        // Surface flags are indexed first for AABB ( first 6 planes ) then for the rest
-        // Radiant brushes are made purely of planes so we dont have a guarantee that we'll get the
-        // Axial ones which define the AABB, that's why we first sort them
-        for (const side_t &side : brush.sides) {
-            Vector3 normal = side.plane.normal();
-            SnapNormal(normal);
-            if ((normal[0] == -1.0f || normal[0] == 1.0f || (normal[0] == 0.0f && normal[1] == 0.0f)
-              || normal[1] == -1.0f || normal[1] == 1.0f || (normal[1] == 0.0f && normal[2] == 0.0f)
-              || normal[2] == -1.0f || normal[2] == 1.0f || (normal[2] == 0.0f && normal[0] == 0.0f)) && !side.bevel) {
-                // Axial
-                axialSides.emplace_back(side);
-            }
-            // Not Axial
-            cuttingSides.emplace_back(side);
+    std::vector<side_t>  axialSides;
+    std::vector<side_t>  cuttingSides;
+    // +X -X +Y -Y +Z -Z
+    bool axials[6];
+    // The bsp brushes are AABBs + cutting planes
+    // Surface flags are indexed first for AABB ( first 6 planes ) then for the rest
+    // Radiant brushes are made purely of planes so we dont have a guarantee that we'll get the
+    // Axial ones which define the AABB, that's why we first sort them
+    for (const side_t &side : brush.sides) {
+        Vector3 normal = side.plane.normal();
+        SnapNormal(normal);
+        if ((normal[0] == -1.0f || normal[0] == 1.0f || (normal[0] == 0.0f && normal[1] == 0.0f)
+            || normal[1] == -1.0f || normal[1] == 1.0f || (normal[1] == 0.0f && normal[2] == 0.0f)
+            || normal[2] == -1.0f || normal[2] == 1.0f || (normal[2] == 0.0f && normal[0] == 0.0f)) && !side.bevel) {
+            // Axial
+            axialSides.emplace_back(side);
+        }
+        // Not Axial
+        cuttingSides.emplace_back(side);
+    }
+
+    for (const side_t &side : axialSides) {
+        Vector3 normal = side.plane.normal();
+        SnapNormal(normal);
+
+        if (normal[0] == 1.0f) {
+            axials[0] = true;  // +X
+        } else if (normal[0] == -1.0f) {
+            axials[1] = true;  // -X
         }
 
-        for (const side_t &side : axialSides) {
-            Vector3 normal = side.plane.normal();
-            SnapNormal(normal);
-
-            if (normal[0] == 1.0f) {
-                axials[0] = true;  // +X
-            } else if (normal[0] == -1.0f) {
-                axials[1] = true;  // -X
-            }
-
-            if (normal[1] == 1.0f) {
-                axials[2] = true;  // +Y
-            } else if (normal[1] == -1.0f) {
-                axials[3] = true;  // -Y
-            }
-
-            if (normal[2] == 1.0f) {
-                axials[4] = true;  // +Z
-            } else if (normal[2] == -1.0f) {
-                axials[5] = true;  // -Z
-            }
+        if (normal[1] == 1.0f) {
+            axials[2] = true;  // +Y
+        } else if (normal[1] == -1.0f) {
+            axials[3] = true;  // -Y
         }
 
-        // TODO: Add correct material offset
-        int test = 0;
-        for (int i = 0; i < 6; i++) {
-            if (axials[i]) {
-                Titanfall::Bsp::cmBrushSideProperties.emplace_back(1);
-            } else {
-                test++;
-                Titanfall::Bsp::cmBrushSideProperties.emplace_back(MASK_DISCARD);
-            }
+        if (normal[2] == 1.0f) {
+            axials[4] = true;  // +Z
+        } else if (normal[2] == -1.0f) {
+            axials[5] = true;  // -Z
         }
+    }
+
+    // TODO: Add correct material offset
+    int test = 0;
+    for (int i = 0; i < 6; i++) {
+        if (axials[i]) {
+            Titanfall::Bsp::cmBrushSideProperties.emplace_back(1);
+        } else {
+            test++;
+            Titanfall::Bsp::cmBrushSideProperties.emplace_back(MASK_DISCARD);
+        }
+    }
 
 #if 1
-        for (const side_t &side : cuttingSides) {
-            Vector3 normal = side.plane.normal();
-            SnapNormal(normal);
-            if (normal[0] == -1.0f || normal[0] == 1.0f || (normal[0] == 0.0f && normal[1] == 0.0f)
-             || normal[1] == -1.0f || normal[1] == 1.0f || (normal[1] == 0.0f && normal[2] == 0.0f)
-             || normal[2] == -1.0f || normal[2] == 1.0f || (normal[2] == 0.0f && normal[0] == 0.0f)) {
-                continue;  // axial, only test non-axial edges
-            }
-
-            Titanfall::EmitPlane(side.plane);
-            b.planeCount++;
-            Titanfall::Bsp::cmBrushSideProperties.emplace_back(1);
-            uint16_t &so = Titanfall::Bsp::cmBrushSidePlaneOffsets.emplace_back();
-            so = 0;
+    for (const side_t &side : cuttingSides) {
+        Vector3 normal = side.plane.normal();
+        SnapNormal(normal);
+        if (normal[0] == -1.0f || normal[0] == 1.0f || (normal[0] == 0.0f && normal[1] == 0.0f)
+            || normal[1] == -1.0f || normal[1] == 1.0f || (normal[1] == 0.0f && normal[2] == 0.0f)
+            || normal[2] == -1.0f || normal[2] == 1.0f || (normal[2] == 0.0f && normal[0] == 0.0f)) {
+            continue;  // axial, only test non-axial edges
         }
 
-        if (b.planeCount) {
-            b.unknown = b.planeCount / 2 + 1;
-            b.sidePlaneIndex = Titanfall::Bsp::cmBrushSidePlaneOffsets.size() - b.planeCount;
-        }
-#endif
-        index++;
+        Titanfall::EmitPlane(side.plane);
+        b.planeCount++;
+        Titanfall::Bsp::cmBrushSideProperties.emplace_back(1);
+        uint16_t &so = Titanfall::Bsp::cmBrushSidePlaneOffsets.emplace_back();
+        so = 0;
     }
+
+    if (b.planeCount) {
+        b.unknown = b.planeCount / 2 + 1;
+        b.sidePlaneIndex = Titanfall::Bsp::cmBrushSidePlaneOffsets.size() - b.planeCount;
+    }
+#endif
 }
 
 

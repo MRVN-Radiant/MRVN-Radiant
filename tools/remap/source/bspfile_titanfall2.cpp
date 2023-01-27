@@ -175,7 +175,7 @@ void CompileR2BSPFile() {
 
             Titanfall::EmitMeshes(entity);
 
-            Titanfall::EmitBrushes(entity);
+            Titanfall::EmitCollisionGrid(entity);
 
             Titanfall::EndModel();
         /* props for gamelump */
