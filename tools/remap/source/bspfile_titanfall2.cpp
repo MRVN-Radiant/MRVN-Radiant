@@ -190,8 +190,8 @@ void CompileR2BSPFile() {
             } else {
                 if( entity.brushes.size() ) {
                     Titanfall::BeginModel(entity);
-                    //Shared::MakeMeshes(entity);
-                    //Titanfall::EmitMeshes(entity);
+                    Shared::MakeMeshes(entity);
+                    Titanfall::EmitMeshes(entity);
                     Titanfall::EmitModelGridCell(entity);
                     Titanfall::EndModel();
                 }

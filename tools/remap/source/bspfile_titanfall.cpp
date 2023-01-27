@@ -1114,7 +1114,7 @@ void Titanfall::EmitLevelInfo() {
         li.firstSkyMeshIndex++;
     }
 #else
-    li.firstDecalMeshIndex = li.firstTransMeshIndex = li.firstSkyMeshIndex = Shared::meshes.size();
+    li.firstDecalMeshIndex = li.firstTransMeshIndex = li.firstSkyMeshIndex = Titanfall::Bsp::models[0].meshCount;
 #endif
 
     li.propCount = Titanfall::Bsp::gameLumpPropHeader.numProps;
