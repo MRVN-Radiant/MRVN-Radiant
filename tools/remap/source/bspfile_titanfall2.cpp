@@ -129,7 +129,7 @@ void WriteR2BSPFile(const char *filename) {
     AddLump(file, header.lumps[R2_LUMP_CM_GEO_SET_BOUNDS],         Titanfall::Bsp::cmGeoSetBounds);
     // AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVES],             Titanfall::Bsp::cmPrimitives_stub);  // stub
     // AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVE_BOUNDS],       Titanfall::Bsp::cmPrimitiveBounds_stub);  // stub
-    AddLump(file, header.lumps[R2_LUMP_CM_UNIQUE_CONTENTS],        Titanfall::Bsp::cmUniqueContents_stub);  // stub
+    AddLump(file, header.lumps[R2_LUMP_CM_UNIQUE_CONTENTS],        Titanfall::Bsp::cmUniqueContents);
     AddLump(file, header.lumps[R2_LUMP_CM_BRUSHES],                Titanfall::Bsp::cmBrushes);
     AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PROPS],       Titanfall::Bsp::cmBrushSideProperties);
     AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PLANES],      Titanfall::Bsp::cmBrushSidePlaneOffsets);

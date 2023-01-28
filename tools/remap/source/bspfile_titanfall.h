@@ -39,8 +39,9 @@ namespace Titanfall {
     uint16_t     EmitMaterialSort(uint32_t index);
     void         EmitCollisionGrid(entity_t &e);
     void         EmitModelGridCell(entity_t &e);
-    void         EmitBrush(const brush_t &e);
-    void         EmitGeoSet(MinMax minmax, int index);
+    void         EmitBrush(brush_t &e);
+    void         EmitGeoSet(MinMax minmax, int index, int flags);
+    int          EmitUniqueContents(int flags);
     void         EmitLevelInfo();
     void         EmitStubs();
     void         EmitExtraEntity(entity_t &e);
@@ -339,6 +340,7 @@ namespace Titanfall {
         inline std::vector<CMPrimitive_t>         cmPrimitives;
         inline std::vector<CMBound_t>             cmPrimitiveBounds;
         inline std::vector<uint16_t>              cmBrushSideProperties;
+        inline std::vector<int32_t>               cmUniqueContents;
         inline std::vector<CMBrush_t>             cmBrushes;
         inline std::vector<uint16_t>              cmBrushSidePlaneOffsets;
         inline std::vector<CellAABBNode_t>        cellAABBNodes;

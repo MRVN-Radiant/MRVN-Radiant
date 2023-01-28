@@ -148,7 +148,7 @@ struct game_titanfall2 : game_t {
             /* name  contentFlags  contentFlagsClear  surfaceFlags  surfaceFlagsClear  compileFlags  compileFlagsClear */
 
             /* default */
-            {"default",        0,                -1,        0x00100000,           -1,       C_SOLID,                -1},
+            {"default",        CM_UNKNOWN,                -1,        0x00100000,           -1,       C_SOLID,                -1},
 
             /* compiler */
             {"nodraw",         0,                 0,                 0,            0,      C_NODRAW,                 0},

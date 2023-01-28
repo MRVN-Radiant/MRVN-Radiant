@@ -115,7 +115,7 @@ void WriteR1BSPFile(const char *filename) {
     AddLump(file, header.lumps[R1_LUMP_CM_GRID_CELLS],               Titanfall::Bsp::cmGridCells);
     AddLump(file, header.lumps[R1_LUMP_CM_GEO_SETS],                 Titanfall::Bsp::cmGeoSets);
     AddLump(file, header.lumps[R1_LUMP_CM_GEO_SET_BOUNDS],           Titanfall::Bsp::cmGeoSetBounds);
-    AddLump(file, header.lumps[R1_LUMP_CM_UNIQUE_CONTENTS],          Titanfall::Bsp::cmUniqueContents_stub);  // stub
+    AddLump(file, header.lumps[R1_LUMP_CM_UNIQUE_CONTENTS],          Titanfall::Bsp::cmUniqueContents);
     AddLump(file, header.lumps[R1_LUMP_CM_BRUSHES],                  Titanfall::Bsp::cmBrushes);
     AddLump(file, header.lumps[R1_LUMP_CM_BRUSH_SIDE_PROPS],         Titanfall::Bsp::cmBrushSideProperties);
     AddLump(file, header.lumps[R1_LUMP_CM_BRUSH_SIDE_PLANE_OFFSETS], Titanfall::Bsp::cmBrushSidePlaneOffsets);
@@ -913,7 +913,7 @@ void Titanfall::EmitCollisionGrid( entity_t &e ) {
                     continue;
                 }
 
-                Titanfall::EmitGeoSet(brushMinmax, brush.index);
+                Titanfall::EmitGeoSet(brushMinmax, brush.index, gridBrushes.at(index)->contentFlags);
             }
 
             cell.count = Titanfall::Bsp::cmGeoSets.size() - cell.start;
@@ -934,7 +934,7 @@ void Titanfall::EmitCollisionGrid( entity_t &e ) {
         brushMinmax.mins = brush.origin - brush.extents;
         brushMinmax.maxs = brush.origin + brush.extents;
 
-        Titanfall::EmitGeoSet(brushMinmax, brush.index);
+        Titanfall::EmitGeoSet(brushMinmax, brush.index, modelBrushes.at(i)->contentFlags);
     }
 
     cell.count = Titanfall::Bsp::cmGeoSets.size() - cell.start;
@@ -953,14 +953,17 @@ void Titanfall::EmitModelGridCell( entity_t &e ) {
     Titanfall::CMGridCell_t &cell = Titanfall::Bsp::cmGridCells.emplace_back();
     cell.start = Titanfall::Bsp::cmGeoSets.size();
 
-    for( std::size_t i = 0; i < e.brushes.size(); i++ ) {
+    std::size_t i = 0;
+    for( brush_t &b : e.brushes ) {
         Titanfall::CMBrush_t &brush = Titanfall::Bsp::cmBrushes.at(offset + i);
 
         MinMax brushMinmax;
         brushMinmax.mins = brush.origin - brush.extents;
         brushMinmax.maxs = brush.origin + brush.extents;
 
-        Titanfall::EmitGeoSet(brushMinmax, brush.index);
+        Titanfall::EmitGeoSet(brushMinmax, brush.index, b.contentFlags);
+
+        i++;
     }
 
     cell.count = Titanfall::Bsp::cmGeoSets.size() - cell.start;
@@ -970,11 +973,11 @@ void Titanfall::EmitModelGridCell( entity_t &e ) {
     EmitGeoSet()
     Emits a geo set into bsp
 */
-void Titanfall::EmitGeoSet(MinMax minmax, int index) {
+void Titanfall::EmitGeoSet(MinMax minmax, int index, int flags) {
     Titanfall::CMGeoSet_t &set = Titanfall::Bsp::cmGeoSets.emplace_back();
     set.straddleGroup = 0;
     set.primitiveCount = 1;
-    set.uniqueContentsIndex = 0;
+    set.uniqueContentsIndex = Titanfall::EmitUniqueContents(flags);
     set.collisionShapeIndex = index;
 
     Titanfall::CMBound_t &bound = Titanfall::Bsp::cmGeoSetBounds.emplace_back();
@@ -988,7 +991,13 @@ void Titanfall::EmitGeoSet(MinMax minmax, int index) {
     EmitBrush()
     Emits a brush into bsp
 */
-void Titanfall::EmitBrush(const brush_t &brush) {
+void Titanfall::EmitBrush(brush_t &brush) {
+    // TODO: The core structs ( entity_t, brush_t parseMest_t, shaderInfo_t, etc... ) need to be rewritten
+    // to avoid this
+    for( side_t &side : brush.sides )
+        brush.contentFlags |= side.shaderInfo->contentFlags;
+
+
     Titanfall::CMBrush_t &b = Titanfall::Bsp::cmBrushes.emplace_back();
 
     b.extents = brush.minmax.extents();
@@ -1076,6 +1085,20 @@ void Titanfall::EmitBrush(const brush_t &brush) {
 #endif
 }
 
+/*
+    EmitUniqueContents()
+    Emits collision flags and returns index to them
+*/
+int Titanfall::EmitUniqueContents(int flags) {
+    for( int i = 0; i < Titanfall::Bsp::cmUniqueContents.size(); i++ ) {
+        if( Titanfall::Bsp::cmUniqueContents.at(i) == flags )
+            return i;
+    }
+
+    Titanfall::Bsp::cmUniqueContents.emplace_back( flags );
+
+    return Titanfall::Bsp::cmUniqueContents.size() - 1;
+}
 
 /*
     EmitPlane
