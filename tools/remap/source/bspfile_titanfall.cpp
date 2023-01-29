@@ -1034,8 +1034,10 @@ void Titanfall::EmitGeoSet(MinMax minmax, int index, int flags) {
 void Titanfall::EmitBrush(brush_t &brush) {
     // TODO: The core structs ( entity_t, brush_t parseMest_t, shaderInfo_t, etc... ) need to be rewritten
     // to avoid this
-    for( side_t &side : brush.sides )
+    for( side_t &side : brush.sides ) {
+        if( !side.bevel )
             brush.contentFlags |= side.shaderInfo->contentFlags;
+    }
 
 
     Titanfall::CMBrush_t &b = Titanfall::Bsp::cmBrushes.emplace_back();
