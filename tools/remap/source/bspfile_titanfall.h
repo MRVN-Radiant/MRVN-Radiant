@@ -189,9 +189,10 @@ namespace Titanfall {
     struct Mesh_t {
         uint32_t  triOffset;
         uint16_t  triCount;
-        uint16_t  firstVertex;
+        uint16_t  vertexOffset;
         uint16_t  vertexCount;
-        uint16_t  unk0;
+        uint8_t   vertexType;
+        uint8_t   unused;
         uint32_t  const0;
         uint16_t  unk1;
         uint16_t  unk2;
