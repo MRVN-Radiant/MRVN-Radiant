@@ -68,7 +68,7 @@ void WriteR5BSPFile(const char *filename) {
     AddLump(file, header.lumps[R5_LUMP_VERTICES],                 Titanfall::Bsp::vertices);
     AddLump(file, header.lumps[R5_LUMP_LIGHTPROBE_PARENT_INFOS],  ApexLegends::Bsp::lightprobeParentInfos_stub);  // stub
     AddLump(file, header.lumps[R5_LUMP_SHADOW_ENVIRONMENTS],      ApexLegends::Bsp::shadowEnvironments_stub);     // stub
-    AddLump(file, header.lumps[R5_LUMP_MODELS],                   ApexLegends::Bsp::models_stub);                 // stub
+    AddLump(file, header.lumps[R5_LUMP_MODELS],                   ApexLegends::Bsp::models);
     AddLump(file, header.lumps[R5_LUMP_SURFACE_NAMES],            Titanfall::Bsp::textureDataData);
     AddLump(file, header.lumps[R5_LUMP_CONTENTS_MASKS],           ApexLegends::Bsp::contentsMasks_stub);          // stub
     AddLump(file, header.lumps[R5_LUMP_SURFACE_PROPERTIES],       ApexLegends::Bsp::surfaceProperties_stub);      // stub
@@ -145,9 +145,13 @@ void CompileR5BSPFile() {
 
         /* visible geo */
         if (ENT_IS("worldspawn")) {
+            ApexLegends::BeginModel();
+
             /* generate bsp meshes from map brushes */
             Shared::MakeMeshes(entity);
             ApexLegends::EmitMeshes(entity);
+
+            ApexLegends::EndModel();
         } else if (ENT_IS("func_occluder")) {
             Titanfall::EmitOcclusionMeshes( entity );
             continue; // Don't emit as entity
@@ -217,6 +221,31 @@ int ApexLegends::EmitVisChildrenOfTreeNode(Shared::visNode_t node) {
     }
 
     return index;
+}
+
+/*
+    BeginModel
+*/
+void ApexLegends::BeginModel() {
+    ApexLegends::Model_t &model = ApexLegends::Bsp::models.emplace_back();
+    model.meshIndex = ApexLegends::Bsp::meshes.size();
+    model.bvhNodeIndex = 0;
+    model.bvhLeafIndex = 0;
+    model.vertexIndex = Titanfall::Bsp::vertices.size();
+    model.vertexFlags = 0;
+}
+
+/*
+    EndModel
+*/
+void ApexLegends::EndModel() {
+    ApexLegends::Model_t &model = ApexLegends::Bsp::models.back();
+    model.meshCount = ApexLegends::Bsp::meshes.size() - model.meshIndex;
+
+    for( Titanfall::MeshBounds_t &meshBounds : Titanfall::Bsp::meshBounds ) {
+        model.minmax.extend(meshBounds.origin - meshBounds.extents);
+        model.minmax.extend(meshBounds.origin + meshBounds.extents);
+    }
 }
 
 
@@ -469,7 +498,12 @@ void ApexLegends::EmitLevelInfo() {
     li.unk2 = 51;
     li.unk3 = 256;
     li.unk4 = 22;
-    li.modelCount = 2;
+
+    li.modelCount = 0;
+    for( Model_t &model : ApexLegends::Bsp::models ) {
+        if( model.meshCount )
+            li.modelCount++;
+    }
 }
 
 
@@ -494,24 +528,6 @@ void ApexLegends::EmitStubs() {
             0x62, 0xB7, 0x4E, 0xBF
         };
         ApexLegends::Bsp::shadowEnvironments_stub = { data.begin(), data.end() };
-    }
-    // Models
-    {
-        constexpr std::array<uint8_t, 192> data = {
-            0x00, 0x00, 0xD0, 0xC4, 0x00, 0x00, 0x44, 0xC6, 0x00, 0x00, 0x0C, 0xC6, 0x00, 0x00, 0x52, 0x46,
-            0x00, 0x00, 0xF8, 0x45, 0x00, 0xC0, 0x22, 0x45, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0xB8, 0x45, 0x00, 0x00, 0x10, 0xC5, 0x00, 0xA0, 0x46, 0xC5, 0x00, 0x00, 0x00, 0x37,
-            0x00, 0xE8, 0x68, 0xC5, 0x00, 0xA0, 0x70, 0xC5, 0x00, 0x40, 0xFA, 0xC4, 0x00, 0xE8, 0x68, 0x45,
-            0x00, 0xA0, 0x70, 0x45, 0x00, 0x40, 0xFA, 0x44, 0x3A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x60, 0x3A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x36,
-            0xFF, 0xFF, 0x7F, 0x7F, 0xFF, 0xFF, 0x7F, 0x7F, 0xFF, 0xFF, 0x7F, 0x7F, 0xFF, 0xFF, 0x7F, 0xFF,
-            0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        };
-        ApexLegends::Bsp::models_stub = { data.begin(), data.end() };
     }
     // Contents Masks
     {

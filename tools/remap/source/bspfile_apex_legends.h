@@ -15,6 +15,8 @@ namespace ApexLegends {
     void EmitStubs();
 
     void EmitEntity(const entity_t &e);
+    void BeginModel();
+    void EndModel();
     void EmitMeshes(const entity_t &e);
     uint32_t EmitTextureData(shaderInfo_t shader);
     uint16_t EmitMaterialSort(uint32_t index);
@@ -37,6 +39,21 @@ namespace ApexLegends {
         uint32_t  sizeX;
         uint32_t  sizeY;
         uint32_t  flags;
+    };
+
+    // 0x0F
+    struct Model_t {
+        MinMax minmax;
+        int32_t meshIndex;
+        int32_t meshCount;
+        int32_t bvhNodeIndex;
+        int32_t bvhLeafIndex;
+        int32_t vertexIndex;
+        int32_t vertexFlags;
+        float unk0;
+        float unk1;
+        float unk2;
+        int32_t unk3;
     };
 
     // 0x47
@@ -136,6 +153,7 @@ namespace ApexLegends {
 
     namespace Bsp {
         inline std::vector<TextureData_t>       textureData;
+        inline std::vector<Model_t>             models;
         inline std::vector<VertexUnlit_t>       vertexUnlitVertices;
         inline std::vector<VertexLitFlat_t>     vertexLitFlatVertices;
         inline std::vector<VertexLitBump_t>     vertexLitBumpVertices;
@@ -151,7 +169,6 @@ namespace ApexLegends {
         // Stubs
         inline std::vector<uint8_t>  lightprobeParentInfos_stub;
         inline std::vector<uint8_t>  shadowEnvironments_stub;
-        inline std::vector<uint8_t>  models_stub;
         inline std::vector<uint8_t>  contentsMasks_stub;
         inline std::vector<uint8_t>  surfaceProperties_stub;
         inline std::vector<uint8_t>  bvhNodes_stub;
