@@ -138,6 +138,8 @@ void WriteR2BSPFile(const char *filename) {
     AddLump(file, header.lumps[R2_LUMP_CSM_AABB_NODES],            Titanfall::Bsp::csmAABBNodes_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_CELL_BSP_NODES],            Titanfall::Bsp::cellBSPNodes_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_CELLS],                     Titanfall::Bsp::cells_stub);  // stub
+    AddLump(file, header.lumps[R2_LUMP_OCCLUSION_MESH_VERTICES],   Titanfall::Bsp::occlusionMeshVertices);
+    AddLump(file, header.lumps[R2_LUMP_OCCLUSION_MESH_INDICES],    Titanfall::Bsp::occlusionMeshIndices);
     AddLump(file, header.lumps[R2_LUMP_CELL_AABB_NODES],           Titanfall::Bsp::cellAABBNodes);
     AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCES],            Titanfall::Bsp::objReferences);
     AddLump(file, header.lumps[R2_LUMP_OBJ_REFERENCE_BOUNDS],      Titanfall::Bsp::objReferenceBounds);
@@ -182,6 +184,9 @@ void CompileR2BSPFile() {
         } else if (ENT_IS("misc_model")) { // Compile as static props into gamelump
             // TODO: use prop_static instead
             // EmitProp(entity);
+            continue; // Don't emit as entity
+        } else if (ENT_IS("func_occluder")) {
+            Titanfall::EmitOcclusionMeshes( entity );
             continue; // Don't emit as entity
         } else {
             // TODO: Some entities may not support keyvalue brush definitions, test

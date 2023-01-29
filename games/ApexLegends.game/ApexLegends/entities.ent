@@ -23,4 +23,13 @@ Place slightly above the ground to avoid getting stuck in the floor.
 TODO
 </point>
 
+<!--
+=============================================================================
+ Func_brush Ents
+=============================================================================
+-->
+
+<group name="func_occluder" color="1 0 1">
+</group>
+
 </classes>

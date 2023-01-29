@@ -377,4 +377,7 @@ CLIENTS spawnflag must be set
 <string key="script_name" name="script_name">New in Titanfall; TODO: identify</string>
 </group>
 
+<group name="func_occluder" color="1 0 1">
+</group>
+
 </classes>

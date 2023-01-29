@@ -33,6 +33,8 @@ namespace Titanfall {
     void         EmitVertexUnlitTS(Shared::Vertex_t &vertex);
     void         EmitVertexBlinnPhong(Shared::Vertex_t &vertex);
     void         EmitMeshes(const entity_t &e);
+    uint16_t     EmitOcclusionMeshVertex(Vector3 vertex);
+    void         EmitOcclusionMeshes(const entity_t &entity);
     std::size_t  EmitObjReferences(Shared::visNode_t &node);
     int          EmitVisChildrenOfTreeNode(Shared::visNode_t node);
     void         EmitVisTree();
@@ -343,6 +345,8 @@ namespace Titanfall {
         inline std::vector<int32_t>               cmUniqueContents;
         inline std::vector<CMBrush_t>             cmBrushes;
         inline std::vector<uint16_t>              cmBrushSidePlaneOffsets;
+        inline std::vector<Vector3>               occlusionMeshVertices;
+        inline std::vector<uint16_t>              occlusionMeshIndices;
         inline std::vector<CellAABBNode_t>        cellAABBNodes;
         inline std::vector<uint16_t>              objReferences;
         inline std::vector<ObjReferenceBounds_t>  objReferenceBounds;

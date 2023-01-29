@@ -112,6 +112,8 @@ void WriteR5BSPFile(const char *filename) {
     AddLump(file, header.lumps[R5_LUMP_CSM_AABB_NODES],          ApexLegends::Bsp::csmAABBNodes_stub);         // stub
     AddLump(file, header.lumps[R5_LUMP_CELL_BSP_NODES],          Titanfall::Bsp::cellBSPNodes_stub);           // stub
     AddLump(file, header.lumps[R5_LUMP_CELLS],                   Titanfall::Bsp::cells_stub);                  // stub
+    AddLump(file, header.lumps[R5_LUMP_OCCLUSION_MESH_VERTICES], Titanfall::Bsp::occlusionMeshVertices);
+    AddLump(file, header.lumps[R5_LUMP_OCCLUSION_MESH_INDICES],  Titanfall::Bsp::occlusionMeshIndices);
     AddLump(file, header.lumps[R5_LUMP_CELL_AABB_NODES],         ApexLegends::Bsp::cellAABBNodes);
     AddLump(file, header.lumps[R5_LUMP_OBJ_REFERENCES],          ApexLegends::Bsp::objReferences);
     AddLump(file, header.lumps[R5_LUMP_OBJ_REFERENCE_BOUNDS],    Titanfall::Bsp::objReferenceBounds);
@@ -136,19 +138,25 @@ void WriteR5BSPFile(const char *filename) {
    Compiles a v47 bsp file
 */
 void CompileR5BSPFile() {
-    for (size_t entityNum = 0; entityNum < entities.size(); ++entityNum) {
-        /* get entity */
-        entity_t &entity = entities[entityNum];
-        const char *classname = entity.classname();
+    for (entity_t &entity : entities) {
+        const char *pszClassname = entity.classname();
 
-        ApexLegends::EmitEntity(entity);
+        #define ENT_IS(classname) striEqual(pszClassname, classname)
 
         /* visible geo */
-        if (striEqual(classname, "worldspawn")) {
+        if (ENT_IS("worldspawn")) {
             /* generate bsp meshes from map brushes */
             Shared::MakeMeshes(entity);
             ApexLegends::EmitMeshes(entity);
+        } else if (ENT_IS("func_occluder")) {
+            Titanfall::EmitOcclusionMeshes( entity );
+            continue; // Don't emit as entity
+        } else {
         }
+
+        ApexLegends::EmitEntity(entity);
+
+        #undef ENT_IS
     }
 
     Shared::MakeVisReferences();
