@@ -1333,12 +1333,6 @@ void Titanfall::EmitStubs() {
         };
         Titanfall::Bsp::lightmapHeaders_stub = { data.begin(), data.end() };
     }
-    {  // CMUnique Contents
-        constexpr std::array<uint8_t, 4> data = {
-            0x01, 0x00, 0x00, 0x00
-        };
-        Titanfall::Bsp::cmUniqueContents_stub = { data.begin(), data.end() };
-    }
     {  // LightMap Data Sky
         for (std::size_t i = 0; i < 524288; i++) {
             Titanfall::Bsp::lightMapDataSky_stub.emplace_back(0);
