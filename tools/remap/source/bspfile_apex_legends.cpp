@@ -250,17 +250,26 @@ void ApexLegends::EmitVisTree() {
 */
 void ApexLegends::EmitMeshes(const entity_t &e) {
     for (const Shared::Mesh_t &mesh : Shared::meshes) {
-    ApexLegends::Mesh_t &bm = ApexLegends::Bsp::meshes.emplace_back();
-        bm.flags = mesh.shaderInfo->surfaceFlags;
-        bm.triOffset = Titanfall::Bsp::meshIndices.size();
-        bm.triCount = mesh.triangles.size() / 3;
+        ApexLegends::Mesh_t &m = ApexLegends::Bsp::meshes.emplace_back();
+        m.flags = mesh.shaderInfo->surfaceFlags;
+        m.triOffset = Titanfall::Bsp::meshIndices.size();
+        m.triCount = mesh.triangles.size() / 3;
+
+        int vertexOffset;
+        if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) == S_VERTEX_LIT_BUMP) {
+            vertexOffset = ApexLegends::Bsp::vertexLitBumpVertices.size();
+        } else if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) == S_VERTEX_UNLIT) {
+            vertexOffset = ApexLegends::Bsp::vertexUnlitVertices.size();
+        } else if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) == S_VERTEX_UNLIT_TS) {
+            vertexOffset = ApexLegends::Bsp::vertexUnlitVertices.size();
+        } else {
+            vertexOffset = ApexLegends::Bsp::vertexLitFlatVertices.size();
+        }
 
 
         // Emit textrue related structs
         uint32_t textureIndex = ApexLegends::EmitTextureData(*mesh.shaderInfo);
-
-        bm.materialOffset = ApexLegends::EmitMaterialSort(textureIndex);
-
+        m.materialOffset = ApexLegends::EmitMaterialSort(textureIndex);
         MinMax  aabb;
 
         // Save vertices and vertexnormals
@@ -270,11 +279,11 @@ void ApexLegends::EmitMeshes(const entity_t &e) {
             // Check against aabb
             aabb.extend(vertex.xyz);
 
-            if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) {
+            if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) == S_VERTEX_LIT_BUMP) {
                 ApexLegends::EmitVertexLitBump(vertex);
-            } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) {
+            } else if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) == S_VERTEX_UNLIT) {
                 ApexLegends::EmitVertexUnlit(vertex);
-            } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) {
+            } else if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) == S_VERTEX_UNLIT_TS) {
                 ApexLegends::EmitVertexUnlitTS(vertex);
             } else {
                 ApexLegends::EmitVertexLitFlat(vertex);
@@ -283,44 +292,7 @@ void ApexLegends::EmitMeshes(const entity_t &e) {
 
         // Save triangles
         for (uint16_t triangle : mesh.triangles) {
-            uint32_t totalVertices = 0;
-            if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) {
-                totalVertices = ApexLegends::Bsp::vertexLitBumpVertices.size();
-            } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) {
-                totalVertices = ApexLegends::Bsp::vertexUnlitVertices.size();
-            } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) {
-                totalVertices = ApexLegends::Bsp::vertexUnlitTSVertices.size();
-            } else {
-                totalVertices = ApexLegends::Bsp::vertexLitFlatVertices.size();
-            }
-
-            for (uint32_t j = 0; j < totalVertices; j++) {
-                uint32_t vertexIndex = 0;
-                uint32_t normalIndex = 0;
-
-                if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) {
-                    vertexIndex = ApexLegends::Bsp::vertexLitBumpVertices.at(j).vertexIndex;
-                    normalIndex = ApexLegends::Bsp::vertexLitBumpVertices.at(j).normalIndex;
-                } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) {
-                    vertexIndex = ApexLegends::Bsp::vertexUnlitVertices.at(j).vertexIndex;
-                    normalIndex = ApexLegends::Bsp::vertexUnlitVertices.at(j).normalIndex;
-                } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) {
-                    vertexIndex = ApexLegends::Bsp::vertexUnlitTSVertices.at(j).vertexIndex;
-                    normalIndex = ApexLegends::Bsp::vertexUnlitTSVertices.at(j).normalIndex;
-                } else {
-                    vertexIndex = ApexLegends::Bsp::vertexLitFlatVertices.at(j).vertexIndex;
-                    normalIndex = ApexLegends::Bsp::vertexLitFlatVertices.at(j).normalIndex;
-                }
-
-                if (!VectorCompare(Titanfall::Bsp::vertices.at(vertexIndex), mesh.vertices.at(triangle).xyz)
-                 || !VectorCompare(Titanfall::Bsp::vertexNormals.at(normalIndex), mesh.vertices.at(triangle).normal)) {
-                    continue;
-                }
-
-                uint16_t &index = Titanfall::Bsp::meshIndices.emplace_back();
-                index = j;
-                break;
-            }
+            Titanfall::Bsp::meshIndices.emplace_back(triangle + vertexOffset);
         }
 
         // Save MeshBounds
