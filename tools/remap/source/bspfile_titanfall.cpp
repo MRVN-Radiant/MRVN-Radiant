@@ -123,6 +123,8 @@ void WriteR1BSPFile(const char *filename) {
     AddLump(file, header.lumps[R1_LUMP_CSM_AABB_NODES],              Titanfall::Bsp::csmAABBNodes_stub);  // stub
     AddLump(file, header.lumps[R1_LUMP_CELL_BSP_NODES],              Titanfall::Bsp::cellBSPNodes_stub);  // stub
     AddLump(file, header.lumps[R1_LUMP_CELLS],                       Titanfall::Bsp::cells_stub);  // stub
+    AddLump(file, header.lumps[R1_LUMP_OCCLUSION_MESH_VERTICES],     Titanfall::Bsp::occlusionMeshVertices);
+    AddLump(file, header.lumps[R1_LUMP_OCCLUSION_MESH_INDICES],      Titanfall::Bsp::occlusionMeshIndices);
     AddLump(file, header.lumps[R1_LUMP_CELL_AABB_NODES],             Titanfall::Bsp::cellAABBNodes);
     AddLump(file, header.lumps[R1_LUMP_OBJ_REFERENCES],              Titanfall::Bsp::objReferences);
     AddLump(file, header.lumps[R1_LUMP_OBJ_REFERENCE_BOUNDS],        Titanfall::Bsp::objReferenceBounds);
@@ -168,6 +170,9 @@ void CompileR1BSPFile() {
         } else if (ENT_IS("misc_model")) { // Compile as static props into gamelump
             // TODO: use prop_static instead
             // EmitProp(entity);
+            continue; // Don't emit as entity
+        } else if (ENT_IS("func_occluder")) {
+            Titanfall::EmitOcclusionMeshes( entity );
             continue; // Don't emit as entity
         } else {
             if( entity.brushes.size() ) {
@@ -501,6 +506,72 @@ void Titanfall::EmitEntityPartitions() {
     Titanfall::Bsp::entityPartitions = { partitions.begin(), partitions.end() + 1 };
 }
 
+/*
+    EmitOcclusionMeshVertex
+    Emits a vertex in occlusion vertices, checks for duplicates
+*/
+uint16_t Titanfall::EmitOcclusionMeshVertex( Vector3 vertex ) {
+    for( std::size_t i = 0; i < Titanfall::Bsp::occlusionMeshVertices.size(); i++ ) {
+        if( VectorCompare(vertex, Titanfall::Bsp::occlusionMeshVertices.at(i)) ) {
+            return i;
+        }
+    }
+
+    Titanfall::Bsp::occlusionMeshVertices.emplace_back(vertex);
+    return Titanfall::Bsp::occlusionMeshVertices.size() - 1;
+}
+
+/*
+    EmitOcclusionMeshes
+    Emits mesh information for func_occluder
+*/
+void Titanfall::EmitOcclusionMeshes( const entity_t &entity ) {
+    for( const brush_t &brush : entity.brushes ) {
+        for( const side_t &side : brush.sides ) {
+            // Skip bevels as they have no windings
+            if( side.bevel )
+                continue;
+            
+            // Skip degenerate windings as they contribute no faces
+            if( side.winding.size() < 3 )
+                continue;
+            
+            for (std::size_t i = 0; i < side.winding.size() - 2; i++) {
+                for (int j = 0; j < 3; j++) {
+                    int vertIndex = (j == 0) ? 0 : i + j;
+                    uint16_t index = Titanfall::EmitOcclusionMeshVertex( side.winding.at(vertIndex) );
+                    Titanfall::Bsp::occlusionMeshIndices.emplace_back( index );
+                }
+            }
+        }
+    }
+
+    for( parseMesh_t *patch = entity.patches; patch != NULL; patch = patch->next ) {
+        mesh_t patchMesh = patch->mesh;
+
+        for( int x = 0; x < (patchMesh.width - 1); x++ ) {
+            for( int y = 0; y < (patchMesh.height - 1); y++ ) {
+                int vertIndex = x + y * patchMesh.width;
+
+                uint16_t index;
+
+                index = Titanfall::EmitOcclusionMeshVertex( patchMesh.verts[vertIndex].xyz );
+                Titanfall::Bsp::occlusionMeshIndices.emplace_back( index );
+                index = Titanfall::EmitOcclusionMeshVertex( patchMesh.verts[vertIndex + patchMesh.width].xyz );
+                Titanfall::Bsp::occlusionMeshIndices.emplace_back( index );
+                index = Titanfall::EmitOcclusionMeshVertex( patchMesh.verts[vertIndex + patchMesh.width + 1].xyz );
+                Titanfall::Bsp::occlusionMeshIndices.emplace_back( index );
+
+                index = Titanfall::EmitOcclusionMeshVertex( patchMesh.verts[vertIndex].xyz );
+                Titanfall::Bsp::occlusionMeshIndices.emplace_back( index );
+                index = Titanfall::EmitOcclusionMeshVertex( patchMesh.verts[vertIndex + patchMesh.width + 1].xyz );
+                Titanfall::Bsp::occlusionMeshIndices.emplace_back( index );
+                index = Titanfall::EmitOcclusionMeshVertex( patchMesh.verts[vertIndex + 1].xyz );
+                Titanfall::Bsp::occlusionMeshIndices.emplace_back( index );
+            }
+        }
+    }
+}
 
 /*
     EmitObjReferences
