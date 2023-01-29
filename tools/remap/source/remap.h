@@ -1630,6 +1630,8 @@ inline bool       g_noob;
 inline String512  globalCelShader;
 inline bool       keepLights;
 
+inline bool  g_bExternalModels;
+
 
 #if Q3MAP2_EXPERIMENTAL_SNAP_NORMAL_FIX
 // Increasing the normalEpsilon to compensate for new logic in SnapNormal(), where

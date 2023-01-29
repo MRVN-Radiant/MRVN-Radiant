@@ -18,7 +18,7 @@ void CompileR1BSPFile();
 
 namespace Titanfall {
     void         SetupGameLump();
-    void         BeginModel();
+    void         BeginModel(entity_t &entity);
     void         EndModel();
     void         EmitEntity(const entity_t &e);
     void         EmitTriggerBrushPlaneKeyValues(entity_t &e);
@@ -37,8 +37,11 @@ namespace Titanfall {
     int          EmitVisChildrenOfTreeNode(Shared::visNode_t node);
     void         EmitVisTree();
     uint16_t     EmitMaterialSort(uint32_t index);
-    void         EmitCollisionGrid();
-    void         EmitBrushes(const entity_t &e);
+    void         EmitCollisionGrid(entity_t &e);
+    void         EmitModelGridCell(entity_t &e);
+    void         EmitBrush(brush_t &e);
+    void         EmitGeoSet(MinMax minmax, int index, int flags);
+    int          EmitUniqueContents(int flags);
     void         EmitLevelInfo();
     void         EmitStubs();
     void         EmitExtraEntity(entity_t &e);
@@ -219,7 +222,7 @@ namespace Titanfall {
         int32_t   yOffset;
         int32_t   xCount;
         int32_t   yCount;
-        int32_t   unk2;
+        int32_t   straddleGroupCount;
         uint32_t  brushSidePlaneOffset;
     };
 
@@ -233,14 +236,14 @@ namespace Titanfall {
     struct CMGeoSet_t {
         uint16_t  straddleGroup;
         uint16_t  primitiveCount;
-        uint32_t  unknown2 : 8;
+        uint32_t  uniqueContentsIndex : 8;
         uint32_t  collisionShapeIndex : 16;
         uint32_t  collisionShapeType : 8;
     };
 
     // 0x59
     struct CMPrimitive_t {
-        uint32_t  unknown2 : 8;
+        uint32_t  uniqueContentsIndex : 8;
         uint32_t  collisionShapeIndex : 16;
         uint32_t  collisionShapeType : 8;
     };
@@ -337,6 +340,7 @@ namespace Titanfall {
         inline std::vector<CMPrimitive_t>         cmPrimitives;
         inline std::vector<CMBound_t>             cmPrimitiveBounds;
         inline std::vector<uint16_t>              cmBrushSideProperties;
+        inline std::vector<int32_t>               cmUniqueContents;
         inline std::vector<CMBrush_t>             cmBrushes;
         inline std::vector<uint16_t>              cmBrushSidePlaneOffsets;
         inline std::vector<CellAABBNode_t>        cellAABBNodes;
@@ -349,7 +353,6 @@ namespace Titanfall {
         inline std::vector<uint8_t>  gameLump_stub;
         inline std::vector<uint8_t>  worldLights_stub;
         inline std::vector<uint8_t>  lightmapHeaders_stub;
-        inline std::vector<uint8_t>  cmUniqueContents_stub;
         inline std::vector<uint8_t>  lightMapDataSky_stub;
         inline std::vector<uint8_t>  csmAABBNodes_stub;
         inline std::vector<uint8_t>  cellBSPNodes_stub;

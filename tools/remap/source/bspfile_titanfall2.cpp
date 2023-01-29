@@ -129,7 +129,7 @@ void WriteR2BSPFile(const char *filename) {
     AddLump(file, header.lumps[R2_LUMP_CM_GEO_SET_BOUNDS],         Titanfall::Bsp::cmGeoSetBounds);
     // AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVES],             Titanfall::Bsp::cmPrimitives_stub);  // stub
     // AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVE_BOUNDS],       Titanfall::Bsp::cmPrimitiveBounds_stub);  // stub
-    AddLump(file, header.lumps[R2_LUMP_CM_UNIQUE_CONTENTS],        Titanfall::Bsp::cmUniqueContents_stub);  // stub
+    AddLump(file, header.lumps[R2_LUMP_CM_UNIQUE_CONTENTS],        Titanfall::Bsp::cmUniqueContents);
     AddLump(file, header.lumps[R2_LUMP_CM_BRUSHES],                Titanfall::Bsp::cmBrushes);
     AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PROPS],       Titanfall::Bsp::cmBrushSideProperties);
     AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PLANES],      Titanfall::Bsp::cmBrushSidePlaneOffsets);
@@ -158,62 +158,63 @@ void WriteR2BSPFile(const char *filename) {
 
 /*
    CompileR2BSPFile()
-   writes a titanfall2 bsp file and it's .ent files
- */
+   Compiles a Titanfall 2 bsp file and sorts entities into ent files
+*/
 void CompileR2BSPFile() {
-    // SetUpGameLump();
+    for (entity_t &entity : entities) {
+        const char *pszClassname = entity.classname();
 
-    for (size_t entityNum = 0; entityNum < entities.size(); ++entityNum) {
-        /* get entity */
-        entity_t   &entity = entities[entityNum];
-        const char *classname = entity.classname();
+        #define ENT_IS(classname) striEqual(pszClassname, classname)
 
         // NOTE: entities' classnames are editorclasses until we call EmitEntity
-        /* visible geo */
-        if (striEqual(classname, "worldspawn")) {
-            Titanfall::BeginModel();
-            /* generate bsp meshes from map brushes */
+        if (ENT_IS("worldspawn")) { // "worldspawn" is most of the map, should always be the 1st entity
+            Titanfall::BeginModel(entity);
+
             Shared::MakeMeshes(entity);
+            Shared::MakeVisReferences();
+
             Titanfall::EmitMeshes(entity);
 
-            Titanfall::EmitBrushes(entity);
+            Titanfall::EmitCollisionGrid(entity);
 
             Titanfall::EndModel();
-
-        /* TODO: *model entities
-         * fog_volume
-         * func_brush
-         * func_brush_lightweight
-         * trigger_no_grapple */
-        /* *trigger_brush_x_plane_y entities */
-        } else if (striEqualPrefix(classname, "trigger_")
-                || striEqual(classname, "envmap_volume")
-                || striEqual(classname, "light_environment_volume")
-                || striEqual(classname, "light_probe_volume")) {
-            Titanfall::EmitTriggerBrushPlaneKeyValues(entity);
         /* props for gamelump */
-        } else if (striEqual(classname, "misc_model")) {  // TODO: use prop_static instead
+        } else if (ENT_IS("misc_model")) { // Compile as static props into gamelump
+            // TODO: use prop_static instead
             // EmitProp(entity);
+            continue; // Don't emit as entity
+        } else {
+            // TODO: Some entities may not support keyvalue brush definitions, test
+            if( g_bExternalModels ) {
+                Titanfall::EmitTriggerBrushPlaneKeyValues(entity);
+            } else {
+                if( entity.brushes.size() ) {
+                    Titanfall::BeginModel(entity);
+                    Shared::MakeMeshes(entity);
+                    Titanfall::EmitMeshes(entity);
+                    Titanfall::EmitModelGridCell(entity);
+                    Titanfall::EndModel();
+                }
+            }
         }
 
         Titanfall::EmitEntity(entity);
+
+        #undef ENT_IS
     }
 
-    /* */
+    // Write entity partitions we used
     Titanfall::EmitEntityPartitions();
 
-    Titanfall::EmitCollisionGrid();
-
-    /* */
-    Shared::MakeVisReferences();
+    // Generate vis tree for worldspawn, we do this here as we'll need portals once we reverse further
     Shared::visRoot = Shared::MakeVisTree(Shared::visRefs, 1e30f);
     Shared::MergeVisTree(Shared::visRoot);
     Titanfall::EmitVisTree();
 
-    /* Emit LevelInfo */
+    // Emit level info
     Titanfall::EmitLevelInfo();
 
-    /* Generate unknown lumps */
+    // Emit lumps we dont generate yet, but need for the map to load
     Titanfall2::EmitStubs();
     Titanfall::EmitStubs();
 }

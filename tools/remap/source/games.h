@@ -75,8 +75,41 @@ const int S_VERTEX_UNLIT_TS      = 0x00000600;
 // const int S_VERTEX_BLINN_PHONG   = ?
 
 // Collision flags
-const int CM_UNKNOWN             = 0x00000001;  // C_SOLID as a contentFlag?
+const int CONTENTS_SOLID                = 0x00000001;  // Everything collides with me
+const int CONTENTS_WINDOW               = 0x00000002;
+const int CONTENTS_AUX                  = 0x00000004;
+const int CONTENTS_GRATE                = 0x00000008;
+const int CONTENTS_SLIME                = 0x00000010;
+const int CONTENTS_WATER                = 0x00000020;
+const int CONTENTS_WINDOW_NOCOLLIDE     = 0x00000040;
+const int CONTENTS_OPAQUE               = 0x00000080;
+const int CONTENTS_TESTFOGVOLUME        = 0x00000100;
+const int CONTENTS_PHYSICSCLIP          = 0x00000200;	
+const int CONTENTS_BLOCKLIGHT           = 0x00000400;
+const int CONTENTS_NOGRAPPLE            = 0x00000800;
+const int CONTENTS_UNUSED_03            = 0x00001000;
+const int CONTENTS_IGNORE_NODRAW_OPAQUE = 0x00002000;
+const int CONTENTS_MOVEABLE             = 0x00004000;
+const int CONTENTS_TEST_SOLID_BODY_SHOT = 0x00008000;
+const int CONTENTS_PLAYERCLIP           = 0x00010000;
+const int CONTENTS_MONSTERCLIP          = 0x00020000;
+const int CONTENTS_OPERATOR_FLOOR       = 0x00040000;
+const int CONTENTS_BLOCKLOS             = 0x00080000;
+const int CONTENTS_NOCLIMB              = 0x00100000;
+const int CONTENTS_TITANCLIP            = 0x00200000;  // Titans collide with me ( TODO: Test reapers )
+const int CONTENTS_BULLETCLIP           = 0x00400000;
+const int CONTENTS_OPERATORCLIP         = 0x00800000;
+const int CONTENTS_MONSTER              = 0x02000000;
+const int CONTENTS_DEBRIS               = 0x04000000;
+const int CONTENTS_DETAIL               = 0x08000000;
+const int CONTENTS_TRANSLUCENT          = 0x10000000;
+const int CONTENTS_HITBOX               = 0x40000000;
 
+// New in apex
+const int CONTENTS_SOUNDTRIGGER         = 0x00000400;
+const int CONTENTS_OCCLUDESOUND         = 0x00001000;
+const int CONTENTS_NOAIRDROP            = 0x01000000;
+const int CONTENTS_BLOCK_PING           = 0x20000000;
 
 /* ydnar: for multiple game support */
 struct surfaceParm_t {
