@@ -783,11 +783,24 @@ void Titanfall::EmitMeshes(const entity_t &e) {
         Titanfall::Mesh_t &m = Titanfall::Bsp::meshes.emplace_back();
         m.const0 = 4294967040;  // :)
         m.flags = mesh.shaderInfo->surfaceFlags;
-        m.firstVertex = Titanfall::Bsp::vertexLitBumpVertices.size();
         m.vertexCount = mesh.vertices.size();
         m.triOffset = Titanfall::Bsp::meshIndices.size();
         m.triCount = mesh.triangles.size() / 3;
-        // TODO: vertexType from mesh.shaderInfo->surfaceFlags?
+        
+        
+        if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) == S_VERTEX_UNLIT_TS) {
+            m.vertexType = 3;
+            m.vertexOffset = Titanfall::Bsp::vertexUnlitTSVertices.size();
+        } else if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) == S_VERTEX_LIT_BUMP) {
+            m.vertexType = 2;
+            m.vertexOffset = Titanfall::Bsp::vertexLitBumpVertices.size();
+        } else if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) == S_VERTEX_UNLIT) {
+            m.vertexType = 1;
+            m.vertexOffset = Titanfall::Bsp::vertexUnlitVertices.size();
+        } else {
+            m.vertexType = 0;
+            m.vertexOffset = Titanfall::Bsp::vertexLitFlatVertices.size();
+        }
 
         // Emit texture related structs
         uint32_t  textureIndex = Titanfall::EmitTextureData(*mesh.shaderInfo);
@@ -800,11 +813,11 @@ void Titanfall::EmitMeshes(const entity_t &e) {
 
             aabb.extend(vertex.xyz);
 
-            if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) {
+            if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) == S_VERTEX_UNLIT_TS) {
                 Titanfall::EmitVertexUnlitTS(vertex);
-            } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) {
+            } else if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) == S_VERTEX_LIT_BUMP) {
                 Titanfall::EmitVertexLitBump(vertex);
-            } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) {
+            } else if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) == S_VERTEX_UNLIT) {
                 Titanfall::EmitVertexUnlit(vertex);
             } else {
                 Titanfall::EmitVertexLitFlat(vertex);
@@ -813,51 +826,7 @@ void Titanfall::EmitMeshes(const entity_t &e) {
 
         // Save triangles
         for (uint16_t triangle : mesh.triangles) {
-            uint32_t totalVertices = 0;
-            if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) {
-                totalVertices = Titanfall::Bsp::vertexUnlitTSVertices.size();
-            } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) {
-                totalVertices = Titanfall::Bsp::vertexLitBumpVertices.size();
-            } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) {
-                totalVertices = Titanfall::Bsp::vertexUnlitVertices.size();
-            } else {
-                totalVertices = Titanfall::Bsp::vertexLitFlatVertices.size();
-            }
-
-            // match emitted vertices to current base mesh
-            for (uint32_t j = 0; j < totalVertices; j++) {
-                uint32_t  vertexIndex;
-                uint32_t  normalIndex;
-                Vector2   uv0;
-
-                if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) {
-                    vertexIndex = Titanfall::Bsp::vertexUnlitTSVertices.at(j).vertexIndex;
-                    normalIndex = Titanfall::Bsp::vertexUnlitTSVertices.at(j).normalIndex;
-                    uv0 = Titanfall::Bsp::vertexUnlitTSVertices.at(j).uv0;
-                } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) {
-                    vertexIndex = Titanfall::Bsp::vertexLitBumpVertices.at(j).vertexIndex;
-                    normalIndex = Titanfall::Bsp::vertexLitBumpVertices.at(j).normalIndex;
-                    uv0 = Titanfall::Bsp::vertexLitBumpVertices.at(j).uv0;
-                } else if (mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) {
-                    vertexIndex = Titanfall::Bsp::vertexUnlitVertices.at(j).vertexIndex;
-                    normalIndex = Titanfall::Bsp::vertexUnlitVertices.at(j).normalIndex;
-                    uv0 = Titanfall::Bsp::vertexUnlitVertices.at(j).uv0;
-                } else {
-                    vertexIndex = Titanfall::Bsp::vertexLitFlatVertices.at(j).vertexIndex;
-                    normalIndex = Titanfall::Bsp::vertexLitFlatVertices.at(j).normalIndex;
-                    uv0 = Titanfall::Bsp::vertexLitFlatVertices.at(j).uv0;
-                }
-
-                if (!VectorCompare(Titanfall::Bsp::vertices.at(vertexIndex), mesh.vertices.at(triangle).xyz)
-                 || !VectorCompare(Titanfall::Bsp::vertexNormals.at(normalIndex), mesh.vertices.at(triangle).normal)
-                 || !vector2_equal_epsilon(uv0, mesh.vertices.at(triangle).st, 1e-4f)) {
-                    continue;  // this vertex doesn't match, on to the next
-                }
-
-                uint16_t &index = Titanfall::Bsp::meshIndices.emplace_back();
-                index = j;
-                break;
-            }
+            Titanfall::Bsp::meshIndices.emplace_back(triangle + m.vertexOffset);
         }
 
         // Save MeshBounds
@@ -1066,7 +1035,7 @@ void Titanfall::EmitBrush(brush_t &brush) {
     // TODO: The core structs ( entity_t, brush_t parseMest_t, shaderInfo_t, etc... ) need to be rewritten
     // to avoid this
     for( side_t &side : brush.sides )
-        brush.contentFlags |= side.shaderInfo->contentFlags;
+            brush.contentFlags |= side.shaderInfo->contentFlags;
 
 
     Titanfall::CMBrush_t &b = Titanfall::Bsp::cmBrushes.emplace_back();
