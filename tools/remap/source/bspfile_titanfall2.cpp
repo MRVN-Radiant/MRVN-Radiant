@@ -167,6 +167,7 @@ void CompileR2BSPFile() {
         const char *pszClassname = entity.classname();
 
         #define ENT_IS(classname) striEqual(pszClassname, classname)
+        #define ENT_IS_PREFIX(classname) striEqualPrefix(pszClassname, classname)
 
         // NOTE: entities' classnames are editorclasses until we call EmitEntity
         if (ENT_IS("worldspawn")) { // "worldspawn" is most of the map, should always be the 1st entity
@@ -192,7 +193,7 @@ void CompileR2BSPFile() {
             continue; // Don't emit as entity
         } else {
             // TODO: Some entities may not support keyvalue brush definitions, test
-            if( g_bExternalModels ) {
+            if( g_bExternalModels && ENT_IS_PREFIX("trigger_") ) {
                 Titanfall::EmitTriggerBrushPlaneKeyValues(entity);
             } else {
                 if( entity.brushes.size() ) {
