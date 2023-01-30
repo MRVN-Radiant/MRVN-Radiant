@@ -10,24 +10,30 @@ void LoadR5BSPFile(rbspHeader_t *header, const char *filename);
 void WriteR5BSPFile(const char *filename);
 void CompileR5BSPFile();
 
+// BVH Node types
+#define BVH_CHILD_NODE 0
+#define BVH_CHILD_NONE 1
 
 namespace ApexLegends {
-    void EmitStubs();
+    void        EmitStubs();
 
-    void EmitEntity(const entity_t &e);
-    void BeginModel(entity_t &entity);
-    void EndModel();
-    void EmitMeshes(const entity_t &e);
-    uint32_t EmitTextureData(shaderInfo_t shader);
-    uint16_t EmitMaterialSort(uint32_t index);
-    void EmitVertexUnlit(Shared::Vertex_t &vertex);
-    void EmitVertexLitFlat(Shared::Vertex_t &vertex);
-    void EmitVertexLitBump(Shared::Vertex_t &vertex);
-    void EmitVertexUnlitTS(Shared::Vertex_t &vertex);
+    void        EmitEntity(const entity_t &e);
+    void        BeginModel(entity_t &entity);
+    void        EndModel();
+    void        EmitBVHNode();
+    int         EmitBVHDataleaf();
+    int         EmitContentsMask( int mask );
+    void        EmitMeshes(const entity_t &e);
+    uint32_t    EmitTextureData(shaderInfo_t shader);
+    uint16_t    EmitMaterialSort(uint32_t index);
+    void        EmitVertexUnlit(Shared::Vertex_t &vertex);
+    void        EmitVertexLitFlat(Shared::Vertex_t &vertex);
+    void        EmitVertexLitBump(Shared::Vertex_t &vertex);
+    void        EmitVertexUnlitTS(Shared::Vertex_t &vertex);
     std::size_t EmitObjReferences(Shared::visNode_t &node);
-    int EmitVisChildrenOfTreeNode(Shared::visNode_t node);
-    void EmitVisTree();
-    void EmitLevelInfo();
+    int         EmitVisChildrenOfTreeNode(Shared::visNode_t node);
+    void        EmitVisTree();
+    void        EmitLevelInfo();
 
     using Vertex_t = Vector3;
 
@@ -43,17 +49,36 @@ namespace ApexLegends {
 
     // 0x0F
     struct Model_t {
-        MinMax minmax;
-        int32_t meshIndex;
-        int32_t meshCount;
-        int32_t bvhNodeIndex;
-        int32_t bvhLeafIndex;
-        int32_t vertexIndex;
-        int32_t vertexFlags;
-        float unk0;
-        float unk1;
-        float unk2;
-        int32_t unk3;
+        MinMax    minmax;
+        int32_t   meshIndex;
+        int32_t   meshCount;
+        int32_t   bvhNodeIndex;
+        int32_t   bvhLeafIndex;
+        int32_t   vertexIndex;
+        int32_t   vertexFlags;
+        float     unk0;
+        float     unk1;
+        float     unk2;
+        int32_t   unk3;
+    };
+
+    // 0x12
+    struct BVHNode_t {
+        int16_t   bounds[24];
+
+        int32_t   cmIndex : 8;
+        int32_t   index0 : 24;
+
+        int32_t   padding : 8;
+        int32_t   index1 : 24;
+
+        int32_t   childType0 : 4;
+        int32_t   childType1 : 4;
+        int32_t   index2 : 24;
+
+        int32_t   childType2 : 4;
+        int32_t   childType3 : 4;
+        int32_t   index3 : 24;
     };
 
     // 0x47
@@ -154,6 +179,9 @@ namespace ApexLegends {
     namespace Bsp {
         inline std::vector<TextureData_t>       textureData;
         inline std::vector<Model_t>             models;
+        inline std::vector<int32_t>             contentsMasks;
+        inline std::vector<BVHNode_t>           bvhNodes;
+        inline std::vector<int32_t>             bvhLeafDatas;
         inline std::vector<VertexUnlit_t>       vertexUnlitVertices;
         inline std::vector<VertexLitFlat_t>     vertexLitFlatVertices;
         inline std::vector<VertexLitBump_t>     vertexLitBumpVertices;
@@ -169,10 +197,7 @@ namespace ApexLegends {
         // Stubs
         inline std::vector<uint8_t>  lightprobeParentInfos_stub;
         inline std::vector<uint8_t>  shadowEnvironments_stub;
-        inline std::vector<uint8_t>  contentsMasks_stub;
         inline std::vector<uint8_t>  surfaceProperties_stub;
-        inline std::vector<uint8_t>  bvhNodes_stub;
-        inline std::vector<uint8_t>  bvhNodeLeafData_stub;
         inline std::vector<uint8_t>  unknown25_stub;
         inline std::vector<uint8_t>  unknown26_stub;
         inline std::vector<uint8_t>  unknown27_stub;

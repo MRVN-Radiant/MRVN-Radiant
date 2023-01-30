@@ -70,10 +70,10 @@ void WriteR5BSPFile(const char *filename) {
     AddLump(file, header.lumps[R5_LUMP_SHADOW_ENVIRONMENTS],      ApexLegends::Bsp::shadowEnvironments_stub);     // stub
     AddLump(file, header.lumps[R5_LUMP_MODELS],                   ApexLegends::Bsp::models);
     AddLump(file, header.lumps[R5_LUMP_SURFACE_NAMES],            Titanfall::Bsp::textureDataData);
-    AddLump(file, header.lumps[R5_LUMP_CONTENTS_MASKS],           ApexLegends::Bsp::contentsMasks_stub);          // stub
-    AddLump(file, header.lumps[R5_LUMP_SURFACE_PROPERTIES],       ApexLegends::Bsp::surfaceProperties_stub);      // stub
-    AddLump(file, header.lumps[R5_LUMP_BVH_NODES],                ApexLegends::Bsp::bvhNodes_stub);               // stub
-    AddLump(file, header.lumps[R5_LUMP_BVH_LEAF_DATA],            ApexLegends::Bsp::bvhNodeLeafData_stub);        // stub
+    AddLump(file, header.lumps[R5_LUMP_CONTENTS_MASKS],           ApexLegends::Bsp::contentsMasks);
+    AddLump(file, header.lumps[R5_LUMP_SURFACE_PROPERTIES],       ApexLegends::Bsp::surfaceProperties_stub);
+    AddLump(file, header.lumps[R5_LUMP_BVH_NODES],                ApexLegends::Bsp::bvhNodes);
+    AddLump(file, header.lumps[R5_LUMP_BVH_LEAF_DATA],            ApexLegends::Bsp::bvhLeafDatas);
     AddLump(file, header.lumps[R5_LUMP_ENTITY_PARTITIONS],        Titanfall::Bsp::entityPartitions);
     AddLump(file, header.lumps[R5_LUMP_VERTEX_NORMALS],           Titanfall::Bsp::vertexNormals);
 
@@ -150,6 +150,8 @@ void CompileR5BSPFile() {
             /* generate bsp meshes from map brushes */
             Shared::MakeMeshes(entity);
             ApexLegends::EmitMeshes(entity);
+
+            ApexLegends::EmitBVHNode();
 
             ApexLegends::EndModel();
         } else if (ENT_IS("func_occluder")) {
@@ -252,6 +254,44 @@ void ApexLegends::EndModel() {
     Sys_FPrintf( SYS_VRB, "   EndModel\n" );
 }
 
+/*
+    EmitBVHNode
+    Placeholder
+*/
+void ApexLegends::EmitBVHNode() {
+    ApexLegends::BVHNode_t &node = ApexLegends::Bsp::bvhNodes.emplace_back();
+    node.cmIndex = EmitContentsMask( CONTENTS_SOLID );
+    node.childType0 = 8;
+    node.childType1 = BVH_CHILD_NONE;
+    node.childType2 = BVH_CHILD_NONE;
+    node.childType3 = BVH_CHILD_NONE;
+
+    ApexLegends::EmitBVHDataleaf();
+}
+
+/*
+    EmitBVHDataleaf
+    Placeholder
+*/
+int ApexLegends::EmitBVHDataleaf() {
+    int32_t &data = ApexLegends::Bsp::bvhLeafDatas.emplace_back();
+    return ApexLegends::Bsp::bvhLeafDatas.size() - 1;
+}
+
+/*
+    EmitContentsMask
+    Emits collision flags and returns an index to them
+*/
+int ApexLegends::EmitContentsMask( int mask ) {
+    for( int32_t i = 0; i < ApexLegends::Bsp::contentsMasks.size(); i++ ) {
+        if( ApexLegends::Bsp::contentsMasks.at(i) == mask )
+            return i;
+    }
+
+    // Didn't find our mask, make new one
+    ApexLegends::Bsp::contentsMasks.emplace_back( mask );
+    return ApexLegends::Bsp::contentsMasks.size() - 1;
+}
 
 /*
     EmitVisTree
@@ -533,14 +573,6 @@ void ApexLegends::EmitStubs() {
         };
         ApexLegends::Bsp::shadowEnvironments_stub = { data.begin(), data.end() };
     }
-    // Contents Masks
-    {
-        constexpr std::array<uint8_t, 20> data = {
-            0x80, 0x12, 0xEB, 0x00, 0x80, 0x12, 0xFB, 0x00, 0x00, 0x00, 0xA3, 0x00, 0x80, 0x00, 0x00, 0x00,
-            0x40, 0x12, 0xE3, 0x10
-        };
-        ApexLegends::Bsp::contentsMasks_stub = { data.begin(), data.end() };
-    }
     // Surface Properties
     {
         constexpr std::array<uint8_t, 112> data = {
@@ -553,23 +585,6 @@ void ApexLegends::EmitStubs() {
             0x02, 0x04, 0x00, 0x03, 0x39, 0x01, 0x00, 0x00, 0x10, 0x06, 0x00, 0x04, 0x4F, 0x01, 0x00, 0x00
         };
         ApexLegends::Bsp::surfaceProperties_stub = { data.begin(), data.end() };
-    }
-    // BVH Nodes
-    {
-        constexpr std::array<uint8_t, 64> data = {
-            0x00, 0xF0, 0x00, 0xF0, 0x00, 0xC5, 0x00, 0xC5, 0x00, 0x34, 0x00, 0x34, 0x9A, 0x35, 0x00, 0x3B,
-            0x00, 0xB0, 0x00, 0xB0, 0x54, 0xF4, 0x00, 0x07, 0x00, 0xF4, 0x00, 0xF4, 0x54, 0x0A, 0x00, 0x50,
-            0xD4, 0xD2, 0xD4, 0xD4, 0x2C, 0x0B, 0xD4, 0x0B, 0xDB, 0xE0, 0xD4, 0xFA, 0x2C, 0x2D, 0xD4, 0x29,
-            0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x11, 0x00, 0x00, 0x00
-        };
-        ApexLegends::Bsp::bvhNodes_stub = { data.begin(), data.end() };
-    }
-    // BVH Node Leaf Data
-    {
-        constexpr std::array<uint8_t, 4> data = {
-            0x01, 0x00, 0x00, 0x00
-        };
-        ApexLegends::Bsp::bvhNodeLeafData_stub = { data.begin(), data.end() };
     }
     // Unknown 0x25
     {
