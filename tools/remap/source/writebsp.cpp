@@ -319,8 +319,6 @@ void BeginBSPFile(){
 void EndBSPFile( bool do_write ){
 	Sys_FPrintf( SYS_VRB, "--- EndBSPFile ---\n" );
 
-	EmitPlanes();
-
 	numBSPEntities = entities.size();
 	UnparseEntities();
 

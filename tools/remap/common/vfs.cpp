@@ -155,7 +155,7 @@ void vfsInitDirectory( const char *path ){
 			return;
 	}
 
-	Sys_Printf( "VFS Init: %s\n", path );
+	Sys_Printf( "       VFS Init: %s\n", path );
 
 	// clean and store copy to be safe of original's reallocation
 	const CopiedString pathCleaned = g_strDirs.emplace_back( StringOutputStream( 256 )( DirectoryCleaned( path ) ) );

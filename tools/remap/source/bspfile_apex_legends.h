@@ -15,7 +15,7 @@ namespace ApexLegends {
     void EmitStubs();
 
     void EmitEntity(const entity_t &e);
-    void BeginModel();
+    void BeginModel(entity_t &entity);
     void EndModel();
     void EmitMeshes(const entity_t &e);
     uint32_t EmitTextureData(shaderInfo_t shader);

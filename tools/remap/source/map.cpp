@@ -1018,11 +1018,11 @@ static void ParseRawBrush( bool onlyLights ){
 			GetToken( false );
 			if ( strEqual( token, "[" ) ){
 				g_brushType = EBrushType::Valve220;
-				Sys_FPrintf( SYS_VRB, "detected brushType = VALVE 220\n" );
+				Sys_FPrintf( SYS_VRB, "       Detected brushType = VALVE 220\n" );
 			}
 			else{
 				g_brushType = EBrushType::Quake;
-				Sys_FPrintf( SYS_VRB, "detected brushType = QUAKE (Axial Projection)\n" );
+				Sys_FPrintf( SYS_VRB, "       Detected brushType = QUAKE (Axial Projection)\n" );
 			}
 			UnGetToken();
 		}
@@ -1518,7 +1518,7 @@ static bool ParseMapEntity( bool onlyLights, bool noCollapseGroups, int mapEntit
 			}
 			else if ( strEqual( token, "brushDef" ) ) {
 				if ( g_brushType == EBrushType::Undefined ) {
-					Sys_FPrintf( SYS_VRB, "detected brushType = BRUSH PRIMITIVES\n" );
+					Sys_FPrintf( SYS_VRB, "       Detected brushType = BRUSH PRIMITIVES\n" );
 					g_brushType = EBrushType::Bp;
 				}
 				ParseBrush( onlyLights, noCollapseGroups, mapEnt, mapPrimitiveNum );
@@ -1704,7 +1704,7 @@ void LoadMapFile( const char *filename, bool onlyLights, bool noCollapseGroups )
 		}
 
 		/* emit some statistics */
-		Sys_FPrintf( SYS_VRB, "%9d total world brushes\n", numMapBrushes );
+		/*Sys_FPrintf( SYS_VRB, "%9d total world brushes\n", numMapBrushes );
 		Sys_FPrintf( SYS_VRB, "%9d detail brushes\n", c_detail );
 		Sys_FPrintf( SYS_VRB, "%9d patches\n", c_patches );
 		Sys_FPrintf( SYS_VRB, "%9d boxbevels\n", c_boxbevels );
@@ -1715,10 +1715,11 @@ void LoadMapFile( const char *filename, bool onlyLights, bool noCollapseGroups )
 		Sys_Printf( "Size: %5.0f, %5.0f, %5.0f to %5.0f, %5.0f, %5.0f\n",
 		            g_mapMinmax.mins[0], g_mapMinmax.mins[1], g_mapMinmax.mins[2],
 		            g_mapMinmax.maxs[0], g_mapMinmax.maxs[1], g_mapMinmax.maxs[2] );
-
-		/* write bogus map */
+		
+		// write bogus map
 		if ( fakemap ) {
 			WriteBSPBrushMap( "fakemap.map", entities[ 0 ].brushes );
-		}
+		}*/
 	}
+	Sys_Printf("\n");
 }

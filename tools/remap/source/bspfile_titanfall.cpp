@@ -451,6 +451,8 @@ void Titanfall::SetupGameLump() {
     Creates a new model entry
 */
 void Titanfall::BeginModel(entity_t &entity) {
+    Sys_FPrintf( SYS_VRB, "   BeginModel: \"%s\"\n", entity.classname() );
+
     Titanfall::Model_t &model = Titanfall::Bsp::models.emplace_back();
     model.firstMesh = (uint32_t)Titanfall::Bsp::meshes.size();
 
@@ -475,6 +477,9 @@ void Titanfall::EndModel() {
         model.minmax.extend(meshBounds.origin - meshBounds.extents);
         model.minmax.extend(meshBounds.origin + meshBounds.extents);
     }
+
+    Sys_FPrintf( SYS_VRB, "       numMeshes: %i\n", model.meshCount );
+    Sys_FPrintf( SYS_VRB, "   EndModel\n" );
 }
 
 
@@ -892,8 +897,8 @@ void Titanfall::EmitCollisionGrid( entity_t &e ) {
         gridSize.extend( brush.minmax );
     }
 
-    Sys_Warning( "Grid brushes: %li\n", gridBrushes.size() );
-    Sys_Warning( "Model brushes: %li\n", modelBrushes.size() );
+    //Sys_Warning( "Grid brushes: %li\n", gridBrushes.size() );
+    //Sys_Warning( "Model brushes: %li\n", modelBrushes.size() );
 
     // Emit grid brushes
     for( brush_t *brush : gridBrushes )
@@ -962,6 +967,11 @@ void Titanfall::EmitCollisionGrid( entity_t &e ) {
         }
     }
 
+    std::size_t numGeoSets, numPrimitives;
+    numGeoSets = Titanfall::Bsp::cmGeoSets.size();
+    numPrimitives = Titanfall::Bsp::cmPrimitives.size();
+    Sys_FPrintf( SYS_VRB, "       Grid ( %i : %i ) has %li GeoSets and %li Primitives\n", grid.xCount, grid.yCount, numGeoSets, numPrimitives );
+
     // Emit model brushes
     for( brush_t *brush : modelBrushes )
         Titanfall::EmitBrush( *brush );
@@ -978,6 +988,10 @@ void Titanfall::EmitCollisionGrid( entity_t &e ) {
 
         Titanfall::EmitGeoSet(brushMinmax, brush.index, modelBrushes.at(i)->contentFlags);
     }
+
+    numGeoSets = Titanfall::Bsp::cmGeoSets.size() - numGeoSets;
+    numPrimitives = Titanfall::Bsp::cmPrimitives.size() - numPrimitives;
+    Sys_FPrintf( SYS_VRB, "       Worldspawn model has %li GeoSets and %li Primitives\n", numGeoSets, numPrimitives );
 
     cell.count = Titanfall::Bsp::cmGeoSets.size() - cell.start;
 }

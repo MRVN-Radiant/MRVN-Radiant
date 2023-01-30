@@ -873,20 +873,22 @@ int BSPMain( Args& args ){
 	InjectCommandLine( "-bsp", argsToInject );
 
 	/* ydnar: decal setup */
-	ProcessDecals();
+	//ProcessDecals();
 
 	/* ydnar: cloned brush model entities */
-	SetCloneModelNumbers();
+	//SetCloneModelNumbers();
 
 	/* process world and submodels */
 	//ProcessModels();
+	Sys_FPrintf( SYS_VRB, "--- CompileMap ---\n" );
 	g_game->compile();
+	Sys_Printf("\n" );
 
 	/* set light styles from targetted light entities */
-	SetLightStyles();
+	//SetLightStyles();
 
 	/* process in game advertisements */
-	ProcessAdvertisements();
+	//ProcessAdvertisements();
 
 	/* finish and write bsp */
 	EndBSPFile( true );

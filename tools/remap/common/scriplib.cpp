@@ -69,9 +69,9 @@ static bool AddScriptToStack( const char *filename, int index, bool verbose ){
 	if ( MemBuffer buffer = vfsLoadFile( filename, index ) ) {
 		if( verbose ){
 			if ( index > 0 )
-				Sys_Printf( "entering %s (%d)\n", filename, index + 1 );
+				Sys_Printf( "       Entering %s (%d)\n", filename, index + 1 );
 			else
-				Sys_Printf( "entering %s\n", filename );
+				Sys_Printf( "       Entering %s\n", filename );
 		}
 
 		scriptstack.emplace_back( filename, std::move( buffer ) );
@@ -80,9 +80,9 @@ static bool AddScriptToStack( const char *filename, int index, bool verbose ){
 	else
 	{
 		if( index >= 0 )
-			Sys_FPrintf( SYS_WRN, "Script file %s was not found\n", filename );
+			Sys_FPrintf( SYS_WRN, "       Script file %s was not found\n", filename );
 		else
-			Sys_FPrintf( SYS_WRN, "Script file %s was not found: %s\n", filename, strerror( errno ) );
+			Sys_FPrintf( SYS_WRN, "       Script file %s was not found: %s\n", filename, strerror( errno ) );
 
 		return false;
 	}

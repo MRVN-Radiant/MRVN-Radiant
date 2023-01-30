@@ -2,7 +2,7 @@
 
 
 void Titanfall::LoadLumpsAndEntities( rbspHeader_t *header, const char *filename ) {
-
+    
     // Load bsp lumps
     CopyLump((rbspHeader_t*)header, R1_LUMP_ENTITIES, Titanfall::Bsp::entities);
     CopyLump((rbspHeader_t*)header, R1_LUMP_PLANES, Titanfall::Bsp::planes);
@@ -56,6 +56,8 @@ void Titanfall::LoadLumpsAndEntities( rbspHeader_t *header, const char *filename
     }
 
     Titanfall::LoadAndParseGameLump( header );
+
+    Sys_FPrintf( SYS_VRB, "--- LoadMapFile ---\n" );
 }
 
 

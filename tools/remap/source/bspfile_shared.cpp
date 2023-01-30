@@ -10,8 +10,6 @@ void Shared::MakeMeshes(const entity_t &e) {
     // Multiple entities can have meshes, make sure we clear before making new meshes
     Shared::meshes.clear();
 
-    Sys_FPrintf(SYS_VRB, "--- SharedMeshes ---\n");
-
     // Loop through brushes
     for (const brush_t &brush : e.brushes) {
         // Loop through sides
@@ -189,8 +187,6 @@ void Shared::MakeMeshes(const entity_t &e) {
     COPY_MESHES(trans_meshes);
     COPY_MESHES(sky_meshes);
     #undef COPY_MESHES
-
-    Sys_Printf("%9zu shared meshes\n", Shared::meshes.size());
 }
 
 
