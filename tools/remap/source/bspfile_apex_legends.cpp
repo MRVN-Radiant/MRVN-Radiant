@@ -285,11 +285,11 @@ void ApexLegends::EmitMeshes(const entity_t &e) {
         m.triCount = mesh.triangles.size() / 3;
 
         int vertexOffset;
-        if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) == S_VERTEX_LIT_BUMP) {
+        if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_LIT_BUMP)) {
             vertexOffset = ApexLegends::Bsp::vertexLitBumpVertices.size();
-        } else if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) == S_VERTEX_UNLIT) {
+        } else if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_UNLIT)) {
             vertexOffset = ApexLegends::Bsp::vertexUnlitVertices.size();
-        } else if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) == S_VERTEX_UNLIT_TS) {
+        } else if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_UNLIT_TS)) {
             vertexOffset = ApexLegends::Bsp::vertexUnlitVertices.size();
         } else {
             vertexOffset = ApexLegends::Bsp::vertexLitFlatVertices.size();
@@ -308,11 +308,11 @@ void ApexLegends::EmitMeshes(const entity_t &e) {
             // Check against aabb
             aabb.extend(vertex.xyz);
 
-            if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) == S_VERTEX_LIT_BUMP) {
+            if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_LIT_BUMP)) {
                 ApexLegends::EmitVertexLitBump(vertex);
-            } else if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) == S_VERTEX_UNLIT) {
+            } else if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_UNLIT)) {
                 ApexLegends::EmitVertexUnlit(vertex);
-            } else if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) == S_VERTEX_UNLIT_TS) {
+            } else if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_UNLIT_TS)) {
                 ApexLegends::EmitVertexUnlitTS(vertex);
             } else {
                 ApexLegends::EmitVertexLitFlat(vertex);

@@ -168,11 +168,11 @@ void Shared::MakeMeshes(const entity_t &e) {
     std::vector<Shared::Mesh_t>  sky_meshes;
 
     for (const Shared::Mesh_t &mesh : Shared::meshes) {
-        if (mesh.shaderInfo->compileFlags & C_SKY) {
+        if (CHECK_FLAG(mesh.shaderInfo->compileFlags, C_SKY)) {
             sky_meshes.push_back(mesh);
-        } else if (mesh.shaderInfo->compileFlags & C_DECAL) {
+        } else if (CHECK_FLAG(mesh.shaderInfo->compileFlags, C_DECAL)) {
             decal_meshes.push_back(mesh);
-        } else if (mesh.shaderInfo->compileFlags & C_TRANSLUCENT) {
+        } else if (CHECK_FLAG(mesh.shaderInfo->compileFlags, C_TRANSLUCENT)) {
             trans_meshes.push_back(mesh);
         } else {
             opaque_meshes.push_back(mesh);

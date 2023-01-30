@@ -788,13 +788,13 @@ void Titanfall::EmitMeshes(const entity_t &e) {
         m.triCount = mesh.triangles.size() / 3;
         
         
-        if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) == S_VERTEX_UNLIT_TS) {
+        if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_UNLIT_TS)) {
             m.vertexType = 3;
             m.vertexOffset = Titanfall::Bsp::vertexUnlitTSVertices.size();
-        } else if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) == S_VERTEX_LIT_BUMP) {
+        } else if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags,S_VERTEX_LIT_BUMP)) {
             m.vertexType = 2;
             m.vertexOffset = Titanfall::Bsp::vertexLitBumpVertices.size();
-        } else if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) == S_VERTEX_UNLIT) {
+        } else if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_UNLIT)) {
             m.vertexType = 1;
             m.vertexOffset = Titanfall::Bsp::vertexUnlitVertices.size();
         } else {
@@ -813,11 +813,11 @@ void Titanfall::EmitMeshes(const entity_t &e) {
 
             aabb.extend(vertex.xyz);
 
-            if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT_TS) == S_VERTEX_UNLIT_TS) {
+            if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_UNLIT_TS)) {
                 Titanfall::EmitVertexUnlitTS(vertex);
-            } else if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_LIT_BUMP) == S_VERTEX_LIT_BUMP) {
+            } else if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_LIT_BUMP)) {
                 Titanfall::EmitVertexLitBump(vertex);
-            } else if ((mesh.shaderInfo->surfaceFlags & S_VERTEX_UNLIT) == S_VERTEX_UNLIT) {
+            } else if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_UNLIT)) {
                 Titanfall::EmitVertexUnlit(vertex);
             } else {
                 Titanfall::EmitVertexLitFlat(vertex);
@@ -877,7 +877,7 @@ void Titanfall::EmitCollisionGrid( entity_t &e ) {
             if( side.bevel )
                 continue;
 
-            if( (side.shaderInfo->compileFlags & C_SKY) == C_SKY )
+            if( CHECK_FLAG(side.shaderInfo->compileFlags,C_SKY) )
                 skySides++;
         }
 
@@ -1161,21 +1161,21 @@ void Titanfall::EmitLevelInfo() {
     // TODO: Add decal support
     li.firstDecalMeshIndex = 0;
     for (Shared::Mesh_t &mesh : Shared::meshes) {  // same indices as Titanfall::Bsp::meshes, more metadata
-        if (mesh.shaderInfo->compileFlags & C_DECAL) { break; }
+        if (CHECK_FLAG(mesh.shaderInfo->compileFlags, C_DECAL)) { break; }
         li.firstDecalMeshIndex++;
     }
 
     // TODO: start from firstDecalMeshIndex
     li.firstTransMeshIndex = 0;
     for (Titanfall::Mesh_t &mesh : Titanfall::Bsp::meshes) {
-        if (mesh.flags & S_TRANSLUCENT) { break; }
+        if (CHECK_FLAG(mesh.flags, S_TRANSLUCENT)) { break; }
         li.firstTransMeshIndex++;
     }
 
     // TODO: start from firstTransMeshIndex
     li.firstSkyMeshIndex = 0;
     for (Titanfall::Mesh_t &mesh : Titanfall::Bsp::meshes) {
-        if ((mesh.flags & S_SKY) || (mesh.flags & S_SKY_2D)) { break; }
+        if (CHECK_FLAG(mesh.flags, S_SKY) || CHECK_FLAG(mesh.flags, S_SKY_2D)) { break; }
         li.firstSkyMeshIndex++;
     }
 #else
