@@ -808,11 +808,6 @@ int BSPMain( Args& args ){
 			Sys_Printf( "\trunning in autocaulk mode\n" );
 			g_autocaulk = true;
 		}
-		while( !args.empty() )
-		{
-			Sys_Warning( "Unknown option \"%s\"\n", args.takeFront() );
-		}
-
 		// Remap args
 		while ( args.takeArg( "-onlyents" ) ) {
 			Sys_Printf( "Running entity-only compile\n" );
@@ -821,6 +816,11 @@ int BSPMain( Args& args ){
 		while ( args.takeArg( "-externalmodels" ) ) {
 			Sys_Printf( "External models enabled\n" );
 			g_bExternalModels = true;
+		}
+		// complain if there's args remaning
+		while( !args.empty() )
+		{
+			Sys_Warning( "Unknown option \"%s\"\n", args.takeFront() );
 		}
 	}
 
