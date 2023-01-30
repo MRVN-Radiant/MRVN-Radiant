@@ -861,6 +861,8 @@ uint16_t Titanfall::EmitMaterialSort(uint32_t index) {
 
     Titanfall::MaterialSort_t &ms = Titanfall::Bsp::materialSorts.emplace_back();
     ms.textureData = index;
+    ms.lightmapHeader = -1;
+    ms.cubemap = -1;
 
     return pos;
 }

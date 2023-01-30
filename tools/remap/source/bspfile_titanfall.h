@@ -212,11 +212,11 @@ namespace Titanfall {
 
     // 0x52
     struct MaterialSort_t {
-        uint16_t  textureData;
-        uint16_t  lightmapHeader;
-        uint16_t  cubemap;
-        uint16_t  unk;
-        uint32_t  vertexOffset;
+        int16_t  textureData;
+        int16_t  lightmapHeader;
+        int16_t  cubemap;
+        int16_t  unk;
+        int32_t  vertexOffset;
     };
 
     // 0x55
