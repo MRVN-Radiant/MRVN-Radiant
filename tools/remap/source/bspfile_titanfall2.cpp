@@ -179,6 +179,8 @@ void CompileR2BSPFile() {
 
             Titanfall::EmitCollisionGrid(entity);
 
+            Titanfall::EmitLevelInfoWorldspawn();
+
             Titanfall::EndModel();
         /* props for gamelump */
         } else if (ENT_IS("misc_model")) { // Compile as static props into gamelump

@@ -166,6 +166,8 @@ void CompileR1BSPFile() {
 
             Titanfall::EmitCollisionGrid(entity);
 
+            Titanfall::EmitLevelInfoWorldspawn();
+
             Titanfall::EndModel();
         } else if (ENT_IS("misc_model")) { // Compile as static props into gamelump
             // TODO: use prop_static instead
@@ -1151,36 +1153,44 @@ void Titanfall::EmitPlane(const Plane3 &plane) {
 
 
 /*
-    EmitLevelInfo()
+    EmitLevelInfoWorldspawn()
 */
-void Titanfall::EmitLevelInfo() {
+void Titanfall::EmitLevelInfoWorldspawn() {
     Titanfall::LevelInfo_t &li = Titanfall::Bsp::levelInfo.emplace_back();
 
-    // mesh counts
-#if 0  /* crashing, this didn't happen when we sorted meshes in Titanfall::EmitMeshes... */
-    // TODO: Add decal support
+    // Mest indicies
     li.firstDecalMeshIndex = 0;
-    for (Shared::Mesh_t &mesh : Shared::meshes) {  // same indices as Titanfall::Bsp::meshes, more metadata
+    for (Shared::Mesh_t &mesh : Shared::meshes) {
         if (CHECK_FLAG(mesh.shaderInfo->compileFlags, C_DECAL)) { break; }
-        li.firstDecalMeshIndex++;
+            li.firstDecalMeshIndex++;
     }
 
     // TODO: start from firstDecalMeshIndex
     li.firstTransMeshIndex = 0;
-    for (Titanfall::Mesh_t &mesh : Titanfall::Bsp::meshes) {
-        if (CHECK_FLAG(mesh.flags, S_TRANSLUCENT)) { break; }
-        li.firstTransMeshIndex++;
+    for (Shared::Mesh_t &mesh : Shared::meshes) {
+        if (CHECK_FLAG(mesh.shaderInfo->compileFlags, C_TRANSLUCENT)) { break; }
+            li.firstTransMeshIndex++;
     }
 
     // TODO: start from firstTransMeshIndex
     li.firstSkyMeshIndex = 0;
-    for (Titanfall::Mesh_t &mesh : Titanfall::Bsp::meshes) {
-        if (CHECK_FLAG(mesh.flags, S_SKY) || CHECK_FLAG(mesh.flags, S_SKY_2D)) { break; }
-        li.firstSkyMeshIndex++;
+    for (Shared::Mesh_t &mesh : Shared::meshes) {
+        if (CHECK_FLAG(mesh.shaderInfo->compileFlags, C_SKY)) { break; }
+            li.firstSkyMeshIndex++;
     }
-#else
-    li.firstDecalMeshIndex = li.firstTransMeshIndex = li.firstSkyMeshIndex = Titanfall::Bsp::models[0].meshCount;
-#endif
+
+    if( li.firstTransMeshIndex > li.firstSkyMeshIndex )
+        li.firstTransMeshIndex = li.firstSkyMeshIndex;
+    
+    if( li.firstDecalMeshIndex > li.firstTransMeshIndex )
+        li.firstDecalMeshIndex = li.firstTransMeshIndex;
+}
+
+/*
+    EmitLevelInfo()
+*/
+void Titanfall::EmitLevelInfo() {
+    Titanfall::LevelInfo_t &li = Titanfall::Bsp::levelInfo.back();
 
     li.propCount = Titanfall::Bsp::gameLumpPropHeader.numProps;
     // TODO: unk2 sun vector from last light_environment

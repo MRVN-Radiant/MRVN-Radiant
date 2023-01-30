@@ -1954,7 +1954,7 @@ inline std::vector<int>             bspDrawIndexes;
 
 
 #define CHECK_FLAG(value, flag) (value & flag) == flag
-#define REMOVE_FLAG(value, flag) value &= ~flag;
+#define REMOVE_FLAG(value, flag) value &= ~flag
 
 #define AUTOEXPAND_BY_REALLOC(ptr, reqitem, allocated, def)\
     do {\

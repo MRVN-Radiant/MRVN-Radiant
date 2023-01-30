@@ -74,6 +74,8 @@ const int S_VERTEX_UNLIT         = 0x00000400;
 const int S_VERTEX_UNLIT_TS      = 0x00000600;
 // const int S_VERTEX_BLINN_PHONG   = ?
 
+const int S_MESH_UNKNOWN         = 0x00100000;
+
 // Collision flags
 const int CONTENTS_SOLID                = 0x00000001;  // Everything collides with me
 const int CONTENTS_WINDOW               = 0x00000002;

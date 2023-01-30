@@ -44,6 +44,7 @@ namespace Titanfall {
     void         EmitBrush(brush_t &e);
     void         EmitGeoSet(MinMax minmax, int index, int flags);
     int          EmitUniqueContents(int flags);
+    void         EmitLevelInfoWorldspawn();
     void         EmitLevelInfo();
     void         EmitStubs();
     void         EmitExtraEntity(entity_t &e);
