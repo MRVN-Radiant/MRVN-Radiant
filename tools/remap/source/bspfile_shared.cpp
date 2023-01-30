@@ -170,7 +170,8 @@ void Shared::MakeMeshes(const entity_t &e) {
     for (Shared::Mesh_t &mesh : Shared::meshes) {
         if (CHECK_FLAG(mesh.shaderInfo->compileFlags, C_SKY)) {
             sky_meshes.push_back(mesh);
-            //REMOVE_FLAG(mesh.shaderInfo->surfaceFlags, S_MESH_UNKNOWN);
+            // Respawn does this on their skyboxes, seems to work even when kept
+            REMOVE_FLAG(mesh.shaderInfo->surfaceFlags, S_MESH_UNKNOWN);
         } else if (CHECK_FLAG(mesh.shaderInfo->compileFlags, C_DECAL)) {
             decal_meshes.push_back(mesh);
         } else if (CHECK_FLAG(mesh.shaderInfo->compileFlags, C_TRANSLUCENT)) {
