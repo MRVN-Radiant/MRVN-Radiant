@@ -1080,7 +1080,7 @@ void Titanfall::EmitBrush(brush_t &brush) {
     std::vector<side_t>  axialSides;
     std::vector<side_t>  cuttingSides;
     // +X -X +Y -Y +Z -Z
-    bool axials[6];
+    shaderInfo_t *axials[6];
     // The bsp brushes are AABBs + cutting planes
     // Surface flags are indexed first for AABB ( first 6 planes ) then for the rest
     // Radiant brushes are made purely of planes so we dont have a guarantee that we'll get the
@@ -1103,29 +1103,28 @@ void Titanfall::EmitBrush(brush_t &brush) {
         SnapNormal(normal);
 
         if (normal[0] == 1.0f) {
-            axials[0] = true;  // +X
+            axials[1] = side.shaderInfo;
         } else if (normal[0] == -1.0f) {
-            axials[1] = true;  // -X
+            axials[0] = side.shaderInfo;
         }
 
         if (normal[1] == 1.0f) {
-            axials[2] = true;  // +Y
+            axials[3] = side.shaderInfo;
         } else if (normal[1] == -1.0f) {
-            axials[3] = true;  // -Y
+            axials[2] = side.shaderInfo;
         }
 
         if (normal[2] == 1.0f) {
-            axials[4] = true;  // +Z
+            axials[5] = side.shaderInfo;
         } else if (normal[2] == -1.0f) {
-            axials[5] = true;  // -Z
+            axials[4] = side.shaderInfo;
         }
     }
 
-    // TODO: Add correct material offset
     int test = 0;
     for (int i = 0; i < 6; i++) {
-        if (axials[i]) {
-            Titanfall::Bsp::cmBrushSideProperties.emplace_back(1);
+        if (axials[i] != nullptr) {
+            Titanfall::Bsp::cmBrushSideProperties.emplace_back(Titanfall::EmitTextureData(*axials[i]));
         } else {
             test++;
             Titanfall::Bsp::cmBrushSideProperties.emplace_back(MASK_DISCARD);
@@ -1144,7 +1143,7 @@ void Titanfall::EmitBrush(brush_t &brush) {
 
         Titanfall::EmitPlane(side.plane);
         b.planeCount++;
-        Titanfall::Bsp::cmBrushSideProperties.emplace_back(1);
+        Titanfall::Bsp::cmBrushSideProperties.emplace_back(Titanfall::EmitTextureData(*side.shaderInfo));
         uint16_t &so = Titanfall::Bsp::cmBrushSidePlaneOffsets.emplace_back();
         so = 0;
     }
