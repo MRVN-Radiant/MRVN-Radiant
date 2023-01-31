@@ -68,19 +68,19 @@ void WriteR2BSPFile(const char *filename) {
 
     /* :) */
     {
-        char message[64] = "Built with love using MRVN-radiant :)";
+        char message[64] = REMAP_MOTD;
         SafeWrite(file, &message, sizeof(message));
     }
     {
         char message[64];
-        strncpy(message, StringOutputStream(64)("Version:        ", Q3MAP_VERSION).c_str(), 64);
+        strncpy(message, StringOutputStream(64)("Version:        ", Q3MAP_VERSION).c_str(), 63);
         SafeWrite(file, &message, sizeof(message));
     }
     {
         time_t t;
         time(&t);
         char message[64];
-        strncpy(message, StringOutputStream(64)("Time:           ", asctime(localtime(&t))).c_str(), 64);
+        strncpy(message, StringOutputStream(64)("Time:           ", asctime(localtime(&t))).c_str(), 63);
         SafeWrite(file, &message, sizeof(message));
     }
 

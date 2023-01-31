@@ -39,7 +39,7 @@
 #ifndef Q3MAP_VERSION
 #error no Q3MAP_VERSION defined
 #endif
-#define Q3MAP_MOTD  "Your map saw the pretty lights from remap's BFG"
+#define REMAP_MOTD  "Built with love using MRVN-Radiant :)"
 
 
 /* -------------------------------------------------------------------------------
