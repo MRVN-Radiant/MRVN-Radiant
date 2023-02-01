@@ -926,7 +926,17 @@ void Titanfall::EmitCollisionGrid( entity_t &e ) {
      
 
     // Choose scale
+    // The limit seems to be 128x128, try to use size of 256 or higher
     float scale = 256;
+    int x, y;
+    x = ceil(size.x() / scale) + 2;
+    y = ceil(size.y() / scale) + 2;
+    while( x > 128 || y > 128 ) {
+        scale += 16;
+        x = ceil(size.x() / scale) + 2;
+        y = ceil(size.y() / scale) + 2;
+    }
+    Sys_FPrintf( SYS_VRB, "       Grid scale is: %f\n", scale );
 
     Titanfall::CMGrid_t &grid = Titanfall::Bsp::cmGrid.emplace_back();
     grid.scale = scale;
