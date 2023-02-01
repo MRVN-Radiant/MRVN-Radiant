@@ -1,3 +1,26 @@
+/* -------------------------------------------------------------------------------
+
+   Copyright (C) 2022-2023 MRVN-Radiant and contributors.
+   For a list of contributors, see the accompanying CONTRIBUTORS file.
+
+   This file is part of MRVN-Radiant.
+
+   MRVN-Radiant is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   MRVN-Radiant is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with GtkRadiant; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+   ------------------------------------------------------------------------------- */
+
 #pragma once
 
 #include "bspfile_shared.h"
@@ -38,12 +61,13 @@ namespace Titanfall {
     std::size_t  EmitObjReferences(Shared::visNode_t &node);
     int          EmitVisChildrenOfTreeNode(Shared::visNode_t node);
     void         EmitVisTree();
-    uint16_t     EmitMaterialSort(uint32_t index);
+    uint16_t     EmitMaterialSort(uint32_t index, int offset, int count);
     void         EmitCollisionGrid(entity_t &e);
     void         EmitModelGridCell(entity_t &e);
     void         EmitBrush(brush_t &e);
     void         EmitGeoSet(MinMax minmax, int index, int flags);
     int          EmitUniqueContents(int flags);
+    void         EmitLevelInfoWorldspawn();
     void         EmitLevelInfo();
     void         EmitStubs();
     void         EmitExtraEntity(entity_t &e);
@@ -189,9 +213,10 @@ namespace Titanfall {
     struct Mesh_t {
         uint32_t  triOffset;
         uint16_t  triCount;
-        uint16_t  firstVertex;
+        uint16_t  vertexOffset;
         uint16_t  vertexCount;
-        uint16_t  unk0;
+        uint8_t   vertexType;
+        uint8_t   unused;
         uint32_t  const0;
         uint16_t  unk1;
         uint16_t  unk2;
@@ -210,11 +235,11 @@ namespace Titanfall {
 
     // 0x52
     struct MaterialSort_t {
-        uint16_t  textureData;
-        uint16_t  lightmapHeader;
-        uint16_t  cubemap;
-        uint16_t  unk;
-        uint32_t  vertexOffset;
+        int16_t  textureData;
+        int16_t  lightmapHeader;
+        int16_t  cubemap;
+        int16_t  unk;
+        int32_t  vertexOffset;
     };
 
     // 0x55

@@ -1,3 +1,26 @@
+/* -------------------------------------------------------------------------------
+
+   Copyright (C) 2022-2023 MRVN-Radiant and contributors.
+   For a list of contributors, see the accompanying CONTRIBUTORS file.
+
+   This file is part of MRVN-Radiant.
+
+   MRVN-Radiant is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   MRVN-Radiant is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with GtkRadiant; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+   ------------------------------------------------------------------------------- */
+
 #include "remap.h"
 #include "bspfile_abstract.h"
 
@@ -9,8 +32,6 @@
 void Shared::MakeMeshes(const entity_t &e) {
     // Multiple entities can have meshes, make sure we clear before making new meshes
     Shared::meshes.clear();
-
-    Sys_FPrintf(SYS_VRB, "--- SharedMeshes ---\n");
 
     // Loop through brushes
     for (const brush_t &brush : e.brushes) {
@@ -167,12 +188,14 @@ void Shared::MakeMeshes(const entity_t &e) {
     std::vector<Shared::Mesh_t>  trans_meshes;
     std::vector<Shared::Mesh_t>  sky_meshes;
 
-    for (const Shared::Mesh_t &mesh : Shared::meshes) {
-        if (mesh.shaderInfo->compileFlags & C_SKY) {
+    for (Shared::Mesh_t &mesh : Shared::meshes) {
+        if (CHECK_FLAG(mesh.shaderInfo->compileFlags, C_SKY)) {
             sky_meshes.push_back(mesh);
-        } else if (mesh.shaderInfo->compileFlags & C_DECAL) {
+            // Respawn does this on their skyboxes, seems to work even when kept
+            REMOVE_FLAG(mesh.shaderInfo->surfaceFlags, S_MESH_UNKNOWN);
+        } else if (CHECK_FLAG(mesh.shaderInfo->compileFlags, C_DECAL)) {
             decal_meshes.push_back(mesh);
-        } else if (mesh.shaderInfo->compileFlags & C_TRANSLUCENT) {
+        } else if (CHECK_FLAG(mesh.shaderInfo->compileFlags, C_TRANSLUCENT)) {
             trans_meshes.push_back(mesh);
         } else {
             opaque_meshes.push_back(mesh);
@@ -187,8 +210,6 @@ void Shared::MakeMeshes(const entity_t &e) {
     COPY_MESHES(trans_meshes);
     COPY_MESHES(sky_meshes);
     #undef COPY_MESHES
-
-    Sys_Printf("%9zu shared meshes\n", Shared::meshes.size());
 }
 
 

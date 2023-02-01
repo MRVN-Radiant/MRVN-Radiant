@@ -382,8 +382,9 @@ int ConvertBSPMain( Args& args ){
 				break;
 			}
 		}
-
+		Sys_FPrintf( SYS_VRB, "--- DecompileMap ---\n" );
 		g_game->load( header, source );
+		Sys_Printf("\n" );
 	}
 	
 	/* bsp format convert? */

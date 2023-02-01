@@ -39,7 +39,7 @@
 #ifndef Q3MAP_VERSION
 #error no Q3MAP_VERSION defined
 #endif
-#define Q3MAP_MOTD  "Your map saw the pretty lights from remap's BFG"
+#define REMAP_MOTD  "Built with love using MRVN-Radiant :)"
 
 
 /* -------------------------------------------------------------------------------
@@ -1952,6 +1952,9 @@ inline std::vector<byte>            bspVisBytes;  // MAX_MAP_VISIBILITY
 inline std::vector<bspDrawVert_t>   bspDrawVerts;
 inline std::vector<int>             bspDrawIndexes;
 
+
+#define CHECK_FLAG(value, flag) (value & flag) == flag
+#define REMOVE_FLAG(value, flag) value &= ~flag
 
 #define AUTOEXPAND_BY_REALLOC(ptr, reqitem, allocated, def)\
     do {\
