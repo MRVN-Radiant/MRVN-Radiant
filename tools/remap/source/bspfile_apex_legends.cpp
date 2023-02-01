@@ -353,7 +353,8 @@ void ApexLegends::EmitMeshes(const entity_t &e) {
 
         // Emit textrue related structs
         uint32_t textureIndex = ApexLegends::EmitTextureData(*mesh.shaderInfo);
-        m.materialOffset = ApexLegends::EmitMaterialSort(textureIndex);
+        m.materialOffset = ApexLegends::EmitMaterialSort(textureIndex, vertexOffset, mesh.vertices.size());
+        int materialSortOffset = ApexLegends::Bsp::materialSorts.at(m.materialOffset).vertexOffset;
         MinMax  aabb;
 
         // Save vertices and vertexnormals
@@ -376,7 +377,7 @@ void ApexLegends::EmitMeshes(const entity_t &e) {
 
         // Save triangles
         for (uint16_t triangle : mesh.triangles) {
-            Titanfall::Bsp::meshIndices.emplace_back(triangle + vertexOffset);
+            Titanfall::Bsp::meshIndices.emplace_back(triangle + vertexOffset - materialSortOffset);
         }
 
         // Save MeshBounds
@@ -437,11 +438,11 @@ uint32_t ApexLegends::EmitTextureData(shaderInfo_t shader) {
     EmitMaterialSort()
     Tries to create a material sort of the last texture
 */
-uint16_t ApexLegends::EmitMaterialSort(uint32_t index) {
+uint16_t ApexLegends::EmitMaterialSort(uint32_t index, int offset, int count) {
         /* Check if the material sort we need already exists */
         std::size_t pos = 0;
         for (ApexLegends::MaterialSort_t &ms : ApexLegends::Bsp::materialSorts) {
-            if (ms.textureData == index) {
+            if (ms.textureData == index && offset - ms.vertexOffset + count < 65535) {
                 return pos;
             }
             pos++;
@@ -449,6 +450,8 @@ uint16_t ApexLegends::EmitMaterialSort(uint32_t index) {
 
         ApexLegends::MaterialSort_t &ms = ApexLegends::Bsp::materialSorts.emplace_back();
         ms.textureData = index;
+        ms.lightmapIndex = -1;
+        ms.vertexOffset = offset;
 
         return pos;
 }

@@ -48,7 +48,7 @@ namespace ApexLegends {
     int         EmitContentsMask( int mask );
     void        EmitMeshes(const entity_t &e);
     uint32_t    EmitTextureData(shaderInfo_t shader);
-    uint16_t    EmitMaterialSort(uint32_t index);
+    uint16_t    EmitMaterialSort(uint32_t index, int offset, int count);
     void        EmitVertexUnlit(Shared::Vertex_t &vertex);
     void        EmitVertexLitFlat(Shared::Vertex_t &vertex);
     void        EmitVertexLitBump(Shared::Vertex_t &vertex);
@@ -159,7 +159,7 @@ namespace ApexLegends {
     // 0x52
     struct MaterialSort_t {
         uint16_t  textureData;
-        uint16_t  lightmapIndex;
+        int16_t  lightmapIndex;
         uint16_t  unknown0;
         uint16_t  unknown1;
         uint32_t  vertexOffset;
