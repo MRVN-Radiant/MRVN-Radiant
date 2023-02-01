@@ -23,7 +23,7 @@
 
 
 /* dependencies */
-#include "bspfile_abstract.h"
+#include "../bspfile_abstract.h"
 #include <algorithm>
 #include <ctime>
 

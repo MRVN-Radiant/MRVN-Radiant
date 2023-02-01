@@ -23,11 +23,11 @@
 
 #pragma once
 
-#include "bspfile_titanfall2.h"
+#include "../titanfall2/titanfall2.h"
 #include "qmath.h"
 #include <cstdint>
-#include "remap.h"
-#include "lump_names.h"
+#include "../remap.h"
+#include "../lump_names.h"
 
 void LoadR5BSPFile(rbspHeader_t *header, const char *filename);
 void WriteR5BSPFile(const char *filename);

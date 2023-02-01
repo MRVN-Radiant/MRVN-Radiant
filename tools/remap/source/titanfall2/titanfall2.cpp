@@ -22,8 +22,8 @@
    ------------------------------------------------------------------------------- */
 
 
-#include "remap.h"
-#include "bspfile_abstract.h"
+#include "../remap.h"
+#include "../bspfile_abstract.h"
 #include <ctime>
 
 

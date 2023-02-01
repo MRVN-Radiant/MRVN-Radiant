@@ -510,10 +510,10 @@ $(INSTALLDIR)/remap.$(EXE): \
 	tools/remap/source/brush.o \
 	tools/remap/source/bspfile_abstract.o \
 	tools/remap/source/bspfile_shared.o \
-	tools/remap/source/bspfile_titanfall.o \
-	tools/remap/source/bspfile_titanfall2.o \
-	tools/remap/source/bspfile_apex_legends.o \
-	tools/remap/source/bspfile_decompile_titanfall.o \
+	tools/remap/source/titanfall/titanfall.o \
+	tools/remap/source/titanfall/titanfall_decompile.o \
+	tools/remap/source/titanfall2/titanfall2.o \
+	tools/remap/source/apex_legends/apex_legends.o \
 	tools/remap/source/bsp.o \
 	tools/remap/source/convert_bsp.o \
 	tools/remap/source/convert_json.o \

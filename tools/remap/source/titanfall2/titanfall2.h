@@ -21,20 +21,37 @@
 
    ------------------------------------------------------------------------------- */
 
+#pragma once
 
-#include <list>
-#include "bspfile_abstract.h"
-#include "remap.h"
-#include "lump_names.h"
+#include "../titanfall/titanfall.h"
+#include "qmath.h"
+#include <cstdint>
+#include "../remap.h"
+#include "../lump_names.h"
 
-namespace Titanfall {
-	void LoadLumpsAndEntities( rbspHeader_t *header, const char *filename );
-	void ParseLoadedBSP();
-	void LoadAndParseGameLump( rbspHeader_t *header );
-	void ParseExtraBrushes( entity_t &entity );
-	void ParseWorldspawn( entity_t &entity );
-	void ParseGridCells( entity_t &entity, std::size_t index, std::size_t count );
-	void ParseBrush( entity_t &entity, std::size_t index );
-	void ParsePatch( entity_t &entity, std::size_t index );
-	std::vector<Plane3> BuildPlanesFromMinMax( MinMax &minmax );
+
+void WriteR2EntFiles(const char* filename);
+
+void LoadR2BSPFile( rbspHeader_t *header, const char *filename );
+void WriteR2BSPFile(const char* filename);
+void CompileR2BSPFile();
+
+
+/* -------------------------------------------------------------------------------
+
+   abstracted bsp globals
+
+   ------------------------------------------------------------------------------- */
+
+
+namespace Titanfall2 {
+    void EmitEntity(const entity_t &e);
+    void EmitStubs();
+
+    namespace Bsp {
+        /* Stubs */
+        inline std::vector<uint8_t>  worldLights_stub;
+        inline std::vector<uint8_t>  lightMapHeaders_stub;
+        inline std::vector<uint8_t>  lightMapDataSky_stub;
+    }
 }

@@ -23,11 +23,11 @@
 
 #pragma once
 
-#include "bspfile_shared.h"
+#include "../bspfile_shared.h"
 #include "qmath.h"
 #include <cstdint>
-#include "remap.h"
-#include "lump_names.h"
+#include "../remap.h"
+#include "../lump_names.h"
 
 
 void LoadR1BSPFile(rbspHeader_t *header, const char *filename);
@@ -71,6 +71,16 @@ namespace Titanfall {
     void         EmitLevelInfo();
     void         EmitStubs();
     void         EmitExtraEntity(entity_t &e);
+
+    void         LoadLumpsAndEntities( rbspHeader_t *header, const char *filename );
+    void         ParseLoadedBSP();
+    void         LoadAndParseGameLump( rbspHeader_t *header );
+    void         ParseExtraBrushes( entity_t &entity );
+    void         ParseWorldspawn( entity_t &entity );
+    void         ParseGridCells( entity_t &entity, std::size_t index, std::size_t count );
+    void         ParseBrush( entity_t &entity, std::size_t index );
+    void         ParsePatch( entity_t &entity, std::size_t index );
+    std::vector<Plane3> BuildPlanesFromMinMax( MinMax &minmax );
 
 
     /* Lump Structs */
