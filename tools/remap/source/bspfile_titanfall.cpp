@@ -1124,7 +1124,8 @@ void Titanfall::EmitBrush(brush_t &brush) {
     int test = 0;
     for (int i = 0; i < 6; i++) {
         if (axials[i] != nullptr) {
-            Titanfall::Bsp::cmBrushSideProperties.emplace_back(Titanfall::EmitTextureData(*axials[i]));
+            //Titanfall::Bsp::cmBrushSideProperties.emplace_back(Titanfall::EmitTextureData(*axials[i]));
+            Titanfall::Bsp::cmBrushSideProperties.emplace_back(0);
         } else {
             test++;
             Titanfall::Bsp::cmBrushSideProperties.emplace_back(MASK_DISCARD);
@@ -1137,7 +1138,7 @@ void Titanfall::EmitBrush(brush_t &brush) {
         SnapNormal(normal);
         if (normal[0] == -1.0f || normal[0] == 1.0f || (normal[0] == 0.0f && normal[1] == 0.0f)
             || normal[1] == -1.0f || normal[1] == 1.0f || (normal[1] == 0.0f && normal[2] == 0.0f)
-            || normal[2] == -1.0f || normal[2] == 1.0f || (normal[2] == 0.0f && normal[0] == 0.0f)) {
+            || normal[2] == -1.0f || normal[2] == 1.0f || (normal[2] == 0.0f && normal[0] == 0.0f) || side.bevel) {
             continue;  // axial, only test non-axial edges
         }
 
