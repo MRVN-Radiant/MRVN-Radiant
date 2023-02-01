@@ -511,9 +511,15 @@ $(INSTALLDIR)/remap.$(EXE): \
 	tools/remap/source/bspfile_abstract.o \
 	tools/remap/source/bspfile_shared.o \
 	tools/remap/source/titanfall/titanfall.o \
+	tools/remap/source/titanfall/titanfall_vis.o \
+	tools/remap/source/titanfall/titanfall_collisions.o \
+	tools/remap/source/titanfall/titanfall_misc.o \
 	tools/remap/source/titanfall/titanfall_decompile.o \
 	tools/remap/source/titanfall2/titanfall2.o \
 	tools/remap/source/apex_legends/apex_legends.o \
+	tools/remap/source/apex_legends/apex_legends_vis.o \
+	tools/remap/source/apex_legends/apex_legends_collisions.o \
+	tools/remap/source/apex_legends/apex_legends_misc.o \
 	tools/remap/source/bsp.o \
 	tools/remap/source/convert_bsp.o \
 	tools/remap/source/convert_json.o \
