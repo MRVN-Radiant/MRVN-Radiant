@@ -61,7 +61,7 @@ namespace Titanfall {
     std::size_t  EmitObjReferences(Shared::visNode_t &node);
     int          EmitVisChildrenOfTreeNode(Shared::visNode_t node);
     void         EmitVisTree();
-    uint16_t     EmitMaterialSort(uint32_t index);
+    uint16_t     EmitMaterialSort(uint32_t index, int offset, int count);
     void         EmitCollisionGrid(entity_t &e);
     void         EmitModelGridCell(entity_t &e);
     void         EmitBrush(brush_t &e);

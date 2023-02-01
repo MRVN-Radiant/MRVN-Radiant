@@ -822,7 +822,8 @@ void Titanfall::EmitMeshes(const entity_t &e) {
 
         // Emit texture related structs
         uint32_t  textureIndex = Titanfall::EmitTextureData(*mesh.shaderInfo);
-        m.materialOffset = Titanfall::EmitMaterialSort(textureIndex);
+        m.materialOffset = Titanfall::EmitMaterialSort(textureIndex, m.vertexOffset, m.vertexCount);
+        int materialSortOffset = Titanfall::Bsp::materialSorts.at(m.materialOffset).vertexOffset;
         MinMax  aabb;
 
         // Save vertices and vertexnormals
@@ -844,7 +845,7 @@ void Titanfall::EmitMeshes(const entity_t &e) {
 
         // Save triangles
         for (uint16_t triangle : mesh.triangles) {
-            Titanfall::Bsp::meshIndices.emplace_back(triangle + m.vertexOffset);
+            Titanfall::Bsp::meshIndices.emplace_back(triangle + m.vertexOffset - materialSortOffset);
         }
 
         // Save MeshBounds
@@ -859,11 +860,11 @@ void Titanfall::EmitMeshes(const entity_t &e) {
     EmitMaterialSort()
     Tries to create a material sort of the last texture
 */
-uint16_t Titanfall::EmitMaterialSort(uint32_t index) {
+uint16_t Titanfall::EmitMaterialSort(uint32_t index, int offset, int count) {
     /* Check if the material sort we need already exists */
     std::size_t pos = 0;
     for (Titanfall::MaterialSort_t &ms : Titanfall::Bsp::materialSorts) {
-        if (ms.textureData == index) {
+        if (ms.textureData == index && offset - ms.vertexOffset + count < 65535) {
             return pos;
         }
 
@@ -874,6 +875,7 @@ uint16_t Titanfall::EmitMaterialSort(uint32_t index) {
     ms.textureData = index;
     ms.lightmapHeader = -1;
     ms.cubemap = -1;
+    ms.vertexOffset = offset;
 
     return pos;
 }
