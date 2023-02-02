@@ -26,11 +26,9 @@
 /* dependencies */
 #include "remap.h"
 #include "bspfile_shared.h"
-#include "bspfile_titanfall.h"
-#include "bspfile_titanfall2.h"
-#include "bspfile_apex_legends.h"
-
-#include "bspfile_decompile_titanfall.h"
+#include "titanfall/titanfall.h"
+#include "titanfall2/titanfall2.h"
+#include "apex_legends/apex_legends.h"
 
 
 /*

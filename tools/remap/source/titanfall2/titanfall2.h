@@ -23,11 +23,11 @@
 
 #pragma once
 
-#include "bspfile_titanfall.h"
+#include "../titanfall/titanfall.h"
 #include "qmath.h"
 #include <cstdint>
-#include "remap.h"
-#include "lump_names.h"
+#include "../remap.h"
+#include "../lump_names.h"
 
 
 void WriteR2EntFiles(const char* filename);

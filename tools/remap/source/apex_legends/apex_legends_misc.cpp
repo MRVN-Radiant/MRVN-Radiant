@@ -22,19 +22,35 @@
    ------------------------------------------------------------------------------- */
 
 
-#include <list>
-#include "bspfile_abstract.h"
-#include "remap.h"
-#include "lump_names.h"
+#include "../remap.h"
+#include "../bspfile_abstract.h"
+#include <ctime>
 
-namespace Titanfall {
-	void LoadLumpsAndEntities( rbspHeader_t *header, const char *filename );
-	void ParseLoadedBSP();
-	void LoadAndParseGameLump( rbspHeader_t *header );
-	void ParseExtraBrushes( entity_t &entity );
-	void ParseWorldspawn( entity_t &entity );
-	void ParseGridCells( entity_t &entity, std::size_t index, std::size_t count );
-	void ParseBrush( entity_t &entity, std::size_t index );
-	void ParsePatch( entity_t &entity, std::size_t index );
-	std::vector<Plane3> BuildPlanesFromMinMax( MinMax &minmax );
+/*
+    BeginModel
+*/
+void ApexLegends::BeginModel(entity_t &entity) {
+    Sys_FPrintf( SYS_VRB, "   BeginModel: \"%s\"\n", entity.classname() );
+    ApexLegends::Model_t &model = ApexLegends::Bsp::models.emplace_back();
+    model.meshIndex = ApexLegends::Bsp::meshes.size();
+    model.bvhNodeIndex = 0;
+    model.bvhLeafIndex = 0;
+    model.vertexIndex = Titanfall::Bsp::vertices.size();
+    model.vertexFlags = 0;
+}
+
+/*
+    EndModel
+*/
+void ApexLegends::EndModel() {
+    ApexLegends::Model_t &model = ApexLegends::Bsp::models.back();
+    model.meshCount = ApexLegends::Bsp::meshes.size() - model.meshIndex;
+
+    for( Titanfall::MeshBounds_t &meshBounds : Titanfall::Bsp::meshBounds ) {
+        model.minmax.extend(meshBounds.origin - meshBounds.extents);
+        model.minmax.extend(meshBounds.origin + meshBounds.extents);
+    }
+
+    Sys_FPrintf( SYS_VRB, "       numMeshes: %i\n", model.meshCount );
+    Sys_FPrintf( SYS_VRB, "   EndModel\n" );
 }

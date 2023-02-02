@@ -21,7 +21,9 @@
 
    ------------------------------------------------------------------------------- */
 
-#include "bspfile_decompile_titanfall.h"
+#include "../remap.h"
+#include "../bspfile_abstract.h"
+#include "titanfall.h"
 
 
 void Titanfall::LoadLumpsAndEntities( rbspHeader_t *header, const char *filename ) {
