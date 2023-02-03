@@ -306,7 +306,7 @@ void Titanfall::EmitBrush(brush_t &brush) {
     }
 
     if (b.planeCount) {
-        b.unknown = b.planeCount / 2 + 1;
+        b.unknown = b.planeCount;
         b.sidePlaneIndex = Titanfall::Bsp::cmBrushSidePlaneOffsets.size() - b.planeCount;
     }
 #endif
