@@ -1178,17 +1178,17 @@ bool ShaderTemplate::parseQuake3( Tokeniser& tokeniser ){
 		}
 
 		if ( depth == 1 ) {
-			if ( string_equal_nocase( token, "qer_nocarve" ) ) {
+			if ( string_equal_nocase( token, "%nocarve" ) ) {
 				m_nFlags |= QER_NOCARVE;
 			}
-			else if ( string_equal_nocase( token, "qer_trans" ) ) {
+			else if ( string_equal_nocase( token, "%trans" ) ) {
 				RETURN_FALSE_IF_FAIL( Tokeniser_getFloat( tokeniser, m_fTrans ) );
 				m_nFlags |= QER_TRANS;
 			}
-			else if ( string_equal_nocase( token, "qer_editorimage" ) ) {
+			else if ( string_equal_nocase( token, "%editorimage" ) ) {
 				RETURN_FALSE_IF_FAIL( Tokeniser_parseTextureName( tokeniser, m_textureName ) );
 			}
-			else if ( string_equal_nocase( token, "qer_alphafunc" ) ) {
+			else if ( string_equal_nocase( token, "%alphafunc" ) ) {
 				const char* alphafunc = tokeniser.getToken();
 
 				if ( alphafunc == 0 ) {
@@ -1220,7 +1220,7 @@ bool ShaderTemplate::parseQuake3( Tokeniser& tokeniser ){
 
 				RETURN_FALSE_IF_FAIL( Tokeniser_getFloat( tokeniser, m_AlphaRef ) );
 			}
-			else if ( string_equal_nocase( token, "cull" ) ) {
+			else if ( string_equal_nocase( token, "%cull" ) ) {
 				const char* cull = tokeniser.getToken();
 
 				if ( cull == 0 ) {
@@ -1245,40 +1245,77 @@ bool ShaderTemplate::parseQuake3( Tokeniser& tokeniser ){
 
 				m_nFlags |= QER_CULL;
 			}
-			else if ( string_equal_nocase( token, "surfaceparm" ) ) {
-				const char* surfaceparm = tokeniser.getToken();
+			else if ( string_equal_nocase( token, "$basetexture" ) ) {
+				// Specifies the base _col texture this shader uses, if this doesn't exist
+				// the shader name is used to look for the base texture
+				const char* basetexture = tokeniser.getToken();
 
-				if ( surfaceparm == 0 ) {
-					Tokeniser_unexpectedError( tokeniser, surfaceparm, "#surfaceparm" );
+				if ( basetexture == 0 ) {
+					Tokeniser_unexpectedError( tokeniser, basetexture, "#basetexture" );
 					return false;
 				}
 
-				if ( string_equal_nocase( surfaceparm, "fog" ) ) {
-					m_nFlags |= QER_FOG;
-					m_nFlags |= QER_TRANS;
-					if ( m_fTrans == 1.0f ) { // has not been explicitly set by qer_trans
-						m_fTrans = 0.35f;
-					}
+				m_textureName = basetexture;
+			}
+			else if ( string_equal_nocase( token, "$basetexture2" ) ) {
+				// Specifies the second _col texture used for blending
+				// NOTE: Not supported in editor as of writing this
+				const char* basetexture2 = tokeniser.getToken();
+
+				if ( basetexture2 == 0 ) {
+					Tokeniser_unexpectedError( tokeniser, basetexture2, "#basetexture2" );
+					return false;
 				}
-				else if ( string_equal_nocase( surfaceparm, "nodraw" ) ) {
-					m_nFlags |= QER_NODRAW;
+			}
+			else if ( string_equal_nocase( token, "$shadertype" ) ) {
+				// Specifies the shader type, this can set multiple flags
+				// to make the life of the mapper easier
+				const char* shadertype = tokeniser.getToken();
+
+				if ( shadertype == 0 ) {
+					Tokeniser_unexpectedError( tokeniser, shadertype, "#shadertype" );
+					return false;
 				}
-				else if ( string_equal_nocase( surfaceparm, "nonsolid" ) ) {
-					m_nFlags |= QER_NONSOLID;
+			}
+			else if ( string_equal_nocase( token, "$surfaceflag" ) ) {
+				// Specifies a specific surface flag
+				const char* surfaceflag = tokeniser.getToken();
+
+				if ( surfaceflag == 0 ) {
+					Tokeniser_unexpectedError( tokeniser, surfaceflag, "#surfaceflag" );
+					return false;
 				}
-				else if ( string_equal_nocase( surfaceparm, "water" ) ||
-				          string_equal_nocase( surfaceparm, "lava" ) ||
-				          string_equal_nocase( surfaceparm, "slime") ){
-					m_nFlags |= QER_LIQUID;
+			}
+			else if ( string_equal_nocase( token, "$contentflag" ) ) {
+				// Specifies a specific content flag
+				const char* contentflag = tokeniser.getToken();
+
+				if ( contentflag == 0 ) {
+					Tokeniser_unexpectedError( tokeniser, contentflag, "#contentflag" );
+					return false;
 				}
-				else if ( string_equal_nocase( surfaceparm, "areaportal" ) ) {
-					m_nFlags |= QER_AREAPORTAL;
-				}
-				else if ( string_equal_nocase( surfaceparm, "playerclip" ) ) {
+
+				if ( string_equal_nocase( contentflag, "playerclip" ) ) {
 					m_nFlags |= QER_CLIP;
 				}
-				else if ( string_equal_nocase( surfaceparm, "botclip" ) ) {
-					m_nFlags |= QER_BOTCLIP;
+			}
+			else if ( string_equal_nocase( token, "$compileflag" ) ) {
+				// Specifies a specific compile flag
+				const char* compileflag = tokeniser.getToken();
+
+				if ( compileflag == 0 ) {
+					Tokeniser_unexpectedError( tokeniser, compileflag, "#compileflag" );
+					return false;
+				}
+
+				if ( string_equal_nocase( compileflag, "nodraw" ) ) {
+					m_nFlags |= QER_NODRAW;
+				}
+				else if ( string_equal_nocase( compileflag, "nonsolid" ) ) {
+					m_nFlags |= QER_NONSOLID;
+				}
+				else if ( string_equal_nocase( compileflag, "portal" ) ) {
+					m_nFlags |= QER_AREAPORTAL;
 				}
 			}
 		}
