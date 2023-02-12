@@ -285,6 +285,8 @@ public:
 	TextureExpression m_specular;
 	TextureExpression m_lightFalloffImage;
 
+	TextureExpression m_textureName2;
+
 	int m_nFlags;
 	float m_fTrans;
 
@@ -846,6 +848,9 @@ class CShader : public IShader
 	qtexture_t* m_pLightFalloffImage;
 	BlendFunc m_blendFunc;
 
+	qtexture_t* m_pTexture2;
+	qtexture_t* m_notfound2;
+
 	bool m_bInUse;
 
 
@@ -864,7 +869,10 @@ public:
 		m_pBump = 0;
 		m_pSpecular = 0;
 
+		m_pTexture2 = 0;
+
 		m_notfound = 0;
+		m_notfound2 = 0;
 
 		realise();
 	}
@@ -901,6 +909,10 @@ public:
 	}
 	qtexture_t* getSpecular() const {
 		return m_pSpecular;
+	}
+
+	qtexture_t* getTexture2() const {
+		return m_pTexture2;
 	}
 // get shader name
 	const char* getName() const {
@@ -956,14 +968,31 @@ public:
 			}
 		}
 
+		m_pTexture2 = evaluateTexture( m_template.m_textureName2, m_template.m_params, m_args );
+
+		if ( m_pTexture2->texture_number == 0 ) {
+			m_notfound2 = m_pTexture2;
+
+			{
+				StringOutputStream name( 256 );
+				name << GlobalRadiant().getAppPath() << "bitmaps/" << ( IsDefault() ? "notex.png" : "shadernotex.png" );
+				m_pTexture2 = GlobalTexturesCache().capture( LoadImageCallback( 0, loadBitmap ), name.c_str() );
+			}
+		}
+
 		realiseLighting();
 	}
 
 	void unrealise(){
 		GlobalTexturesCache().release( m_pTexture );
+		GlobalTexturesCache().release( m_pTexture2 );
 
 		if ( m_notfound != 0 ) {
 			GlobalTexturesCache().release( m_notfound );
+		}
+
+		if ( m_notfound2 != 0 ) {
+			GlobalTexturesCache().release( m_notfound2 );
 		}
 
 		unrealiseLighting();
@@ -1266,6 +1295,8 @@ bool ShaderTemplate::parseQuake3( Tokeniser& tokeniser ){
 					Tokeniser_unexpectedError( tokeniser, basetexture2, "#basetexture2" );
 					return false;
 				}
+
+				m_textureName2 = basetexture2;
 			}
 			else if ( string_equal_nocase( token, "$shadertype" ) ) {
 				// Specifies the shader type, this can set multiple flags
