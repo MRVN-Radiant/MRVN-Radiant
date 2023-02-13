@@ -1352,6 +1352,11 @@ bool ShaderTemplate::parseQuake3( Tokeniser& tokeniser ){
 		}
 	}
 
+	// If $basetexture2 wans't specified we want both textures to be the same
+	if( string_empty( m_textureName2.c_str()) ) {
+		m_textureName2 = m_textureName;
+	}
+
 	return true;
 }
 
