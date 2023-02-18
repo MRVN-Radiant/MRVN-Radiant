@@ -495,6 +495,8 @@ struct shaderInfo_t {
     String512                  lightImagePath;        /* use this image to generate color / averageColor */
     String512                  normalImagePath;       /* ydnar: normalmap image for bumpmapping */
 
+    String512                  baseTexture2Path;
+
     EImplicitMap               implicitMap;           /* ydnar: enemy territory implicit shaders */
     String512                  implicitImagePath;
 
