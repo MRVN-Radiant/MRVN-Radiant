@@ -887,6 +887,9 @@ static void ParseShaderFile(const char *filename) {
             } else if (striEqual(token, "$basetexture")) {
                 text.GetToken(false);
                 si->editorImagePath(PathExtensionless(token));
+            } else if (striEqual(token, "$basetexture2")) {
+                text.GetToken(false);
+                si->baseTexture2Path(PathExtensionless(token));
             }
             
 
