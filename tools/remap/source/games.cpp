@@ -24,7 +24,12 @@
    This code has been altered significantly from its original form, to support
    several games based on the Quake III Arena engine, in the form of "Q3Map2."
 
-   ------------------------------------------------------------------------------- */
+   ----------------------------------------------------------------------------------
+
+   "Q3Map2" has been significantly modified in the form of "remap" to support
+   Respawn Entertainment games.
+
+   ---------------------------------------------------------------------------------- */
 
 
 #include "games.h"
@@ -97,23 +102,62 @@ struct game_titanfallonline : game_t {
         0,
         // Shader Type
         {
-            // name      contentFlags  contentFlagsClear  surfaceFlags  surfaceFlagsClear  compileFlags  compileFlagsClear
-            {"default",            0,                -1,            0,                -1,            0,                -1},
+            // name                     surfaceFlags, surfaceFlagsClear,    contentsFlags, contentsFlagsClear, compileFlags, compileFlagsClear
+            {"default",               S_MESH_UNKNOWN,                -1,   CONTENTS_SOLID,                 -1,            0,                -1},
+            {"UnlitGeneric",      MASK_UNLIT_GENERIC,                 0,                0,                  0,            0,                 0},
+            {"LitFlatGeneric", MASK_LIT_FLAT_GENERIC,                 0,                0,                  0,            0,                 0},
+            {"LitBumpGeneric", MASK_LIT_BUMP_GENERIC,                 0,                0,                  0,            0,                 0},
+            {"UnlitTSGeneric", MASK_UNLIT_TS_GENERIC,                 0,                0,                  0,            0,                 0},
         },
         // Surface Flags
         {
-            // name flags  flagsClear
-            {"",       0,         -1},
+            // name                 flags, flagsClear
+            {"unlit",      S_VERTEX_UNLIT,          0},
+            {"litflat", S_VERTEX_LIT_FLAT,          0},
+            {"litbump", S_VERTEX_LIT_BUMP,          0},
+            {"unlitts", S_VERTEX_UNLIT_TS,          0},
+            {"sky2d",            S_SKY_2D,          0},
+            {"sky",                 S_SKY,          0},
         },
         // Content Flags
         {
-            // name flags  flagsClear
-            {"",       0,         -1},
+            // name                                            flags,         flagsClear
+            {"nonsolid",                                           0,     CONTENTS_SOLID},
+            {"solid",                                 CONTENTS_SOLID,                  0},
+            {"window",                               CONTENTS_WINDOW,                  0},
+            {"aux",                                     CONTENTS_AUX,                  0},
+            {"grate",                                 CONTENTS_GRATE,                  0},
+            {"slime",                                 CONTENTS_SLIME,                  0},
+            {"water",                                 CONTENTS_WATER,                  0},
+            {"windownocollide",            CONTENTS_WINDOW_NOCOLLIDE,     CONTENTS_SOLID},
+            {"opaque",                               CONTENTS_OPAQUE,                  0},
+            {"fogvolume",                     CONTENTS_TESTFOGVOLUME,                  0},
+            {"physicsclip",                     CONTENTS_PHYSICSCLIP,     CONTENTS_SOLID},
+            {"blocklight",                       CONTENTS_BLOCKLIGHT,                  0},
+            {"nograpple",                         CONTENTS_NOGRAPPLE,                  0},
+            {"ignorenodrawopaque",     CONTENTS_IGNORE_NODRAW_OPAQUE,                  0},
+            {"moveable",                           CONTENTS_MOVEABLE,                  0},
+            {"solidbody",              CONTENTS_TEST_SOLID_BODY_SHOT,                  0},
+            {"playerclip",                       CONTENTS_PLAYERCLIP,     CONTENTS_SOLID},
+            {"monsterclip",                     CONTENTS_MONSTERCLIP,     CONTENTS_SOLID},
+            {"operatorfloorclip",            CONTENTS_OPERATOR_FLOOR,     CONTENTS_SOLID},
+            {"blocklosclip",                       CONTENTS_BLOCKLOS,                  0},
+            {"noclimb",                             CONTENTS_NOCLIMB,                  0},
+            {"titanclip",                         CONTENTS_TITANCLIP,     CONTENTS_SOLID},
+            {"bulletclip",                       CONTENTS_BULLETCLIP,     CONTENTS_SOLID},
+            {"operatorclip",                   CONTENTS_OPERATORCLIP,     CONTENTS_SOLID},
+            {"monster",                             CONTENTS_MONSTER,                  0},
+            {"debris",                               CONTENTS_DEBRIS,                  0},
+            {"detail",                               CONTENTS_DETAIL,                  0},
+            {"trans",                           CONTENTS_TRANSLUCENT,                  0},
         },
         // Compile Flags
         {
-            // name flags  flagsClear
-            {"",       0,         -1},
+            // name           flags, flagsClear
+            {"nodraw",     C_NODRAW,          0},
+            {"sky",           C_SKY,          0},
+            {"decal",       C_DECAL,          0},
+            {"trans", C_TRANSLUCENT,          0},
         }
     }{}
 };
@@ -215,10 +259,65 @@ struct game_titanfall2 : game_t {
             {"hitbox",                               CONTENTS_HITBOX,     CONTENTS_SOLID,           0,                  0,             0,                 0},
         },
         0,
-        {},
-        {},
-        {},
-        {}
+        // Shader Type
+        {
+            // name                     surfaceFlags, surfaceFlagsClear,    contentsFlags, contentsFlagsClear, compileFlags, compileFlagsClear
+            {"default",               S_MESH_UNKNOWN,                -1,   CONTENTS_SOLID,                 -1,            0,                -1},
+            {"UnlitGeneric",      MASK_UNLIT_GENERIC,                 0,                0,                  0,            0,                 0},
+            {"LitFlatGeneric", MASK_LIT_FLAT_GENERIC,                 0,                0,                  0,            0,                 0},
+            {"LitBumpGeneric", MASK_LIT_BUMP_GENERIC,                 0,                0,                  0,            0,                 0},
+            {"UnlitTSGeneric", MASK_UNLIT_TS_GENERIC,                 0,                0,                  0,            0,                 0},
+        },
+        // Surface Flags
+        {
+            // name                 flags, flagsClear
+            {"unlit",      S_VERTEX_UNLIT,          0},
+            {"litflat", S_VERTEX_LIT_FLAT,          0},
+            {"litbump", S_VERTEX_LIT_BUMP,          0},
+            {"unlitts", S_VERTEX_UNLIT_TS,          0},
+            {"sky2d",            S_SKY_2D,          0},
+            {"sky",                 S_SKY,          0},
+        },
+        // Content Flags
+        {
+            // name                                            flags,         flagsClear
+            {"nonsolid",                                           0,     CONTENTS_SOLID},
+            {"solid",                                 CONTENTS_SOLID,                  0},
+            {"window",                               CONTENTS_WINDOW,                  0},
+            {"aux",                                     CONTENTS_AUX,                  0},
+            {"grate",                                 CONTENTS_GRATE,                  0},
+            {"slime",                                 CONTENTS_SLIME,                  0},
+            {"water",                                 CONTENTS_WATER,                  0},
+            {"windownocollide",            CONTENTS_WINDOW_NOCOLLIDE,     CONTENTS_SOLID},
+            {"opaque",                               CONTENTS_OPAQUE,                  0},
+            {"fogvolume",                     CONTENTS_TESTFOGVOLUME,                  0},
+            {"physicsclip",                     CONTENTS_PHYSICSCLIP,     CONTENTS_SOLID},
+            {"blocklight",                       CONTENTS_BLOCKLIGHT,                  0},
+            {"nograpple",                         CONTENTS_NOGRAPPLE,                  0},
+            {"ignorenodrawopaque",     CONTENTS_IGNORE_NODRAW_OPAQUE,                  0},
+            {"moveable",                           CONTENTS_MOVEABLE,                  0},
+            {"solidbody",              CONTENTS_TEST_SOLID_BODY_SHOT,                  0},
+            {"playerclip",                       CONTENTS_PLAYERCLIP,     CONTENTS_SOLID},
+            {"monsterclip",                     CONTENTS_MONSTERCLIP,     CONTENTS_SOLID},
+            {"operatorfloorclip",            CONTENTS_OPERATOR_FLOOR,     CONTENTS_SOLID},
+            {"blocklosclip",                       CONTENTS_BLOCKLOS,                  0},
+            {"noclimb",                             CONTENTS_NOCLIMB,                  0},
+            {"titanclip",                         CONTENTS_TITANCLIP,     CONTENTS_SOLID},
+            {"bulletclip",                       CONTENTS_BULLETCLIP,     CONTENTS_SOLID},
+            {"operatorclip",                   CONTENTS_OPERATORCLIP,     CONTENTS_SOLID},
+            {"monster",                             CONTENTS_MONSTER,                  0},
+            {"debris",                               CONTENTS_DEBRIS,                  0},
+            {"detail",                               CONTENTS_DETAIL,                  0},
+            {"trans",                           CONTENTS_TRANSLUCENT,                  0},
+        },
+        // Compile Flags
+        {
+            // name           flags, flagsClear
+            {"nodraw",     C_NODRAW,          0},
+            {"sky",           C_SKY,          0},
+            {"decal",       C_DECAL,          0},
+            {"trans", C_TRANSLUCENT,          0},
+        }
     }{}
 };
 
@@ -286,10 +385,69 @@ struct game_apexlegends : game_t {
             {"unlitts",        0,                 0, S_VERTEX_UNLIT_TS,            0,             0,                 0},
         },
         0,
-        {},
-        {},
-        {},
-        {}
+        // Shader Type
+        {
+            // name                     surfaceFlags, surfaceFlagsClear,    contentsFlags, contentsFlagsClear, compileFlags, compileFlagsClear
+            {"default",               S_MESH_UNKNOWN,                -1,   CONTENTS_SOLID,                 -1,            0,                -1},
+            {"UnlitGeneric",      MASK_UNLIT_GENERIC,                 0,                0,                  0,            0,                 0},
+            {"LitFlatGeneric", MASK_LIT_FLAT_GENERIC,                 0,                0,                  0,            0,                 0},
+            {"LitBumpGeneric", MASK_LIT_BUMP_GENERIC,                 0,                0,                  0,            0,                 0},
+            {"UnlitTSGeneric", MASK_UNLIT_TS_GENERIC,                 0,                0,                  0,            0,                 0},
+        },
+        // Surface Flags
+        {
+            // name                 flags, flagsClear
+            {"unlit",      S_VERTEX_UNLIT,          0},
+            {"litflat", S_VERTEX_LIT_FLAT,          0},
+            {"litbump", S_VERTEX_LIT_BUMP,          0},
+            {"unlitts", S_VERTEX_UNLIT_TS,          0},
+            {"sky2d",            S_SKY_2D,          0},
+            {"sky",                 S_SKY,          0},
+        },
+        // Content Flags
+        {
+            // name                                            flags,         flagsClear
+            {"nonsolid",                                           0,     CONTENTS_SOLID},
+            {"solid",                                 CONTENTS_SOLID,                  0},
+            {"window",                               CONTENTS_WINDOW,                  0},
+            {"aux",                                     CONTENTS_AUX,                  0},
+            {"grate",                                 CONTENTS_GRATE,                  0},
+            {"slime",                                 CONTENTS_SLIME,                  0},
+            {"water",                                 CONTENTS_WATER,                  0},
+            {"windownocollide",            CONTENTS_WINDOW_NOCOLLIDE,     CONTENTS_SOLID},
+            {"opaque",                               CONTENTS_OPAQUE,                  0},
+            {"fogvolume",                     CONTENTS_TESTFOGVOLUME,                  0},
+            {"physicsclip",                     CONTENTS_PHYSICSCLIP,     CONTENTS_SOLID},
+            {"blocklight",                       CONTENTS_BLOCKLIGHT,                  0},
+            {"nograpple",                         CONTENTS_NOGRAPPLE,                  0},
+            {"ignorenodrawopaque",     CONTENTS_IGNORE_NODRAW_OPAQUE,                  0},
+            {"moveable",                           CONTENTS_MOVEABLE,                  0},
+            {"solidbody",              CONTENTS_TEST_SOLID_BODY_SHOT,                  0},
+            {"playerclip",                       CONTENTS_PLAYERCLIP,     CONTENTS_SOLID},
+            {"monsterclip",                     CONTENTS_MONSTERCLIP,     CONTENTS_SOLID},
+            {"operatorfloorclip",            CONTENTS_OPERATOR_FLOOR,     CONTENTS_SOLID},
+            {"blocklosclip",                       CONTENTS_BLOCKLOS,                  0},
+            {"noclimb",                             CONTENTS_NOCLIMB,                  0},
+            {"titanclip",                         CONTENTS_TITANCLIP,     CONTENTS_SOLID},
+            {"bulletclip",                       CONTENTS_BULLETCLIP,     CONTENTS_SOLID},
+            {"operatorclip",                   CONTENTS_OPERATORCLIP,     CONTENTS_SOLID},
+            {"monster",                             CONTENTS_MONSTER,                  0},
+            {"debris",                               CONTENTS_DEBRIS,                  0},
+            {"detail",                               CONTENTS_DETAIL,                  0},
+            {"trans",                           CONTENTS_TRANSLUCENT,                  0},
+            {"soundtrigger",                   CONTENTS_SOUNDTRIGGER,                  0},
+            {"occludesound",                   CONTENTS_OCCLUDESOUND,                  0},
+            {"noairdrop",                         CONTENTS_NOAIRDROP,                  0},
+            {"blockping",                        CONTENTS_BLOCK_PING,                  0},
+        },
+        // Compile Flags
+        {
+            // name           flags, flagsClear
+            {"nodraw",     C_NODRAW,          0},
+            {"sky",           C_SKY,          0},
+            {"decal",       C_DECAL,          0},
+            {"trans", C_TRANSLUCENT,          0},
+        }
     }{}
 };
 

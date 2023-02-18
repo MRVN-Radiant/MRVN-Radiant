@@ -105,7 +105,7 @@ const int CONTENTS_MONSTER              = 0x02000000;
 const int CONTENTS_DEBRIS               = 0x04000000;
 const int CONTENTS_DETAIL               = 0x08000000;
 const int CONTENTS_TRANSLUCENT          = 0x10000000;
-const int CONTENTS_HITBOX               = 0x40000000;
+const int CONTENTS_HITBOX               = 0x40000000;  // Non-map entities have this
 
 // New in apex
 const int CONTENTS_SOUNDTRIGGER         = 0x00000400;
@@ -113,10 +113,16 @@ const int CONTENTS_OCCLUDESOUND         = 0x00001000;
 const int CONTENTS_NOAIRDROP            = 0x01000000;
 const int CONTENTS_BLOCK_PING           = 0x20000000;
 
+const int MASK_UNLIT_GENERIC            = S_VERTEX_UNLIT;
+const int MASK_LIT_FLAT_GENERIC         = S_VERTEX_LIT_FLAT;
+const int MASK_LIT_BUMP_GENERIC         = S_VERTEX_LIT_BUMP;
+const int MASK_UNLIT_TS_GENERIC         = S_VERTEX_UNLIT_TS;
+
+
 struct ShaderType_t {
     const char *name;
-    int contentFlags, contentFlagsClear;
     int surfaceFlags, surfaceFlagsClear;
+    int contentFlags, contentFlagsClear;
     int compileFlags, compileFlagsClear;
 };
 

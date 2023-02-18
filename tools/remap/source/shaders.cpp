@@ -618,7 +618,7 @@ static shaderInfo_t *AllocShaderInfo() {
     new (si) shaderInfo_t{};  // placement new
 
     /* set defaults */
-    ApplySurfaceParm("default", &si->contentFlags, &si->surfaceFlags, &si->compileFlags);
+    ApplyShaderType("default", &si->surfaceFlags, &si->contentFlags, &si->compileFlags);
 
     si->backsplashFraction = DEF_BACKSPLASH_FRACTION * g_backsplashFractionScale;
     si->backsplashDistance = g_backsplashDistance < -900.0f ? DEF_BACKSPLASH_DISTANCE : g_backsplashDistance;
@@ -944,9 +944,7 @@ static void ParseShaderFile(const char *filename) {
             /* match surfaceparm */
             } else if (striEqual(token, "surfaceparm")) {
                 text.GetToken(false);
-                if (!ApplySurfaceParm(token, &si->contentFlags, &si->surfaceFlags, &si->compileFlags)) {
-                    Sys_Warning("Unknown surfaceparm: \"%s\"\n", token);
-                }
+                Sys_Warning("The surfaceparm is no longer supported!\n");
             } else if (striEqual(token, "$shadertype")) {
                 text.GetToken(false);
                 if ( !ApplyShaderType(token, &si->surfaceFlags, &si->contentFlags, &si->compileFlags) ) {
