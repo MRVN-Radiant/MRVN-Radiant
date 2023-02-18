@@ -1525,6 +1525,9 @@ void TCMod(const tcMod_t &mod, Vector2 &st);
 bool ApplySurfaceParm(const char *name, int *contentFlags, int *surfaceFlags, int *compileFlags);
 const surfaceParm_t *GetSurfaceParm(const char *name);
 
+bool ApplyShaderType( const char *name, int *surfaceFlags, int *contentFlags, int *compileFlags );
+bool ApplyShaderFlag( const char *name, int *surfaceFlags, int *contentFlags, int *compileFlags );
+
 // Encode the string as a type
 template <char... chars>
 using TemplateString = std::integer_sequence<char, chars...>;

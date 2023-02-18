@@ -94,7 +94,27 @@ struct game_titanfallonline : game_t {
             {"litbump",        0,                 0, S_VERTEX_LIT_BUMP,            0,             0,                 0},
             {"unlitts",        0,                 0, S_VERTEX_UNLIT_TS,            0,             0,                 0},
         },
-        0
+        0,
+        // Shader Type
+        {
+            // name      contentFlags  contentFlagsClear  surfaceFlags  surfaceFlagsClear  compileFlags  compileFlagsClear
+            {"default",            0,                -1,            0,                -1,            0,                -1},
+        },
+        // Surface Flags
+        {
+            // name flags  flagsClear
+            {"",       0,         -1},
+        },
+        // Content Flags
+        {
+            // name flags  flagsClear
+            {"",       0,         -1},
+        },
+        // Compile Flags
+        {
+            // name flags  flagsClear
+            {"",       0,         -1},
+        }
     }{}
 };
 
@@ -194,7 +214,11 @@ struct game_titanfall2 : game_t {
             {"transclip",                       CONTENTS_TRANSLUCENT,     CONTENTS_SOLID,           0,                  0,             0,                 0},
             {"hitbox",                               CONTENTS_HITBOX,     CONTENTS_SOLID,           0,                  0,             0,                 0},
         },
-        0
+        0,
+        {},
+        {},
+        {},
+        {}
     }{}
 };
 
@@ -261,7 +285,11 @@ struct game_apexlegends : game_t {
             {"litbump",        0,                 0, S_VERTEX_LIT_BUMP,            0,             0,                 0},
             {"unlitts",        0,                 0, S_VERTEX_UNLIT_TS,            0,             0,                 0},
         },
-        0
+        0,
+        {},
+        {},
+        {},
+        {}
     }{}
 };
 

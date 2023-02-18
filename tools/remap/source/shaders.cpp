@@ -241,6 +241,93 @@ bool ApplySurfaceParm(const char *name, int *contentFlags, int *surfaceFlags, in
     return false;
 }
 
+/*
+    GetShaderType()
+    Returns a ShaderType_t corresponding to name
+*/
+const ShaderType_t *GetShaderType( const char *name ) {
+    // Walk the current game's shader type vector
+    for( const ShaderType_t &st : g_game->shaderTypes ) {
+        if ( striEqual(name, st.name) ) {
+            return &st;
+        }
+    }
+
+    return nullptr;
+}
+
+/*
+    ApplyShaderType()
+    Applies a shader type to the supplied flags
+*/
+bool ApplyShaderType( const char *name, int *surfaceFlags, int *contentFlags, int *compileFlags ) {
+    if( const ShaderType_t *st = GetShaderType(name) ) {
+        // Clear and apply flags
+        if( surfaceFlags != nullptr ) {
+            *surfaceFlags &= ~(st->surfaceFlagsClear);
+            *surfaceFlags |= st->surfaceFlags;
+        }
+        if( contentFlags != nullptr ) {
+            *contentFlags &= ~(st->contentFlagsClear);
+            *contentFlags |= st->contentFlags;
+        }
+        if( compileFlags != nullptr ) {
+            *compileFlags &= ~(st->compileFlagsClear);
+            *compileFlags |= st->compileFlags;
+        }
+
+        return true;
+    }
+    // Didn't find the shader type
+    return false;
+}
+
+/*
+    GetShaderFlag()
+    Returns a ShaderType_t corresponding to name
+*/
+ShaderFlag_t *GetShaderFlag( const char *name, std::vector<ShaderFlag_t> flags ) {
+    // Walk the current game's shader type vector
+    for( ShaderFlag_t &sf : flags ) {
+        if ( striEqual(name, sf.name) ) {
+            return &sf;
+        }
+    }
+
+    return nullptr;
+}
+
+/*
+    ApplyShaderFlag()
+    Applies a shader flag to the supplied flags
+*/
+bool ApplyShaderFlag( const char *name, int *surfaceFlags, int *contentFlags, int *compileFlags ) {
+    ShaderFlag_t *sf = nullptr;
+    if( surfaceFlags != nullptr ) { sf = GetShaderFlag(name, g_game->surfaceFlags); }
+    if( contentFlags != nullptr ) { sf = GetShaderFlag(name, g_game->contentFlags); }
+    if( compileFlags != nullptr ) { sf = GetShaderFlag(name, g_game->compileFlags); }
+
+
+    if( sf != nullptr ) {
+        // Clear and apply flags
+        if( surfaceFlags != nullptr ) {
+            *surfaceFlags &= ~(sf->flagsClear);
+            *surfaceFlags |= sf->flags;
+        }
+        if( contentFlags != nullptr ) {
+            *contentFlags &= ~(sf->flagsClear);
+            *contentFlags |= sf->flags;
+        }
+        if( compileFlags != nullptr ) {
+            *compileFlags &= ~(sf->flagsClear);
+            *compileFlags |= sf->flags;
+        }
+
+        return true;
+    }
+    // Didn't find the shader type
+    return false;
+}
 
 
 /*
@@ -859,6 +946,26 @@ static void ParseShaderFile(const char *filename) {
                 text.GetToken(false);
                 if (!ApplySurfaceParm(token, &si->contentFlags, &si->surfaceFlags, &si->compileFlags)) {
                     Sys_Warning("Unknown surfaceparm: \"%s\"\n", token);
+                }
+            } else if (striEqual(token, "$shadertype")) {
+                text.GetToken(false);
+                if ( !ApplyShaderType(token, &si->surfaceFlags, &si->contentFlags, &si->compileFlags) ) {
+                    Sys_Warning( "Unknown shadertype: \"%s\"\n", token );
+                }
+            } else if (striEqual(token, "$surfaceflag")) {
+                text.GetToken(false);
+                if ( !ApplyShaderFlag(token, &si->surfaceFlags, nullptr, nullptr) ) {
+                    Sys_Warning( "Unknown surfaceflag: \"%s\"\n", token );
+                }
+            } else if (striEqual(token, "$contentflag")) {
+                text.GetToken(false);
+                if ( !ApplyShaderFlag(token, nullptr, &si->contentFlags, nullptr) ) {
+                    Sys_Warning( "Unknown contentflag: \"%s\"\n", token );
+                }
+            } else if (striEqual(token, "$compileflag")) {
+                text.GetToken(false);
+                if ( !ApplyShaderFlag(token, nullptr, nullptr, &si->compileFlags) ) {
+                    Sys_Warning( "Unknown compileflag: \"%s\"\n", token );
                 }
             /* -----------------------------------------------------------------
                game-related shader directives

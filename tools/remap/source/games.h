@@ -113,6 +113,18 @@ const int CONTENTS_OCCLUDESOUND         = 0x00001000;
 const int CONTENTS_NOAIRDROP            = 0x01000000;
 const int CONTENTS_BLOCK_PING           = 0x20000000;
 
+struct ShaderType_t {
+    const char *name;
+    int contentFlags, contentFlagsClear;
+    int surfaceFlags, surfaceFlagsClear;
+    int compileFlags, compileFlagsClear;
+};
+
+struct ShaderFlag_t {
+    const char* name;
+    int flags, flagsClear;
+};
+
 /* ydnar: for multiple game support */
 struct surfaceParm_t {
     const char *name;
@@ -120,7 +132,6 @@ struct surfaceParm_t {
     int  surfaceFlags, surfaceFlagsClear;
     int  compileFlags, compileFlagsClear;
 };
-
 
 enum class EMiniMapMode {
     Gray,
@@ -168,15 +179,19 @@ struct game_t {
     const char     *bspIdent;                      /* 4-letter bsp file prefix */
     int             bspVersion;                    /* bsp version to use */
     bool            lumpSwap;                      /* cod-style len/ofs order */
-    typedef void  (*bspLoadFunc)(rbspHeader_t*, const char*);
+    typedef void    (*bspLoadFunc)(rbspHeader_t*, const char*);
     bspLoadFunc     load;
-    typedef void  (*bspWriteFunc)(const char*);
+    typedef void    (*bspWriteFunc)(const char*);
     bspWriteFunc    write;
-    typedef void  (*bspCompileFunc)();
+    typedef void    (*bspCompileFunc)();
     bspCompileFunc  compile;
     std::vector<surfaceParm_t>  surfaceParms;      /* surfaceparm array */
     int             brushBevelsSurfaceFlagsMask;   /* apply only these surfaceflags to bevels to reduce extra bsp shaders amount;
                                                       applying them to get correct physics at walkable brush edges and vertices */
+    std::vector<ShaderType_t> shaderTypes;
+    std::vector<ShaderFlag_t> surfaceFlags;
+    std::vector<ShaderFlag_t> contentFlags;
+    std::vector<ShaderFlag_t> compileFlags;
 };
 
 
