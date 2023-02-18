@@ -1284,7 +1284,7 @@ bool ShaderTemplate::parseQuake3( Tokeniser& tokeniser ){
 					return false;
 				}
 
-				m_textureName = basetexture;
+				m_textureName = PathExtensionless( basetexture );
 			}
 			else if ( string_equal_nocase( token, "$basetexture2" ) ) {
 				// Specifies the second _col texture used for blending
@@ -1296,7 +1296,7 @@ bool ShaderTemplate::parseQuake3( Tokeniser& tokeniser ){
 					return false;
 				}
 
-				m_textureName2 = basetexture2;
+				m_textureName2 =  PathExtensionless( basetexture2 );
 			}
 			else if ( string_equal_nocase( token, "$shadertype" ) ) {
 				// Specifies the shader type, this can set multiple flags
