@@ -66,40 +66,11 @@ struct game_titanfallonline : game_t {
         false,                  /* keep light entities on bsp */
         8,                      /* default patchMeta subdivisions tolerance */
         false,                  /* patch casting enabled */
-        false,                  /* compile deluxemaps */
-        0,                      /* deluxemaps default mode */
-        512,                    /* minimap size */
-        1.0f,                   /* minimap sharpener */
-        0.0f,                   /* minimap border */
-        true,                   /* minimap keep aspect */
-        EMiniMapMode::Gray,     /* minimap mode */
-        "%s.tga",               /* minimap name format */
         "rBSP",                 /* bsp file prefix */
         29,                     /* bsp file version */
-        false,                  /* cod-style lump len/ofs order */
         LoadR1BSPFile,          /* bsp load function */
         WriteR1BSPFile,         /* bsp write function */
         CompileR1BSPFile,
-        {
-            /* name  contentFlags  contentFlagsClear  surfaceFlags  surfaceFlagsClear  compileFlags  compileFlagsClear */
-
-            /* default */
-            {"default",        0,                -1,    S_MESH_UNKNOWN,           -1,       C_SOLID,                -1},
-
-            /* compiler */
-            {"nodraw",         0,                 0,                 0,            0,      C_NODRAW,                 0},
-
-            // remap
-            {"decal",          0,                 0,     S_TRANSLUCENT,            0,       C_DECAL,                 0},
-            {"sky2d",          0,                 0,          S_SKY_2D,            0,         C_SKY,                 0},
-            {"sky",            0,                 0,             S_SKY,            0,         C_SKY,                 0},
-            {"trans",          0,                 0, S_VERTEX_UNLIT_TS,            0, C_TRANSLUCENT,                 0},
-            {"unlit",          0,                 0,    S_VERTEX_UNLIT,            0,             0,                 0},
-            {"litflat",        0,                 0, S_VERTEX_LIT_FLAT,            0,             0,                 0},
-            {"litbump",        0,                 0, S_VERTEX_LIT_BUMP,            0,             0,                 0},
-            {"unlitts",        0,                 0, S_VERTEX_UNLIT_TS,            0,             0,                 0},
-        },
-        0,
         // Shader Type
         {
             // name                     surfaceFlags, surfaceFlagsClear,    contentsFlags, contentsFlagsClear, compileFlags, compileFlagsClear
@@ -192,73 +163,11 @@ struct game_titanfall2 : game_t {
         false,                  /* keep light entities on bsp */
         8,                      /* default patchMeta subdivisions tolerance */
         false,                  /* patch casting enabled */
-        false,                  /* compile deluxemaps */
-        0,                      /* deluxemaps default mode */
-        512,                    /* minimap size */
-        1.0f,                   /* minimap sharpener */
-        0.0f,                   /* minimap border */
-        true,                   /* minimap keep aspect */
-        EMiniMapMode::Gray,     /* minimap mode */
-        "%s.tga",               /* minimap name format */
         "rBSP",                 /* bsp file prefix */
         37,                     /* bsp file version */
-        false,                  /* cod-style lump len/ofs order */
         LoadR2BSPFile,          /* bsp load function */
         WriteR2BSPFile,         /* bsp write function */
         CompileR2BSPFile,
-        {
-            /* name              contentFlags,  contentFlagsClear,       surfaceFlags,  surfaceFlagsClear,  compileFlags,  compileFlagsClear, */
-
-            // Default
-            {"default",        CONTENTS_SOLID,                 -1,     S_MESH_UNKNOWN,                 -1,       C_SOLID,                -1},
-
-            // Compiler
-            {"nodraw",                      0,                  0,                  0,                  0,      C_NODRAW,                 0},
-
-            // Visual
-            {"decal",                       0,                  0,      S_TRANSLUCENT,                  0,       C_DECAL,                 0},
-            {"sky2d",                       0,                  0,           S_SKY_2D,                  0,         C_SKY,                 0},
-            {"sky",                         0,                  0,              S_SKY,                  0,         C_SKY,                 0},
-            {"trans",                       0,                  0,  S_VERTEX_UNLIT_TS,                  0, C_TRANSLUCENT,                 0},
-            {"unlit",                       0,                  0,     S_VERTEX_UNLIT,                  0,             0,                 0},
-            {"litflat",                     0,                  0,  S_VERTEX_LIT_FLAT,                  0,             0,                 0},
-            {"litbump",                     0,                  0,  S_VERTEX_LIT_BUMP,                  0,             0,                 0},
-            {"unlitts",                     0,                  0,  S_VERTEX_UNLIT_TS,                  0,             0,                 0},
-
-            // Collision
-            /* name                                     contentFlags, contentFlagsClear, surfaceFlags,  surfaceFlagsClear,  compileFlags,  compileFlagsClear, */
-            {"empty",                                              0,     CONTENTS_SOLID,           0,                  0,             0,           C_SOLID},
-            {"solid",                                 CONTENTS_SOLID,                  0,           0,                  0,       C_SOLID,                 0},
-
-            {"window",                               CONTENTS_WINDOW,                  0,           0,                  0,             0,                 0},
-            {"aux",                                     CONTENTS_AUX,                  0,           0,                  0,             0,                 0},
-            {"grate",                                 CONTENTS_GRATE,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"slimeclip",                             CONTENTS_SLIME,                  0,           0,                  0,             0,                 0},
-            {"waterclip",                             CONTENTS_WATER,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"windownocollideclip",        CONTENTS_WINDOW_NOCOLLIDE,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"opaqueclip",                           CONTENTS_OPAQUE,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"fogvolumeclip",                 CONTENTS_TESTFOGVOLUME,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"physicsclip",                     CONTENTS_PHYSICSCLIP,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"physicsclip",                      CONTENTS_BLOCKLIGHT,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"nograppleclip",                     CONTENTS_NOGRAPPLE,                  0,           0,                  0,             0,                 0},
-            {"ignorenodrawopaqueclip", CONTENTS_IGNORE_NODRAW_OPAQUE,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"moveableclip",                       CONTENTS_MOVEABLE,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"solidbodyclip",          CONTENTS_TEST_SOLID_BODY_SHOT,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"playerclip",                       CONTENTS_PLAYERCLIP,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"monsterclip",                     CONTENTS_MONSTERCLIP,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"operatorfloorclip",            CONTENTS_OPERATOR_FLOOR,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"blocklosclip",                       CONTENTS_BLOCKLOS,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"noclimbclip",                         CONTENTS_NOCLIMB,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"titanclip",                         CONTENTS_TITANCLIP,                  0,           0,                  0,             0,                 0},
-            {"bulletclip",                       CONTENTS_BULLETCLIP,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"operatorclip",                   CONTENTS_OPERATORCLIP,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"monstercontents",                     CONTENTS_MONSTER,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"debrisclip",                           CONTENTS_DEBRIS,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"detailclip",                           CONTENTS_DETAIL,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"transclip",                       CONTENTS_TRANSLUCENT,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-            {"hitbox",                               CONTENTS_HITBOX,     CONTENTS_SOLID,           0,                  0,             0,                 0},
-        },
-        0,
         // Shader Type
         {
             // name                     surfaceFlags, surfaceFlagsClear,    contentsFlags, contentsFlagsClear, compileFlags, compileFlagsClear
@@ -351,40 +260,11 @@ struct game_apexlegends : game_t {
         false,                  /* keep light entities on bsp */
         8,                      /* default patchMeta subdivisions tolerance */
         false,                  /* patch casting enabled */
-        false,                  /* compile deluxemaps */
-        0,                      /* deluxemaps default mode */
-        512,                    /* minimap size */
-        1.0f,                   /* minimap sharpener */
-        0.0f,                   /* minimap border */
-        true,                   /* minimap keep aspect */
-        EMiniMapMode::Gray,     /* minimap mode */
-        "%s.tga",               /* minimap name format */
         "rBSP",                 /* bsp file prefix */
         47,                     /* bsp file version */
-        false,                  /* cod-style lump len/ofs order */
         LoadR5BSPFile,          /* bsp load function */
         WriteR5BSPFile,         /* bsp write function */
         CompileR5BSPFile,
-        {
-            /* name  contentFlags  contentFlagsClear  surfaceFlags  surfaceFlagsClear  compileFlags  compileFlagsClear */
-
-            /* default */
-            {"default",        0,                -1,    S_MESH_UNKNOWN,           -1,       C_SOLID,                -1},
-
-            /* compiler */
-            {"nodraw",         0,                 0,                 0,            0,      C_NODRAW,                 0},
-
-            // remap
-            {"decal",          0,                 0,     S_TRANSLUCENT,            0,       C_DECAL,                 0},
-            {"sky2d",          0,                 0,          S_SKY_2D,            0,         C_SKY,                 0},
-            {"sky",            0,                 0,             S_SKY,            0,         C_SKY,                 0},
-            {"trans",          0,                 0, S_VERTEX_UNLIT_TS,            0, C_TRANSLUCENT,                 0},
-            {"unlit",          0,                 0,    S_VERTEX_UNLIT,            0,             0,                 0},
-            {"litflat",        0,                 0, S_VERTEX_LIT_FLAT,            0,             0,                 0},
-            {"litbump",        0,                 0, S_VERTEX_LIT_BUMP,            0,             0,                 0},
-            {"unlitts",        0,                 0, S_VERTEX_UNLIT_TS,            0,             0,                 0},
-        },
-        0,
         // Shader Type
         {
             // name                     surfaceFlags, surfaceFlagsClear,    contentsFlags, contentsFlagsClear, compileFlags, compileFlagsClear

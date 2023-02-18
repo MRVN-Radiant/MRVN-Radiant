@@ -172,28 +172,14 @@ struct game_t {
     bool            keepLights;                    /* keep light entities on bsp */
     int             patchSubdivisions;             /* default patchMeta subdivisions tolerance */
     bool            patchShadows;                  /* patch casting enabled */
-    bool            deluxeMap;                     /* compile deluxemaps */
-    int             deluxeMode;                    /* deluxemap mode (0 - modelspace,
-                                                                      1 - tangentspace with renormalization,
-                                                                      2 - tangentspace without renormalization) */
-    int             miniMapSize;                   /* minimap size */
-    float           miniMapSharpen;                /* minimap sharpening coefficient */
-    float           miniMapBorder;                 /* minimap border amount */
-    bool            miniMapKeepAspect;             /* minimap keep aspect ratio by letterboxing */
-    EMiniMapMode    miniMapMode;                   /* minimap mode */
-    const char     *miniMapNameFormat;             /* minimap name format */
     const char     *bspIdent;                      /* 4-letter bsp file prefix */
     int             bspVersion;                    /* bsp version to use */
-    bool            lumpSwap;                      /* cod-style len/ofs order */
     typedef void    (*bspLoadFunc)(rbspHeader_t*, const char*);
     bspLoadFunc     load;
     typedef void    (*bspWriteFunc)(const char*);
     bspWriteFunc    write;
     typedef void    (*bspCompileFunc)();
     bspCompileFunc  compile;
-    std::vector<surfaceParm_t>  surfaceParms;      /* surfaceparm array */
-    int             brushBevelsSurfaceFlagsMask;   /* apply only these surfaceflags to bevels to reduce extra bsp shaders amount;
-                                                      applying them to get correct physics at walkable brush edges and vertices */
     std::vector<ShaderType_t> shaderTypes;
     std::vector<ShaderFlag_t> surfaceFlags;
     std::vector<ShaderFlag_t> contentFlags;

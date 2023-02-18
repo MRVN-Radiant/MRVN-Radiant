@@ -569,7 +569,8 @@ static void SetBrushContents( brush_t& b ){
  */
 
 void AddBrushBevels(){
-	const int surfaceFlagsMask = g_game->brushBevelsSurfaceFlagsMask;
+	// TODO: Set bevel plane flags here
+	const int surfaceFlagsMask = 0; //g_game->brushBevelsSurfaceFlagsMask;
 	auto& sides = buildBrush.sides;
 
 	//
