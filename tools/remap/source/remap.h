@@ -1522,8 +1522,6 @@ const image_t *ImageLoad(const char *name);
 /* shaders.c */
 void ColorMod(const colorMod_t *colormod, int numVerts, bspDrawVert_t *drawVerts);
 void TCMod(const tcMod_t &mod, Vector2 &st);
-bool ApplySurfaceParm(const char *name, int *contentFlags, int *surfaceFlags, int *compileFlags);
-const surfaceParm_t *GetSurfaceParm(const char *name);
 
 bool ApplyShaderType( const char *name, int *surfaceFlags, int *contentFlags, int *compileFlags );
 bool ApplyShaderFlag( const char *name, int *surfaceFlags, int *contentFlags, int *compileFlags );
@@ -1535,13 +1533,13 @@ using TemplateString = std::integer_sequence<char, chars...>;
 template <typename T, T... chars>
 constexpr TemplateString<chars...> operator""_Tstring() { return { }; }
 /// \brief returns statically evaluated \c surfaceParm_t for the given name or emits \c Error
-template<char... chars>
-const surfaceParm_t &GetRequiredSurfaceParm(const TemplateString<chars...>) {
-    static constexpr char  str[sizeof...(chars) + 1] = { chars..., '\0' };  // Recover the character data
-        static const  surfaceParm_t *const sp = GetSurfaceParm(str);
-        ENSURE(sp != nullptr);
-    return *sp;
-}
+//template<char... chars>
+//const surfaceParm_t &GetRequiredSurfaceParm(const TemplateString<chars...>) {
+//    static constexpr char  str[sizeof...(chars) + 1] = { chars..., '\0' };  // Recover the character data
+//        static const  surfaceParm_t *const sp = GetSurfaceParm(str);
+//        ENSURE(sp != nullptr);
+//    return *sp;
+//}
 
 void BeginMapShaderFile(const char *mapFile);
 void WriteMapShaderFile();

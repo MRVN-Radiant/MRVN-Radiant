@@ -195,52 +195,6 @@ static void TCModRotate(tcMod_t &mod, float euler) {
     TCModMultiply(old, temp, mod);
 }
 
-
-const surfaceParm_t *GetSurfaceParm(const char *name) {
-    /* walk the current game's surfaceparms */
-    for (const surfaceParm_t &sp : g_game->surfaceParms) {
-        if (striEqual(name, sp.name)) {
-            return &sp;
-        }
-    }
-
-    /* check custom info parms */
-    for (const surfaceParm_t &sp : Span(custSurfaceParms, numCustSurfaceParms)) {
-        if (striEqual(name, sp.name)) {
-            return &sp;
-        }
-    }
-
-    return nullptr;
-}
-
-
-/*
-   ApplySurfaceParm() - ydnar
-   applies a named surfaceparm to the supplied flags
-*/
-bool ApplySurfaceParm(const char *name, int *contentFlags, int *surfaceFlags, int *compileFlags) {
-    if (const surfaceParm_t *sp = GetSurfaceParm(name)) {
-        /* clear and set flags */
-        if (contentFlags != nullptr) {
-            *contentFlags &= ~(sp->contentFlagsClear);
-            *contentFlags |= sp->contentFlags;
-        }
-        if (surfaceFlags != nullptr) {
-            *surfaceFlags &= ~(sp->surfaceFlagsClear);
-            *surfaceFlags |= sp->surfaceFlags;
-        }
-        if (compileFlags != nullptr) {
-            *compileFlags &= ~(sp->compileFlagsClear);
-            *compileFlags |= sp->compileFlags;
-        }
-        /* return ok */
-        return true;
-    }
-    /* no matching surfaceparm found */
-    return false;
-}
-
 /*
     GetShaderType()
     Returns a ShaderType_t corresponding to name
@@ -697,9 +651,6 @@ static void FinishShader(shaderInfo_t *si) {
             }
         }
 
-        if (g_noob && !(si->compileFlags & C_OB)) {
-            ApplySurfaceParm("noob", nullptr, &si->surfaceFlags, nullptr);
-        }
 
         /* set to finished */
         si->finished = true;
@@ -997,7 +948,7 @@ static void ParseShaderFile(const char *filename) {
                 if (striEqualPrefix(token, "autosprite")) {
                     /* set it as autosprite and detail */
                     si->autosprite = true;
-                    ApplySurfaceParm("detail", &si->contentFlags, &si->surfaceFlags, &si->compileFlags);
+                    //ApplySurfaceParm("detail", &si->contentFlags, &si->surfaceFlags, &si->compileFlags);
 
                     /* ydnar: gs mods: added these useful things */
                     si->noClip = true;
@@ -1156,7 +1107,7 @@ static void ParseShaderFile(const char *filename) {
                 }
 
                 /* apply sky surfaceparm */
-                ApplySurfaceParm("sky", &si->contentFlags, &si->surfaceFlags, &si->compileFlags);
+                //ApplySurfaceParm("sky", &si->contentFlags, &si->surfaceFlags, &si->compileFlags);
 
                 /* don't process any more tokens on this line */
                 continue;
@@ -1631,14 +1582,14 @@ static void ParseShaderFile(const char *filename) {
                     si->forceSunlight = true;
                 /* q3map_onlyvertexlighting (sof2) */
                 } else if (striEqual(token, "q3map_onlyVertexLighting")) {
-                    ApplySurfaceParm("pointlight", &si->contentFlags, &si->surfaceFlags, &si->compileFlags);
+                    //ApplySurfaceParm("pointlight", &si->contentFlags, &si->surfaceFlags, &si->compileFlags);
                 /* q3map_material (sof2) */
                 } else if (striEqual(token, "q3map_material")) {
                     text.GetToken(false);
-                    if (!ApplySurfaceParm(StringOutputStream(64)("*mat_", token),
-                                          &si->contentFlags, &si->surfaceFlags, &si->compileFlags)) {
-                        Sys_Warning("Unknown material \"%s\"\n", token);
-                    }
+                    //if (!ApplySurfaceParm(StringOutputStream(64)("*mat_", token),
+                    //                      &si->contentFlags, &si->surfaceFlags, &si->compileFlags)) {
+                    //    Sys_Warning("Unknown material \"%s\"\n", token);
+                    //}
                 /* ydnar: q3map_clipmodel (autogenerate clip brushes for model triangles using this shader) */
                 } else if (striEqual(token, "q3map_clipmodel")) {
                     si->clipModel = true;
@@ -1652,9 +1603,9 @@ static void ParseShaderFile(const char *filename) {
 #if 1
                 else {
                     //% Sys_FPrintf(SYS_VRB, "Attempting to match %s with a known surfaceparm\n", token);
-                    if (!ApplySurfaceParm(&token[6], &si->contentFlags, &si->surfaceFlags, &si->compileFlags)) {
-                        Sys_Warning("Unknown q3map_* directive \"%s\"\n", token);
-                    }
+                    //if (!ApplySurfaceParm(&token[6], &si->contentFlags, &si->surfaceFlags, &si->compileFlags)) {
+                    //    Sys_Warning("Unknown q3map_* directive \"%s\"\n", token);
+                    //}
                 }
 #endif
             }
