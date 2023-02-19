@@ -968,7 +968,11 @@ public:
 			}
 		}
 
-		m_pTexture2 = evaluateTexture( m_template.m_textureName2, m_template.m_params, m_args );
+		// If we're a texture make sure both triangles use the same texture
+		if( IsDefault() )
+			m_pTexture2 = evaluateTexture( m_template.m_textureName, m_template.m_params, m_args );
+		else
+			m_pTexture2 = evaluateTexture( m_template.m_textureName2, m_template.m_params, m_args );
 
 		if ( m_pTexture2->texture_number == 0 ) {
 			m_notfound2 = m_pTexture2;
