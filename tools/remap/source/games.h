@@ -105,13 +105,31 @@ const int CONTENTS_MONSTER              = 0x02000000;
 const int CONTENTS_DEBRIS               = 0x04000000;
 const int CONTENTS_DETAIL               = 0x08000000;
 const int CONTENTS_TRANSLUCENT          = 0x10000000;
-const int CONTENTS_HITBOX               = 0x40000000;
+const int CONTENTS_HITBOX               = 0x40000000;  // Non-map entities have this
 
 // New in apex
 const int CONTENTS_SOUNDTRIGGER         = 0x00000400;
 const int CONTENTS_OCCLUDESOUND         = 0x00001000;
 const int CONTENTS_NOAIRDROP            = 0x01000000;
 const int CONTENTS_BLOCK_PING           = 0x20000000;
+
+const int MASK_UNLIT_GENERIC            = S_VERTEX_UNLIT;
+const int MASK_LIT_FLAT_GENERIC         = S_VERTEX_LIT_FLAT;
+const int MASK_LIT_BUMP_GENERIC         = S_VERTEX_LIT_BUMP;
+const int MASK_UNLIT_TS_GENERIC         = S_VERTEX_UNLIT_TS;
+
+
+struct ShaderType_t {
+    const char *name;
+    int surfaceFlags, surfaceFlagsClear;
+    int contentFlags, contentFlagsClear;
+    int compileFlags, compileFlagsClear;
+};
+
+struct ShaderFlag_t {
+    const char* name;
+    int flags, flagsClear;
+};
 
 /* ydnar: for multiple game support */
 struct surfaceParm_t {
@@ -120,7 +138,6 @@ struct surfaceParm_t {
     int  surfaceFlags, surfaceFlagsClear;
     int  compileFlags, compileFlagsClear;
 };
-
 
 enum class EMiniMapMode {
     Gray,
@@ -155,28 +172,18 @@ struct game_t {
     bool            keepLights;                    /* keep light entities on bsp */
     int             patchSubdivisions;             /* default patchMeta subdivisions tolerance */
     bool            patchShadows;                  /* patch casting enabled */
-    bool            deluxeMap;                     /* compile deluxemaps */
-    int             deluxeMode;                    /* deluxemap mode (0 - modelspace,
-                                                                      1 - tangentspace with renormalization,
-                                                                      2 - tangentspace without renormalization) */
-    int             miniMapSize;                   /* minimap size */
-    float           miniMapSharpen;                /* minimap sharpening coefficient */
-    float           miniMapBorder;                 /* minimap border amount */
-    bool            miniMapKeepAspect;             /* minimap keep aspect ratio by letterboxing */
-    EMiniMapMode    miniMapMode;                   /* minimap mode */
-    const char     *miniMapNameFormat;             /* minimap name format */
     const char     *bspIdent;                      /* 4-letter bsp file prefix */
     int             bspVersion;                    /* bsp version to use */
-    bool            lumpSwap;                      /* cod-style len/ofs order */
-    typedef void  (*bspLoadFunc)(rbspHeader_t*, const char*);
+    typedef void    (*bspLoadFunc)(rbspHeader_t*, const char*);
     bspLoadFunc     load;
-    typedef void  (*bspWriteFunc)(const char*);
+    typedef void    (*bspWriteFunc)(const char*);
     bspWriteFunc    write;
-    typedef void  (*bspCompileFunc)();
+    typedef void    (*bspCompileFunc)();
     bspCompileFunc  compile;
-    std::vector<surfaceParm_t>  surfaceParms;      /* surfaceparm array */
-    int             brushBevelsSurfaceFlagsMask;   /* apply only these surfaceflags to bevels to reduce extra bsp shaders amount;
-                                                      applying them to get correct physics at walkable brush edges and vertices */
+    std::vector<ShaderType_t> shaderTypes;
+    std::vector<ShaderFlag_t> surfaceFlags;
+    std::vector<ShaderFlag_t> contentFlags;
+    std::vector<ShaderFlag_t> compileFlags;
 };
 
 

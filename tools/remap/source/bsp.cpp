@@ -44,9 +44,9 @@ static void autocaulk_write(){
 	FILE* file = SafeOpenWrite( filename, "wt" );
 
 	int fslime = 0;
-	ApplySurfaceParm( "slime", &fslime, NULL, NULL );
+	//ApplySurfaceParm( "slime", &fslime, NULL, NULL );
 	int flava = 0;
-	ApplySurfaceParm( "lava", &flava, NULL, NULL );
+	//ApplySurfaceParm( "lava", &flava, NULL, NULL );
 
 	for ( const brush_t& b : entities[0].brushes ) {
 		fprintf( file, "%i ", b.brushNum );

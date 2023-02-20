@@ -496,12 +496,12 @@ static void SetBrushContents( brush_t& b ){
 		else if ( s->compileFlags & C_FOG ){
 			b.contentShader = s->shaderInfo;
 		}
-		else if ( b.contentShader->contentFlags & GetRequiredSurfaceParm( "playerclip"_Tstring ).contentFlags ){
-			continue;
-		}
-		else if ( s->contentFlags & GetRequiredSurfaceParm( "playerclip"_Tstring ).contentFlags ){
-			b.contentShader = s->shaderInfo;
-		}
+		//else if ( b.contentShader->contentFlags & GetRequiredSurfaceParm( "playerclip"_Tstring ).contentFlags ){
+		//	continue;
+		//}
+		//else if ( s->contentFlags & GetRequiredSurfaceParm( "playerclip"_Tstring ).contentFlags ){
+		//	b.contentShader = s->shaderInfo;
+		//}
 		else if (!( b.contentShader->compileFlags & C_SOLID )){
 			continue;
 		}
@@ -569,7 +569,8 @@ static void SetBrushContents( brush_t& b ){
  */
 
 void AddBrushBevels(){
-	const int surfaceFlagsMask = g_game->brushBevelsSurfaceFlagsMask;
+	// TODO: Set bevel plane flags here
+	const int surfaceFlagsMask = 0; //g_game->brushBevelsSurfaceFlagsMask;
 	auto& sides = buildBrush.sides;
 
 	//

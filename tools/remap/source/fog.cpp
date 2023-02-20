@@ -697,8 +697,8 @@ void CreateMapFogs(){
 		defaultFogNum = mapFogs.size() - 1;
 
 		/* mark all worldspawn brushes as fogged */
-		for ( brush_t& brush : entities[ 0 ].brushes )
-			ApplySurfaceParm( "fog", &brush.contentFlags, NULL, &brush.compileFlags );
+		//for ( brush_t& brush : entities[ 0 ].brushes )
+		//	ApplySurfaceParm( "fog", &brush.contentFlags, NULL, &brush.compileFlags );
 	}
 
 	/* emit some stats */

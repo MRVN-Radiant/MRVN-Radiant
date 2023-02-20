@@ -195,52 +195,93 @@ static void TCModRotate(tcMod_t &mod, float euler) {
     TCModMultiply(old, temp, mod);
 }
 
-
-const surfaceParm_t *GetSurfaceParm(const char *name) {
-    /* walk the current game's surfaceparms */
-    for (const surfaceParm_t &sp : g_game->surfaceParms) {
-        if (striEqual(name, sp.name)) {
-            return &sp;
-        }
-    }
-
-    /* check custom info parms */
-    for (const surfaceParm_t &sp : Span(custSurfaceParms, numCustSurfaceParms)) {
-        if (striEqual(name, sp.name)) {
-            return &sp;
+/*
+    GetShaderType()
+    Returns a ShaderType_t corresponding to name
+*/
+const ShaderType_t *GetShaderType( const char *name ) {
+    // Walk the current game's shader type vector
+    for( const ShaderType_t &st : g_game->shaderTypes ) {
+        if ( striEqual(name, st.name) ) {
+            return &st;
         }
     }
 
     return nullptr;
 }
 
-
 /*
-   ApplySurfaceParm() - ydnar
-   applies a named surfaceparm to the supplied flags
+    ApplyShaderType()
+    Applies a shader type to the supplied flags
 */
-bool ApplySurfaceParm(const char *name, int *contentFlags, int *surfaceFlags, int *compileFlags) {
-    if (const surfaceParm_t *sp = GetSurfaceParm(name)) {
-        /* clear and set flags */
-        if (contentFlags != nullptr) {
-            *contentFlags &= ~(sp->contentFlagsClear);
-            *contentFlags |= sp->contentFlags;
+bool ApplyShaderType( const char *name, int *surfaceFlags, int *contentFlags, int *compileFlags ) {
+    if( const ShaderType_t *st = GetShaderType(name) ) {
+        // Clear and apply flags
+        if( surfaceFlags != nullptr ) {
+            *surfaceFlags &= ~(st->surfaceFlagsClear);
+            *surfaceFlags |= st->surfaceFlags;
         }
-        if (surfaceFlags != nullptr) {
-            *surfaceFlags &= ~(sp->surfaceFlagsClear);
-            *surfaceFlags |= sp->surfaceFlags;
+        if( contentFlags != nullptr ) {
+            *contentFlags &= ~(st->contentFlagsClear);
+            *contentFlags |= st->contentFlags;
         }
-        if (compileFlags != nullptr) {
-            *compileFlags &= ~(sp->compileFlagsClear);
-            *compileFlags |= sp->compileFlags;
+        if( compileFlags != nullptr ) {
+            *compileFlags &= ~(st->compileFlagsClear);
+            *compileFlags |= st->compileFlags;
         }
-        /* return ok */
+
         return true;
     }
-    /* no matching surfaceparm found */
+    // Didn't find the shader type
     return false;
 }
 
+/*
+    GetShaderFlag()
+    Returns a ShaderType_t corresponding to name
+*/
+ShaderFlag_t *GetShaderFlag( const char *name, std::vector<ShaderFlag_t> flags ) {
+    // Walk the current game's shader type vector
+    for( ShaderFlag_t &sf : flags ) {
+        if ( striEqual(name, sf.name) ) {
+            return &sf;
+        }
+    }
+
+    return nullptr;
+}
+
+/*
+    ApplyShaderFlag()
+    Applies a shader flag to the supplied flags
+*/
+bool ApplyShaderFlag( const char *name, int *surfaceFlags, int *contentFlags, int *compileFlags ) {
+    ShaderFlag_t *sf = nullptr;
+    if( surfaceFlags != nullptr ) { sf = GetShaderFlag(name, g_game->surfaceFlags); }
+    if( contentFlags != nullptr ) { sf = GetShaderFlag(name, g_game->contentFlags); }
+    if( compileFlags != nullptr ) { sf = GetShaderFlag(name, g_game->compileFlags); }
+
+
+    if( sf != nullptr ) {
+        // Clear and apply flags
+        if( surfaceFlags != nullptr ) {
+            *surfaceFlags &= ~(sf->flagsClear);
+            *surfaceFlags |= sf->flags;
+        }
+        if( contentFlags != nullptr ) {
+            *contentFlags &= ~(sf->flagsClear);
+            *contentFlags |= sf->flags;
+        }
+        if( compileFlags != nullptr ) {
+            *compileFlags &= ~(sf->flagsClear);
+            *compileFlags |= sf->flags;
+        }
+
+        return true;
+    }
+    // Didn't find the shader type
+    return false;
+}
 
 
 /*
@@ -531,7 +572,7 @@ static shaderInfo_t *AllocShaderInfo() {
     new (si) shaderInfo_t{};  // placement new
 
     /* set defaults */
-    ApplySurfaceParm("default", &si->contentFlags, &si->surfaceFlags, &si->compileFlags);
+    ApplyShaderType("default", &si->surfaceFlags, &si->contentFlags, &si->compileFlags);
 
     si->backsplashFraction = DEF_BACKSPLASH_FRACTION * g_backsplashFractionScale;
     si->backsplashDistance = g_backsplashDistance < -900.0f ? DEF_BACKSPLASH_DISTANCE : g_backsplashDistance;
@@ -610,9 +651,6 @@ static void FinishShader(shaderInfo_t *si) {
             }
         }
 
-        if (g_noob && !(si->compileFlags & C_OB)) {
-            ApplySurfaceParm("noob", nullptr, &si->surfaceFlags, nullptr);
-        }
 
         /* set to finished */
         si->finished = true;
@@ -797,17 +835,14 @@ static void ParseShaderFile(const char *filename) {
     /* load the shader */
     LoadScriptFile(filename);
 
+    Sys_Printf( "Parsing shader file: \"%s\"\n", filename );
+
     /* tokenize it */
     while (GetToken(true)) {  /* test for end of file */
         /* shader name is initial token */
         shaderInfo_t *si = AllocShaderInfo();
 
-        /* ignore ":q3map" suffix */
-        if (striEqualSuffix(token, ":q3map")) {
-            si->shader << StringRange(token, strlen(token) - strlen(":q3map"));
-        } else {
-            si->shader << token;
-        }
+        si->shader << token;
 
         /* handle { } section */
         if (!(text.GetToken(true) && strEqual(token, "{"))) {
@@ -819,740 +854,44 @@ static void ParseShaderFile(const char *filename) {
         }
 
         while (text.GetToken(true) && !strEqual(token, "}")) {
+            
             /* -----------------------------------------------------------------
-               shader stages (passes)
+               flag and type directives
                ----------------------------------------------------------------- */
-            /* parse stage directives */
-            if (strEqual(token, "{")) {
-                si->hasPasses = true;
-                while (text.GetToken(true) && !strEqual(token, "}")) {
-                    /* only care about images if we don't have a editor/light image */
-                    if (si->editorImagePath.empty() && si->lightImagePath.empty() && si->implicitImagePath.empty()) {
-                        /* digest any images */
-                        if (striEqual(token, "map")
-                         || striEqual(token, "clampMap")
-                         || striEqual(token, "animMap")
-                         || striEqual(token, "clampAnimMap")
-                         || striEqual(token, "mapComp")
-                         || striEqual(token, "mapNoComp")) {
-                            /* skip one token for animated stages */
-                            if (striEqual(token, "animMap") || striEqual(token, "clampAnimMap")) {
-                                text.GetToken(false);
-                            }
-
-                            /* get an image */
-                            text.GetToken(false);
-                            if (token[0] != '*' && token[0] != '$') {
-                                si->lightImagePath(PathExtensionless(token));
-
-                                /* debug code */
-                                //%     Sys_FPrintf(SYS_VRB, "Deduced shader image: %s\n", si->lightImagePath);
-                            }
-                        }
-                    }
+            if (striEqual(token, "surfaceparm")) {
+                text.GetToken(false);
+                Sys_Warning("The \"surfaceparm\" directive is no longer supported!\n");
+            } else if (striEqual(token, "$shadertype")) {
+                text.GetToken(false);
+                if ( !ApplyShaderType(token, &si->surfaceFlags, &si->contentFlags, &si->compileFlags) ) {
+                    Sys_Warning( "Unknown shadertype: \"%s\"\n", token );
+                }
+            } else if (striEqual(token, "$surfaceflag")) {
+                text.GetToken(false);
+                if ( !ApplyShaderFlag(token, &si->surfaceFlags, nullptr, nullptr) ) {
+                    Sys_Warning( "Unknown surfaceflag: \"%s\"\n", token );
+                }
+            } else if (striEqual(token, "$contentflag")) {
+                text.GetToken(false);
+                if ( !ApplyShaderFlag(token, nullptr, &si->contentFlags, nullptr) ) {
+                    Sys_Warning( "Unknown contentflag: \"%s\"\n", token );
+                }
+            } else if (striEqual(token, "$compileflag")) {
+                text.GetToken(false);
+                if ( !ApplyShaderFlag(token, nullptr, nullptr, &si->compileFlags) ) {
+                    Sys_Warning( "Unknown compileflag: \"%s\"\n", token );
                 }
             /* -----------------------------------------------------------------
-               surfaceparm * directives
+               basetexture directives
                ----------------------------------------------------------------- */
-            /* match surfaceparm */
-            } else if (striEqual(token, "surfaceparm")) {
-                text.GetToken(false);
-                if (!ApplySurfaceParm(token, &si->contentFlags, &si->surfaceFlags, &si->compileFlags)) {
-                    Sys_Warning("Unknown surfaceparm: \"%s\"\n", token);
-                }
-            /* -----------------------------------------------------------------
-               game-related shader directives
-               ----------------------------------------------------------------- */
-            /* ydnar: fogparms (for determining fog volumes) */
-            } else if (striEqual(token, "fogparms")) {
-                si->fogParms = true;
-            /* ydnar: polygonoffset (for no culling) */
-            } else if (striEqual(token, "polygonoffset")) {
-                si->polygonOffset = true;
-            /* tesssize is used to force liquid surfaces to subdivide */
-            } else if (striEqual(token, "tessSize")
-                  || striEqual(token, "q3map_tessSize")) {  /* sof2 */
-                text.GetToken(false);
-                si->subdivisions = atof(token);
-            /* cull none will set twoSided (ydnar: added disable too) */
-            } else if (striEqual(token, "cull")) {
-                text.GetToken(false);
-                if (striEqual(token, "none")
-                 || striEqual(token, "disable")
-                 || striEqual(token, "twosided")) {
-                    si->twoSided = true;
-                }
-            /* deformVertexes autosprite[2]
-               we catch this so autosprited surfaces become point
-               lights instead of area lights */
-            } else if (striEqual(token, "deformVertexes")) {
-                text.GetToken(false);
-
-                /* deformVertexes autosprite(2) */
-                if (striEqualPrefix(token, "autosprite")) {
-                    /* set it as autosprite and detail */
-                    si->autosprite = true;
-                    ApplySurfaceParm("detail", &si->contentFlags, &si->surfaceFlags, &si->compileFlags);
-
-                    /* ydnar: gs mods: added these useful things */
-                    si->noClip = true;
-                    si->notjunc = true;
-                }
-
-                /* deformVertexes move <x> <y> <z> <func> <base> <amplitude> <phase> <freq>
-                 * (ydnar: for particle studio support) */
-                if (striEqual(token, "move")) {
-                    Vector3 amt;
-                    float base, amp;
-
-                    /* get move amount */
-                    text.GetToken(false);   amt[0] = atof(token);
-                    text.GetToken(false);   amt[1] = atof(token);
-                    text.GetToken(false);   amt[2] = atof(token);
-
-                    /* skip func */
-                    text.GetToken(false);
-
-                    /* get base and amplitude */
-                    text.GetToken(false);   base = atof(token);
-                    text.GetToken(false);   amp = atof(token);
-
-                    /* calculate */
-                    si->minmax.mins = amt * base;
-                    si->minmax.maxs = amt * amp + si->minmax.mins;
-                }
-            /* light <value> (old-style flare specification) */
-            } else if (striEqual(token, "light")) {
-                text.GetToken(false);
-                si->flareShader = g_game->flareShader;
-            /* ydnar: damageShader <shader> <health> (sof2 mods) */
-            } else if (striEqual(token, "damageShader")) {
-                text.GetToken(false);
-                if (!strEmpty(token)) {
-                    si->damageShader = copystring(token);
-                }
-                text.GetToken(false);   /* don't do anything with health */
-            /* ydnar: enemy territory implicit shaders */
-            } else if (striEqual(token, "implicitMap")) {
-                si->implicitMap = EImplicitMap::Opaque;
-                text.GetToken(false);
-                if (strEqual(token, "-")) {
-                    si->implicitImagePath = si->shader;
-                } else {
-                    si->implicitImagePath = token;
-                }
-            } else if (striEqual(token, "implicitMask")) {
-                si->implicitMap = EImplicitMap::Masked;
-                text.GetToken(false);
-                if (strEqual(token, "-")) {
-                    si->implicitImagePath = si->shader;
-                } else {
-                    si->implicitImagePath = token;
-                }
-            } else if (striEqual(token, "implicitBlend")) {
-                si->implicitMap = EImplicitMap::Blend;
-                text.GetToken(false);
-                if (strEqual(token, "-")) {
-                    si->implicitImagePath = si->shader;
-                } else {
-                    si->implicitImagePath = token;
-                }
-            /* -----------------------------------------------------------------
-               image directives
-               ----------------------------------------------------------------- */
-            /* qer_editorimage <image> */
-            } else if (striEqual(token, "qer_editorImage")) {
+            } else if (striEqual(token, "$basetexture")) {
                 text.GetToken(false);
                 si->editorImagePath(PathExtensionless(token));
-            /* ydnar: q3map_normalimage <image> (bumpmapping normal map) */
-            } else if (striEqual(token, "q3map_normalImage")) {
+            } else if (striEqual(token, "$basetexture2")) {
                 text.GetToken(false);
-                si->normalImagePath(PathExtensionless(token));
-            /* q3map_lightimage <image> */
-            } else if (striEqual(token, "q3map_lightImage")) {
-                text.GetToken(false);
-                si->lightImagePath(PathExtensionless(token));
-            /* ydnar: skyparms <outer image> <cloud height> <inner image> */
-            } else if (striEqual(token, "skyParms")) {
-                /* get image base */
-                text.GetToken(false);
-
-                /* ignore bogus paths */
-                if (!strEqual(token, "-") && !striEqual(token, "full")) {
-                        si->skyParmsImageBase = token;
-
-                        /* use top image as sky light image */
-                        if (si->lightImagePath.empty()) {
-                                si->lightImagePath(si->skyParmsImageBase, "_up");
-                        }
-                }
-
-                /* skip rest of line */
-                text.GetToken(false);
-                text.GetToken(false);
-            /* -----------------------------------------------------------------
-               q3map_* directives
-               ----------------------------------------------------------------- */
-            /* q3map_sun <red> <green> <blue> <intensity> <degrees> <elevation>
-               color will be normalized, so it doesn't matter what range you use
-               intensity falls off with angle but not distance 100 is a fairly bright sun
-               degree of 0 = from the east, 90 = north, etc.  altitude of 0 = sunrise/set, 90 = noon
-               ydnar: sof2map has bareword 'sun' token, so we support that as well */
-            } else if (striEqual(token, "sun") /* sof2 */
-                    || striEqual(token, "q3map_sun")
-                    || striEqual(token, "q3map_sunExt")) {
-                sun_t &sun = si->suns.emplace_back();
-                /* ydnar: extended sun directive? */
-                const bool  ext = striEqual(token, "q3map_sunext");
-
-                /* set style */
-                sun.style = si->lightStyle;
-
-                /* get color */
-                text.GetToken(false);
-                sun.color[0] = atof(token);
-                text.GetToken(false);
-                sun.color[1] = atof(token);
-                text.GetToken(false);
-                sun.color[2] = atof(token);
-
-                if (colorsRGB) {
-                    sun.color[0] = Image_LinearFloatFromsRGBFloat(sun.color[0]);
-                    sun.color[1] = Image_LinearFloatFromsRGBFloat(sun.color[1]);
-                    sun.color[2] = Image_LinearFloatFromsRGBFloat(sun.color[2]);
-                }
-
-                /* normalize it */
-                ColorNormalize(sun.color);
-
-                /* scale color by brightness */
-                text.GetToken(false);
-                sun.photons = atof(token);
-
-                /* get sun angle/elevation */
-                text.GetToken(false);
-                const double  a = degrees_to_radians(atof(token));
-
-                text.GetToken(false);
-                const double  b = degrees_to_radians(atof(token));
-
-                sun.direction = vector3_for_spherical(a, b);
-
-                /* get filter radius from shader */
-                sun.filterRadius = si->lightFilterRadius;
-
-                /* ydnar: get sun angular deviance/samples */
-                if (ext && TokenAvailable()) {
-                    text.GetToken(false);
-                    sun.deviance = degrees_to_radians(atof(token));
-
-                    text.GetToken(false);
-                    sun.numSamples = atoi(token);
-                }
-
-                /* apply sky surfaceparm */
-                ApplySurfaceParm("sky", &si->contentFlags, &si->surfaceFlags, &si->compileFlags);
-
-                /* don't process any more tokens on this line */
-                continue;
-            /* match q3map_ */
-            } else if (striEqualPrefix(token, "q3map_")) {
-                /* ydnar: q3map_baseShader <shader> (inherit this shader's parameters) */
-                if (striEqual(token, "q3map_baseShader")) {
-                    /* get shader */
-                    text.GetToken(false);
-                    //% Sys_FPrintf(SYS_VRB, "Shader %s has base shader %s\n", si->shader, token);
-                    const bool oldWarnImage = std::exchange(g_warnImage, false);
-                    shaderInfo_t *si2 = ShaderInfoForShader(token);
-                    g_warnImage = oldWarnImage;
-
-                    /* subclass it */
-                    if (si2 != NULL) {
-                        /* preserve name */
-                        const String512 temp = si->shader;
-
-                        /* copy shader */
-                        *si = *si2;
-
-                        /* restore name and set to unfinished */
-                        si->shader = temp;
-                        si->shaderWidth = 0;
-                        si->shaderHeight = 0;
-                        si->finished = false;
-                    }
-                /* ydnar: q3map_surfacemodel <path to model> <density> <min scale> <max scale> <min angle> <max angle> <oriented (0 or 1)> */
-                } else if (striEqual(token, "q3map_surfacemodel")) {
-                    /* allocate new model and attach it */
-                    surfaceModel_t& model = si->surfaceModels.emplace_back();
-
-                    /* get parameters */
-                    text.GetToken(false);
-                    model.model = token;
-
-                    text.GetToken(false);
-                    model.density = atof(token);
-                    text.GetToken(false);
-                    model.odds = atof(token);
-
-                    text.GetToken(false);
-                    model.minScale = atof(token);
-                    text.GetToken(false);
-                    model.maxScale = atof(token);
-
-                    text.GetToken(false);
-                    model.minAngle = atof(token);
-                    text.GetToken(false);
-                    model.maxAngle = atof(token);
-
-                    text.GetToken(false);
-                    model.oriented = (token[0] == '1');
-                /* ydnar/sd: q3map_foliage <path to model> <scale> <density> <odds> <invert alpha (1 or 0)> */
-                } else if (striEqual(token, "q3map_foliage")) {
-                    /* allocate new foliage struct and attach it */
-                    foliage_t& foliage = si->foliage.emplace_back();
-
-                    /* get parameters */
-                    text.GetToken(false);
-                    foliage.model = token;
-
-                    text.GetToken(false);
-                    foliage.scale = atof(token);
-                    text.GetToken(false);
-                    foliage.density = atof(token);
-                    text.GetToken(false);
-                    foliage.odds = atof(token);
-                    text.GetToken(false);
-                    foliage.inverseAlpha = atoi(token);
-                /* ydnar: q3map_bounce <value> (fraction of light to re-emit during radiosity passes) */
-                } else if (striEqual(token, "q3map_bounce")
-                        || striEqual(token, "q3map_bounceScale")) {
-                        text.GetToken(false);
-                        si->bounceScale = atof(token);
-                /* ydnar/splashdamage: q3map_skyLight <value> <iterations> */
-                } else if (striEqual(token, "q3map_skyLight")) {
-                    skylight_t& skylight = si->skylights.emplace_back();
-                    text.GetToken(false);
-                    skylight.value = atof(token);
-                    text.GetToken(false);
-                    skylight.iterations = atoi(token);
-
-                    /* clamp */
-                    value_maximize(skylight.value, 0.0f);
-                    value_maximize(skylight.iterations, 2);
-
-                    /* read optional extension: horizon_min horizon_max sample_color*/
-                    if (TokenAvailable()) {
-                        text.GetToken(false);
-                        skylight.horizon_min = std::clamp(atoi(token), -90, 90);
-                    } else {
-                        continue;  // avoid two sequential TokenAvailable()
-                    }
-
-                    if (TokenAvailable()) {
-                        text.GetToken(false);
-                        skylight.horizon_max = std::clamp(atoi(token), -90, 90);
-                    } else {
-                        continue;  // avoid two sequential TokenAvailable()
-                    }
-
-                    if (TokenAvailable()) {
-                        text.GetToken(false);
-                        skylight.sample_color = atoi(token) != 0;
-                    } else {
-                        continue;  // avoid two sequential TokenAvailable()
-                    }
-                /* q3map_surfacelight <value> */
-                } else if (striEqual(token, "q3map_surfacelight")) {
-                    text.GetToken(false);
-                    si->value = atof(token);
-                /* q3map_lightStyle (sof2/jk2 lightstyle) */
-                } else if (striEqual(token, "q3map_lightStyle")) {
-                    text.GetToken(false);
-                    si->lightStyle = std::clamp(atoi(token), 0, LS_NONE);
-                /* wolf: q3map_lightRGB <red> <green> <blue> */
-                } else if (striEqual(token, "q3map_lightRGB")) {
-                    si->color.set(0);
-                    text.GetToken(false);
-                    si->color[0] = atof(token);
-                    text.GetToken(false);
-                    si->color[1] = atof(token);
-                    text.GetToken(false);
-                    si->color[2] = atof(token);
-                    if (colorsRGB) {
-                        si->color[0] = Image_LinearFloatFromsRGBFloat(si->color[0]);
-                        si->color[1] = Image_LinearFloatFromsRGBFloat(si->color[1]);
-                        si->color[2] = Image_LinearFloatFromsRGBFloat(si->color[2]);
-                    }
-                    ColorNormalize(si->color);
-                /* q3map_lightSubdivide <value> */
-                } else if (striEqual(token, "q3map_lightSubdivide")) {
-                    text.GetToken(false);
-                    si->lightSubdivide = atoi(token);
-                /* q3map_backsplash <percent> <distance> */
-                } else if (striEqual(token, "q3map_backsplash")) {
-                    text.GetToken(false);
-                    si->backsplashFraction = atof(token) * 0.01f;
-                    text.GetToken(false);
-                    si->backsplashDistance = atof(token);
-                /* q3map_floodLight <r> <g> <b> <distance> <intensity> <light_direction_power> */
-                } else if (striEqual(token, "q3map_floodLight")) {
-                    /* get color */
-                    text.GetToken(false);
-                    si->floodlightRGB[0] = atof(token);
-                    text.GetToken(false);
-                    si->floodlightRGB[1] = atof(token);
-                    text.GetToken(false);
-                    si->floodlightRGB[2] = atof(token);
-                    text.GetToken(false);
-                    si->floodlightDistance = atof(token);
-                    text.GetToken(false);
-                    si->floodlightIntensity = atof(token);
-                    text.GetToken(false);
-                    si->floodlightDirectionScale = atof(token);
-                    if (colorsRGB) {
-                        si->floodlightRGB[0] = Image_LinearFloatFromsRGBFloat(si->floodlightRGB[0]);
-                        si->floodlightRGB[1] = Image_LinearFloatFromsRGBFloat(si->floodlightRGB[1]);
-                        si->floodlightRGB[2] = Image_LinearFloatFromsRGBFloat(si->floodlightRGB[2]);
-                    }
-                    ColorNormalize(si->floodlightRGB);
-                /* jal: q3map_nodirty : skip dirty */
-                } else if (striEqual(token, "q3map_nodirty")) {
-                    si->noDirty = true;
-                /* q3map_lightmapSampleSize <value> */
-                } else if (striEqual(token, "q3map_lightmapSampleSize")) {
-                    text.GetToken(false);
-                    si->lightmapSampleSize = atoi(token);
-                /* q3map_lightmapSampleOffset <value> */
-                } else if (striEqual(token, "q3map_lightmapSampleOffset")) {
-                    text.GetToken(false);
-                    si->lightmapSampleOffset = atof(token);
-                /* ydnar: q3map_lightmapFilterRadius <self> <other> */
-                } else if (striEqual(token, "q3map_lightmapFilterRadius")) {
-                    text.GetToken(false);
-                    si->lmFilterRadius = atof(token);
-                    text.GetToken(false);
-                    si->lightFilterRadius = atof(token);
-                /* ydnar: q3map_lightmapAxis [xyz] */
-                } else if (striEqual(token, "q3map_lightmapAxis")) {
-                    text.GetToken(false);
-                    if (striEqual(token, "x")) {
-                        si->lightmapAxis = g_vector3_axis_x;
-                    } else if (striEqual(token, "y")) {
-                        si->lightmapAxis = g_vector3_axis_y;
-                    } else if (striEqual(token, "z")) {
-                        si->lightmapAxis = g_vector3_axis_z;
-                    } else {
-                        Sys_Warning("Unknown value for lightmap axis: %s\n", token);
-                        si->lightmapAxis.set(0);
-                    }
-                /* ydnar: q3map_lightmapSize <width> <height> (for autogenerated shaders + external tga lightmaps) */
-                } else if (striEqual(token, "q3map_lightmapSize")) {
-                    text.GetToken(false);
-                    si->lmCustomWidth = atoi(token);
-                    text.GetToken(false);
-                    si->lmCustomHeight = atoi(token);
-
-                    /* must be a power of 2 */
-                    if (((si->lmCustomWidth - 1) & si->lmCustomWidth)
-                     || ((si->lmCustomHeight - 1) & si->lmCustomHeight)) {
-                        Sys_Warning("Non power-of-two lightmap size specified (%d, %d)\n",
-                                     si->lmCustomWidth, si->lmCustomHeight);
-                        si->lmCustomWidth = lmCustomSizeW;
-                        si->lmCustomHeight = lmCustomSizeH;
-                    }
-                /* ydnar: q3map_lightmapBrightness N (for autogenerated shaders + external tga lightmaps) */
-                } else if (striEqual(token, "q3map_lightmapBrightness")
-                        || striEqual(token, "q3map_lightmapGamma")) {
-                    text.GetToken(false);
-                    si->lmBrightness *= atof(token);
-                    if (si->lmBrightness < 0) {
-                        si->lmBrightness = 1.0;
-                    }
-                /* q3map_vertexScale (scale vertex lighting by this fraction) */
-                } else if (striEqual(token, "q3map_vertexScale")) {
-                    text.GetToken(false);
-                    si->vertexScale *= atof(token);
-                /* q3map_noVertexLight */
-                } else if (striEqual(token, "q3map_noVertexLight")) {
-                    si->noVertexLight = true;
-                /* q3map_flare[Shader] <shader> */
-                } else if (striEqual(token, "q3map_flare")
-                        || striEqual(token, "q3map_flareShader")) {
-                    text.GetToken(false);
-                    if (!strEmpty(token)) {
-                        si->flareShader = copystring(token);
-                    }
-                /* q3map_backShader <shader> */
-                } else if (striEqual(token, "q3map_backShader")) {
-                    text.GetToken(false);
-                    if (!strEmpty(token)) {
-                        si->backShader = copystring(token);
-                    }
-                /* ydnar: q3map_cloneShader <shader> */
-                } else if (striEqual(token, "q3map_cloneShader")) {
-                    text.GetToken(false);
-                    if (!strEmpty(token)) {
-                        si->cloneShader = copystring(token);
-                    }
-                /* q3map_remapShader <shader> */
-                } else if (striEqual(token, "q3map_remapShader")) {
-                    text.GetToken(false);
-                    if (!strEmpty(token)) {
-                        si->remapShader = copystring(token);
-                    }
-                /* q3map_deprecateShader <shader> */
-                } else if (striEqual(token, "q3map_deprecateShader")) {
-                    text.GetToken(false);
-                    if (!strEmpty(token)) {
-                        si->deprecateShader = copystring(token);
-                    }
-                /* ydnar: q3map_offset <value> */
-                } else if (striEqual(token, "q3map_offset")) {
-                    text.GetToken(false);
-                    si->offset = atof(token);
-                /* ydnar: q3map_fur <numlayers> <offset> <fade> */
-                } else if (striEqual(token, "q3map_fur")) {
-                    text.GetToken(false);
-                    si->furNumLayers = atoi(token);
-                    text.GetToken(false);
-                    si->furOffset = atof(token);
-                    text.GetToken(false);
-                    si->furFade = atof(token);
-                /* ydnar: gs mods: legacy support for terrain/terrain2 shaders */
-                } else if (striEqual(token, "q3map_terrain")) {
-                    /* team arena terrain is assumed to be nonplanar, with full normal averaging,
-                       passed through the metatriangle surface pipeline, with a lightmap axis on z */
-                    si->legacyTerrain = true;
-                    si->noClip = true;
-                    si->notjunc = true;
-                    si->indexed = true;
-                    si->nonplanar = true;
-                    si->forceMeta = true;
-                    si->shadeAngleDegrees = 179.0f;
-                    //% si->lightmapAxis = g_vector3_axis_z;
-                    /* ydnar 2002-09-21: turning ^^this^^ off for better lightmapping of cliff faces */
-                /* ydnar: picomodel: q3map_forceMeta
-                 * (forces brush faces and/or triangle models to go through the metasurface pipeline) */
-                } else if (striEqual(token, "q3map_forceMeta")) {
-                    si->forceMeta = true;
-                /* ydnar: gs mods: q3map_shadeAngle <degrees> */
-                } else if (striEqual(token, "q3map_shadeAngle")) {
-                    text.GetToken(false);
-                    si->shadeAngleDegrees = atof(token);
-                /* ydnar: q3map_textureSize <width> <height> (substitute for q3map_lightimage derivation for terrain) */
-                } else if (striEqual(token, "q3map_textureSize")) {
-                    text.GetToken(false);
-                    si->shaderWidth = atoi(token);
-                    text.GetToken(false);
-                    si->shaderHeight = atoi(token);
-                /* ydnar: gs mods: q3map_tcGen <style> <parameters> */
-                } else if (striEqual(token, "q3map_tcGen")) {
-                    si->tcGen = true;
-                    text.GetToken(false);
-
-                    /* q3map_tcGen vector <s vector> <t vector> */
-                    if (striEqual(token, "vector")) {
-                        Parse1DMatrixAppend(text, 3, si->vecs[0].data());
-                        Parse1DMatrixAppend(text, 3, si->vecs[1].data());
-                    /* q3map_tcGen ivector <1.0/s vector> <1.0/t vector> (inverse vector, easier for mappers to understand) */
-                    } else if (striEqual(token, "ivector")) {
-                        Parse1DMatrixAppend(text, 3, si->vecs[0].data());
-                        Parse1DMatrixAppend(text, 3, si->vecs[1].data());
-                        for (size_t i = 0; i < 3; i++) {
-                            si->vecs[0][i] = si->vecs[0][i] ? 1.0 / si->vecs[0][i] : 0;
-                            si->vecs[1][i] = si->vecs[1][i] ? 1.0 / si->vecs[1][i] : 0;
-                        }
-                    } else {
-                        Sys_Warning("Unknown q3map_tcGen method: %s\n", token);
-                        si->vecs[0].set(0);
-                        si->vecs[1].set(0);
-                    }
-                /* ydnar: gs mods: q3map_[color|rgb|alpha][Gen|Mod] <style> <parameters> */
-                } else if (striEqual(token, "q3map_colorGen")
-                        || striEqual(token, "q3map_colorMod")
-                        || striEqual(token, "q3map_rgbGen")
-                        || striEqual(token, "q3map_rgbMod")
-                        || striEqual(token, "q3map_alphaGen")
-                        || striEqual(token, "q3map_alphaMod")) {
-                    colorMod_t  *cm, *cm2;
-
-                    /* alphamods are colormod + 1 */
-                    const bool alpha = striEqual(token, "q3map_alphaGen") || striEqual(token, "q3map_alphaMod");
-
-                    /* allocate new colormod */
-                    cm = safe_calloc(sizeof(*cm));
-
-                    /* attach to shader */
-                    if (si->colorMod == NULL) {
-                            si->colorMod = cm;
-                    } else {
-                        for (cm2 = si->colorMod; cm2 != NULL; cm2 = cm2->next) {
-                            if (cm2->next == NULL) {
-                                cm2->next = cm;
-                                break;
-                            }
-                        }
-                    }
-
-                    /* get type */
-                    text.GetToken(false);
-
-                    /* alpha set|const A */
-                    if (alpha && (striEqual(token, "set")
-                               || striEqual(token, "const"))) {
-                        cm->type = EColorMod::AlphaSet;
-                        text.GetToken(false);
-                        cm->data[0] = atof(token);
-                    /* color|rgb set|const (X Y Z) */
-                    } else if (striEqual(token, "set")
-                            || striEqual(token, "const")) {
-                        cm->type = EColorMod::ColorSet;
-                        Parse1DMatrixAppend(text, 3, cm->data);
-                        if (colorsRGB) {
-                            cm->data[0] = Image_LinearFloatFromsRGBFloat(cm->data[0]);
-                            cm->data[1] = Image_LinearFloatFromsRGBFloat(cm->data[1]);
-                            cm->data[2] = Image_LinearFloatFromsRGBFloat(cm->data[2]);
-                        }
-                    /* alpha scale A */
-                    } else if (alpha && striEqual(token, "scale")) {
-                        cm->type = EColorMod::AlphaScale;
-                        text.GetToken(false);
-                        cm->data[0] = atof(token);
-                    /* color|rgb scale (X Y Z) */
-                    } else if (striEqual(token, "scale")) {
-                        cm->type = EColorMod::ColorScale;
-                        Parse1DMatrixAppend(text, 3, cm->data);
-                    /* dotProduct (X Y Z) */
-                    } else if (striEqual(token, "dotProduct")) {
-                        cm->type = alpha? EColorMod::AlphaDotProduct : EColorMod::ColorDotProduct;
-                        Parse1DMatrixAppend(text, 3, cm->data);
-                    /* dotProductScale (X Y Z MIN MAX) */
-                    } else if (striEqual(token, "dotProductScale")) {
-                        cm->type = alpha? EColorMod::AlphaDotProductScale : EColorMod::ColorDotProductScale;
-                        Parse1DMatrixAppend(text, 5, cm->data);
-                    /* dotProduct2 (X Y Z) */
-                    } else if (striEqual(token, "dotProduct2")) {
-                        cm->type = alpha? EColorMod::AlphaDotProduct2 : EColorMod::ColorDotProduct2;
-                        Parse1DMatrixAppend(text, 3, cm->data);
-                    /* dotProduct2scale (X Y Z MIN MAX) */
-                    } else if (striEqual(token, "dotProduct2scale")) {
-                        cm->type = alpha? EColorMod::AlphaDotProduct2Scale : EColorMod::ColorDotProduct2Scale;
-                        Parse1DMatrixAppend(text, 5, cm->data);
-                    /* volume */
-                    } else if (striEqual(token, "volume")) {
-                        /* special stub mode for flagging volume brushes */
-                        cm->type = EColorMod::Volume;
-                    /* unknown */
-                    } else {
-                        Sys_Warning("Unknown colorMod method: %s\n", token);
-                    }
-                /* ydnar: gs mods: q3map_tcMod <style> <parameters> */
-                } else if (striEqual(token, "q3map_tcMod")) {
-                    float a, b;
-
-                    text.GetToken(false);
-
-                    /* q3map_tcMod [translate | shift | offset] <s> <t> */
-                    if (striEqual(token, "translate")
-                     || striEqual(token, "shift")
-                     || striEqual(token, "offset")) {
-                        text.GetToken(false);
-                        a = atof(token);
-                        text.GetToken(false);
-                        b = atof(token);
-
-                        TCModTranslate(si->mod, a, b);
-                    /* q3map_tcMod scale <s> <t> */
-                    } else if (striEqual(token, "scale")) {
-                        text.GetToken(false);
-                        a = atof(token);
-                        text.GetToken(false);
-                        b = atof(token);
-
-                        TCModScale(si->mod, a, b);
-                    /* q3map_tcMod rotate <s> <t> (fixme: make this communitive) */
-                    } else if (striEqual(token, "rotate")) {
-                        text.GetToken(false);
-                        a = atof(token);
-                        TCModRotate(si->mod, a);
-                    } else {
-                        Sys_Warning("Unknown q3map_tcMod method: %s\n", token);
-                    }
-                /* q3map_fogDir (direction a fog shader fades from transparent to opaque) */
-                } else if (striEqual(token, "q3map_fogDir")) {
-                    Parse1DMatrixAppend(text, 3, si->fogDir.data());
-                    VectorNormalize(si->fogDir);
-                /* q3map_globaltexture */
-                } else if (striEqual(token, "q3map_globaltexture")) {
-                    si->globalTexture = true;
-                /* ydnar: gs mods: q3map_nonplanar (make it a nonplanar merge candidate for meta surfaces) */
-                } else if (striEqual(token, "q3map_nonplanar")) {
-                    si->nonplanar = true;
-                /* ydnar: gs mods: q3map_noclip (preserve original face winding, don't clip by bsp tree) */
-                } else if (striEqual(token, "q3map_noclip")) {
-                    si->noClip = true;
-                /* q3map_notjunc */
-                } else if (striEqual(token, "q3map_notjunc")) {
-                    si->notjunc = true;
-                /* q3map_nofog */
-                } else if (striEqual(token, "q3map_nofog")) {
-                    si->noFog = true;
-                /* ydnar: gs mods: q3map_indexed (for explicit terrain-style indexed mapping) */
-                } else if (striEqual(token, "q3map_indexed")) {
-                    si->indexed = true;
-                /* ydnar: q3map_invert (inverts a drawsurface's facing) */
-                } else if (striEqual(token, "q3map_invert")) {
-                    si->invert = true;
-                /* ydnar: gs mods: q3map_lightmapMergable (ok to merge non-planar */
-                } else if (striEqual(token, "q3map_lightmapMergable")) {
-                    si->lmMergable = true;
-                /* ydnar: q3map_nofast */
-                } else if (striEqual(token, "q3map_noFast")) {
-                    si->noFast = true;
-                /* q3map_patchshadows */
-                } else if (striEqual(token, "q3map_patchShadows")) {
-                    si->patchShadows = true;
-                /* q3map_vertexshadows */
-                } else if (striEqual(token, "q3map_vertexShadows")) {
-                    si->vertexShadows = true;  /* ydnar */
-                /* q3map_novertexshadows */
-                } else if (striEqual(token, "q3map_noVertexShadows")) {
-                    si->vertexShadows = false; /* ydnar */
-                /* q3map_splotchfix (filter dark lightmap luxels on lightmapped models) */
-                } else if (striEqual(token, "q3map_splotchfix")) {
-                    si->splotchFix = true; /* ydnar */
-                /* q3map_forcesunlight */
-                } else if (striEqual(token, "q3map_forceSunlight")) {
-                    si->forceSunlight = true;
-                /* q3map_onlyvertexlighting (sof2) */
-                } else if (striEqual(token, "q3map_onlyVertexLighting")) {
-                    ApplySurfaceParm("pointlight", &si->contentFlags, &si->surfaceFlags, &si->compileFlags);
-                /* q3map_material (sof2) */
-                } else if (striEqual(token, "q3map_material")) {
-                    text.GetToken(false);
-                    if (!ApplySurfaceParm(StringOutputStream(64)("*mat_", token),
-                                          &si->contentFlags, &si->surfaceFlags, &si->compileFlags)) {
-                        Sys_Warning("Unknown material \"%s\"\n", token);
-                    }
-                /* ydnar: q3map_clipmodel (autogenerate clip brushes for model triangles using this shader) */
-                } else if (striEqual(token, "q3map_clipmodel")) {
-                    si->clipModel = true;
-                /* ydnar: q3map_styleMarker[2] */
-                } else if (striEqual(token, "q3map_styleMarker")) {
-                    si->styleMarker = 1;
-                } else if (striEqual(token, "q3map_styleMarker2")) {  /* uses depthFunc equal */
-                    si->styleMarker = 2;
-                }
-                /* ydnar: default to searching for q3map_<surfaceparm> */
-#if 1
-                else {
-                    //% Sys_FPrintf(SYS_VRB, "Attempting to match %s with a known surfaceparm\n", token);
-                    if (!ApplySurfaceParm(&token[6], &si->contentFlags, &si->surfaceFlags, &si->compileFlags)) {
-                        Sys_Warning("Unknown q3map_* directive \"%s\"\n", token);
-                    }
-                }
-#endif
+                si->baseTexture2Path(PathExtensionless(token));
             }
+            
 
             /* -----------------------------------------------------------------
                skip

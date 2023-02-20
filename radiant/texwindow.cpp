@@ -1129,13 +1129,14 @@ void Texture_Draw( TextureBrowser& textureBrowser ){
 
 		int x, y;
 		Texture_NextPos( textureBrowser, layout, shader->getTexture(), &x, &y );
-		qtexture_t *q = shader->getTexture();
-		if ( !q ) {
+		qtexture_t *texture = shader->getTexture();
+		qtexture_t *texture2 = shader->getTexture2();
+		if ( !texture || !texture2 ) {
 			break;
 		}
 
 		int nWidth, nHeight;
-		textureBrowser.getTextureWH( q, nWidth, nHeight );
+		textureBrowser.getTextureWH( texture, nWidth, nHeight );
 
 		// Is this texture visible?
 		if ( ( y - nHeight - fontHeight < originy )
@@ -1214,18 +1215,34 @@ void Texture_Draw( TextureBrowser& textureBrowser ){
 
 			// Draw the texture
 			glEnable( GL_TEXTURE_2D );
-			glBindTexture( GL_TEXTURE_2D, q->texture_number );
+			// Texture 1
+			glBindTexture( GL_TEXTURE_2D, texture->texture_number );
 			GlobalOpenGL_debugAssertNoErrors();
 			glColor3f( 1, 1, 1 );
-			glBegin( GL_QUADS );
+
+			glBegin( GL_TRIANGLES );
+			// Triangle 1
 			glTexCoord2i( 0, 0 );
 			glVertex2i( x, y - fontHeight );
 			glTexCoord2i( 1, 0 );
 			glVertex2i( x + nWidth, y - fontHeight );
-			glTexCoord2i( 1, 1 );
-			glVertex2i( x + nWidth, y - fontHeight - nHeight );
 			glTexCoord2i( 0, 1 );
 			glVertex2i( x, y - fontHeight - nHeight );
+
+			glEnd();
+			// Texture 2
+			glBindTexture( GL_TEXTURE_2D, texture2->texture_number );
+			GlobalOpenGL_debugAssertNoErrors();
+			glColor3f( 1, 1, 1 );
+			glBegin( GL_TRIANGLES );
+
+			// Triangle 2
+			glTexCoord2i( 1, 0 );
+			glVertex2i( x + nWidth, y - fontHeight );
+			glTexCoord2i( 0, 1 );
+			glVertex2i( x, y - fontHeight - nHeight );
+			glTexCoord2i( 1, 1 );
+			glVertex2i( x + nWidth, y - fontHeight - nHeight );
 			glEnd();
 
 			// draw the texture name

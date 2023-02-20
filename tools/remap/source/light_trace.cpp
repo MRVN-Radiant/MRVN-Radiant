@@ -901,7 +901,7 @@ void SetupTraceNodes(){
 
 	/* find nodraw bit */
 	noDrawContentFlags = noDrawSurfaceFlags = noDrawCompileFlags = 0;
-	ApplySurfaceParm( "nodraw", &noDrawContentFlags, &noDrawSurfaceFlags, &noDrawCompileFlags );
+	//ApplySurfaceParm( "nodraw", &noDrawContentFlags, &noDrawSurfaceFlags, &noDrawCompileFlags );
 
 	/* create the baseline raytracing tree from the bsp tree */
 	headNodeNum = SetupTraceNodes_r( 0 );
