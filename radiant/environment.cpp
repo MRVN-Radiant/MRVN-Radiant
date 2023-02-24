@@ -261,7 +261,7 @@ void environment_init( int argc, char* argv[] ){
 	}
 
 	if ( !portable_app_setup() ) {
-		home_path = StringOutputStream( 256 )( DirectoryCleaned( g_get_home_dir() ), ".mrvnradiant/" ).c_str();
+		home_path = StringOutputStream( 256 )( DirectoryCleaned( g_get_home_dir() ), ".netradiant/" ).c_str();
 		Q_mkdir( home_path.c_str() );
 	}
 	gamedetect();

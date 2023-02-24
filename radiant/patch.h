@@ -83,29 +83,29 @@ extern std::size_t MAX_PATCH_HEIGHT;
 #define MAX_PATCH_ROWCTRL ( ( ( MAX_PATCH_WIDTH - 1 ) - 1 ) / 2 )
 #define MAX_PATCH_COLCTRL ( ( ( MAX_PATCH_HEIGHT - 1 ) - 1 ) / 2 )
 
-enum EPatchCap
+enum class EPatchCap
 {
-	eCapBevel,
-	eCapEndCap,
-	eCapIBevel,
-	eCapIEndCap,
-	eCapCylinder,
+	Bevel,
+	EndCap,
+	IBevel,
+	IEndCap,
+	Cylinder,
 };
 
-enum EPatchPrefab
+enum class EPatchPrefab
 {
-	ePlane,
-	eBevel,
-	eEndCap,
-	eCylinder,
-	eDenseCylinder,
-	eVeryDenseCylinder,
-	eSqCylinder,
-	eCone,
-	eSphere,
-	eXactCylinder,
-	eXactSphere,
-	eXactCone,
+	Plane,
+	Bevel,
+	EndCap,
+	Cylinder,
+	DenseCylinder,
+	VeryDenseCylinder,
+	SqCylinder,
+	Cone,
+	Sphere,
+	ExactCylinder,
+	ExactSphere,
+	ExactCone,
 };
 
 enum EMatrixMajor
@@ -211,7 +211,7 @@ public:
 	RenderablePatchWireframe( PatchTesselation& tess ) : m_tess( tess ){
 	}
 	void render( RenderStateFlags state ) const {
-		glVertexPointer( 3, GL_FLOAT, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->vertex );
+		gl().glVertexPointer( 3, GL_FLOAT, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->vertex );
 
 		unsigned int indices[m_tess.m_nArrayHeight * 2 + (m_tess.m_nArrayWidth-2)*2 + 1];
 
@@ -246,7 +246,7 @@ public:
 			//	glDrawArrays( GL_LINE_STRIP, i, 2 );
 			//}
 		//}
-		glDrawElements( GL_LINE_STRIP, sizeof(indices)/sizeof(int), GL_UNSIGNED_INT, indices);
+		gl().glDrawElements( GL_LINE_STRIP, sizeof(indices)/sizeof(int), GL_UNSIGNED_INT, indices);
 	}
 };
 
@@ -257,11 +257,11 @@ public:
 	RenderablePatchFixedWireframe( PatchTesselation& tess ) : m_tess( tess ){
 	}
 	void render( RenderStateFlags state ) const {
-		glVertexPointer( 3, GL_FLOAT, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->vertex );
+		gl().glVertexPointer( 3, GL_FLOAT, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->vertex );
 		const RenderIndex* strip_indices = m_tess.m_indices.data();
 		for ( std::size_t i = 0; i < m_tess.m_numStrips; i++, strip_indices += m_tess.m_lenStrips )
 		{
-			glDrawElements( GL_QUAD_STRIP, GLsizei( m_tess.m_lenStrips ), RenderIndexTypeID, strip_indices );
+			gl().glDrawElements( GL_QUAD_STRIP, GLsizei( m_tess.m_lenStrips ), RenderIndexTypeID, strip_indices );
 		}
 	}
 };
@@ -282,30 +282,21 @@ public:
 #endif
 		{
 			if ( ( state & RENDER_BUMP ) != 0 ) {
-				if ( GlobalShaderCache().useShaderLanguage() ) {
-					glNormalPointer( GL_FLOAT, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->normal );
-					glVertexAttribPointerARB( c_attr_TexCoord0, 2, GL_FLOAT, 0, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->texcoord );
-					glVertexAttribPointerARB( c_attr_Tangent, 3, GL_FLOAT, 0, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->tangent );
-					glVertexAttribPointerARB( c_attr_Binormal, 3, GL_FLOAT, 0, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->bitangent );
-				}
-				else
-				{
-					glVertexAttribPointerARB( 11, 3, GL_FLOAT, 0, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->normal );
-					glVertexAttribPointerARB( 8, 2, GL_FLOAT, 0, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->texcoord );
-					glVertexAttribPointerARB( 9, 3, GL_FLOAT, 0, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->tangent );
-					glVertexAttribPointerARB( 10, 3, GL_FLOAT, 0, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->bitangent );
-				}
+				gl().glNormalPointer( GL_FLOAT, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->normal );
+				gl().glVertexAttribPointer( c_attr_TexCoord0, 2, GL_FLOAT, 0, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->texcoord );
+				gl().glVertexAttribPointer( c_attr_Tangent, 3, GL_FLOAT, 0, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->tangent );
+				gl().glVertexAttribPointer( c_attr_Binormal, 3, GL_FLOAT, 0, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->bitangent );
 			}
 			else
 			{
-				glNormalPointer( GL_FLOAT, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->normal );
-				glTexCoordPointer( 2, GL_FLOAT, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->texcoord );
+				gl().glNormalPointer( GL_FLOAT, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->normal );
+				gl().glTexCoordPointer( 2, GL_FLOAT, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->texcoord );
 			}
-			glVertexPointer( 3, GL_FLOAT, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->vertex );
+			gl().glVertexPointer( 3, GL_FLOAT, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->vertex );
 			const RenderIndex* strip_indices = m_tess.m_indices.data();
 			for ( std::size_t i = 0; i < m_tess.m_numStrips; i++, strip_indices += m_tess.m_lenStrips )
 			{
-				glDrawElements( GL_QUAD_STRIP, GLsizei( m_tess.m_lenStrips ), RenderIndexTypeID, strip_indices );
+				gl().glDrawElements( GL_QUAD_STRIP, GLsizei( m_tess.m_lenStrips ), RenderIndexTypeID, strip_indices );
 			}
 		}
 
@@ -459,7 +450,6 @@ private:
 public:
 	Callback m_lightsChanged;
 
-//static int m_CycleCapIndex;  // = 0;
 	static EPatchType m_type;
 
 	STRING_CONSTANT( Name, "Patch" );
@@ -1618,7 +1608,7 @@ public:
 		}
 
 		if ( m_dragPlanes.isSelected() ) { // this should only be true when the transform is a pure translation.
-			m_patch.transform( m_dragPlanes.evaluateTransform( vector4_to_vector3( matrix.t() ) ) );
+			m_patch.transform( m_dragPlanes.evaluateTransform( matrix.t().vec3() ) );
 		}
 	}
 
