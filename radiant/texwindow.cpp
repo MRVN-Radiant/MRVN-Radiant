@@ -1143,7 +1143,7 @@ void TextureGroups_constructTreeModel( TextureGroups groups, QStandardItemModel*
 		// models/
 		// models/editor/
 		// 'iter[0]' is the root of the list which the user doesnt see
-		char *separator = strchr( cutPath.c_str(), '/' );
+		const char *separator = strchr( cutPath.c_str(), '/' );
 		while( separator != nullptr && depth < TEX_MAX_FOLDER_DEPTH + 1) {
 			cutPath = StringRange( path_remove_directory( cutPath.c_str() ), path_get_filename_base_end( cutPath.c_str() ) );
 
