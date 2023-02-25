@@ -24,6 +24,8 @@
 #include "generic/callbackfwd.h"
 #include "signal/signalfwd.h"
 
+#define TEX_MAX_FOLDER_DEPTH 16
+
 class QWidget;
 QWidget* TextureBrowser_constructWindow( QWidget* toplevel );
 void TextureBrowser_destroyWindow();

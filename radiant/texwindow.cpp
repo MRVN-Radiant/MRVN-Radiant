@@ -1121,36 +1121,43 @@ void TextureBrowser_ToggleHideUnused(){
 void TextureGroups_constructTreeModel( TextureGroups groups, QStandardItemModel* model ){
 	auto root = model->invisibleRootItem();
 
+	QStandardItem *iter[TEX_MAX_FOLDER_DEPTH + 1] = {};
+	iter[0] = root;
+
+	// Loop through every path
 	TextureGroups::const_iterator i = groups.begin();
 	while ( i != groups.end() )
 	{
 		const char* dirName = ( *i ).c_str();
-		const char* firstUnderscore = strchr( dirName, '/' );
-		StringRange dirRoot( dirName, ( firstUnderscore == 0 ) ? dirName : firstUnderscore + 1 );
+		int depth = 1;
 
-		TextureGroups::const_iterator next = std::next( i );
-		if ( firstUnderscore != 0
-		  && next != groups.end()
-		  && string_equal_start( ( *next ).c_str(), dirRoot ) ) {
-			auto subroot = new QStandardItem( CopiedString( StringRange( dirName, firstUnderscore ) ).c_str() );
-			root->appendRow( subroot );
+		CopiedString cutPath = CopiedString( dirName );
 
-			// keep going...
-			while ( i != groups.end() && string_equal_start( ( *i ).c_str(), dirRoot ) )
-			{
-				auto item = new QStandardItem( ( *i ).c_str() );
-				item->setData( ( *i ).c_str(), Qt::ItemDataRole::ToolTipRole );
-				subroot->appendRow( item );
-				++i;
-			}
+		// Find out the depth of the current folder
+		// We can happily index into 'iter' without worrying about null pointers
+		// because this is how 'groups' looks: (this is just an example)
+		// world/
+		// world/dev/
+		// world/dev/concrete/
+		// tools
+		// models/
+		// models/editor/
+		// 'iter[0]' is the root of the list which the user doesnt see
+		char *separator = strchr( cutPath.c_str(), '/' );
+		while( separator != nullptr && depth < TEX_MAX_FOLDER_DEPTH + 1) {
+			cutPath = StringRange( path_remove_directory( cutPath.c_str() ), path_get_filename_base_end( cutPath.c_str() ) );
+
+			separator = strchr( cutPath.c_str(), '/' );
+
+			depth++;
 		}
-		else
-		{
-			auto item = new QStandardItem( dirName );
-			item->setData( dirName, Qt::ItemDataRole::ToolTipRole );
-			root->appendRow( item );
-			++i;
-		}
+
+		auto item = new QStandardItem( cutPath.c_str() );
+		item->setData( dirName, Qt::ItemDataRole::ToolTipRole );
+		iter[depth - 1]->appendRow( item );
+		iter[depth] = item;
+
+		i++;
 	}
 }
 
@@ -1181,7 +1188,7 @@ void TextureGroups_constructTreeView( TextureGroups& groups ){
 	{
 		// scan texture dirs and pak files only if not restricting to shaderlist
 		if ( g_pGameDescription->mGameType != "doom3" && !g_TextureBrowser_shaderlistOnly ) {
-			GlobalFileSystem().forEachDirectory( "textures/", TextureGroupsAddDirectoryCaller( groups ) );
+			GlobalFileSystem().forEachDirectory( "textures/", TextureGroupsAddDirectoryCaller( groups ), TEX_MAX_FOLDER_DEPTH );
 		}
 
 		GlobalShaderSystem().foreachShaderName( TextureGroupsAddShaderCaller( groups ) );
