@@ -1955,7 +1955,7 @@ void CamWnd::Cam_Draw(){
 		clearColour = g_camwindow_globals.color_cameraback;
 	}
 
-	gl().glClearColor( clearColour[0], clearColour[1], clearColour[2], 1 );
+	gl().glClearColor( clearColour[0], clearColour[1], clearColour[2], 0 );
 	gl().glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 	extern void Renderer_ResetStats();
