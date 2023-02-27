@@ -1820,7 +1820,7 @@ void XYWnd::XY_Draw(){
 	gl().glViewport( 0, 0, m_nWidth, m_nHeight );
 	gl().glClearColor( g_xywindow_globals.color_gridback[0],
 	              g_xywindow_globals.color_gridback[1],
-	              g_xywindow_globals.color_gridback[2], 0 );
+	              g_xywindow_globals.color_gridback[2], 1 );
 
 	gl().glClear( GL_COLOR_BUFFER_BIT );
 

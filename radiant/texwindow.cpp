@@ -916,7 +916,7 @@ void TextureBrowser::draw(){
 	gl().glClearColor( m_color_textureback[0],
 	                   m_color_textureback[1],
 	                   m_color_textureback[2],
-	                   0 );
+	                   1 );
 	gl().glViewport( 0, 0, m_width, m_height );
 	gl().glMatrixMode( GL_PROJECTION );
 	gl().glLoadIdentity();

@@ -764,7 +764,7 @@ void ModelBrowser_render(){
 	gl().glDepthMask( GL_TRUE );
 	gl().glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
-	gl().glClearColor( .25f, .25f, .25f, 0 );
+	gl().glClearColor( .25f, .25f, .25f, 1 );
 	gl().glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 	const unsigned int globalstate = RENDER_DEPTHTEST
