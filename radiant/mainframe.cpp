@@ -2101,6 +2101,19 @@ void MainFrame_Construct(){
 		g_strEnginePath = StringOutputStream( 256 )( DirectoryCleaned( g_pGameDescription->getRequiredKeyValue( ENGINEPATH_ATTRIBUTE ) ) ).c_str();
 	}
 
+	// Check if EnginePath starts with ${HOME} and make it relative to the real home dir
+	if( string_equal_prefix( g_strEnginePath.c_str(), "${HOME}" ) ) {
+		auto strippedPath = StringOutputStream(1028);
+
+		CopiedString home = g_get_home_dir();
+		if( strlen(home.c_str()) == 0 )
+			globalErrorStream() << "Failed to find home directory, please verify that the resources path exists to prevent errors.";
+
+
+		strippedPath << home << StringRange( &g_strEnginePath.c_str()[7], &g_strEnginePath.c_str()[strlen( g_strEnginePath.c_str() )] );
+		g_strEnginePath = strippedPath.c_str();
+	}
+
 
 	Layout_registerPreferencesPage();
 	Paths_registerPreferencesPage();
