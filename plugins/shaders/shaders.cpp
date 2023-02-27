@@ -918,6 +918,7 @@ public:
 	qtexture_t* getSpecular() const override {
 		return m_pSpecular;
 	}
+
 	qtexture_t* getTexture2() const {
 		return m_pTexture2;
 	}
