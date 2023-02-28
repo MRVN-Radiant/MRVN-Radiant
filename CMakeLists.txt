@@ -1,12 +1,25 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 
 #
 project(mrvnradiant)
 
 # 
-#set(CMAKE_CXX_STANDARD 17)
-#set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Definitions
+add_definitions(-DRADIANT_VERSION="0.0")
+add_definitions(-DRADIANT_MAJOR_VERSION=0)
+add_definitions(-DRADIANT_MINOR_VERSION=0)
+add_definitions(-DRADIANT_ABOUTMSG="dev build")
+
+if(WIN32)
+    add_definitions(-DRADIANT_EXECUTABLE="exe")
+else()
+    add_definitions(-DRADIANT_EXECUTABLE="")
+endif()
+
+add_compile_definitions(POSIX)
 
 # Find dependencies
 include(FindPkgConfig)

@@ -84,5 +84,8 @@ add_executable( radiant
                 xywindow.cpp
                 )
 
-target_include_directories(radiant PRIVATE .)
-target_link_libraries(radiant PRIVATE math Qt5::Core Qt5::Gui Qt5::Widgets )
+target_include_directories(radiant PRIVATE .
+                                           ${XML_INCLUDE_DIRS}
+                                           ${GLIB_INCLUDE_DIRS}
+                          )
+target_link_libraries(radiant PRIVATE Qt5::Gui Qt5::Widgets Qt5::Core)
