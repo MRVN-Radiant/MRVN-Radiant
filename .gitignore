@@ -4,3 +4,6 @@ install
 .vscode
 .vs
 libs/assimp/out
+CMakeFiles
+cmake_install.cmake
+CMakeCache.txt
