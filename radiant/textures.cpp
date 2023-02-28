@@ -22,7 +22,6 @@
 #include "textures.h"
 
 #include "debugging/debugging.h"
-#include "warnings.h"
 
 #include "itextures.h"
 #include "igl.h"
@@ -33,6 +32,7 @@
 #include "container/hashfunc.h"
 #include "container/cache.h"
 #include "generic/callback.h"
+#include "stream/stringstream.h"
 #include "stringio.h"
 
 #include "image.h"
@@ -91,28 +91,28 @@ void SetTexParameters( ETexturesMode mode ){
 	switch ( mode )
 	{
 	case eTextures_NEAREST:
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+		gl().glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+		gl().glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 		break;
 	case eTextures_NEAREST_MIPMAP_NEAREST:
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+		gl().glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST );
+		gl().glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 		break;
 	case eTextures_NEAREST_MIPMAP_LINEAR:
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+		gl().glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR );
+		gl().glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 		break;
 	case eTextures_LINEAR:
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		gl().glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		gl().glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 		break;
 	case eTextures_LINEAR_MIPMAP_NEAREST:
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		gl().glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
+		gl().glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 		break;
 	case eTextures_LINEAR_MIPMAP_LINEAR:
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		gl().glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+		gl().glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 		break;
 	default:
 		globalErrorStream() << "invalid texture mode\n";
@@ -122,7 +122,7 @@ void SetTexParameters( ETexturesMode mode ){
 void SetTexAnisotropy( bool anisotropy ){
 	float maxAniso = QGL_maxTextureAnisotropy();
 	if ( maxAniso > 1 ) {
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropy ? maxAniso : 1.f );
+		gl().glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropy ? maxAniso : 1.f );
 	}
 }
 
@@ -190,19 +190,19 @@ void LoadTextureRGBA( qtexture_t* q, unsigned char* pPixels, int nWidth, int nHe
 	q->color[1] = total[1] / ( nCount * 255 );
 	q->color[2] = total[2] / ( nCount * 255 );
 
-	glGenTextures( 1, &q->texture_number );
+	gl().glGenTextures( 1, &q->texture_number );
 
-	glBindTexture( GL_TEXTURE_2D, q->texture_number );
+	gl().glBindTexture( GL_TEXTURE_2D, q->texture_number );
 
 	SetTexParameters( g_texture_mode );
 	SetTexAnisotropy( g_TextureAnisotropy );
 #if 1
-	glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE );
-	glTexImage2D( GL_TEXTURE_2D, 0, g_texture_globals.texture_components, nWidth, nHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pPixels );
+	gl().glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE );
+	gl().glTexImage2D( GL_TEXTURE_2D, 0, g_texture_globals.texture_components, nWidth, nHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pPixels );
 
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, std::min( g_Textures_mipLevel, static_cast<int>( log2( static_cast<float>( std::max( nWidth, nHeight ) ) ) ) ) );
+	gl().glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, std::min( g_Textures_mipLevel, static_cast<int>( log2( static_cast<float>( std::max( nWidth, nHeight ) ) ) ) ) );
 
-	glBindTexture( GL_TEXTURE_2D, 0 );
+	gl().glBindTexture( GL_TEXTURE_2D, 0 );
 #else
 	int gl_width = 1;
 	while ( gl_width < nWidth )
@@ -240,7 +240,7 @@ void LoadTextureRGBA( qtexture_t* q, unsigned char* pPixels, int nWidth, int nHe
 	}
 
 	int mip = 0;
-	glTexImage2D( GL_TEXTURE_2D, mip++, g_texture_globals.texture_components, gl_width, gl_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, outpixels );
+	gl().glTexImage2D( GL_TEXTURE_2D, mip++, g_texture_globals.texture_components, gl_width, gl_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, outpixels );
 	while ( gl_width > 1 || gl_height > 1 )
 	{
 		GL_MipReduce( outpixels, outpixels, gl_width, gl_height, 1, 1 );
@@ -252,10 +252,10 @@ void LoadTextureRGBA( qtexture_t* q, unsigned char* pPixels, int nWidth, int nHe
 			gl_height >>= 1;
 		}
 
-		glTexImage2D( GL_TEXTURE_2D, mip++, g_texture_globals.texture_components, gl_width, gl_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, outpixels );
+		gl().glTexImage2D( GL_TEXTURE_2D, mip++, g_texture_globals.texture_components, gl_width, gl_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, outpixels );
 	}
 
-	glBindTexture( GL_TEXTURE_2D, 0 );
+	gl().glBindTexture( GL_TEXTURE_2D, 0 );
 	if ( resampled ) {
 		free( outpixels );
 	}
@@ -334,26 +334,74 @@ typedef std::pair<LoadImageCallback, CopiedString> TextureKey;
 void qtexture_realise( qtexture_t& texture, const TextureKey& key ){
 	texture.texture_number = 0;
 	if ( !string_empty( key.second.c_str() ) ) {
-		Image* image = key.first.loadImage( key.second.c_str() );
-		if ( image != 0 ) {
-			LoadTextureRGBA( &texture, image->getRGBAPixels(), image->getWidth(), image->getHeight() );
-			texture.surfaceFlags = image->getSurfaceFlags();
-			texture.contentFlags = image->getContentFlags();
-			texture.value = image->getValue();
-			image->release();
-			globalOutputStream() << "Loaded Texture: \"" << key.second << "\"\n";
-			GlobalOpenGL_debugAssertNoErrors();
+		if( !key.first.m_skybox ){
+			Image* image = key.first.loadImage( key.second.c_str() );
+			if ( image != 0 ) {
+				LoadTextureRGBA( &texture, image->getRGBAPixels(), image->getWidth(), image->getHeight() );
+				texture.surfaceFlags = image->getSurfaceFlags();
+				texture.contentFlags = image->getContentFlags();
+				texture.value = image->getValue();
+				image->release();
+				globalOutputStream() << "Loaded Texture: \"" << key.second << "\"\n";
+				GlobalOpenGL_debugAssertNoErrors();
+			}
+			else
+			{
+				globalErrorStream() << "Texture load failed: \"" << key.second << "\"\n";
+			}
 		}
-		else
-		{
-			globalErrorStream() << "Texture load failed: \"" << key.second << "\"\n";
+		else {
+			Image *images[6]{};
+			/* load in order, so that Q3 cubemap is seamless in openGL, but rotated & flipped; fix misorientation in shader later */
+			const char *suffixes[] = { "_ft", "_bk", "_up", "_dn", "_rt", "_lf" };
+			for( int i = 0; i < 6; ++i ){
+				images[i] = key.first.loadImage( StringOutputStream( 64 )( key.second, suffixes[i] ) );
+			}
+			if( std::all_of( images, images + std::size( images ), []( const Image *img ){ return img != nullptr; } ) ){
+				gl().glGenTextures( 1, &texture.texture_number );
+				gl().glBindTexture( GL_TEXTURE_CUBE_MAP, texture.texture_number );
+				gl().glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_GENERATE_MIPMAP, GL_FALSE );
+
+				gl().glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+				gl().glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+				gl().glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
+				gl().glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+				gl().glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+				gl().glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0 );
+				gl().glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0); //this or mipmaps are required for samplerCube to work
+				// fix non quadratic, varying sizes; GL_TEXTURE_CUBE_MAP requires this
+				unsigned int size = 0;
+				for( const auto img : images )
+					size = std::max( { size, img->getWidth(), img->getHeight() } );
+				for( int i = 0; i < 6; ++i ){
+					const Image& img = *images[i];
+					byte *pix = img.getRGBAPixels();
+					if( img.getWidth() != size || img.getHeight() != size ){
+						pix = static_cast<byte*>( malloc( size * size * 4 ) );
+						R_ResampleTexture( img.getRGBAPixels(), img.getWidth(), img.getHeight(), pix, size, size, 4 );
+					}
+					gl().glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, g_texture_globals.texture_components, size, size, 0, GL_RGBA, GL_UNSIGNED_BYTE, pix );
+					if( pix != img.getRGBAPixels() )
+						free( pix );
+				}
+
+				gl().glBindTexture( GL_TEXTURE_CUBE_MAP, 0 );
+				globalOutputStream() << "Loaded Skybox: \"" << key.second << "\"\n";
+				GlobalOpenGL_debugAssertNoErrors();
+			}
+			else
+			{
+				globalErrorStream() << "Skybox load failed: \"" << key.second << "\"\n";
+			}
+
+			std::for_each_n( images, std::size( images ), []( Image *img ){ if( img != nullptr ) img->release(); } );
 		}
 	}
 }
 
 void qtexture_unrealise( qtexture_t& texture ){
 	if ( GlobalOpenGL().contextValid && texture.texture_number != 0 ) {
-		glDeleteTextures( 1, &texture.texture_number );
+		gl().glDeleteTextures( 1, &texture.texture_number );
 		GlobalOpenGL_debugAssertNoErrors();
 	}
 }
@@ -496,7 +544,7 @@ public:
 			}
 
 
-			glGetIntegerv( GL_MAX_TEXTURE_SIZE, &max_tex_size );
+			gl().glGetIntegerv( GL_MAX_TEXTURE_SIZE, &max_tex_size );
 			if ( max_tex_size == 0 ) {
 				max_tex_size = 1024;
 			}
@@ -559,12 +607,12 @@ void Textures_ModeChanged(){
 
 		for ( TexturesMap::iterator i = g_texturesmap->begin(); i != g_texturesmap->end(); ++i )
 		{
-			glBindTexture( GL_TEXTURE_2D, ( *i ).value->texture_number );
+			gl().glBindTexture( GL_TEXTURE_2D, ( *i ).value->texture_number );
 			SetTexParameters( g_texture_mode );
 			SetTexAnisotropy( g_TextureAnisotropy );
 		}
 
-		glBindTexture( GL_TEXTURE_2D, 0 );
+		gl().glBindTexture( GL_TEXTURE_2D, 0 );
 	}
 	g_texturesModeChangedNotify();
 }
@@ -727,7 +775,6 @@ void Textures_constructPreferences( PreferencesPage& page ){
 	}
 	page.appendSpinner(
 	    "Texture Gamma",
-	    1.0,
 	    0.0,
 	    5.0,
 	    FloatImportCallback( TextureGammaImportCaller( g_texture_globals.fGamma ) ),
@@ -803,6 +850,7 @@ void Textures_Destroy(){
 #include "modulesystem/modulesmap.h"
 #include "modulesystem/singletonmodule.h"
 #include "modulesystem/moduleregistry.h"
+#include "qerplugin.h"
 
 class TexturesDependencies :
 	public GlobalRadiantModuleRef,

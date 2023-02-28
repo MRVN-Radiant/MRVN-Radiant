@@ -88,11 +88,30 @@ void EntityClassFGD_forEach( EntityClassVisitor& visitor ){
 	}
 }
 
+#define PARSE_ERROR "error parsing fgd entity class definition at line " << tokeniser.getLine() << ':' << tokeniser.getColumn()
+
+static bool s_fgd_warned = false;
+
 inline bool EntityClassFGD_parseToken( Tokeniser& tokeniser, const char* token ){
-	return string_equal( tokeniser.getToken(), token );
+	const bool w = s_fgd_warned;
+	const bool ok = string_equal( tokeniser.getToken(), token );
+	if( !ok ){
+		globalErrorStream() << PARSE_ERROR << "\nExpected " << makeQuoted( token ) << '\n';
+		s_fgd_warned = true;
+	}
+	return w || ok;
 }
 
-#define PARSE_ERROR "error parsing entity class definition"
+#define ERROR_FGD( message )\
+do{\
+	if( s_fgd_warned )\
+		globalErrorStream() << message << '\n';\
+	else{\
+		ERROR_MESSAGE( message );\
+		s_fgd_warned = true;\
+	}\
+}while( 0 )
+
 
 void EntityClassFGD_parseSplitString( Tokeniser& tokeniser, CopiedString& string ){
 	StringOutputStream buffer( 256 );
@@ -253,7 +272,7 @@ void EntityClassFGD_parseClass( Tokeniser& tokeniser, bool fixedsize, bool isBas
 		}
 		else
 		{
-			ERROR_MESSAGE( PARSE_ERROR );
+			ERROR_FGD( PARSE_ERROR );
 		}
 	}
 
@@ -316,12 +335,8 @@ void EntityClassFGD_parseClass( Tokeniser& tokeniser, bool fixedsize, bool isBas
 		ASSERT_MESSAGE( EntityClassFGD_parseToken( tokeniser, ")" ), PARSE_ERROR );
 
 		if ( string_equal_nocase( type.c_str(), "flags" ) ) {
-			EntityClassAttribute attribute;
-
 			ASSERT_MESSAGE( EntityClassFGD_parseToken( tokeniser, "=" ), PARSE_ERROR );
-			tokeniser.nextLine();
 			ASSERT_MESSAGE( EntityClassFGD_parseToken( tokeniser, "[" ), PARSE_ERROR );
-			tokeniser.nextLine();
 			for (;; )
 			{
 				const char* flag = tokeniser.getToken();
@@ -331,9 +346,16 @@ void EntityClassFGD_parseClass( Tokeniser& tokeniser, bool fixedsize, bool isBas
 				}
 				else
 				{
+					const size_t bit = std::log2( atoi( flag ) );
+					ASSERT_MESSAGE( bit < MAX_FLAGS, "invalid flag bit" << PARSE_ERROR );
+					ASSERT_MESSAGE( string_empty( entityClass->flagnames[bit] ), "non-unique flag bit" << PARSE_ERROR );
+
 					ASSERT_MESSAGE( EntityClassFGD_parseToken( tokeniser, ":" ), PARSE_ERROR );
-					//const char* name =
-					tokeniser.getToken();
+
+					const char* name = tokeniser.getToken();
+					strcpy( entityClass->flagnames[bit], name );
+					EntityClassAttribute *attribute = &EntityClass_insertAttribute( *entityClass, name, EntityClassAttribute( "flag", name ) ).second;
+					entityClass->flagAttributes[bit] = attribute;
 					{
 						const char* defaultSeparator = tokeniser.getToken();
 						if ( string_equal( defaultSeparator, ":" ) ) {
@@ -341,7 +363,7 @@ void EntityClassFGD_parseClass( Tokeniser& tokeniser, bool fixedsize, bool isBas
 							{
 								const char* descriptionSeparator = tokeniser.getToken();
 								if ( string_equal( descriptionSeparator, ":" ) ) {
-									EntityClassFGD_parseSplitString( tokeniser, attribute.m_description );
+									EntityClassFGD_parseSplitString( tokeniser, attribute->m_description );
 								}
 								else
 								{
@@ -357,7 +379,6 @@ void EntityClassFGD_parseClass( Tokeniser& tokeniser, bool fixedsize, bool isBas
 				}
 				tokeniser.nextLine();
 			}
-			EntityClass_insertAttribute( *entityClass, key.c_str(), attribute );
 		}
 		else if ( string_equal_nocase( type.c_str(), "choices" ) ) {
 			EntityClassAttribute attribute;
@@ -504,7 +525,7 @@ void EntityClassFGD_parseClass( Tokeniser& tokeniser, bool fixedsize, bool isBas
 		}
 		else
 		{
-			ERROR_MESSAGE( "unknown key type: " << makeQuoted( type ) );
+			ERROR_FGD( "unknown key type: " << makeQuoted( type ) );
 		}
 		tokeniser.nextLine();
 	}
@@ -531,18 +552,18 @@ void EntityClassFGD_parse( TextInputStream& inputStream, const char* path ){
 		if ( blockType == 0 ) {
 			break;
 		}
-		if ( string_equal( blockType, "@SolidClass" ) ) {
+		if ( string_equal_nocase( blockType, "@SolidClass" ) ) {
 			EntityClassFGD_parseClass( tokeniser, false, false );
 		}
-		else if ( string_equal( blockType, "@BaseClass" ) ) {
+		else if ( string_equal_nocase( blockType, "@BaseClass" ) ) {
 			EntityClassFGD_parseClass( tokeniser, false, true );
 		}
-		else if ( string_equal( blockType, "@PointClass" )
+		else if ( string_equal_nocase( blockType, "@PointClass" )
 		       // hl2 below
-		       || string_equal( blockType, "@KeyFrameClass" )
-		       || string_equal( blockType, "@MoveClass" )
-		       || string_equal( blockType, "@FilterClass" )
-		       || string_equal( blockType, "@NPCClass" ) ) {
+		       || string_equal_nocase( blockType, "@KeyFrameClass" )
+		       || string_equal_nocase( blockType, "@MoveClass" )
+		       || string_equal_nocase( blockType, "@FilterClass" )
+		       || string_equal_nocase( blockType, "@NPCClass" ) ) {
 			EntityClassFGD_parseClass( tokeniser, true, false );
 		}
 		// hl2 below
@@ -560,7 +581,7 @@ void EntityClassFGD_parse( TextInputStream& inputStream, const char* path ){
 		}
 		else
 		{
-			ERROR_MESSAGE( "unknown block type: " << makeQuoted( blockType ) );
+			ERROR_FGD( "unknown block type: " << makeQuoted( blockType ) );
 		}
 	}
 
@@ -631,6 +652,13 @@ void EntityClassFGD_resolveInheritance( EntityClass* derivedClass ){
 				for ( EntityClassAttributes::iterator k = parentClass->m_attributes.begin(); k != parentClass->m_attributes.end(); ++k )
 				{
 					EntityClass_insertAttribute( *derivedClass, ( *k ).first.c_str(), ( *k ).second );
+				}
+
+				for( size_t flag = 0; flag < MAX_FLAGS; ++flag ){
+					if( !string_empty( parentClass->flagnames[flag] ) && string_empty( derivedClass->flagnames[flag] ) ){
+						strcpy( derivedClass->flagnames[flag], parentClass->flagnames[flag] );
+						derivedClass->flagAttributes[flag] = parentClass->flagAttributes[flag];
+					}
 				}
 			}
 		}
