@@ -87,5 +87,19 @@ add_executable( radiant
 target_include_directories(radiant PRIVATE .
                                            ${XML_INCLUDE_DIRS}
                                            ${GLIB_INCLUDE_DIRS}
+                                           ${QT5_INCLUDE_DIRS}
                           )
-target_link_libraries(radiant PRIVATE Qt5::Gui Qt5::Widgets Qt5::Core)
+target_link_libraries(radiant 
+                      libs
+                      gtkutil
+                      l_net
+                      quickhull
+                      profile
+                      xml
+                      Qt5::Gui
+                      Qt5::Widgets
+                      Qt5::Core
+                      ${GLIB_LIBRARIES}
+                      ${OPENGL_gl_LIBRARY}
+                      ${LIBXML2_LIBRARIES}
+                     )

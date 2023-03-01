@@ -1021,12 +1021,12 @@ void TextureBrowser::draw(){
 						const int right = std::min( j + 8, nWidth );
 						const int top = i;
 						const int bottom = std::min( i + 8, nHeight );
-						glVertex2i( x + right, y - nHeight - fontHeight + top );
-						glVertex2i( x + left,  y - nHeight - fontHeight + top );
-						glVertex2i( x + left,  y - nHeight - fontHeight + bottom );
-						glVertex2i( x + right, y - nHeight - fontHeight + bottom );
+						gl().glVertex2i( x + right, y - nHeight - fontHeight + top );
+						gl().glVertex2i( x + left,  y - nHeight - fontHeight + top );
+						gl().glVertex2i( x + left,  y - nHeight - fontHeight + bottom );
+						gl().glVertex2i( x + right, y - nHeight - fontHeight + bottom );
 					}
-				glEnd();
+				gl().glEnd();
 			}
 
 			// Draw the texture
