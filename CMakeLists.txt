@@ -23,11 +23,14 @@ set(CMAKE_VERBOSE_MAKEFILE ${VERBOSE})
 
 set(CMAKE_BUILD_TYPE ${BUILD})
 
-# Definitions
+# Radiant definitions
 add_definitions(-DRADIANT_VERSION="0.0")
 add_definitions(-DRADIANT_MAJOR_VERSION=0)
 add_definitions(-DRADIANT_MINOR_VERSION=0)
 add_definitions(-DRADIANT_ABOUTMSG="Dev build")
+
+# Remap definitions
+add_definitions(-DQ3MAP_VERSION="Dev build")
 
 if(WIN32)
     add_definitions(-DRADIANT_EXECUTABLE="exe")
@@ -42,6 +45,7 @@ include(FindPkgConfig)
 pkg_check_modules(GLIB glib-2.0 REQUIRED)
 pkg_check_modules(PNG libpng REQUIRED)
 
+include(FindJPEG)
 find_package(LibXml2 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
@@ -53,12 +57,14 @@ include_directories(include libs)
 # Libs
 add_subdirectory(libs)
 
-# Radiant
-add_subdirectory(radiant)
-
 # Plugins
 add_subdirectory(plugins)
 
+# Radiant
+add_subdirectory(radiant)
+
+# Tools
+add_subdirectory(tools)
 
 # Copy gamepacks
 add_custom_target(gamepacks ALL

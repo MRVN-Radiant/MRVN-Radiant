@@ -90,7 +90,7 @@ target_include_directories(radiant PRIVATE .
                                            ${QT5_INCLUDE_DIRS}
                           )
 target_link_libraries(radiant 
-                      libs
+                      commandlib
                       gtkutil
                       l_net
                       quickhull
