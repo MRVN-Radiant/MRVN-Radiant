@@ -77,7 +77,8 @@ jobs:
 
     - name: Build
       run: |
-        make -j 4 CXXFLAGS="-Wno-deprecated-declarations"
+        cmake .
+        make
 
     - name: Generate Artifact Name
       run: |
@@ -86,5 +87,5 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: ${{ env.ARTIFACT_NAME }}
-        path: install/
+        path: build/
         if-no-files-found: error
