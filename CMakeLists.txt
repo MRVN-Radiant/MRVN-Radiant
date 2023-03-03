@@ -7,6 +7,8 @@ project(mrvnradiant)
 option(VERBOSE "Verbose output" OFF)
 option(BUILD "Built type" Release)
 
+# Github actions moment
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 # Build system setup
 set(CMAKE_CXX_STANDARD 17)
