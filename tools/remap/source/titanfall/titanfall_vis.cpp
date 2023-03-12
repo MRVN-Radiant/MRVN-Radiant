@@ -394,24 +394,27 @@ void Titanfall::EmitMeshes(const entity_t &e) {
         m.triOffset = Titanfall::Bsp::meshIndices.size();
         m.triCount = mesh.triangles.size() / 3;
         
+        int vertexOffset = 0;
         
         if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_UNLIT_TS)) {
             m.vertexType = 3;
-            m.vertexOffset = Titanfall::Bsp::vertexUnlitTSVertices.size();
+            vertexOffset = Titanfall::Bsp::vertexUnlitTSVertices.size();
         } else if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags,S_VERTEX_LIT_BUMP)) {
             m.vertexType = 2;
-            m.vertexOffset = Titanfall::Bsp::vertexLitBumpVertices.size();
+            vertexOffset = Titanfall::Bsp::vertexLitBumpVertices.size();
         } else if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_UNLIT)) {
             m.vertexType = 1;
-            m.vertexOffset = Titanfall::Bsp::vertexUnlitVertices.size();
+            vertexOffset = Titanfall::Bsp::vertexUnlitVertices.size();
         } else {
             m.vertexType = 0;
-            m.vertexOffset = Titanfall::Bsp::vertexLitFlatVertices.size();
+            vertexOffset = Titanfall::Bsp::vertexLitFlatVertices.size();
         }
+
+        m.vertexOffset = vertexOffset;
 
         // Emit texture related structs
         uint32_t  textureIndex = Titanfall::EmitTextureData(*mesh.shaderInfo);
-        m.materialOffset = Titanfall::EmitMaterialSort(textureIndex, m.vertexOffset, m.vertexCount);
+        m.materialOffset = Titanfall::EmitMaterialSort(textureIndex, vertexOffset, m.vertexCount);
         int materialSortOffset = Titanfall::Bsp::materialSorts.at(m.materialOffset).vertexOffset;
         MinMax  aabb;
 

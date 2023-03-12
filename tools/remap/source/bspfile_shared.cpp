@@ -150,6 +150,9 @@ void Shared::MakeMeshes(const entity_t &e) {
 
                 Shared::Mesh_t &mesh2 = Shared::meshes.at(i);
 
+                if( mesh1.triangles.size() + mesh2.triangles.size() > 63000 )
+                    continue;
+
                 // Check if they have the same shader
                 if (!striEqual(mesh1.shaderInfo->shader.c_str(), mesh2.shaderInfo->shader.c_str())) {
                     continue;
