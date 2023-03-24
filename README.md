@@ -26,6 +26,40 @@ MRVNRadiant is a fork of NetRadiant-custom (GtkRadiant 1.4 &rarr; massive rewrit
 
 > NOTE: These values are updated manually.
 
+## Compiling
+### Getting dependencies on Windows (Using MinGW)
+- Install [msys2](https://www.msys2.org/) and follow installation steps on their website
+- Open the MingW shell
+- Run:
+  1. `pacman -S  {make,diffutils,gcc,binutils,pkg-config,unzip,git-core,subversion}`
+  2. `pacman -S mingw-w64-x86_64-{openjpeg,qt5-base,glib2,libxml2,libpng,zlib}`
+- Use `mingw-w64-x86_64` for 64-bit and `mingw-w64-i686` for 32-bit
+
+### Compiling on Windows
+`cd` into the root directory of MRVN-Radiant and run these commands:
+```sh
+cmake . -G "MinGW Makefiles"
+cmake --build .
+```
+
+### Getting dependencies on Linux
+- Dependencies:
+    - qt5
+    - glib
+    - libxml2
+    - zlib
+    - libpng
+
+### Compiling on Linux
+`cd` into the root directory of MRVN-Radiant and run these commands:
+```sh
+cmake . -G "Unix Makefiles"
+cmake --build .
+```
+
 ## Other tools
 - [bsp_tool](https://github.com/snake-biscuits/bsp_tool)
     - A Python library for analyzing .bsp files
+
+- [MRVN-Explorer](https://github.com/MRVN-Radiant/MRVN-Explorer)
+    - A OpenGL/ImGui respawn bsp viewer
