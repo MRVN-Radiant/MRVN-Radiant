@@ -38,9 +38,17 @@ MRVNRadiant is a fork of NetRadiant-custom (GtkRadiant 1.4 &rarr; massive rewrit
 ### Compiling on Windows
 `cd` into the root directory of MRVN-Radiant and run these commands:
 ```sh
-cmake . -G "MinGW Makefiles"
+cmake . -G "MinGW Makefiles" - DINSTALL_DLLS=OFF
 cmake --build .
 ```
+### Note
+To be able to run radiant from file explorer you'll need to copy over some dlls. Thankfully there's a script for this.
+```sh
+cmake . -G "MinGW Makefiles" -DINSTALL_DLLS=ON
+```
+You only need to run this once.
+
+If you get a white screen after launching radiant you'll need to manually delete `OPENGL32.dll` from the `install/` folder. Alternatively you can delete mesa.
 
 ### Getting dependencies on Linux
 - Dependencies:

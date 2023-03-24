@@ -4,10 +4,12 @@
 
 INSTALLDIR=`pwd`/install
 
-if [ "\"$1\"" = "x86_64" ]; then
+if [ "$1" = x86_64 ]; then
     MINGWDIR=/mingw64
+elif [ "$1" = x86 ]; then
+    MINGWDIR=/mingw32
 else
-     MINGWDIR=/mingw32
+    exit
 fi
 
 function dependencies_single_target_no_depth {

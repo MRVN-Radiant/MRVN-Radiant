@@ -1,7 +1,6 @@
 *.[oda]
 .settings
-build
-install
+out
 .vscode
 .vs
 libs/assimp/out
@@ -14,3 +13,7 @@ libs/assimp/generated
 libs/assimp/assimp.pc
 cmake_uninstall.cmake
 libs/assimp/revision.h
+
+# Windows binary files
+*.dll
+*.exe
