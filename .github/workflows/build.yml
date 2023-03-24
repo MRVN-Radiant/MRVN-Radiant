@@ -37,9 +37,12 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Setup CMake
+      run: cmake . -G "MinGW Makefiles"
+
     - name: Build
       run: |
-        make MAKEFILE_CONF=msys2-Makefile.conf BUILD=release -j$(nproc) CXXFLAGS="-Wno-deprecated-declarations" 2> windows-warn-${{ matrix.arch }}.log
+        cmake --build .
         wget https://www.dropbox.com/s/hcgkwzzmja3m6c0/netradiant-custom-extra-win.zip
         unzip -o netradiant-custom-extra-win.zip -d "install"
 
@@ -75,10 +78,12 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Setup CMake
+      run: cmake . -G "Unix Makefiles"
+
     - name: Build
       run: |
-        cmake .
-        make
+        cmake --build .
 
     - name: Generate Artifact Name
       run: |
