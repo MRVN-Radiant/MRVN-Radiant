@@ -1,4 +1,4 @@
-add_library(image
+add_library(image MODULE
             bmp.cpp
             bmp.h
             dds.cpp
@@ -13,7 +13,8 @@ add_library(image
             pcx.h
             tga.cpp
             tga.h
+            imageq3.def
            )
 
 #target_include_directories(shaders PRIVATE ${GLIB_INCLUDE_DIRS})
-#target_link_libraries(shaders PRIVATE ${GLIB_LIBRARIES})
+target_link_libraries(image PRIVATE ddslib etclib ${JPEG_LIBRARIES})

@@ -1,4 +1,4 @@
-add_library(archivezip
+add_library(archivezip MODULE
             archive.cpp
             archive.h
             pkzip.cpp
@@ -7,7 +7,8 @@ add_library(archivezip
             plugin.h
             zlibstream.cpp
             zlibstream.h
+            archivezip.def
            )
 
 #target_include_directories(shaders PRIVATE ${GLIB_INCLUDE_DIRS})
-#target_link_libraries(shaders PRIVATE ${GLIB_LIBRARIES})
+target_link_libraries(archivezip PRIVATE z)

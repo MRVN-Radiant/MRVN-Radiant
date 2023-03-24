@@ -1,4 +1,4 @@
-add_library(imagehl
+add_library(imagehl MODULE
             hlw.cpp
             hlw.h
             imagehl.cpp
@@ -7,7 +7,5 @@ add_library(imagehl
             mip.h
             sprite.cpp
             sprite.h
+            imagehl.def
            )
-
-#target_include_directories(shaders PRIVATE ${GLIB_INCLUDE_DIRS})
-#target_link_libraries(shaders PRIVATE ${GLIB_LIBRARIES})

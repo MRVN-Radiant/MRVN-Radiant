@@ -1,4 +1,4 @@
-add_library(entity
+add_library(entity MODULE
             angle.cpp
             angle.h
             angles.cpp
@@ -45,6 +45,7 @@ add_library(entity
             skincache.h
             targetable.cpp
             targetable.h
+            entityq3.def
            )
 
 target_include_directories(entity PRIVATE
@@ -52,6 +53,4 @@ target_include_directories(entity PRIVATE
                           )
 target_link_libraries(entity PRIVATE
                       Qt5::Gui
-                      Qt5::Widgets
-                      Qt5::Core
                      )

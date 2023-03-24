@@ -1,4 +1,4 @@
-add_library(assmodel
+add_library(assmodel MODULE
             mdlimage.cpp
             mdlimage.h
             model.cpp
@@ -14,6 +14,4 @@ target_include_directories(assmodel PRIVATE
 target_link_libraries(assmodel PRIVATE
                       assimp
                       Qt5::Gui
-                      Qt5::Widgets
-                      Qt5::Core
                      )

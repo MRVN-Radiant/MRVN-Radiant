@@ -1,13 +1,28 @@
 
+set(ASSIMP_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/install)
+set(ASSIMP_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/install)
+set(ASSIMP_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/install)
+
+add_compile_definitions(ASSIMP_BUILD_DLL_EXPORT)
+add_compile_definitions(ASSIMP_BUILD_NO_C4D_IMPORTER)
+add_compile_definitions(ASSIMP_BUILD_NO_EXPORT)
+add_compile_definitions(ASSIMP_BUILD_NO_IFC_IMPORTER)
+add_compile_definitions(ASSIMP_BUILD_NO_OWN_ZLIB)
+add_compile_definitions(OPENDDLPARSER_BUILD)
+add_compile_definitions(RAPIDJSON_NOMEMBERITERATORCLASS)
+add_compile_definitions(WIN32_LEAN_AND_MEAN)
+add_compile_definitions(assimp_EXPORTS)
+set(ASSIMP_IMPORTER_GLTF_USE_OPEN3DGC true)
+set(MINIZ_USE_UNALIGNED_LOADS_AND_STORES false)
 set(ASSIMP_BUILD_TESTS OFF)
 set(ASSIMP_BUILD_DOCS OFF)
-set(ASSIMP_INSTALL OFF)
-set(ASSIMP_NO_EXPORT OFF)
-set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF)
+set(ASSIMP_BUILD_TOOLS OFF)
+set(ASSIMP_BUILD_DRACO OFF)
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
 add_subdirectory(assimp)
 
-# ...
+# These are static
+add_subdirectory(ddslib)
 add_subdirectory(mathlib)
 add_subdirectory(gtkutil)
 add_subdirectory(l_net)
@@ -26,60 +41,7 @@ add_library(filematch STATIC
             filematch.h
            )
 
-add_library(ddslib STATIC
-            ddslib.h
-            ddslib/ddslib.c
-           )
-
 add_library(etclib STATIC
             etclib.c
             etclib.h
            )
-
-# add_library(libs STATIC
-#             archivelib.h
-#             bytebool.h
-#             bytestreamutils.h
-#             character.h
-#             commandlib.cpp
-#             commandlib.h
-#             convert.h
-#             ddslib.h
-#             dragplanes.h
-#             eclasslib.h
-#             entitylib.h
-#             entityxml.h
-#             etclib.c
-#             etclib.h
-#             filematch.c
-#             filematch.h
-#             fs_filesystem.h
-#             fs_path.h
-#             imagelib.h
-#             instancelib.h
-#             maplib.h
-#             mathlib.h
-#             md5lib.h
-#             moduleobservers.h
-#             picomodel.h
-#             pivot.h
-#             rect_t.h
-#             render.h
-#             scenelib.h
-#             scenelib.h
-#             selectionlib.h
-#             shaderlib.h
-#             str.h
-#             stringio.h
-#             texturelib.h
-#             timer.h
-#             transformlib.h
-#             traverselib.h
-#             typesystem.h
-#             undolib.h
-#             uniquenames.h
-#             versionlib.h
-#         )
-
-# target_include_directories(libs PRIVATE ${GLIB_INCLUDE_DIRS} )
-# target_link_libraries(libs PRIVATE ${GLIB_LIBRARIES})

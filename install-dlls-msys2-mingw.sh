@@ -4,10 +4,10 @@
 
 INSTALLDIR=`pwd`/install
 
-if [[ `file $INSTALLDIR/radiant.exe` == *"x86-64"* ]]; then
+if [ "\"$1\"" = "x86_64" ]; then
     MINGWDIR=/mingw64
 else
-    MINGWDIR=/mingw32
+     MINGWDIR=/mingw32
 fi
 
 function dependencies_single_target_no_depth {

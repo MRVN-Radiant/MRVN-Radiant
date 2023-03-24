@@ -100,11 +100,11 @@ target_include_directories(remap PRIVATE .
                            common
                            source
                            ${CMAKE_SOURCE_DIR}/libs/assimp
-                           ${XML_INCLUDE_DIRS}
+                           ${LIBXML2_INCLUDE_DIRS}
                            ${GLIB_INCLUDE_DIRS}
 # ${QT5_INCLUDE_DIRS}
                           )
-target_link_libraries(remap 
+target_link_libraries(remap
                       xml
                       ddslib
                       etclib
@@ -119,5 +119,5 @@ target_link_libraries(remap
                       ${JPEG_LIBRARIES}
                       ${PNG_LIBRARIES}
 # ${OPENGL_gl_LIBRARY}
-# ${LIBXML2_LIBRARIES}
+                      ${LIBXML2_LIBRARIES}
                      )

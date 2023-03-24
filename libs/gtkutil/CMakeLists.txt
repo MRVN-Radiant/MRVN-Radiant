@@ -60,4 +60,5 @@ add_library(gtkutil STATIC
 target_link_libraries(gtkutil PRIVATE Qt5::Gui
                                       Qt5::Widgets
                                       Qt5::Core
+                                      ${GLIB_LIBRARIES}
                      )

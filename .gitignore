@@ -1,6 +1,7 @@
 *.[oda]
 .settings
 build
+install
 .vscode
 .vs
 libs/assimp/out
