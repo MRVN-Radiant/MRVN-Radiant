@@ -31,8 +31,10 @@ MRVNRadiant is a fork of NetRadiant-custom (GtkRadiant 1.4 &rarr; massive rewrit
 - Install [msys2](https://www.msys2.org/) and follow installation steps on their website
 - Open the MingW shell
 - Run:
-  1. `pacman -S  {make,diffutils,gcc,binutils,pkg-config,unzip,git-core,subversion}`
-  2. `pacman -S mingw-w64-x86_64-{openjpeg,qt5-base,glib2,libxml2,libpng,zlib}`
+  ```sh
+  pacman -S  {make,diffutils,gcc,binutils,pkg-config,unzip,git-core,subversion}
+  pacman -S mingw-w64-x86_64-{openjpeg,qt5-base,glib2,libxml2,libpng,zlib}
+  ```
 - Use `mingw-w64-x86_64` for 64-bit and `mingw-w64-i686` for 32-bit
 
 ### Compiling on Windows
