@@ -41,10 +41,12 @@ jobs:
       run: cmake . -G "MinGW Makefiles"
 
     - name: Build
+      run: cmake --build .
+
+    - name: Install DLLs
       run: |
-        cmake --build .
         wget https://www.dropbox.com/s/hcgkwzzmja3m6c0/netradiant-custom-extra-win.zip
-        unzip -o netradiant-custom-extra-win.zip -d "install"
+        unzip -o netradiant-custom-extra-win.zip -d ./install
 
     - name: Generate Artifact Name
       run: |
