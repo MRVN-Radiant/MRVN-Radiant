@@ -36,10 +36,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(WIN32)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows" )
-endif()
-
 if(UNIX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
     set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
@@ -82,6 +78,7 @@ include(FindPkgConfig)
 pkg_check_modules(GLIB glib-2.0 REQUIRED)
 pkg_check_modules(PNG libpng REQUIRED)
 pkg_check_modules(LIBXML2 libxml-2.0 REQUIRED)
+pkg_check_modules(ZLIB zlib REQUIRED)
 
 include(FindJPEG)
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)

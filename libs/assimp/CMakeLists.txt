@@ -268,7 +268,7 @@ ELSEIF(MSVC)
   ENDIF()
   # disable "elements of array '' will be default initialized" warning on MSVC2013
   IF(MSVC12)
-    ADD_COMPILE_OPTIONS(/wd4351)	
+    ADD_COMPILE_OPTIONS(/wd4351)
   ENDIF()
   ADD_COMPILE_OPTIONS(/wd4244) #supress warning for double to float conversion if Double precission is activated
   SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D_DEBUG /Zi /Od")
@@ -458,10 +458,10 @@ IF(ASSIMP_HUNTER_ENABLED)
   set(ASSIMP_BUILD_MINIZIP TRUE)
 ELSE()
   # If the zlib is already found outside, add an export in case assimpTargets can't find it.
-  IF( ZLIB_FOUND )
-    INSTALL( TARGETS zlib zlibstatic
-        EXPORT "${TARGETS_EXPORT_NAME}")
-  ENDIF()
+  # IF( ZLIB_FOUND )
+  #   INSTALL( TARGETS zlib zlibstatic
+  #       EXPORT "${TARGETS_EXPORT_NAME}")
+  # ENDIF()
 
   IF ( NOT ASSIMP_BUILD_ZLIB )
     FIND_PACKAGE(ZLIB)

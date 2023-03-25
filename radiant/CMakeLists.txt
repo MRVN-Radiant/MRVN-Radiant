@@ -1,3 +1,7 @@
+if(WIN32)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows" )
+endif()
+
 add_executable( radiant
                 autosave.cpp
                 brushmanip.cpp
@@ -82,7 +86,7 @@ add_executable( radiant
                 windowobservers.cpp
                 xmlstuff.cpp
                 xywindow.cpp
-                ${CMAKE_BINARY_DIR}/icons/radiant.o
+                ${CMAKE_BINARY_DIR}/icons/radiant.rc
                 )
 
 target_include_directories(radiant PRIVATE .

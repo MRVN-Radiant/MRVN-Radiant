@@ -92,7 +92,7 @@ add_executable(remap
                source/visflow.cpp
                source/visflow.h
                source/writebsp.cpp
-               ${CMAKE_BINARY_DIR}/icons/remap.o
+               ${CMAKE_BINARY_DIR}/icons/remap.rc
               )
 
 target_include_directories(remap PRIVATE .
@@ -113,5 +113,6 @@ target_link_libraries(remap
                       ${GLIB_LIBRARIES}
                       ${JPEG_LIBRARIES}
                       ${PNG_LIBRARIES}
+                      ${ZLIB_LIBRARIES}
                       ${LIBXML2_LIBRARIES}
                      )

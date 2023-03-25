@@ -69,6 +69,9 @@ for DEPENDENCY in `dependencies ./install/*.exe`; do
     cp -v "$DEPENDENCY" "$INSTALLDIR"
 done
 
+# remap.exe wants this, but objdump doesnt pick it up
+cp -v "$MINGWDIR/bin/libminizip-1.dll" "$INSTALLDIR"
+
 cd $MINGWDIR
 
 for EXTRAPATH in \
