@@ -4,6 +4,7 @@ add_library(shaderplug MODULE
             shaderplug.def
            )
 
+
 target_include_directories(shaderplug PRIVATE .
                                             ${GLIB_INCLUDE_DIRS}
                                             ${QT5_INCLUDE_DIRS}
