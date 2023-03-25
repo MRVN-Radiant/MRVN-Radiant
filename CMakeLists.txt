@@ -36,6 +36,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+if(WIN32)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows" )
+endif()
+
 if(UNIX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
     set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
@@ -57,10 +61,16 @@ add_definitions(-DQ3MAP_VERSION="Dev build")
 if(WIN32)
     add_definitions(-DRADIANT_EXECUTABLE="exe")
     add_compile_definitions(WIN32)
-    add_compile_definitions(mwindows)
+    add_compile_definitions(_WIN32)
 else()
     add_definitions(-DRADIANT_EXECUTABLE="")
     add_compile_definitions(POSIX)
+endif()
+
+if(BUILD EQUAL Debug)
+    add_compile_definitions(_DEBUG)
+else()
+    add_compile_definitions(NDEBUG)
 endif()
 
 # Compile defs
