@@ -92,9 +92,8 @@ add_executable(remap
                source/visflow.cpp
                source/visflow.h
                source/writebsp.cpp
+               ${CMAKE_BINARY_DIR}/icons/remap.o
               )
-
-# target_precompile_headers(remap PRIVATE source/remap.h)
 
 target_include_directories(remap PRIVATE .
                            common
@@ -102,7 +101,6 @@ target_include_directories(remap PRIVATE .
                            ${CMAKE_SOURCE_DIR}/libs/assimp
                            ${LIBXML2_INCLUDE_DIRS}
                            ${GLIB_INCLUDE_DIRS}
-# ${QT5_INCLUDE_DIRS}
                           )
 target_link_libraries(remap
                       xml
@@ -112,12 +110,8 @@ target_link_libraries(remap
                       l_net
                       commandlib
                       assimp
-# Qt5::Gui
-# Qt5::Widgets
-# Qt5::Core
                       ${GLIB_LIBRARIES}
                       ${JPEG_LIBRARIES}
                       ${PNG_LIBRARIES}
-# ${OPENGL_gl_LIBRARY}
                       ${LIBXML2_LIBRARIES}
                      )

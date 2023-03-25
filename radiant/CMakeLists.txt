@@ -82,6 +82,7 @@ add_executable( radiant
                 windowobservers.cpp
                 xmlstuff.cpp
                 xywindow.cpp
+                ${CMAKE_BINARY_DIR}/icons/radiant.o
                 )
 
 target_include_directories(radiant PRIVATE .
