@@ -85,6 +85,11 @@ if(BUILD_RADIANT OR BUILD_TOOLS OR BUILD_PLUGINS)
     add_subdirectory(libs)
 endif()
 
+# Contrib
+if(BUILD_PLUGINS)
+    add_subdirectory(contrib)
+endif()
+
 # Plugins && Radiant
 if(BUILD_RADIANT)
     add_subdirectory(plugins)
