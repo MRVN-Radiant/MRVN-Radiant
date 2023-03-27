@@ -11,9 +11,9 @@ option(BUILD_RADIANT "Build radiant" ON)
 option(BUILD_TOOLS   "Build tools" ON)
 option(INSTALL_DLLS  "Install DLLs" OFF)
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
+# if(NOT CMAKE_BUILD_TYPE)
+#     set(CMAKE_BUILD_TYPE Release)
+# endif()
 
 # Why are you trying to do this on linux
 if(NOT WIN32)
