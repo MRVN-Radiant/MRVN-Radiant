@@ -36,8 +36,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Compile flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wcast-align -fno-strict-aliasing -Wno-unused-parameter")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wcast-align -fno-strict-aliasing -Wno-unused-parameter")
 
 if(UNIX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
