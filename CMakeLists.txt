@@ -48,7 +48,7 @@ if(UNIX)
 endif()
 
 if(WIN32)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mms-bitfields")
+    # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mms-bitfields")
     add_definitions(-DRADIANT_EXECUTABLE="exe")
     add_compile_definitions(WIN32)
     add_compile_definitions(_WIN32)
