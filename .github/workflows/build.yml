@@ -38,7 +38,7 @@ jobs:
         submodules: recursive
 
     - name: Setup CMake
-      run: cmake . -G "MinGW Makefiles"
+      run: cmake . -G "MinGW Makefiles" -DVERBOSE=ON
 
     - name: Build
       run: cmake --build .
@@ -81,7 +81,7 @@ jobs:
         submodules: recursive
 
     - name: Setup CMake
-      run: cmake . -G "Unix Makefiles"
+      run: cmake . -G "Unix Makefiles" -DVERBOSE=ON
 
     - name: Build
       run: |
