@@ -17,3 +17,9 @@ libs/assimp/revision.h
 # Windows binary files
 *.dll
 *.exe
+
+# Unix binary files
+*.so
+libassimp.*
+radiant
+remap
