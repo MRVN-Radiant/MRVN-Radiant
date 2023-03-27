@@ -38,7 +38,7 @@ jobs:
         submodules: recursive
 
     - name: Setup CMake
-      run: cmake . -G "MinGW Makefiles" -DVERBOSE=ON
+      run: cmake . -G "MinGW Makefiles"
 
     - name: Build
       run: cmake --build .
@@ -46,7 +46,7 @@ jobs:
     - name: Install DLLs
       run: |
         wget https://www.dropbox.com/s/hcgkwzzmja3m6c0/netradiant-custom-extra-win.zip
-        unzip -o netradiant-custom-extra-win.zip -d ./install
+        unzip -o netradiant-custom-extra-win.zip -d "install"
 
     - name: Generate Artifact Name
       run: |
@@ -81,7 +81,7 @@ jobs:
         submodules: recursive
 
     - name: Setup CMake
-      run: cmake . -G "Unix Makefiles" -DVERBOSE=ON
+      run: cmake . -G "Unix Makefiles"
 
     - name: Build
       run: |
