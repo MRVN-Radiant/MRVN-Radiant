@@ -67,6 +67,14 @@ cmake . -G "Unix Makefiles"
 cmake --build .
 ```
 
+### Some more useful flags when generating a makefile
+ - Example: `cmake . -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DBUILD_PLUGINS=OFF`
+ - `CMAKE_VERBOSE_MAKEFILE` ON/OFF
+ - `CMAKE_BUILD_TYPE` Release/Debug
+ - `BUILD_PLUGINS` ON/OFF
+ - `BUILD_RADIANT` ON/OFF
+ - `BUILD_TOOLS` ON/OFF
+
 ## Other tools
 - [bsp_tool](https://github.com/snake-biscuits/bsp_tool)
     - A Python library for analyzing .bsp files

@@ -6,12 +6,14 @@ project(mrvnradiant)
 
 
 # Options
-option(VERBOSE "Verbose output" OFF)
-option(BUILD "Built type" Release) # Release / Debug
 option(BUILD_PLUGINS "Build plugins" ON)
 option(BUILD_RADIANT "Build radiant" ON)
 option(BUILD_TOOLS   "Build tools" ON)
 option(INSTALL_DLLS  "Install DLLs" OFF)
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
 
 # Why are you trying to do this on linux
 if(NOT WIN32)
@@ -25,9 +27,6 @@ if(INSTALL_DLLS)
     set(BUILD_TOOLS   OFF)
 endif()
 
-set(CMAKE_VERBOSE_MAKEFILE ${VERBOSE})
-set(CMAKE_BUILD_TYPE ${BUILD})
-
 # Github actions moment
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
@@ -36,11 +35,36 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Compile flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wreorder")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wcast-align -fno-strict-aliasing -Wno-unused-parameter")
+
 if(UNIX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-    set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+    add_definitions(-DRADIANT_EXECUTABLE="")
+    add_compile_definitions(POSIX)
+    add_compile_definitions(XWINDOWS)
 endif()
 
+if(WIN32)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mms-bitfields")
+    add_definitions(-DRADIANT_EXECUTABLE="exe")
+    add_compile_definitions(WIN32)
+    add_compile_definitions(_WIN32)
+endif()
+
+# Release
+if(CMAKE_BUILD_TYPE MATCHES Release)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+endif()
+
+# Debug
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    add_compile_definitions(_DEBUG)
+else()
+    add_compile_definitions(NDEBUG)
+endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/install)
 
@@ -54,20 +78,6 @@ add_definitions(-DRADIANT_ABOUTMSG="Dev build")
 # Remap definitions
 add_definitions(-DQ3MAP_VERSION="Dev build")
 
-if(WIN32)
-    add_definitions(-DRADIANT_EXECUTABLE="exe")
-    add_compile_definitions(WIN32)
-    add_compile_definitions(_WIN32)
-else()
-    add_definitions(-DRADIANT_EXECUTABLE="")
-    add_compile_definitions(POSIX)
-endif()
-
-if(BUILD EQUAL Debug)
-    add_compile_definitions(_DEBUG)
-else()
-    add_compile_definitions(NDEBUG)
-endif()
 
 # Compile defs
 add_compile_definitions(QT_NO_KEYWORDS)
