@@ -19,6 +19,7 @@ set(ASSIMP_BUILD_DOCS OFF)
 set(ASSIMP_BUILD_TOOLS OFF)
 set(ASSIMP_BUILD_DRACO OFF)
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
+set(ASSIMP_BUILD_MINIZIP ON)
 add_subdirectory(assimp)
 
 # These are static

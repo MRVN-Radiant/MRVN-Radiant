@@ -75,6 +75,9 @@ cmake --build .
  - `BUILD_RADIANT` ON/OFF
  - `BUILD_TOOLS` ON/OFF
 
+## Running on wayland
+ - When running on wayland you'll need to launch with `QT_QPA_PLATFORM=xcb` otherwise the OpenGL viewports wont clear properly.
+
 ## Other tools
 - [bsp_tool](https://github.com/snake-biscuits/bsp_tool)
     - A Python library for analyzing .bsp files
