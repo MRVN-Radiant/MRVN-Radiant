@@ -281,6 +281,8 @@ bool TriangulateProcess::TriangulateMesh( aiMesh* pMesh)
 
     const aiVector3D* verts = pMesh->mVertices;
 
+    max_out = std::min(PTRDIFF_MAX, max_out);
+
     // use std::unique_ptr to avoid slow std::vector<bool> specialiations
     std::unique_ptr<bool[]> done(new bool[max_out]);
     for( unsigned int a = 0; a < pMesh->mNumFaces; a++) {
