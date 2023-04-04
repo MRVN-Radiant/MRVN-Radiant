@@ -83,7 +83,7 @@ pkg_check_modules(GLIB glib-2.0 REQUIRED)
 pkg_check_modules(PNG libpng REQUIRED)
 pkg_check_modules(LIBXML2 libxml-2.0 REQUIRED)
 pkg_check_modules(ZLIB zlib REQUIRED)
-pkg_check_modules(JPEG jpeg REQUIRED)
+pkg_check_modules(JPEG libjpeg REQUIRED)
 
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
 
