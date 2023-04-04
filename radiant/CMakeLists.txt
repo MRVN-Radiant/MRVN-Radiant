@@ -86,7 +86,7 @@ add_executable( radiant
                 windowobservers.cpp
                 xmlstuff.cpp
                 xywindow.cpp
-                ${CMAKE_BINARY_DIR}/icons/radiant.rc
+                ${CMAKE_SOURCE_DIR}/icons/radiant.rc
                 )
 
 target_include_directories(radiant PRIVATE .
@@ -94,6 +94,7 @@ target_include_directories(radiant PRIVATE .
                                            ${GLIB_INCLUDE_DIRS}
                                            ${QT5_INCLUDE_DIRS}
                           )
+
 target_link_libraries(radiant
                       commandlib
                       gtkutil

@@ -48,16 +48,10 @@ if(UNIX)
 endif()
 
 if(WIN32)
-    # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mms-bitfields")
     add_definitions(-DRADIANT_EXECUTABLE="exe")
     add_compile_definitions(WIN32)
     add_compile_definitions(_WIN32)
 endif()
-
-# Release
-# if(CMAKE_BUILD_TYPE MATCHES Release)
-#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-# endif()
 
 # Debug
 if(CMAKE_BUILD_TYPE MATCHES Debug)
@@ -66,7 +60,7 @@ else()
     add_compile_definitions(NDEBUG)
 endif()
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/install)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/install)
 
 
 # Radiant definitions
@@ -89,8 +83,8 @@ pkg_check_modules(GLIB glib-2.0 REQUIRED)
 pkg_check_modules(PNG libpng REQUIRED)
 pkg_check_modules(LIBXML2 libxml-2.0 REQUIRED)
 pkg_check_modules(ZLIB zlib REQUIRED)
+pkg_check_modules(JPEG jpeg REQUIRED)
 
-include(FindJPEG)
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
 
 # Global include dirs

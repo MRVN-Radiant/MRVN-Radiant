@@ -92,7 +92,7 @@ add_executable(remap
                source/visflow.cpp
                source/visflow.h
                source/writebsp.cpp
-               ${CMAKE_BINARY_DIR}/icons/remap.rc
+               ${CMAKE_SOURCE_DIR}/icons/remap.rc
               )
 
 target_include_directories(remap PRIVATE .
@@ -102,6 +102,7 @@ target_include_directories(remap PRIVATE .
                            ${LIBXML2_INCLUDE_DIRS}
                            ${GLIB_INCLUDE_DIRS}
                           )
+
 target_link_libraries(remap
                       xml
                       ddslib
