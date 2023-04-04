@@ -46,7 +46,7 @@ jobs:
     - name: Install DLLs
       run: |
         wget https://www.dropbox.com/s/mhj3xodu3w9hb2z/mrvn-radiant-libs.zip
-        unzip -o netradiant-custom-extra-win.zip -d "install"
+        unzip -o mrvn-radiant-libs.zip -d "install"
 
     - name: Generate Artifact Name
       run: |
