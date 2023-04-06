@@ -11,9 +11,9 @@ option(BUILD_RADIANT "Build radiant" ON)
 option(BUILD_TOOLS   "Build tools" ON)
 option(INSTALL_DLLS  "Install DLLs" OFF)
 
-# if(NOT CMAKE_BUILD_TYPE)
-#     set(CMAKE_BUILD_TYPE Release)
-# endif()
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
 
 # Why are you trying to do this on linux
 if(NOT WIN32)
@@ -36,8 +36,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Compile flags
-# O2 errors, Os is O2 with minor changes
-set( CMAKE_CXX_FLAGS_RELEASE "-Os" )
+set( CMAKE_CXX_FLAGS_RELEASE "-O1" )
 
 if(UNIX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
