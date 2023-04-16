@@ -48,7 +48,7 @@ if(UNIX)
 endif()
 
 if(WIN32)
-    add_definitions(-DRADIANT_EXECUTABLE="exe")
+    add_definitions(-DRADIANT_EXECUTABLE=".exe")
     add_compile_definitions(WIN32)
     add_compile_definitions(_WIN32)
 endif()
