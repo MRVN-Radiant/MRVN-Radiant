@@ -117,3 +117,5 @@ target_link_libraries(remap
                       ${ZLIB_LIBRARIES}
                       ${LIBXML2_LIBRARIES}
                      )
+
+set_target_properties(remap PROPERTIES LINK_FLAGS "-Wl,-rpath,./")
