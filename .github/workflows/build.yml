@@ -37,11 +37,16 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Setup CMake
+      run: cmake . -G "MinGW Makefiles"
+
     - name: Build
+      run: cmake --build .
+
+    - name: Install DLLs
       run: |
-        make MAKEFILE_CONF=msys2-Makefile.conf BUILD=release -j$(nproc) CXXFLAGS="-Wno-deprecated-declarations" 2> windows-warn-${{ matrix.arch }}.log
-        wget https://www.dropbox.com/s/hcgkwzzmja3m6c0/netradiant-custom-extra-win.zip
-        unzip -o netradiant-custom-extra-win.zip -d "install"
+        wget https://www.dropbox.com/s/z1uohnun81682zi/mrvn-radiant-libs.zip
+        unzip -o mrvn-radiant-libs.zip -d "install"
 
     - name: Generate Artifact Name
       run: |
@@ -75,9 +80,12 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Setup CMake
+      run: cmake . -G "Unix Makefiles"
+
     - name: Build
       run: |
-        make -j 4 CXXFLAGS="-Wno-deprecated-declarations"
+        cmake --build .
 
     - name: Generate Artifact Name
       run: |

@@ -73,6 +73,9 @@ const unsigned int BRUSH_DETAIL_MASK = ( 1 << BRUSH_DETAIL_FLAG );
 
 #define Update_move_planepts_vertex 0
 
+// Qt bruh moment
+#undef foreach
+
 inline bool texdef_sane( const texdef_t& texdef ){
 	return fabs( texdef.shift[0] ) < ( 1 << 16 )
 	    && fabs( texdef.shift[1] ) < ( 1 << 16 );

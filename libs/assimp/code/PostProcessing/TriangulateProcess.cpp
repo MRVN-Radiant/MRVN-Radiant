@@ -281,8 +281,13 @@ bool TriangulateProcess::TriangulateMesh( aiMesh* pMesh)
 
     const aiVector3D* verts = pMesh->mVertices;
 
+#pragma GCC diagnostic ignored "-Walloc-size-larger-than="
+
     // use std::unique_ptr to avoid slow std::vector<bool> specialiations
     std::unique_ptr<bool[]> done(new bool[max_out]);
+
+#pragma GCC diagnostic pop
+
     for( unsigned int a = 0; a < pMesh->mNumFaces; a++) {
         aiFace& face = pMesh->mFaces[a];
 

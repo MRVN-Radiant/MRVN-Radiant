@@ -218,6 +218,7 @@ public:
 		DynamicLibraryModule* library = new DynamicLibraryModule( filename );
 
 		if ( library->failed() ) {
+			globalErrorStream() << "Failed to register module: '" << filename << "'\n";
 			delete library;
 		}
 		else

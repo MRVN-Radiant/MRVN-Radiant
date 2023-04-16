@@ -1,6 +1,25 @@
 *.[oda]
 .settings
-install
+out
 .vscode
 .vs
 libs/assimp/out
+CMakeFiles
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+libs/assimp/bin
+libs/assimp/generated
+libs/assimp/assimp.pc
+cmake_uninstall.cmake
+libs/assimp/revision.h
+
+# Windows binary files
+*.dll
+*.exe
+
+# Unix binary files
+*.so
+libassimp.*
+radiant
+remap

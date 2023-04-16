@@ -42,6 +42,7 @@
 #include "commands.h"
 
 #include <list>
+#include <memory>
 
 /* plugin manager --------------------------------------- */
 class CPluginSlot : public IPlugIn
@@ -207,22 +208,21 @@ void CPluginSlots::PopulateMenu( PluginsVisitor& menu ){
 	}
 }
 
-CPluginSlots g_plugin_slots;
+std::shared_ptr<CPluginSlots> g_pPluginSlots = std::make_shared<CPluginSlots>();
 
-
-void FillPluginSlots( CPluginSlots& slots, QWidget* main_window ){
-	class AddPluginVisitor : public PluginModules::Visitor
-	{
-		CPluginSlots& m_slots;
-		QWidget* m_main_window;
-	public:
-		AddPluginVisitor( CPluginSlots& slots, QWidget* main_window )
-			: m_slots( slots ), m_main_window( main_window ){
-		}
-		void visit( const char* name, const _QERPluginTable& table ) const {
-			m_slots.AddPluginSlot( m_main_window, name, table );
-		}
-	} visitor( slots, main_window );
+void FillPluginSlots( std::shared_ptr<CPluginSlots> pSlots, QWidget* pMainWindow ) {
+	class AddPluginVisitor : public PluginModules::Visitor {
+			std::shared_ptr<CPluginSlots> m_pSlots;
+			QWidget* m_pMainWindow;
+		public:
+			AddPluginVisitor( std::shared_ptr<CPluginSlots> pSlots, QWidget* pMainWindow ) {
+				m_pSlots = pSlots;
+				m_pMainWindow = pMainWindow;
+			}
+			void visit( const char* name, const _QERPluginTable& table ) const {
+				m_pSlots->AddPluginSlot( m_pMainWindow, name, table );
+			}
+	} visitor( pSlots, pMainWindow );
 
 	Radiant_getPluginModules().foreachModule( visitor );
 }
@@ -234,12 +234,12 @@ CPlugInManager& GetPlugInMgr(){
 	return g_PlugInMgr;
 }
 
-void CPlugInManager::Init( QWidget* main_window ){
-	FillPluginSlots( g_plugin_slots, main_window );
+void CPlugInManager::Init( QWidget* pMainWindow ){
+	FillPluginSlots( g_pPluginSlots, pMainWindow );
 }
 
 void CPlugInManager::constructMenu( PluginsVisitor& menu ){
-	g_plugin_slots.PopulateMenu( menu );
+	g_pPluginSlots->PopulateMenu( menu );
 }
 
 void CPlugInManager::Shutdown(){

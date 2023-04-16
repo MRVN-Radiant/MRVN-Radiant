@@ -260,146 +260,147 @@ static void PseudoCompileBSP( bool need_tree ){
  */
 
 int ConvertBSPMain( Args& args ){
-	int ( *convertFunc )( char * );
-	const game_t  *convertGame;
-	bool map_allowed, force_bsp, force_map;
+	// int ( *convertFunc )( char * );
+	// const game_t  *convertGame;
+	// bool map_allowed, force_bsp, force_map;
 
 
-	/* set default */
-	convertFunc = ConvertBSPToMap;
-	convertGame = NULL;
-	map_allowed = false;
-	force_bsp = false;
-	force_map = false;
+	// /* set default */
+	// convertFunc = ConvertBSPToMap;
+	// convertGame = NULL;
+	// map_allowed = false;
+	// force_bsp = false;
+	// force_map = false;
 
-	/* arg checking */
-	if ( args.empty() ) {
-		Sys_Printf( "Usage: q3map2 -convert [-format <ase|obj|map_bp|map|game name>] [-shadersasbitmap|-lightmapsastexcoord|-deluxemapsastexcoord] [-readbsp|-readmap [-meta|-patchmeta]] [-v] <mapname>\n" );
-		return 0;
-	}
+	// /* arg checking */
+	// if ( args.empty() ) {
+	// 	Sys_Printf( "Usage: q3map2 -convert [-format <ase|obj|map_bp|map|game name>] [-shadersasbitmap|-lightmapsastexcoord|-deluxemapsastexcoord] [-readbsp|-readmap [-meta|-patchmeta]] [-v] <mapname>\n" );
+	// 	return 0;
+	// }
 
-	/* process arguments */
-	const char *fileName = args.takeBack();
-	{
-		/* -format map|ase|... */
-		while ( args.takeArg( "-format" ) ) {
-			const char *fmt = args.takeNext();
-			if ( striEqual( fmt, "obj" ) ) {
-				convertFunc = ConvertBSPToOBJ;
-				map_allowed = false;
-			}
-			else if ( striEqual( fmt, "map_bp" ) ) {
-				convertFunc = ConvertBSPToMap_BP;
-				map_allowed = true;
-			}
-			else if ( striEqual( fmt, "map" ) ) {
-				convertFunc = ConvertBSPToMap;
-				map_allowed = true;
-			}
-			else
-			{
-				convertGame = GetGame( fmt );
-				map_allowed = false;
-				if ( convertGame == NULL ) {
-					Sys_Printf( "Unknown conversion format \"%s\". Defaulting to MAP.\n", fmt );
-				}
-			}
-		}
-		while ( args.takeArg( "-ne" ) ) {
-			normalEpsilon = atof( args.takeNext() );
-			Sys_Printf( "Normal epsilon set to %lf\n", normalEpsilon );
-		}
-		while ( args.takeArg( "-de" ) ) {
-			distanceEpsilon = atof( args.takeNext() );
-			Sys_Printf( "Distance epsilon set to %lf\n", distanceEpsilon );
-		}
-		while ( args.takeArg( "-shaderasbitmap", "-shadersasbitmap" ) ) {
-			shadersAsBitmap = true;
-		}
-		while ( args.takeArg( "-lightmapastexcoord", "-lightmapsastexcoord" ) ) {
-			lightmapsAsTexcoord = true;
-		}
-		while ( args.takeArg( "-deluxemapastexcoord", "-deluxemapsastexcoord" ) ) {
-			lightmapsAsTexcoord = true;
-			deluxemap = true;
-		}
-		while ( args.takeArg( "-readbsp" ) ) {
-			force_bsp = true;
-		}
-		while ( args.takeArg( "-readmap" ) ) {
-			force_map = true;
-		}
-		while ( args.takeArg( "-meta" ) ) {
-			meta = true;
-		}
-		while ( args.takeArg( "-patchmeta" ) ) {
-			meta = true;
-			patchMeta = true;
-		}
-		while ( args.takeArg( "-fast" ) ) {
-			fast = true;
-		}
-	}
+	// /* process arguments */
+	// const char *fileName = args.takeBack();
+	// {
+	// 	/* -format map|ase|... */
+	// 	while ( args.takeArg( "-format" ) ) {
+	// 		const char *fmt = args.takeNext();
+	// 		if ( striEqual( fmt, "obj" ) ) {
+	// 			convertFunc = ConvertBSPToOBJ;
+	// 			map_allowed = false;
+	// 		}
+	// 		else if ( striEqual( fmt, "map_bp" ) ) {
+	// 			convertFunc = ConvertBSPToMap_BP;
+	// 			map_allowed = true;
+	// 		}
+	// 		else if ( striEqual( fmt, "map" ) ) {
+	// 			convertFunc = ConvertBSPToMap;
+	// 			map_allowed = true;
+	// 		}
+	// 		else
+	// 		{
+	// 			convertGame = GetGame( fmt );
+	// 			map_allowed = false;
+	// 			if ( convertGame == NULL ) {
+	// 				Sys_Printf( "Unknown conversion format \"%s\". Defaulting to MAP.\n", fmt );
+	// 			}
+	// 		}
+	// 	}
+	// 	while ( args.takeArg( "-ne" ) ) {
+	// 		normalEpsilon = atof( args.takeNext() );
+	// 		Sys_Printf( "Normal epsilon set to %lf\n", normalEpsilon );
+	// 	}
+	// 	while ( args.takeArg( "-de" ) ) {
+	// 		distanceEpsilon = atof( args.takeNext() );
+	// 		Sys_Printf( "Distance epsilon set to %lf\n", distanceEpsilon );
+	// 	}
+	// 	while ( args.takeArg( "-shaderasbitmap", "-shadersasbitmap" ) ) {
+	// 		shadersAsBitmap = true;
+	// 	}
+	// 	while ( args.takeArg( "-lightmapastexcoord", "-lightmapsastexcoord" ) ) {
+	// 		lightmapsAsTexcoord = true;
+	// 	}
+	// 	while ( args.takeArg( "-deluxemapastexcoord", "-deluxemapsastexcoord" ) ) {
+	// 		lightmapsAsTexcoord = true;
+	// 		deluxemap = true;
+	// 	}
+	// 	while ( args.takeArg( "-readbsp" ) ) {
+	// 		force_bsp = true;
+	// 	}
+	// 	while ( args.takeArg( "-readmap" ) ) {
+	// 		force_map = true;
+	// 	}
+	// 	while ( args.takeArg( "-meta" ) ) {
+	// 		meta = true;
+	// 	}
+	// 	while ( args.takeArg( "-patchmeta" ) ) {
+	// 		meta = true;
+	// 		patchMeta = true;
+	// 	}
+	// 	while ( args.takeArg( "-fast" ) ) {
+	// 		fast = true;
+	// 	}
+	// }
 
-	LoadShaderInfo();
+	// LoadShaderInfo();
 
-	/* clean up map name */
-	strcpy( source, ExpandArg( fileName ) );
+	// /* clean up map name */
+	// strcpy( source, ExpandArg( fileName ) );
 
-	if ( !map_allowed && !force_map ) {
-		force_bsp = true;
-	}
+	// if ( !map_allowed && !force_map ) {
+	// 	force_bsp = true;
+	// }
 
-	if ( force_map || ( !force_bsp && path_extension_is( source, "map" ) && map_allowed ) ) {
-		if ( !map_allowed ) {
-			Sys_Warning( "the requested conversion should not be done from .map files. Compile a .bsp first.\n" );
-		}
-		path_set_extension( source, ".map" );
-		Sys_Printf( "Loading %s\n", source );
-		LoadMapFile( source, false, convertGame == NULL );
-		PseudoCompileBSP( convertGame != NULL );
-	}
-	else
-	{
-		path_set_extension( source, ".bsp" );
-		Sys_FPrintf( SYS_VRB, "Loading bsp file: \"%s\"\n", source );
+	// if ( force_map || ( !force_bsp && path_extension_is( source, "map" ) && map_allowed ) ) {
+	// 	if ( !map_allowed ) {
+	// 		Sys_Warning( "the requested conversion should not be done from .map files. Compile a .bsp first.\n" );
+	// 	}
+	// 	path_set_extension( source, ".map" );
+	// 	Sys_Printf( "Loading %s\n", source );
+	// 	LoadMapFile( source, false, convertGame == NULL );
+	// 	PseudoCompileBSP( convertGame != NULL );
+	// }
+	// else
+	// {
+	// 	path_set_extension( source, ".bsp" );
+	// 	Sys_FPrintf( SYS_VRB, "Loading bsp file: \"%s\"\n", source );
 
-		// Load file into memory
-		MemBuffer file = LoadFile( source );
+	// 	// Load file into memory
+	// 	MemBuffer file = LoadFile( source );
 
-		rbspHeader_t* header = file.data();
+	// 	rbspHeader_t* header = file.data();
 
 
-		// Make sure magic matches the format we're trying to load
-		if (!force && memcmp(header->ident, "rBSP", 4)) {
-			Error("%s is not a %s file", source, g_game->bspIdent);
-		}
+	// 	// Make sure magic matches the format we're trying to load
+	// 	if (!force && memcmp(header->ident, "rBSP", 4)) {
+	// 		Error("%s is not a %s file", source, g_game->bspIdent);
+	// 	}
 
-		for( const game_t &game : g_games ) {
-			if( header->version == game.bspVersion ) {
-				g_game = &game;
-				Sys_FPrintf( SYS_VRB, "Detected game: %s\n", g_game->arg );
-				break;
-			}
-		}
-		Sys_FPrintf( SYS_VRB, "--- DecompileMap ---\n" );
-		g_game->load( header, source );
-		Sys_Printf("\n" );
-	}
+	// 	for( const game_t &game : g_games ) {
+	// 		if( header->version == game.bspVersion ) {
+	// 			g_game = &game;
+	// 			Sys_FPrintf( SYS_VRB, "Detected game: %s\n", g_game->arg );
+	// 			break;
+	// 		}
+	// 	}
+	// 	Sys_FPrintf( SYS_VRB, "--- DecompileMap ---\n" );
+	// 	g_game->load( header, source );
+	// 	Sys_Printf("\n" );
+	// }
 	
-	/* bsp format convert? */
-	if ( convertGame != NULL ) {
-		/* set global game */
-		//g_game = convertGame;
-		/* write bsp */
-		path_set_extension( source, "_c.bsp" );
-		Sys_Printf( "Writing %s\n", source );
-		WriteBSPFile( source );
+	// /* bsp format convert? */
+	// if ( convertGame != NULL ) {
+	// 	/* set global game */
+	// 	//g_game = convertGame;
+	// 	/* write bsp */
+	// 	path_set_extension( source, "_c.bsp" );
+	// 	Sys_Printf( "Writing %s\n", source );
+	// 	WriteBSPFile( source );
 
-		/* return to sender */
-		return 0;
-	}
+	// 	/* return to sender */
+	// 	return 0;
+	// }
 
-	/* normal convert */
-	return convertFunc( source );
+	// /* normal convert */
+	// return convertFunc( source );
+	return 0;
 }

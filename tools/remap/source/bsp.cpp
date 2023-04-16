@@ -237,7 +237,7 @@ static void ProcessWorldModel( entity_t& e ){
 	const bool ignoreLeaks = e.boolForKey( "_ignoreleaks", "ignoreleaks" );
 
 	/* begin worldspawn model */
-	BeginModel( e );
+	//BeginModel( e );
 	e.firstDrawSurf = 0;
 
 	/* ydnar: gs mods */
@@ -317,19 +317,19 @@ static void ProcessWorldModel( entity_t& e ){
 
 
 	/* generate bsp meshes from map brushes */
-	EmitMeshes( e );
+	//EmitMeshes( e );
 
 	/**/
-	EmitObjReferences();
+	//EmitObjReferences();
 
 	/* Generate Model lump */
-	EmitModels();
+	//EmitModels();
 
 	/* Generate unknown lumps */
-	EmitStubs();
+	//EmitStubs();
 
 	/* Emit LevelInfo */
-	EmitLevelInfo();
+	//EmitLevelInfo();
 
 	/* add references to the detail brushes */
 	FilterDetailBrushesIntoTree( e, tree );
@@ -420,7 +420,7 @@ static void ProcessWorldModel( entity_t& e ){
 	FixBrushSides( e );
 
 	/* finish */
-	EndModel( e, tree.headnode );
+	//EndModel( e, tree.headnode );
 	FreeTree( tree );
 }
 
@@ -433,7 +433,7 @@ static void ProcessWorldModel( entity_t& e ){
 
 static void ProcessSubModel( entity_t& e ){
 	/* start a brush model */
-	BeginModel( e );
+	//BeginModel( e );
 	e.firstDrawSurf = numMapDrawSurfs;
 
 	/* ydnar: gs mods */
@@ -460,7 +460,7 @@ static void ProcessSubModel( entity_t& e ){
 	//EmitBrushes( e.brushes, &e.firstBrush, &e.numBrushes );
 
 	/* generate bsp meshes from map brushes */
-	EmitMeshes(e);
+	//EmitMeshes(e);
 
 	/* just put all the brushes in headnode */
 	tree.headnode->brushlist = e.brushes;
@@ -494,7 +494,7 @@ static void ProcessSubModel( entity_t& e ){
 	FixBrushSides( e );
 
 	/* finish */
-	EndModel( e, tree.headnode );
+	//EndModel( e, tree.headnode );
 	FreeTree( tree );
 }
 

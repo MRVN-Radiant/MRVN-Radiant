@@ -4,10 +4,12 @@
 
 INSTALLDIR=`pwd`/install
 
-if [[ `file $INSTALLDIR/radiant.exe` == *"x86-64"* ]]; then
+if [ "$1" = x86_64 ]; then
     MINGWDIR=/mingw64
-else
+elif [ "$1" = x86 ]; then
     MINGWDIR=/mingw32
+else
+    exit
 fi
 
 function dependencies_single_target_no_depth {
@@ -66,6 +68,9 @@ function dependencies {
 for DEPENDENCY in `dependencies ./install/*.exe`; do
     cp -v "$DEPENDENCY" "$INSTALLDIR"
 done
+
+# remap.exe wants this, but objdump doesnt pick it up
+cp -v "$MINGWDIR/bin/libminizip-1.dll" "$INSTALLDIR"
 
 cd $MINGWDIR
 
