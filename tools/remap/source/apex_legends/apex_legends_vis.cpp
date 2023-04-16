@@ -62,14 +62,16 @@ void ApexLegends::EmitMeshes(const entity_t &e) {
         m.triCount = mesh.triangles.size() / 3;
 
         int vertexOffset;
-        if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_LIT_BUMP)) {
+        if (CHECK_FLAG(m.flags, S_VERTEX_LIT_BUMP)) {
             vertexOffset = ApexLegends::Bsp::vertexLitBumpVertices.size();
-        } else if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_UNLIT)) {
+        } else if (CHECK_FLAG(m.flags, S_VERTEX_UNLIT)) {
             vertexOffset = ApexLegends::Bsp::vertexUnlitVertices.size();
-        } else if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_UNLIT_TS)) {
-            vertexOffset = ApexLegends::Bsp::vertexUnlitVertices.size();
+        } else if (CHECK_FLAG(m.flags, S_VERTEX_UNLIT_TS)) {
+            vertexOffset = ApexLegends::Bsp::vertexUnlitTSVertices.size();
         } else {
-            vertexOffset = ApexLegends::Bsp::vertexLitFlatVertices.size();
+            vertexOffset = ApexLegends::Bsp::vertexUnlitVertices.size();
+            m.flags |= S_VERTEX_UNLIT;
+            mesh.shaderInfo->surfaceFlags |= S_VERTEX_UNLIT;
         }
 
 
@@ -86,13 +88,15 @@ void ApexLegends::EmitMeshes(const entity_t &e) {
             // Check against aabb
             aabb.extend(vertex.xyz);
 
-            if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_LIT_BUMP)) {
+            if (CHECK_FLAG(m.flags, S_VERTEX_LIT_BUMP)) {
                 ApexLegends::EmitVertexLitBump(vertex);
-            } else if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_UNLIT)) {
+            } else if (CHECK_FLAG(m.flags, S_VERTEX_UNLIT)) {
                 ApexLegends::EmitVertexUnlit(vertex);
-            } else if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_UNLIT_TS)) {
+            } else if (CHECK_FLAG(m.flags, S_VERTEX_UNLIT_TS)) {
                 ApexLegends::EmitVertexUnlitTS(vertex);
             } else {
+                // There's no way to get here, if future code changes break this exit with an error
+                Error("Attempted to write VertexLitFlat, this is an error!");
                 ApexLegends::EmitVertexLitFlat(vertex);
             }
         }
@@ -194,6 +198,7 @@ void ApexLegends::EmitVertexUnlit(Shared::Vertex_t &vertex) {
 /*
     EmitVertexLitFlat
     Saves a vertex into ApexLegends::Bsp::vertexLitFlatVertices
+    NOTE: Lit Flat crashes r5r and so is substituted with VertexUnlit in EmitMeshes 
 */
 void ApexLegends::EmitVertexLitFlat(Shared::Vertex_t &vertex) {
     ApexLegends::VertexLitFlat_t& lf = ApexLegends::Bsp::vertexLitFlatVertices.emplace_back();
