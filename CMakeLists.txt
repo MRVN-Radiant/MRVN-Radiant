@@ -86,6 +86,7 @@ pkg_check_modules(ZLIB zlib REQUIRED)
 pkg_check_modules(JPEG libjpeg REQUIRED)
 
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
+find_package(Threads REQUIRED)
 
 # Global include dirs
 include_directories(include libs)
