@@ -111,6 +111,7 @@ target_link_libraries(remap
                       l_net
                       commandlib
                       assimp
+                      Threads::Threads
                       ${GLIB_LIBRARIES}
                       ${JPEG_LIBRARIES}
                       ${PNG_LIBRARIES}
