@@ -107,4 +107,5 @@ target_link_libraries(radiant
                       Qt5::Core
                       ${GLIB_LIBRARIES}
                       ${LIBXML2_LIBRARIES}
+                      ${CMAKE_DL_LIBS}
                      )
