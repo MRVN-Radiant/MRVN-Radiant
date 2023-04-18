@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 
 # Project
-project(mrvnradiant)
+project(mrvnradiant VERSION 0.0)
 
 
 # Options
@@ -36,19 +36,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Compile flags
-set( CMAKE_CXX_FLAGS_RELEASE "-Os" )
-set( CMAKE_C_FLAGS_RELEASE "" )
+set(CMAKE_CXX_FLAGS_RELEASE "-Os")
+set(CMAKE_C_FLAGS_RELEASE "")
 
 if(UNIX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
-    add_definitions(-DRADIANT_EXECUTABLE="")
+    add_compile_definitions(RADIANT_EXECUTABLE="")
     add_compile_definitions(POSIX)
     add_compile_definitions(XWINDOWS)
 endif()
 
 if(WIN32)
-    add_definitions(-DRADIANT_EXECUTABLE=".exe")
+    add_compile_definitions(RADIANT_EXECUTABLE=".exe")
     add_compile_definitions(WIN32)
     add_compile_definitions(_WIN32)
 endif()
@@ -64,18 +64,16 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/install)
 
 
 # Radiant definitions
-add_definitions(-DRADIANT_VERSION="0.0")
-add_definitions(-DRADIANT_MAJOR_VERSION=0)
-add_definitions(-DRADIANT_MINOR_VERSION=0)
-add_definitions(-DRADIANT_ABOUTMSG="Dev build")
+add_compile_definitions(RADIANT_VERSION="0.0")
+add_compile_definitions(RADIANT_MAJOR_VERSION=0)
+add_compile_definitions(RADIANT_MINOR_VERSION=0)
+add_compile_definitions(RADIANT_ABOUTMSG="Dev build")
 
 # Remap definitions
-add_definitions(-DQ3MAP_VERSION="Dev build")
-
+add_compile_definitions(Q3MAP_VERSION="Dev build")
 
 # Compile defs
 add_compile_definitions(QT_NO_KEYWORDS)
-
 
 # Find dependencies
 include(FindPkgConfig)

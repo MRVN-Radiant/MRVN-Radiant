@@ -16,5 +16,4 @@ add_library(image MODULE
             imageq3.def
            )
 
-#target_include_directories(shaders PRIVATE ${GLIB_INCLUDE_DIRS})
 target_link_libraries(image PRIVATE ddslib etclib ${JPEG_LIBRARIES})

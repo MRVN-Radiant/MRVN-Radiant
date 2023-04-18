@@ -6,9 +6,9 @@ add_library(shaderplug MODULE
 
 
 target_include_directories(shaderplug PRIVATE .
-                                            ${GLIB_INCLUDE_DIRS}
-                                            ${QT5_INCLUDE_DIRS}
-                                            ${LIBXML2_INCLUDE_DIRS}
+                           ${GLIB_INCLUDE_DIRS}
+                           ${QT5_INCLUDE_DIRS}
+                           ${LIBXML2_INCLUDE_DIRS}
                           )
 
 target_link_libraries(shaderplug

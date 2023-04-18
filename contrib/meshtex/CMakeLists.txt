@@ -28,8 +28,8 @@ add_library(meshtex MODULE
            )
 
 target_include_directories(meshtex PRIVATE .
-                                            ${GLIB_INCLUDE_DIRS}
-                                            ${QT5_INCLUDE_DIRS}
+                           ${GLIB_INCLUDE_DIRS}
+                           ${QT5_INCLUDE_DIRS}
                           )
 
 target_link_libraries(meshtex

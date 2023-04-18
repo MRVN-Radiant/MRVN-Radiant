@@ -4,5 +4,4 @@ add_library(imagepng MODULE
             imagepng.def
            )
 
-#target_include_directories(shaders PRIVATE ${GLIB_INCLUDE_DIRS})
 target_link_libraries(imagepng PRIVATE ${PNG_LIBRARIES})
