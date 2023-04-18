@@ -58,11 +58,6 @@ jobs:
         path: install/
         if-no-files-found: error
 
-    - uses: actions/upload-artifact@v3
-      with:
-        name: warnings
-        path: windows-warn*.log
-
   linux:
     name: ${{ matrix.config }} Linux ${{ matrix.arch }}
     runs-on: ubuntu-latest
