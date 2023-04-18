@@ -1,8 +1,8 @@
-# MRVNRadiant
+# MRVN-Radiant
 
 The open-source, cross-platform level editor for Respawn Entertainment Source based games.
 
-MRVNRadiant is a fork of NetRadiant-custom (GtkRadiant 1.4 &rarr; massive rewrite &rarr; 1.5 &rarr; NetRadiant &rarr; NetRadiant-custom &rarr; this)
+MRVN-Radiant is a fork of NetRadiant-custom (GtkRadiant 1.4 &rarr; massive rewrite &rarr; 1.5 &rarr; NetRadiant &rarr; NetRadiant-custom &rarr; this)
 
 <div align=left>
 <img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/MRVNRadiant/MRVNRadiant/build.yml?style=for-the-badge">
@@ -18,9 +18,9 @@ MRVNRadiant is a fork of NetRadiant-custom (GtkRadiant 1.4 &rarr; massive rewrit
 ## Status
 | Game | Coverage | Note |
 |------|----------|------|
-| Titanfall Online | 38% | Basic collision, no lighting, needs testing |
-| Titanfall 2 | 37% | Basic collision, no lighting, meshes flicker |
-| Apex Legends | 25% | No collision, no lighting |
+| Titanfall Online | 38% | No triangle collision, no lighting, no portals |
+| Titanfall 2 | 37% | No triangle collision, no lighting, no portals |
+| Apex Legends | 25% | No collision, no lighting, no portals |
 
 > Coverage = Lumps generated / Total lump count. Stubbed lumps arent counted because they're not custom.
 
@@ -38,19 +38,19 @@ MRVNRadiant is a fork of NetRadiant-custom (GtkRadiant 1.4 &rarr; massive rewrit
 - Use `mingw-w64-x86_64` for 64-bit and `mingw-w64-i686` for 32-bit
 
 ### Compiling on Windows
-`cd` into the root directory of MRVN-Radiant and run these commands:
-```sh
-cmake . -G "MinGW Makefiles" - DINSTALL_DLLS=OFF
-cmake --build .
-```
+- `cd` into the root directory of MRVN-Radiant and run these commands:
+  ```sh
+  cmake . -G "MinGW Makefiles" -DINSTALL_DLLS=OFF
+  cmake --build .
+  ```
 ### Note
-To be able to run radiant from file explorer you'll need to copy over some dlls. Thankfully there's a script for this.
-```sh
-cmake . -G "MinGW Makefiles" -DINSTALL_DLLS=ON
-```
-You only need to run this once.
+- To be able to run radiant from file explorer you'll need to copy over some dlls. Thankfully there's a script for this.
+  ```sh
+  cmake . -G "MinGW Makefiles" -DINSTALL_DLLS=ON
+  ```
+- You only need to run this once.
 
-If you get a white screen after launching radiant you'll need to manually delete `OPENGL32.dll` from the `install/` folder. Alternatively you can delete mesa.
+- If you get a white screen after launching radiant you'll need to manually delete `OPENGL32.dll` from the `install/` folder. Alternatively you can delete mesa.
 
 ### Getting dependencies on Linux
 - Dependencies:
@@ -59,13 +59,14 @@ If you get a white screen after launching radiant you'll need to manually delete
     - libxml2
     - zlib
     - libpng
+    - libjpeg
 
 ### Compiling on Linux
-`cd` into the root directory of MRVN-Radiant and run these commands:
-```sh
-cmake . -G "Unix Makefiles"
-cmake --build .
-```
+- `cd` into the root directory of MRVN-Radiant and run these commands:
+  ```sh
+  cmake . -G "Unix Makefiles"
+  cmake --build .
+  ```
 
 ### Some more useful flags when generating a makefile
  - Example: `cmake . -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DBUILD_PLUGINS=OFF`
