@@ -1,7 +1,6 @@
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/install/modules)
 
 
-
 add_subdirectory(archivepak)
 add_subdirectory(archivewad)
 add_subdirectory(archivezip)

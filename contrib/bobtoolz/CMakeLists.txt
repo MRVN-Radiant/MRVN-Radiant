@@ -48,8 +48,8 @@ add_library(bobtoolz MODULE
            )
 
 target_include_directories(bobtoolz PRIVATE .
-                                            ${GLIB_INCLUDE_DIRS}
-                                            ${QT5_INCLUDE_DIRS}
+                           ${GLIB_INCLUDE_DIRS}
+                           ${QT5_INCLUDE_DIRS}
                           )
 
 target_link_libraries(bobtoolz

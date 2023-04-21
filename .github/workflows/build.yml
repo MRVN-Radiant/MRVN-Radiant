@@ -50,18 +50,13 @@ jobs:
 
     - name: Generate Artifact Name
       run: |
-        echo "ARTIFACT_NAME=$(echo MRVN-radiant_`date -u -Idate`_${GITHUB_SHA::7}_Windows_${{ matrix.arch }})" >> $GITHUB_ENV
+        echo "ARTIFACT_NAME=$(echo MRVN-Radiant_`date -u -Idate`_`git rev-parse --short HEAD`_Windows_${{ matrix.arch }})" >> $GITHUB_ENV
 
     - uses: actions/upload-artifact@v3
       with:
         name: ${{ env.ARTIFACT_NAME }}
         path: install/
         if-no-files-found: error
-
-    - uses: actions/upload-artifact@v3
-      with:
-        name: warnings
-        path: windows-warn*.log
 
   linux:
     name: ${{ matrix.config }} Linux ${{ matrix.arch }}
@@ -89,7 +84,7 @@ jobs:
 
     - name: Generate Artifact Name
       run: |
-        echo "ARTIFACT_NAME=$(echo MRVN-radiant_`date -u -Idate`_${GITHUB_SHA::7}_Linux_${{ matrix.arch }})" >> $GITHUB_ENV
+        echo "ARTIFACT_NAME=$(echo MRVN-Radiant_`date -u -Idate`_`git rev-parse --short HEAD`_Linux_${{ matrix.arch }})" >> $GITHUB_ENV
 
     - uses: actions/upload-artifact@v3
       with:

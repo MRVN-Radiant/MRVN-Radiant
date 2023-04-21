@@ -10,5 +10,4 @@ add_library(archivezip MODULE
             archivezip.def
            )
 
-#target_include_directories(shaders PRIVATE ${GLIB_INCLUDE_DIRS})
 target_link_libraries(archivezip PRIVATE z)

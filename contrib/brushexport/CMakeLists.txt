@@ -10,8 +10,8 @@ add_library(brushexport MODULE
            )
 
 target_include_directories(brushexport PRIVATE .
-                                            ${GLIB_INCLUDE_DIRS}
-                                            ${QT5_INCLUDE_DIRS}
+                           ${GLIB_INCLUDE_DIRS}
+                           ${QT5_INCLUDE_DIRS}
                           )
 
 target_link_libraries(brushexport
