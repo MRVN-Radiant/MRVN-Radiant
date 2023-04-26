@@ -65,18 +65,244 @@ R1MDLLoader::R1MDLLoader(
     aiScene *scene,
     IOSystem *io,
     const unsigned char *buffer,
-    const std::string &file_path) {
-    load_file();
+    const std::string &file_path) :
+    scene_(scene),
+    io_(io),
+    mdl_buffer_(buffer),
+    file_path_(file_path),
+    header_(nullptr),
+    header2_(nullptr),
+    mdl_bodyparts_(nullptr),
+    mdl_stringtable_(nullptr),
+    vtx_buffer_(nullptr),
+    vvd_buffer_(nullptr) {
+    load_vtx_file();
+    load_vvd_file();
+    load_mdl_file();
+    //throw DeadlyImportError( "hah" );
 }
 
 // ------------------------------------------------------------------------------------------------
 R1MDLLoader::~R1MDLLoader() {
-    
+    release_resources();
 }
 
 // ------------------------------------------------------------------------------------------------
-void R1MDLLoader::load_file() {
+void R1MDLLoader::release_resources() {
+    if(vtx_buffer_) {
+        delete[] vtx_buffer_;
+        vtx_buffer_ = nullptr;
+    }
 
+    if(vvd_buffer_) {
+        delete[] vvd_buffer_;
+        vvd_buffer_ = nullptr;
+    }
+}
+
+// ------------------------------------------------------------------------------------------------
+void R1MDLLoader::load_mdl_file() {
+    header_ = (const studiohdr_t *)mdl_buffer_;
+
+    if(!header_->numbodyparts)
+        throw DeadlyImportError("Model has no bodyparts in mdl!");
+    
+    if(header_->numbodyparts != vtx_header_->numBodyParts)
+        throw DeadlyImportError("MDL and VTX num bodyparts mismatch!");
+
+    header2_ = (const studiohdr2_t *)(mdl_buffer_ + (int)header_->studiohdr2index);
+    mdl_bodyparts_ = (const mstudiobodyparts_t*)(mdl_buffer_ + header_->bodypartindex);
+
+    if(header2_->sznameindex == 0) {
+        mdl_stringtable_ = (const char *)(mdl_buffer_ + (int)header_->surfacepropindex - 1);
+    } else {
+        mdl_stringtable_ = (const char *)(mdl_buffer_ + (int)header2_->sznameindex - 1 + (int)header_->studiohdr2index);
+    }
+
+    // Parse model into aiScene
+    // Textures
+    scene_->mNumMaterials = header_->numtextures;
+    scene_->mMaterials = new aiMaterial *[scene_->mNumMaterials];
+    for(unsigned int i = 0; i < scene_->mNumMaterials; i++) {
+        const mstudiotexture_t *texture = (const mstudiotexture_t *)(mdl_buffer_ + (int)header_->textureindex + sizeof(mstudiotexture_t) * i);
+        const char* sztexture = (const char *)((const char *)texture + texture->sznameindex);
+
+        aiString *aiTex = new aiString(sztexture);
+
+        scene_->mMaterials[i] = new aiMaterial();
+        scene_->mMaterials[i]->AddProperty(aiTex, AI_MATKEY_NAME);
+    }
+
+    // Count meshes
+    // We need to know the total num of meshes so we can alloc space for them
+    int iCurrentMesh = 0;
+    for(int i = 0; i < vtx_header_->numBodyParts; i++) {
+        const BodyPartHeader_t *bodypart = (const BodyPartHeader_t *)(vtx_buffer_ + vtx_header_->bodyPartOffset + sizeof(BodyPartHeader_t) * i);
+        for(int j = 0; j < bodypart->numModels; j++) {
+            const ModelHeader_t *model = (const ModelHeader_t *)((const char *)bodypart + bodypart->modelOffset + sizeof(ModelHeader_t) * j);
+            for(int k = 0; k < model->numLODs; k++) {
+                const ModelLODHeader_t *lodHeader = (const ModelLODHeader_t *)((const char *)model + model->lodOffset + sizeof(ModelLODHeader_t) * k);
+                for(int l = 0; l < lodHeader->numMeshes; l++) {
+                    const MeshHeader_t *mesh = (const MeshHeader_t *)((const char *)lodHeader + lodHeader->meshOffset + /*sizeof(MeshHeader_t)*/ 9 * l);
+                    for(int m = 0; m < mesh->numStripGroups; m++) {
+                        //const StripGroupHeader_t *stripGroupHeader = (const StripGroupHeader_t *)((const char *)mesh + mesh->stripGroupHeaderOffset + sizeof(StripGroupHeader_t) * m);
+                        //for(int n = 0; n < stripGroupHeader->numStrips; n++) {
+                            //const StripHeader_t *strip = (const StripHeader_t *)((const char *)stripGroupHeader + stripGroupHeader->stripOffset + sizeof(StripHeader_t) * n);
+                            iCurrentMesh++;
+                        //}
+                    }
+                }
+            }
+        }
+    }
+
+    ASSIMP_LOG_DEBUG("NumMeshes: ", iCurrentMesh);
+    scene_->mNumMeshes = iCurrentMesh;
+    scene_->mMeshes = new aiMesh *[iCurrentMesh];
+    iCurrentMesh = 0;
+
+    aiNode *pRootNode = new aiNode();
+    pRootNode->mNumChildren = vtx_header_->numBodyParts;
+    pRootNode->mChildren = new aiNode *[vtx_header_->numBodyParts];
+    scene_->mRootNode = pRootNode;
+    // Populate the meshes
+    for(int i = 0; i < vtx_header_->numBodyParts; i++) {
+        const BodyPartHeader_t *bodypart = (const BodyPartHeader_t *)(vtx_buffer_ + vtx_header_->bodyPartOffset + sizeof(BodyPartHeader_t) * i);
+        aiNode *pBodyPartNode = new aiNode();
+        pBodyPartNode->mNumChildren = bodypart->numModels;
+        pBodyPartNode->mChildren = new aiNode *[bodypart->numModels];
+        pRootNode->mChildren[i] = pBodyPartNode;
+        pBodyPartNode->mParent = pRootNode;
+        for(int j = 0; j < bodypart->numModels; j++) {
+            const ModelHeader_t *model = (const ModelHeader_t *)((const char *)bodypart + bodypart->modelOffset + sizeof(ModelHeader_t) * j);
+            aiNode *pModelNode = new aiNode();
+            pModelNode->mNumChildren = model->numLODs;
+            pModelNode->mChildren = new aiNode *[model->numLODs];
+            pBodyPartNode->mChildren[j] = pModelNode;
+            pModelNode->mParent = pBodyPartNode;
+            for(int k = 0; k < model->numLODs; k++) {
+                const ModelLODHeader_t *lodHeader = (const ModelLODHeader_t *)((const char *)model + model->lodOffset + sizeof(ModelLODHeader_t) * k);
+                aiNode *pModelLODHeaderNode = new aiNode();
+                pModelLODHeaderNode->mNumChildren = lodHeader->numMeshes;
+                pModelLODHeaderNode->mChildren = new aiNode *[lodHeader->numMeshes];
+                pModelNode->mChildren[k] = pModelLODHeaderNode;
+                pModelLODHeaderNode->mParent = pModelNode;
+                for(int l = 0; l < lodHeader->numMeshes; l++) {
+                    const MeshHeader_t *mesh = (const MeshHeader_t *)((const char *)lodHeader + lodHeader->meshOffset + sizeof(MeshHeader_t) * l);
+                    aiNode *pMeshNode = new aiNode();
+                    //pMeshNode->mNumChildren = mesh->numStripGroups;
+                    //pMeshNode->mChildren = new aiNode *[mesh->numStripGroups];
+                    pModelLODHeaderNode->mChildren[l] = pMeshNode;
+                    pMeshNode->mParent = pModelLODHeaderNode;
+                    pMeshNode->mNumMeshes = mesh->numStripGroups;
+                    pMeshNode->mMeshes = new unsigned int[mesh->numStripGroups];
+                    for(int m = 0; m < mesh->numStripGroups; m++) {
+                        const StripGroupHeader_t *stripGroupHeader = (const StripGroupHeader_t *)((const char *)mesh + mesh->stripGroupHeaderOffset + sizeof(StripGroupHeader_t) * m);
+                        pMeshNode->mMeshes[m] = iCurrentMesh;
+                        aiMesh *pMesh = new aiMesh();
+
+                        // Build vertices
+                        pMesh->mNumVertices = stripGroupHeader->numVerts;
+                        pMesh->mVertices = new aiVector3D[pMesh->mNumVertices];
+                        pMesh->mNormals = new aiVector3D[pMesh->mNumVertices];
+                        pMesh->mTangents = new aiVector3D[pMesh->mNumVertices];
+                        pMesh->mBitangents = new aiVector3D[pMesh->mNumVertices];
+                        for(unsigned int v = 0; v < pMesh->mNumVertices; v++) {
+                            const Vertex_t *vert = (const Vertex_t *)((const char *)stripGroupHeader + stripGroupHeader->vertOffset + sizeof(Vertex_t) * v);
+                            const mstudiovertex_t *stdioVert = (const mstudiovertex_t *)((const char *)vertices_ + sizeof(mstudiovertex_t) * vert->origMeshVertID);
+                            pMesh->mVertices[v] = aiVector3D(stdioVert->m_vecPosition[0], stdioVert->m_vecPosition[1], stdioVert->m_vecPosition[2]);
+                            pMesh->mNormals[v] = aiVector3D(stdioVert->m_vecNormal[0], stdioVert->m_vecNormal[1], stdioVert->m_vecNormal[2]);
+                        }
+
+                        // Build faces
+                        pMesh->mNumFaces = stripGroupHeader->numIndices / 3;
+                        pMesh->mFaces = new aiFace[pMesh->mNumFaces];
+                        const uint16_t *indices = (const uint16_t *)((const char *)stripGroupHeader + stripGroupHeader->indexOffset);
+                        for(unsigned int f = 0; f < pMesh->mNumFaces; f++) {
+                            pMesh->mFaces[f].mNumIndices = 3;
+                            pMesh->mFaces[f].mIndices = new unsigned int[3];
+                            pMesh->mFaces[f].mIndices[0] = *(uint16_t*)((const char *)indices + sizeof(uint16_t) * (f * 3 + 2) );
+                            pMesh->mFaces[f].mIndices[1] = *(uint16_t*)((const char *)indices + sizeof(uint16_t) * (f * 3 + 1) );
+                            pMesh->mFaces[f].mIndices[2] = *(uint16_t*)((const char *)indices + sizeof(uint16_t) * (f * 3 + 0) );
+                        }
+
+
+                        scene_->mMeshes[iCurrentMesh] = pMesh;
+
+                        iCurrentMesh++;
+                    }
+                }
+            }
+        }
+    }
+
+    // Set mesh mats
+    // ...
+}
+
+// ------------------------------------------------------------------------------------------------
+void R1MDLLoader::load_vtx_file() {
+    std::string vtx_file_path =
+            DefaultIOSystem::absolutePath(file_path_) +
+            io_->getOsSeparator() +
+            DefaultIOSystem::completeBaseName(file_path_) +
+            ".dx11.vtx";
+    
+    if(!io_->Exists(vtx_file_path)) {
+        throw DeadlyImportError("Missing VTX file ", DefaultIOSystem::fileName(vtx_file_path));
+    }
+
+    std::unique_ptr<IOStream> file(io_->Open(vtx_file_path));
+
+    if (file.get() == nullptr) {
+        throw DeadlyImportError("Failed to open VTX file ", DefaultIOSystem::fileName(vtx_file_path));
+    }
+
+    const size_t file_size = file->FileSize();
+    vtx_buffer_ = new unsigned char[1 + file_size];
+    file->Read((void *)vtx_buffer_, 1, file_size);
+    vtx_buffer_[file_size] = '\0';
+
+    vtx_header_ = (const FileHeader_t *)vtx_buffer_;
+
+    if(vtx_header_->version != 7)
+        throw DeadlyImportError("Unknown VTX header version!");
+}
+
+// ------------------------------------------------------------------------------------------------
+void R1MDLLoader::load_vvd_file() {
+    std::string vvd_file_path =
+            DefaultIOSystem::absolutePath(file_path_) +
+            io_->getOsSeparator() +
+            DefaultIOSystem::completeBaseName(file_path_) +
+            ".vvd";
+    
+    if(!io_->Exists(vvd_file_path)) {
+        throw DeadlyImportError("Missing VVD file ", DefaultIOSystem::fileName(vvd_file_path));
+    }
+
+    std::unique_ptr<IOStream> file(io_->Open(vvd_file_path));
+
+    if (file.get() == nullptr) {
+        throw DeadlyImportError("Failed to open VVD file ", DefaultIOSystem::fileName(vvd_file_path));
+    }
+
+    const size_t file_size = file->FileSize();
+    vvd_buffer_ = new unsigned char[1 + file_size];
+    file->Read((void *)vvd_buffer_, 1, file_size);
+    vvd_buffer_[file_size] = '\0';
+
+    vvd_header_ = (const vertexFileHeader_t *)vvd_buffer_;
+
+    //ASSIMP_LOG_DEBUG("VVD id: ", vvd_header_->id);
+    if(vvd_header_->id != 1448297545)
+        throw DeadlyImportError("Unknown VVD header id!");
+    
+    if(vvd_header_->version != 4)
+        throw DeadlyImportError("Unknown VVD header version!");
+    
+    vertices_ = (const mstudiovertex_t *)(vvd_buffer_ + vvd_header_->vertexDataStart);
+    tangents_ = (const vec4_t *)(vvd_buffer_ + vvd_header_->tangentDataStart);
 }
 
 } // namespace HalfLife

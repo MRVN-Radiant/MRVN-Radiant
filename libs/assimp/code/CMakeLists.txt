@@ -449,6 +449,7 @@ ADD_ASSIMP_IMPORTER( MDL
   AssetLib/MDL/HalfLife/UniqueNameGenerator.h
   AssetLib/MDL/Respawn/R1MDLLoader.cpp
   AssetLib/MDL/Respawn/R1MDLLoader.h
+  AssetLib/MDL/Respawn/R1MDLFileData.h
 )
 
 SET( MaterialSystem_SRCS

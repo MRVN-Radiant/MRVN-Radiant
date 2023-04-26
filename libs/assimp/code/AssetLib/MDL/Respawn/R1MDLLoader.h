@@ -46,6 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_R1MDLLOADER_INCLUDED
 #define AI_R1MDLLOADER_INCLUDED
 
+
+#include "R1MDLFileData.h"
+
 #include <memory>
 #include <string>
 
@@ -74,15 +77,61 @@ public:
 
     ~R1MDLLoader();
 
-    void load_file();
-
 protected:
     /** \brief Validate the header data structure of a Half-Life 1 MDL file.
      * \param[in] header Input header to be validated.
      * \param[in] is_texture_header Whether or not we are reading an MDL
      *   texture file.
      */
+    void load_mdl_file();
+    void load_vtx_file();
+    void load_vvd_file();
     //void validate_header(const Header_HL1 *header, bool is_texture_header);
+    void release_resources();
+private:
+    /** Output scene to be filled */
+    aiScene *scene_;
+
+    /** Output I/O handler. Required for additional IO operations. */
+    IOSystem *io_;
+
+    /** Buffer from MDLLoader class. */
+    const unsigned char *mdl_buffer_;
+
+    /** The full file path to the MDL file we are trying to load.
+     * Used to locate other MDL files since MDL may store resources
+     * in external MDL files. */
+    const std::string &file_path_;
+
+    /** Main MDL header. */
+    const studiohdr_t *header_;
+
+    /** MDL header. */
+    const studiohdr2_t *header2_;
+
+    /** MDL bodyparts. */
+    const mstudiobodyparts_t *mdl_bodyparts_;
+
+    /** MDL stringtable */
+    const char *mdl_stringtable_;
+
+    /** VTX file buffer class. */
+    unsigned char *vtx_buffer_;
+
+    /** VTX header */
+    const FileHeader_t *vtx_header_;
+
+    /** VVD file buffer class. */
+    unsigned char *vvd_buffer_;
+
+    /** VVD header */
+    const vertexFileHeader_t *vvd_header_;
+
+    /** VVD vertices */
+    const mstudiovertex_t *vertices_;
+
+    /** VVD Tangents */
+    const vec4_t *tangents_;
 };
 
 } // namespace Respawn
