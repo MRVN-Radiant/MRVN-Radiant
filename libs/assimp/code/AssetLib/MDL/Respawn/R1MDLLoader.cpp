@@ -199,8 +199,8 @@ void R1MDLLoader::parse_mdl_file() {
                         pMesh->mNumVertices = stripGroupHeader->numVerts;
                         pMesh->mVertices = new aiVector3D[pMesh->mNumVertices];
                         pMesh->mNormals = new aiVector3D[pMesh->mNumVertices];
-                        pMesh->mTangents = new aiVector3D[pMesh->mNumVertices];
-                        pMesh->mBitangents = new aiVector3D[pMesh->mNumVertices];
+                        //pMesh->mTangents = new aiVector3D[pMesh->mNumVertices];
+                        //pMesh->mBitangents = new aiVector3D[pMesh->mNumVertices];
                         for(unsigned int v = 0; v < pMesh->mNumVertices; v++) {
                             const Vertex_t *vert = (const Vertex_t *)((const char *)stripGroupHeader + stripGroupHeader->vertOffset + sizeof(Vertex_t) * v);
                             const mstudiovertex_t *stdioVert = reinterpret_cast<const mstudiovertex_t* const>((char*)vertices_ + mdl_model->vertexindex + ((mdl_mesh->vertexoffset + vert->origMeshVertID) * sizeof(mstudiovertex_t)));
