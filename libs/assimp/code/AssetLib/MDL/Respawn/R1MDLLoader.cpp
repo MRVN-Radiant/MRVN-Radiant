@@ -119,8 +119,7 @@ void R1MDLLoader::load_mdl_file() {
         mdl_stringtable_ = (const char *)(mdl_buffer_ + (int)header2_->sznameindex - 1 + (int)header_->studiohdr2index);
     }
 
-    // Parse model into aiScene
-    // Textures
+    // Craete aiMaterials we want to use
     scene_->mNumMaterials = header_->numtextures;
     scene_->mMaterials = new aiMaterial *[scene_->mNumMaterials];
     for(unsigned int i = 0; i < scene_->mNumMaterials; i++) {
@@ -137,69 +136,78 @@ void R1MDLLoader::load_mdl_file() {
     // We need to know the total num of meshes so we can alloc space for them
     int iCurrentMesh = 0;
     for(int i = 0; i < vtx_header_->numBodyParts; i++) {
-        const BodyPartHeader_t *bodypart = (const BodyPartHeader_t *)(vtx_buffer_ + vtx_header_->bodyPartOffset + sizeof(BodyPartHeader_t) * i);
-        for(int j = 0; j < bodypart->numModels; j++) {
-            const ModelHeader_t *model = (const ModelHeader_t *)((const char *)bodypart + bodypart->modelOffset + sizeof(ModelHeader_t) * j);
-            for(int k = 0; k < model->numLODs; k++) {
-                const ModelLODHeader_t *lodHeader = (const ModelLODHeader_t *)((const char *)model + model->lodOffset + sizeof(ModelLODHeader_t) * k);
-                for(int l = 0; l < lodHeader->numMeshes; l++) {
-                    const MeshHeader_t *mesh = (const MeshHeader_t *)((const char *)lodHeader + lodHeader->meshOffset + /*sizeof(MeshHeader_t)*/ 9 * l);
-                    for(int m = 0; m < mesh->numStripGroups; m++) {
-                        //const StripGroupHeader_t *stripGroupHeader = (const StripGroupHeader_t *)((const char *)mesh + mesh->stripGroupHeaderOffset + sizeof(StripGroupHeader_t) * m);
-                        //for(int n = 0; n < stripGroupHeader->numStrips; n++) {
-                            //const StripHeader_t *strip = (const StripHeader_t *)((const char *)stripGroupHeader + stripGroupHeader->stripOffset + sizeof(StripHeader_t) * n);
-                            iCurrentMesh++;
-                        //}
-                    }
+        const BodyPartHeader_t *vtx_bodypart = (const BodyPartHeader_t *)(vtx_buffer_ + vtx_header_->bodyPartOffset + sizeof(BodyPartHeader_t) * i);
+        for(int j = 0; j < vtx_bodypart->numModels; j++) {
+            const ModelHeader_t *vtx_model = (const ModelHeader_t *)((const char *)vtx_bodypart + vtx_bodypart->modelOffset + sizeof(ModelHeader_t) * j);
+            for(int k = 0; k < vtx_model->numLODs; k++) {
+                const ModelLODHeader_t *vtx_lod_header = (const ModelLODHeader_t *)((const char *)vtx_model + vtx_model->lodOffset + sizeof(ModelLODHeader_t) * k);
+                for(int l = 0; l < vtx_lod_header->numMeshes; l++) {
+                    const MeshHeader_t *mesh = (const MeshHeader_t *)((const char *)vtx_lod_header + vtx_lod_header->meshOffset + sizeof(MeshHeader_t) * l);
+                    iCurrentMesh += mesh->numStripGroups;
                 }
             }
         }
     }
 
+    // Allocate space for our meshes
     ASSIMP_LOG_DEBUG("NumMeshes: ", iCurrentMesh);
     scene_->mNumMeshes = iCurrentMesh;
     scene_->mMeshes = new aiMesh *[iCurrentMesh];
     iCurrentMesh = 0;
 
+    // Build the scene tree and build the meshes it uses
     aiNode *pRootNode = new aiNode();
     pRootNode->mNumChildren = vtx_header_->numBodyParts;
     pRootNode->mChildren = new aiNode *[vtx_header_->numBodyParts];
     scene_->mRootNode = pRootNode;
     // Populate the meshes
     for(int i = 0; i < vtx_header_->numBodyParts; i++) {
-        const BodyPartHeader_t *bodypart = (const BodyPartHeader_t *)(vtx_buffer_ + vtx_header_->bodyPartOffset + sizeof(BodyPartHeader_t) * i);
+        const BodyPartHeader_t *vtx_bodypart = (const BodyPartHeader_t *)(vtx_buffer_ + vtx_header_->bodyPartOffset + sizeof(BodyPartHeader_t) * i);
+        const mstudiobodyparts_t *mdl_bodypart = (const mstudiobodyparts_t *)(mdl_buffer_ + header_->bodypartindex + sizeof(mstudiobodyparts_t) * i);
+
         aiNode *pBodyPartNode = new aiNode();
-        pBodyPartNode->mNumChildren = bodypart->numModels;
-        pBodyPartNode->mChildren = new aiNode *[bodypart->numModels];
+        pBodyPartNode->mNumChildren = vtx_bodypart->numModels;
+        pBodyPartNode->mChildren = new aiNode *[vtx_bodypart->numModels];
         pRootNode->mChildren[i] = pBodyPartNode;
         pBodyPartNode->mParent = pRootNode;
-        for(int j = 0; j < bodypart->numModels; j++) {
-            const ModelHeader_t *model = (const ModelHeader_t *)((const char *)bodypart + bodypart->modelOffset + sizeof(ModelHeader_t) * j);
+
+        for(int j = 0; j < vtx_bodypart->numModels; j++) {
+            const ModelHeader_t *vtx_model = (const ModelHeader_t *)((const char *)vtx_bodypart + vtx_bodypart->modelOffset + sizeof(ModelHeader_t) * j);
+            const mstudiomodel_t *mdl_model = (const mstudiomodel_t *)((const char*)mdl_bodypart + mdl_bodypart->modelindex + sizeof(mstudiomodel_t) * j);
+
             aiNode *pModelNode = new aiNode();
-            pModelNode->mNumChildren = model->numLODs;
-            pModelNode->mChildren = new aiNode *[model->numLODs];
+            pModelNode->mNumChildren = vtx_model->numLODs;
+            pModelNode->mChildren = new aiNode *[vtx_model->numLODs];
             pBodyPartNode->mChildren[j] = pModelNode;
             pModelNode->mParent = pBodyPartNode;
-            for(int k = 0; k < model->numLODs; k++) {
-                const ModelLODHeader_t *lodHeader = (const ModelLODHeader_t *)((const char *)model + model->lodOffset + sizeof(ModelLODHeader_t) * k);
+
+            for(int k = 0; k < vtx_model->numLODs; k++) {
+                const ModelLODHeader_t *vtx_lod_header = (const ModelLODHeader_t *)((const char *)vtx_model + vtx_model->lodOffset + sizeof(ModelLODHeader_t) * k);
+                
                 aiNode *pModelLODHeaderNode = new aiNode();
-                pModelLODHeaderNode->mNumChildren = lodHeader->numMeshes;
-                pModelLODHeaderNode->mChildren = new aiNode *[lodHeader->numMeshes];
+                pModelLODHeaderNode->mNumChildren = vtx_lod_header->numMeshes;
+                pModelLODHeaderNode->mChildren = new aiNode *[vtx_lod_header->numMeshes];
                 pModelNode->mChildren[k] = pModelLODHeaderNode;
                 pModelLODHeaderNode->mParent = pModelNode;
-                for(int l = 0; l < lodHeader->numMeshes; l++) {
-                    const MeshHeader_t *mesh = (const MeshHeader_t *)((const char *)lodHeader + lodHeader->meshOffset + sizeof(MeshHeader_t) * l);
+                
+                for(int l = 0; l < vtx_lod_header->numMeshes; l++) {
+                    const MeshHeader_t *vtx_mesh = (const MeshHeader_t *)((const char *)vtx_lod_header + vtx_lod_header->meshOffset + sizeof(MeshHeader_t) * l);
+                    const mstudiomesh_t *mdl_mesh = (const mstudiomesh_t*)((const char*)mdl_model + mdl_model->meshindex + sizeof(mstudiomesh_t) * l);
+                    
                     aiNode *pMeshNode = new aiNode();
-                    //pMeshNode->mNumChildren = mesh->numStripGroups;
-                    //pMeshNode->mChildren = new aiNode *[mesh->numStripGroups];
                     pModelLODHeaderNode->mChildren[l] = pMeshNode;
                     pMeshNode->mParent = pModelLODHeaderNode;
-                    pMeshNode->mNumMeshes = mesh->numStripGroups;
-                    pMeshNode->mMeshes = new unsigned int[mesh->numStripGroups];
-                    for(int m = 0; m < mesh->numStripGroups; m++) {
-                        const StripGroupHeader_t *stripGroupHeader = (const StripGroupHeader_t *)((const char *)mesh + mesh->stripGroupHeaderOffset + sizeof(StripGroupHeader_t) * m);
+                    pMeshNode->mNumMeshes = vtx_mesh->numStripGroups;
+                    pMeshNode->mMeshes = new unsigned int[vtx_mesh->numStripGroups];
+
+                    for(int m = 0; m < vtx_mesh->numStripGroups; m++) {
+                        const StripGroupHeader_t *stripGroupHeader = (const StripGroupHeader_t *)((const char *)vtx_mesh + vtx_mesh->stripGroupHeaderOffset + sizeof(StripGroupHeader_t) * m);
                         pMeshNode->mMeshes[m] = iCurrentMesh;
+
+                        // Build te aiMesh
                         aiMesh *pMesh = new aiMesh();
+
+                        pMesh->mMaterialIndex = mdl_mesh->material;
 
                         // Build vertices
                         pMesh->mNumVertices = stripGroupHeader->numVerts;
@@ -209,7 +217,7 @@ void R1MDLLoader::load_mdl_file() {
                         pMesh->mBitangents = new aiVector3D[pMesh->mNumVertices];
                         for(unsigned int v = 0; v < pMesh->mNumVertices; v++) {
                             const Vertex_t *vert = (const Vertex_t *)((const char *)stripGroupHeader + stripGroupHeader->vertOffset + sizeof(Vertex_t) * v);
-                            const mstudiovertex_t *stdioVert = (const mstudiovertex_t *)((const char *)vertices_ + sizeof(mstudiovertex_t) * vert->origMeshVertID);
+                            const mstudiovertex_t *stdioVert = reinterpret_cast<const mstudiovertex_t* const>((char*)vertices_ + mdl_model->vertexindex + ((mdl_mesh->vertexoffset + vert->origMeshVertID) * sizeof(mstudiovertex_t)));
                             pMesh->mVertices[v] = aiVector3D(stdioVert->m_vecPosition[0], stdioVert->m_vecPosition[1], stdioVert->m_vecPosition[2]);
                             pMesh->mNormals[v] = aiVector3D(stdioVert->m_vecNormal[0], stdioVert->m_vecNormal[1], stdioVert->m_vecNormal[2]);
                         }
@@ -226,18 +234,13 @@ void R1MDLLoader::load_mdl_file() {
                             pMesh->mFaces[f].mIndices[2] = *(uint16_t*)((const char *)indices + sizeof(uint16_t) * (f * 3 + 0) );
                         }
 
-
                         scene_->mMeshes[iCurrentMesh] = pMesh;
-
                         iCurrentMesh++;
                     }
                 }
             }
         }
     }
-
-    // Set mesh mats
-    // ...
 }
 
 // ------------------------------------------------------------------------------------------------
