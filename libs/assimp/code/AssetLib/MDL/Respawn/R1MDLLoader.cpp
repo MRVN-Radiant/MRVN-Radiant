@@ -76,10 +76,10 @@ R1MDLLoader::R1MDLLoader(
     mdl_stringtable_(nullptr),
     vtx_buffer_(nullptr),
     vvd_buffer_(nullptr) {
+    load_mdl_file();
     load_vtx_file();
     load_vvd_file();
-    load_mdl_file();
-    //throw DeadlyImportError( "hah" );
+    parse_mdl_file();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -101,24 +101,10 @@ void R1MDLLoader::release_resources() {
 }
 
 // ------------------------------------------------------------------------------------------------
-void R1MDLLoader::load_mdl_file() {
-    header_ = (const studiohdr_t *)mdl_buffer_;
-
-    if(!header_->numbodyparts)
-        throw DeadlyImportError("Model has no bodyparts in mdl!");
-    
+void R1MDLLoader::parse_mdl_file() {
     if(header_->numbodyparts != vtx_header_->numBodyParts)
         throw DeadlyImportError("MDL and VTX num bodyparts mismatch!");
-
-    header2_ = (const studiohdr2_t *)(mdl_buffer_ + (int)header_->studiohdr2index);
-    mdl_bodyparts_ = (const mstudiobodyparts_t*)(mdl_buffer_ + header_->bodypartindex);
-
-    if(header2_->sznameindex == 0) {
-        mdl_stringtable_ = (const char *)(mdl_buffer_ + (int)header_->surfacepropindex - 1);
-    } else {
-        mdl_stringtable_ = (const char *)(mdl_buffer_ + (int)header2_->sznameindex - 1 + (int)header_->studiohdr2index);
-    }
-
+    
     // Craete aiMaterials we want to use
     scene_->mNumMaterials = header_->numtextures;
     scene_->mMaterials = new aiMaterial *[scene_->mNumMaterials];
@@ -240,6 +226,23 @@ void R1MDLLoader::load_mdl_file() {
                 }
             }
         }
+    }
+}
+
+// ------------------------------------------------------------------------------------------------
+void R1MDLLoader::load_mdl_file() {
+    header_ = (const studiohdr_t *)mdl_buffer_;
+
+    if(!header_->numbodyparts)
+        throw DeadlyImportError("Model has no bodyparts in mdl!");
+
+    header2_ = (const studiohdr2_t *)(mdl_buffer_ + (int)header_->studiohdr2index);
+    mdl_bodyparts_ = (const mstudiobodyparts_t*)(mdl_buffer_ + header_->bodypartindex);
+
+    if(header2_->sznameindex == 0) {
+        mdl_stringtable_ = (const char *)(mdl_buffer_ + (int)header_->surfacepropindex - 1);
+    } else {
+        mdl_stringtable_ = (const char *)(mdl_buffer_ + (int)header2_->sznameindex - 1 + (int)header_->studiohdr2index);
     }
 }
 

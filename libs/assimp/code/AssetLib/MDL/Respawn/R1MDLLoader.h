@@ -86,6 +86,7 @@ protected:
     void load_mdl_file();
     void load_vtx_file();
     void load_vvd_file();
+    void parse_mdl_file();
     //void validate_header(const Header_HL1 *header, bool is_texture_header);
     void release_resources();
 private:
