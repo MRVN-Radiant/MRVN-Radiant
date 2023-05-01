@@ -48,8 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Structs taken from https://github.com/IJARika/respawn-mdl with permission
  */
 
-#ifndef AI_R1FILEDATA_INCLUDED
-#define AI_R1FILEDATA_INCLUDED
+#ifndef AI_R2FILEDATA_INCLUDED
+#define AI_R2FILEDATA_INCLUDED
 
 #define MAX_NUM_LODS 8
 #define MAX_NUM_BONES_PER_VERT 3
@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace Assimp {
 namespace MDL {
-namespace RespawnR1 {
+namespace RespawnR2 {
 
 using vec2_t = float[2];
 using vec3_t = float[3];
@@ -69,165 +69,150 @@ struct studiohdr_t
     int32_t id; // Model format ID, such as "IDST" (0x49 0x44 0x53 0x54)
     int32_t version; // Format version number, such as 48 (0x30,0x00,0x00,0x00)
     int32_t checksum; // This has to be the same in the phy and vtx files to load!
-    char name[64]; // The int32_ternal name of the model, padding with null uint8_ts.
-                    // Typically "my_model.mdl" will have an int32_ternal name of "my_model"
-    int32_t length; // Data size of MDL file in uint8_ts.
+	int32_t sznameindex; // This has been moved from studiohdr2 to the front of the main header.
+    char name[64]; // The internal name of the model, padding with null bytes.
+                    // Typically "my_model.mdl" will have an internal name of "my_model"
+    int32_t length; // Data size of MDL file in bytes.
  
     vec3_t eyeposition;	// ideal eye position
 
-    vec3_t illumposition;	// illumination center
-    
-    vec3_t hull_min;		// ideal movement hull size
-    vec3_t hull_max;			
+	vec3_t illumposition;	// illumination center
+	
+	vec3_t hull_min;		// ideal movement hull size
+	vec3_t hull_max;			
 
-    vec3_t view_bbmin;		// clipping bounding box
-    vec3_t view_bbmax;		
+	vec3_t view_bbmin;		// clipping bounding box
+	vec3_t view_bbmax;		
  
     int32_t flags;
   
     // highest observed: 250
+    // max is definitely 256 because 8bit uint limit
     int32_t numbones; // bones
-    int32_t boneindex;
+	int32_t boneindex;
  
     int32_t numbonecontrollers; // bone controllers
-    int32_t bonecontrollerindex;
+	int32_t bonecontrollerindex;
  
     int32_t numhitboxsets;
-    int32_t hitboxsetindex;
+	int32_t hitboxsetindex;
  
     int32_t numlocalanim; // animations/poses
-    int32_t localanimindex; // animation descriptions
+	int32_t localanimindex; // animation descriptions
  
     int32_t numlocalseq; // sequences
-    int32_t	localseqindex;
+	int32_t	localseqindex;
  
-    int32_t activitylistversion; // initialization flag - have the sequences been indexed?
-    int32_t eventsindexed;
+	int32_t activitylistversion; // initialization flag - have the sequences been indexed? set on load
+	int32_t eventsindexed;
  
-    // raw textures
-    int32_t numtextures;
-    int32_t textureindex;
+    // mstudiotexture_t
+    // short rpak path
+	// raw textures
+	int32_t numtextures; // the material limit exceeds 128, probably 256.
+	int32_t textureindex;
  
-    /// raw textures search paths
-    int32_t numcdtextures;
-    int32_t cdtextureindex;
+    // this should always only be one, unless using vmts.
+    // raw textures search paths
+	int32_t numcdtextures;
+	int32_t cdtextureindex;
  
     // replaceable textures tables
-    int32_t numskinref;
-    int32_t numskinfamilies;
-    int32_t skinindex;
+	int32_t numskinref;
+	int32_t numskinfamilies;
+	int32_t skinindex;
  
-    int32_t numbodyparts;		
-    int32_t bodypartindex;
+	int32_t numbodyparts;		
+	int32_t bodypartindex;
  
     int32_t numlocalattachments;
-    int32_t localattachmentindex;
+	int32_t localattachmentindex;
  
     int32_t numlocalnodes;
-    int32_t localnodeindex;
-    int32_t localnodenameindex;
+	int32_t localnodeindex;
+	int32_t localnodenameindex;
  
     int32_t deprecated_numflexdesc;
-    int32_t deprecated_flexdescindex;
+	int32_t deprecated_flexdescindex;
  
     int32_t deprecated_numflexcontrollers;
-    int32_t deprecated_flexcontrollerindex;
+	int32_t deprecated_flexcontrollerindex;
  
     int32_t deprecated_numflexrules;
-    int32_t deprecated_flexruleindex;
+	int32_t deprecated_flexruleindex;
  
     int32_t numikchains;
-    int32_t ikchainindex;
-    
-    int32_t deprecated_nummouths;
-    int32_t deprecated_mouthindex;
+	int32_t ikchainindex;
+
+    int32_t numruimeshes;
+    int32_t ruimeshindex;
  
     int32_t numlocalposeparameters;
-    int32_t localposeparamindex;
+	int32_t localposeparamindex;
  
     int32_t surfacepropindex;
  
     int32_t keyvalueindex;
-    int32_t keyvaluesize;
+	int32_t keyvaluesize;
  
     int32_t numlocalikautoplaylocks;
-    int32_t localikautoplaylockindex;
- 
+	int32_t localikautoplaylockindex;
  
     float mass;
-    int32_t contents;
+	int32_t contents;
  
     // external animations, models, etc.
-    int32_t numincludemodels;
-    int32_t includemodelindex;
+	int32_t numincludemodels;
+	int32_t includemodelindex;
     
-    // implementation specific back point32_ter to virtual data
-    int32_t /* mutable void* */ virtualModel;
+    int32_t virtualModel; // should be void
 
-    // for demand loaded animation blocks
-    int32_t szanimblocknameindex;
+    // animblock is either completely cut, this is because they no longer use .ani files.
 
-    int32_t numanimblocks;
-    int32_t animblockindex;
-
-    int32_t /* mutable void* */ animblockModel;
-
-    int32_t bonetablebynameindex;
-
-    // used by tools only that don't cache, but persist mdl's peer data
-    // engine uses virtualModel to back link to cache point32_ters
-    int32_t /* void* */ pVertexBase;
-    int32_t /* void* */ pIndexBase;
+	int32_t bonetablebynameindex;
     
     // if STUDIOHDR_FLAGS_CONSTANT_DIRECTIONAL_LIGHT_DOT is set,
-    // this value is used to calculate directional components of lighting 
-    // on static props
-    uint8_t constdirectionallightdot;
+	// this value is used to calculate directional components of lighting 
+	// on static props
+	uint8_t constdirectionallightdot;
 
-    // set during load of mdl data to track *desired* lod configuration (not actual)
-    // the *actual* clamped root lod is found in studiohwdata
-    // this is stored here as a global store to ensure the staged loading matches the rendering
-    uint8_t rootLOD;
+	// set during load of mdl data to track *desired* lod configuration (not actual)
+	// the *actual* clamped root lod is found in studiohwdata
+	// this is stored here as a global store to ensure the staged loading matches the rendering
+	uint8_t rootLOD;
+	
+	// set in the mdl data to specify that lod configuration should only allow first numAllowRootLODs
+	// to be set as root LOD:
+	//	numAllowedRootLODs = 0	means no restriction, any lod can be set as root lod.
+	//	numAllowedRootLODs = N	means that lod0 - lod(N-1) can be set as root lod, but not lodN or lower.
+	uint8_t numAllowedRootLODs;
+
+	uint8_t unused;
+
+	float fadeDistance; // set to -1 to never fade. set above 0 if you want it to fade out, distance is in feet.
+                        // player/titan models seem to inherit this value from the first model loaded in menus.
+                        // works oddly on entities, probably only meant for static props
+
+	int32_t deprecated_numflexcontrollerui;
+	int32_t deprecated_flexcontrolleruiindex;
     
-    // set in the mdl data to specify that lod configuration should only allow first numAllowRootLODs
-    // to be set as root LOD:
-    //	numAllowedRootLODs = 0	means no restriction, any lod can be set as root lod.
-    //	numAllowedRootLODs = N	means that lod0 - lod(N-1) can be set as root lod, but not lodN or lower.
-    uint8_t numAllowedRootLODs;
+    float flVertAnimFixedPointScale;
+    int32_t surfacepropLookup; // this index must be cached by the loader, not saved in the file
 
-    uint8_t unused;
+    // this is in all shipped models, probably part of their asset bakery. it should be 0x2CC.
+    // doesn't actually need to be written pretty sure, only four bytes when not present.
+    // this is not completely true as some models simply have nothing, such as animation models.
+	int32_t sourceFilenameOffset;
 
-    float fadeDistance;
-
-    int32_t deprecated_numflexcontrollerui;
-    int32_t deprecated_flexcontrolleruiindex;
-
-    float flVertAnimFixedPoint32_tScale;
-    int32_t surfacepropLookup;	// this index must be cached by the loader, not saved in the file
-    
-    // NOTE: No room to add stuff? Up the .mdl file format version 
-    // [and move all fields in studiohdr2_t int32_to studiohdr_t and kill studiohdr2_t],
-    // or add your stuff to studiohdr2_t. See NumSrcBoneTransforms/SrcBoneTransform for the pattern to use.
-    int32_t studiohdr2index;
-    
-    int32_t sourceFilenameOffset; // in v52 not every model has these strings, only four uint8_ts when not present.
-};
-
-struct studiohdr2_t
-{
     int32_t numsrcbonetransform;
-    int32_t srcbonetransformindex;
+	int32_t srcbonetransformindex;
 
-    int32_t	illumpositionattachmentindex;
+	int32_t	illumpositionattachmentindex;
+	
+	int32_t linearboneindex;
 
-    float flMaxEyeDeflection; // default to cos(30) if not set
-    
-    int32_t linearboneindex;
-
-    int32_t sznameindex;
-
-    int32_t m_nBoneFlexDriverCount;
-    int32_t m_nBoneFlexDriverIndex;
+	int32_t m_nBoneFlexDriverCount;
+	int32_t m_nBoneFlexDriverIndex;
     
     // for static props (and maybe others)
     // Precomputed Per-Triangle AABB data
@@ -239,22 +224,40 @@ struct studiohdr2_t
     // always "" or "Titan"
     int32_t unkstringindex;
 
-    int32_t reserved[39];
+    // ANIs are no longer used and this is reflected in many structs
+    // Start of interal file data
+    int32_t vtxindex; // VTX
+	int32_t vvdindex; // VVD / IDSV
+    int32_t vvcindex; // VVC / IDCV 
+    int32_t vphyindex; // VPHY / IVPS
+
+    int32_t vtxsize; // VTX
+    int32_t vvdsize; // VVD / IDSV
+    int32_t vvcsize; // VVC / IDCV 
+    int32_t vphysize; // VPHY / IVPS
+
+    // this data block is related to the vphy, if it's not present the data will not be written
+    // definitely related to phy, apex phy has this merged into it
+    int32_t unkindex; // section between vphy and vtx.?
+    int32_t numunk; // only seems to be used when phy has one solid
+
+    // mostly seen on '_animated' suffixed models
+	// manually declared bone followers are no longer stored in kvs under 'bone_followers', they are now stored in an array of ints with the bone index.
+	int32_t numbonefollowers; // numBoneFollowers
+	int32_t bonefollowerindex;
+
+    int32_t unused1[60];
+
 };
 
 struct mstudiotexture_t
 {
     int32_t sznameindex;
 
-    int32_t unused_flags;
-    int32_t used;
-    int32_t unused1;
-    
-    // these are turned into 64 bit ints on load and only filled in memory
-    int32_t material_RESERVED;
-    int32_t clientmaterial_RESERVED;
+	int32_t unused_flags;
+	int32_t used;
 
-    int32_t unused[10];
+	int32_t unused[8];
 };
 
 struct mstudiobodyparts_t
@@ -278,9 +281,9 @@ struct mstudiomodel_t
 
     // cache purposes
     int32_t numvertices; // number of unique vertices/normals/texcoords
-    int32_t vertexindex; // vertex Vector
+    int32_t vertexindex; // vertex vec3_t
                      // offset by vertexindex number of bytes into vvd verts
-    int32_t tangentsindex; // tangents Vector
+    int32_t tangentsindex; // tangents vec3_t
                        // offset by tangentsindex number of bytes into vvd tangents
 
     int32_t numattachments;
@@ -310,29 +313,31 @@ struct mstudiomesh_t
 {
     int32_t material;
 
-    int32_t modelindex;
+	int32_t modelindex;
 
-    int32_t numvertices; // number of unique vertices/normals/texcoords
-    int32_t vertexoffset; // vertex mstudiovertex_t
+	int32_t numvertices; // number of unique vertices/normals/texcoords
+	int32_t vertexoffset; // vertex mstudiovertex_t
                       // offset by vertexoffset number of verts into vvd vertexes, relative to the models offset
 
-    // Access thin/fat mesh vertex data (only one will return a non-NULL result)
+	// Access thin/fat mesh vertex data (only one will return a non-NULL result)
+	
+	int32_t deprecated_numflexes; // vertex animation
+	int32_t deprecated_flexindex;
+
+	// special codes for material operations
+	int32_t deprecated_materialtype;
+	int32_t deprecated_materialparam;
+
+	// a unique ordinal for this mesh
+	int32_t meshid;
+
+	vec3_t center;
+
+	mstudio_meshvertexloddata_t vertexloddata;
     
-    int32_t deprecated_numflexes; // vertex animation
-    int32_t deprecated_flexindex;
+    char unk[8]; // set on load
 
-    // special codes for material operations
-    int32_t deprecated_materialtype;
-    int32_t deprecated_materialparam;
-
-    // a unique ordinal for this mesh
-    int32_t meshid;
-
-    vec3_t center;
-
-    mstudio_meshvertexloddata_t vertexloddata;
-
-    int unused[8]; // remove as appropriate
+	int32_t unused[6]; // remove as appropriate
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -486,4 +491,4 @@ struct __attribute__ ((packed)) mstudiovertex_t
 } // namespace MDL
 } // namespace Assimp
 
-#endif // AI_R1FILEDATA_INCLUDED
+#endif // AI_R2FILEDATA_INCLUDED

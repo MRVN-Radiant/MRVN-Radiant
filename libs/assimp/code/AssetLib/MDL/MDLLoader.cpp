@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssetLib/MD2/MD2FileData.h"
 #include "AssetLib/MDL/HalfLife/HL1MDLLoader.h"
 #include "AssetLib/MDL/Respawn/R1MDLLoader.h"
+#include "AssetLib/MDL/Respawn/R2MDLLoader.h"
 #include "AssetLib/MDL/MDLDefaultColorMap.h"
 
 #include <assimp/StringUtils.h>
@@ -1997,7 +1998,7 @@ void MDLImporter::InternReadFile_HL2() {
 // ------------------------------------------------------------------------------------------------
 // Read a Titanfall 2 MDL
 void MDLImporter::InternReadFile_Titanfall1(const std::string &pFile) {
-    Respawn::R1MDLLoader loader(
+    RespawnR1::R1MDLLoader loader(
             pScene,
             mIOHandler,
             mBuffer,
@@ -2007,9 +2008,11 @@ void MDLImporter::InternReadFile_Titanfall1(const std::string &pFile) {
 // ------------------------------------------------------------------------------------------------
 // Read a Titanfall 1 MDL
 void MDLImporter::InternReadFile_Titanfall2(const std::string &pFile) {
-    // Read header and check version here
-    // Make this a generic respawn mdl reader?
-    throw DeadlyImportError("Titanfall2 mdl not supported yet!");
+    RespawnR2::R2MDLLoader loader(
+            pScene,
+            mIOHandler,
+            mBuffer,
+            pFile);
 }
 
 // ------------------------------------------------------------------------------------------------

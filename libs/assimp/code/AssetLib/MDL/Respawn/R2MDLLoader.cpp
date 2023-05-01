@@ -8,7 +8,7 @@ Copyright (c) 2006-2021, assimp team
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
-with or without modification, are permitted provided that the following
+with or without modification, are R2 provided that the following
 conditions are met:
 
 * Redistributions of source code must retain the above
@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  @brief Implementation for the Half-Life 1 MDL loader.
  */
 
-#include "R1MDLLoader.h"
+#include "R2MDLLoader.h"
 
 #include <assimp/BaseImporter.h>
 #include <assimp/StringUtils.h>
@@ -58,10 +58,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace Assimp {
 namespace MDL {
-namespace RespawnR1 {
+namespace RespawnR2 {
 
 // ------------------------------------------------------------------------------------------------
-R1MDLLoader::R1MDLLoader(
+R2MDLLoader::R2MDLLoader(
     aiScene *scene,
     IOSystem *io,
     const unsigned char *buffer,
@@ -71,37 +71,24 @@ R1MDLLoader::R1MDLLoader(
     mdl_buffer_(buffer),
     file_path_(file_path),
     header_(nullptr),
-    header2_(nullptr),
     mdl_bodyparts_(nullptr),
-    mdl_stringtable_(nullptr),
     vtx_buffer_(nullptr),
     vvd_buffer_(nullptr) {
     load_mdl_file();
-    load_vtx_file();
-    load_vvd_file();
     parse_mdl_file();
 }
 
 // ------------------------------------------------------------------------------------------------
-R1MDLLoader::~R1MDLLoader() {
+R2MDLLoader::~R2MDLLoader() {
     release_resources();
 }
 
 // ------------------------------------------------------------------------------------------------
-void R1MDLLoader::release_resources() {
-    if(vtx_buffer_) {
-        delete[] vtx_buffer_;
-        vtx_buffer_ = nullptr;
-    }
-
-    if(vvd_buffer_) {
-        delete[] vvd_buffer_;
-        vvd_buffer_ = nullptr;
-    }
+void R2MDLLoader::release_resources() {
 }
 
 // ------------------------------------------------------------------------------------------------
-void R1MDLLoader::parse_mdl_file() {
+void R2MDLLoader::parse_mdl_file() {
     if(header_->numbodyparts != vtx_header_->numBodyParts)
         throw DeadlyImportError("MDL and VTX num bodyparts mismatch!");
     
@@ -230,73 +217,22 @@ void R1MDLLoader::parse_mdl_file() {
 }
 
 // ------------------------------------------------------------------------------------------------
-void R1MDLLoader::load_mdl_file() {
+void R2MDLLoader::load_mdl_file() {
     header_ = (const studiohdr_t *)mdl_buffer_;
 
     if(!header_->numbodyparts)
         throw DeadlyImportError("Model has no bodyparts in mdl!");
 
-    header2_ = (const studiohdr2_t *)(mdl_buffer_ + (int)header_->studiohdr2index);
     mdl_bodyparts_ = (const mstudiobodyparts_t*)(mdl_buffer_ + header_->bodypartindex);
 
-    if(header2_->sznameindex == 0) {
-        mdl_stringtable_ = (const char *)(mdl_buffer_ + (int)header_->surfacepropindex - 1);
-    } else {
-        mdl_stringtable_ = (const char *)(mdl_buffer_ + (int)header2_->sznameindex - 1 + (int)header_->studiohdr2index);
-    }
-}
-
-// ------------------------------------------------------------------------------------------------
-void R1MDLLoader::load_vtx_file() {
-    std::string vtx_file_path =
-            DefaultIOSystem::absolutePath(file_path_) +
-            io_->getOsSeparator() +
-            DefaultIOSystem::completeBaseName(file_path_) +
-            ".dx11.vtx";
-    
-    if(!io_->Exists(vtx_file_path)) {
-        throw DeadlyImportError("Missing VTX file ", DefaultIOSystem::fileName(vtx_file_path));
-    }
-
-    std::unique_ptr<IOStream> file(io_->Open(vtx_file_path));
-
-    if (file.get() == nullptr) {
-        throw DeadlyImportError("Failed to open VTX file ", DefaultIOSystem::fileName(vtx_file_path));
-    }
-
-    const size_t file_size = file->FileSize();
-    vtx_buffer_ = new unsigned char[1 + file_size];
-    file->Read((void *)vtx_buffer_, 1, file_size);
-    vtx_buffer_[file_size] = '\0';
+    vtx_buffer_ = (const unsigned char *)(mdl_buffer_ + header_->vtxindex);
 
     vtx_header_ = (const FileHeader_t *)vtx_buffer_;
 
     if(vtx_header_->version != 7)
         throw DeadlyImportError("Unknown VTX header version!");
-}
 
-// ------------------------------------------------------------------------------------------------
-void R1MDLLoader::load_vvd_file() {
-    std::string vvd_file_path =
-            DefaultIOSystem::absolutePath(file_path_) +
-            io_->getOsSeparator() +
-            DefaultIOSystem::completeBaseName(file_path_) +
-            ".vvd";
-    
-    if(!io_->Exists(vvd_file_path)) {
-        throw DeadlyImportError("Missing VVD file ", DefaultIOSystem::fileName(vvd_file_path));
-    }
-
-    std::unique_ptr<IOStream> file(io_->Open(vvd_file_path));
-
-    if (file.get() == nullptr) {
-        throw DeadlyImportError("Failed to open VVD file ", DefaultIOSystem::fileName(vvd_file_path));
-    }
-
-    const size_t file_size = file->FileSize();
-    vvd_buffer_ = new unsigned char[1 + file_size];
-    file->Read((void *)vvd_buffer_, 1, file_size);
-    vvd_buffer_[file_size] = '\0';
+    vvd_buffer_ = (const unsigned char *)(mdl_buffer_ + header_->vvdindex);
 
     vvd_header_ = (const vertexFileHeader_t *)vvd_buffer_;
 

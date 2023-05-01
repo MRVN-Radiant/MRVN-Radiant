@@ -43,11 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  @brief Declaration of the Half-Life 1 MDL loader.
  */
 
-#ifndef AI_R1MDLLOADER_INCLUDED
-#define AI_R1MDLLOADER_INCLUDED
+#ifndef AI_R2MDLLOADER_INCLUDED
+#define AI_R2MDLLOADER_INCLUDED
 
 
-#include "R1MDLFileData.h"
+#include "R2MDLFileData.h"
 
 #include <memory>
 #include <string>
@@ -61,21 +61,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace Assimp {
 namespace MDL {
-namespace RespawnR1 {
+namespace RespawnR2 {
 
-class R1MDLLoader {
+class R2MDLLoader {
 public:
-    R1MDLLoader() = delete;
-    R1MDLLoader(const R1MDLLoader &) = delete;
+    R2MDLLoader() = delete;
+    R2MDLLoader(const R2MDLLoader &) = delete;
 
     /** See variables descriptions at the end for more details. */
-    R1MDLLoader(
+    R2MDLLoader(
         aiScene *scene,
         IOSystem *io,
         const unsigned char *buffer,
         const std::string &file_path);
 
-    ~R1MDLLoader();
+    ~R2MDLLoader();
 
 protected:
     /** \brief Validate the header data structure of a Half-Life 1 MDL file.
@@ -84,8 +84,6 @@ protected:
      *   texture file.
      */
     void load_mdl_file();
-    void load_vtx_file();
-    void load_vvd_file();
     void parse_mdl_file();
     //void validate_header(const Header_HL1 *header, bool is_texture_header);
     void release_resources();
@@ -107,9 +105,6 @@ private:
     /** Main MDL header. */
     const studiohdr_t *header_;
 
-    /** MDL header. */
-    const studiohdr2_t *header2_;
-
     /** MDL bodyparts. */
     const mstudiobodyparts_t *mdl_bodyparts_;
 
@@ -117,13 +112,13 @@ private:
     const char *mdl_stringtable_;
 
     /** VTX file buffer class. */
-    unsigned char *vtx_buffer_;
+    const unsigned char *vtx_buffer_;
 
     /** VTX header */
     const FileHeader_t *vtx_header_;
 
     /** VVD file buffer class. */
-    unsigned char *vvd_buffer_;
+    const unsigned char *vvd_buffer_;
 
     /** VVD header */
     const vertexFileHeader_t *vvd_header_;
@@ -139,4 +134,4 @@ private:
 } // namespace MDL
 } // namespace Assimp
 
-#endif // AI_R1MDLLOADER_INCLUDED
+#endif // AI_R2MDLLOADER_INCLUDED
