@@ -244,12 +244,15 @@ void MDLImporter::InternReadFile(const std::string &pFile,
             if (iFileVersion == AI_MDL_VERSION_R1) {
                 ASSIMP_LOG_DEBUG("MDL subtype: Titanfall1 MDL");
                 InternReadFile_Titanfall1(pFile);
+                is_half_life = true;
             } else if (iFileVersion == AI_MDL_VERSION_R2) {
                 ASSIMP_LOG_DEBUG("MDL subtype: Titanfall2 MDL");
                 InternReadFile_Titanfall2(pFile);
+                is_half_life = true;
             } else if(iFileVersion == AI_MDL_VERSION_R5) {
                 ASSIMP_LOG_DEBUG("MDL subtype: Titanfall3 MDL");
                 InternReadFile_ApexLegends(pFile);
+                is_half_life = true;
             } else {
                 throw DeadlyImportError("Unknown MDL version ", pFile, ". Version: ", iFileVersion );
             }
