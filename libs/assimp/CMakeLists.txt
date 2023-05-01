@@ -306,6 +306,8 @@ IF ( IOS AND NOT ASSIMP_HUNTER_ENABLED)
   ENDIF()
 ENDIF()
 
+SET(CMAKE_CXX_FLAGS "-Wno-dangling-reference ${CMAKE_CXX_FLAGS}" )
+
 IF (ASSIMP_COVERALLS)
   MESSAGE(STATUS "Coveralls enabled")
   INCLUDE(Coveralls)
