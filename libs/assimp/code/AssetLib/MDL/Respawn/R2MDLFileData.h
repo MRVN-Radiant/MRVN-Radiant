@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MAX_NUM_LODS 8
 #define MAX_NUM_BONES_PER_VERT 3
 
+#include <assimp/Compiler/pushpack1.h>
 #include <assimp/types.h>
 
 namespace Assimp {
@@ -247,8 +248,7 @@ struct studiohdr_t
 	int32_t bonefollowerindex;
 
     int32_t unused1[60];
-
-};
+} PACK_STRUCT;
 
 struct mstudiotexture_t
 {
@@ -258,7 +258,7 @@ struct mstudiotexture_t
 	int32_t used;
 
 	int32_t unused[8];
-};
+} PACK_STRUCT;
 
 struct mstudiobodyparts_t
 {
@@ -266,7 +266,7 @@ struct mstudiobodyparts_t
     int32_t nummodels;
     int32_t base;
     int32_t modelindex; // index into models array
-};
+} PACK_STRUCT;
 
 struct mstudiomodel_t
 {
@@ -300,14 +300,14 @@ struct mstudiomodel_t
                   // offset by uv2index number of bytes into vvc secondary uv map
 
     int32_t unused[4];
-};
+} PACK_STRUCT;
 
 struct mstudio_meshvertexloddata_t
 {
     int32_t modelvertexdataUnusedPad; // likely has none of the funny stuff because unused
 
     int32_t numLODVertexes[MAX_NUM_LODS]; // depreciated starting with rmdl v14(?)
-};
+} PACK_STRUCT;
 
 struct mstudiomesh_t
 {
@@ -338,7 +338,7 @@ struct mstudiomesh_t
     char unk[8]; // set on load
 
 	int32_t unused[6]; // remove as appropriate
-};
+} PACK_STRUCT;
 
 // ------------------------------------------------------------------------------------------------
 // vtx
@@ -365,21 +365,21 @@ struct FileHeader_t
     // Defines the size and location of the body part array
     int32_t numBodyParts;
     int32_t bodyPartOffset;
-};
+} PACK_STRUCT;
 
 struct BodyPartHeader_t
 {
     // Model array
     int32_t numModels;
     int32_t modelOffset;
-};
+} PACK_STRUCT;
 
 struct ModelHeader_t
 {
     //LOD mesh array
     int32_t numLODs;   //This is also specified in FileHeader_t
     int32_t lodOffset;
-};
+} PACK_STRUCT;
 
 struct ModelLODHeader_t
 {
@@ -388,15 +388,15 @@ struct ModelLODHeader_t
     int32_t meshOffset;
 
     float switchPoint;
-};
+} PACK_STRUCT;
 
-struct __attribute__ ((packed)) MeshHeader_t
+struct MeshHeader_t
 {
     int32_t numStripGroups;
     int32_t stripGroupHeaderOffset;
 
     uint8_t flags;
-};
+} PACK_STRUCT;
 
 struct StripGroupHeader_t
 {
@@ -416,7 +416,7 @@ struct StripGroupHeader_t
     // Points to an array of unsigned shorts (16 bits each)
     int32_t numTopologyIndices;
     int32_t topologyOffset;
-};
+} PACK_STRUCT;
 
 struct StripHeader_t
 {
@@ -436,9 +436,9 @@ struct StripHeader_t
     // MDL Version 49 and up only
     int32_t numTopologyIndices;
     int32_t topologyOffset;
-};
+} PACK_STRUCT;
 
-struct __attribute__ ((packed)) Vertex_t
+struct Vertex_t
 {
     // these index into the mesh's vert[origMeshVertID]'s bones
     uint8_t boneWeightIndex[MAX_NUM_BONES_PER_VERT];
@@ -449,7 +449,7 @@ struct __attribute__ ((packed)) Vertex_t
     // for sw skinned verts, these are indices into the global list of bones
     // for hw skinned verts, these are hardware bone indices
     uint8_t boneID[MAX_NUM_BONES_PER_VERT];
-};
+} PACK_STRUCT;
 
 // ------------------------------------------------------------------------------------------------
 // vvd
@@ -470,22 +470,24 @@ struct vertexFileHeader_t
     int32_t fixupTableStart; // offset from base to fixup table
     int32_t vertexDataStart; // offset from base to vertex block
     int32_t tangentDataStart; // offset from base to tangent block
-};
+} PACK_STRUCT;
 
-struct __attribute__ ((packed)) mstudioboneweight_t
+struct mstudioboneweight_t
 {
     float	weight[MAX_NUM_BONES_PER_VERT];
     unsigned char bone[MAX_NUM_BONES_PER_VERT]; // set to unsigned so we can read it
     uint8_t	numbones;
-};
+} PACK_STRUCT;
 
-struct __attribute__ ((packed)) mstudiovertex_t
+struct mstudiovertex_t
 {
     mstudioboneweight_t	m_BoneWeights;
     vec3_t m_vecPosition;
     vec3_t m_vecNormal;
     vec2_t m_vecTexCoord;
-};
+} PACK_STRUCT;
+
+#include <assimp/Compiler/poppack1.h>
 
 } // namespace Respawn
 } // namespace MDL
