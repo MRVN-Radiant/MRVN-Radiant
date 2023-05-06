@@ -186,13 +186,14 @@ void R2MDLLoader::parse_mdl_file() {
                         pMesh->mNumVertices = stripGroupHeader->numVerts;
                         pMesh->mVertices = new aiVector3D[pMesh->mNumVertices];
                         pMesh->mNormals = new aiVector3D[pMesh->mNumVertices];
-                        //pMesh->mTangents = new aiVector3D[pMesh->mNumVertices];
-                        //pMesh->mBitangents = new aiVector3D[pMesh->mNumVertices];
+                        pMesh->mTextureCoords[0] = new aiVector3D[pMesh->mNumVertices];
+                        pMesh->mNumUVComponents[0] = 2;
                         for(unsigned int v = 0; v < pMesh->mNumVertices; v++) {
                             const Vertex_t *vert = (const Vertex_t *)((const char *)stripGroupHeader + stripGroupHeader->vertOffset + sizeof(Vertex_t) * v);
                             const mstudiovertex_t *stdioVert = reinterpret_cast<const mstudiovertex_t* const>((char*)vertices_ + mdl_model->vertexindex + ((mdl_mesh->vertexoffset + vert->origMeshVertID) * sizeof(mstudiovertex_t)));
                             pMesh->mVertices[v] = aiVector3D(stdioVert->m_vecPosition[0], stdioVert->m_vecPosition[1], stdioVert->m_vecPosition[2]);
                             pMesh->mNormals[v] = aiVector3D(stdioVert->m_vecNormal[0], stdioVert->m_vecNormal[1], stdioVert->m_vecNormal[2]);
+                            pMesh->mTextureCoords[0][v] = aiVector3D(stdioVert->m_vecTexCoord[0], stdioVert->m_vecTexCoord[1], 0.0);
                         }
 
                         // Build faces
