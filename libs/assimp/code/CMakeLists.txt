@@ -453,6 +453,9 @@ ADD_ASSIMP_IMPORTER( MDL
   AssetLib/MDL/Respawn/R2MDLLoader.cpp
   AssetLib/MDL/Respawn/R2MDLLoader.h
   AssetLib/MDL/Respawn/R2MDLFileData.h
+  AssetLib/MDL/Respawn/R5MDLLoader.cpp
+  AssetLib/MDL/Respawn/R5MDLLoader.h
+  AssetLib/MDL/Respawn/R5MDLFileData.h
 )
 
 SET( MaterialSystem_SRCS

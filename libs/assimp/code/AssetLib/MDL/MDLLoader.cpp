@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssetLib/MDL/HalfLife/HL1MDLLoader.h"
 #include "AssetLib/MDL/Respawn/R1MDLLoader.h"
 #include "AssetLib/MDL/Respawn/R2MDLLoader.h"
+#include "AssetLib/MDL/Respawn/R5MDLLoader.h"
 #include "AssetLib/MDL/MDLDefaultColorMap.h"
 
 #include <assimp/StringUtils.h>
@@ -2021,9 +2022,11 @@ void MDLImporter::InternReadFile_Titanfall2(const std::string &pFile) {
 // ------------------------------------------------------------------------------------------------
 // Read a Apex Legends RMDL
 void MDLImporter::InternReadFile_ApexLegends(const std::string &pFile) {
-    // Read header and check version here
-    // Make this a generic respawn mdl reader?
-    throw DeadlyImportError("Apex Legends rmdl not supported yet!");
+    RespawnR5::R5MDLLoader loader(
+            pScene,
+            mIOHandler,
+            mBuffer,
+            pFile);
 }
 
 #endif // !! ASSIMP_BUILD_NO_MDL_IMPORTER
