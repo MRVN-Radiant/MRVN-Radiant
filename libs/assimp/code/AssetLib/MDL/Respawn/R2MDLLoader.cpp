@@ -112,7 +112,7 @@ void R2MDLLoader::parse_mdl_file() {
         const BodyPartHeader_t *vtx_bodypart = (const BodyPartHeader_t *)(vtx_buffer_ + vtx_header_->bodyPartOffset + sizeof(BodyPartHeader_t) * i);
         for(int j = 0; j < vtx_bodypart->numModels; j++) {
             const ModelHeader_t *vtx_model = (const ModelHeader_t *)((const char *)vtx_bodypart + vtx_bodypart->modelOffset + sizeof(ModelHeader_t) * j);
-            for(int k = 0; k < vtx_model->numLODs; k++) {
+            for(int k = 0; k < 1 /*vtx_model->numLODs*/; k++) {
                 const ModelLODHeader_t *vtx_lod_header = (const ModelLODHeader_t *)((const char *)vtx_model + vtx_model->lodOffset + sizeof(ModelLODHeader_t) * k);
                 for(int l = 0; l < vtx_lod_header->numMeshes; l++) {
                     const MeshHeader_t *mesh = (const MeshHeader_t *)((const char *)vtx_lod_header + vtx_lod_header->meshOffset + sizeof(MeshHeader_t) * l);
@@ -149,12 +149,12 @@ void R2MDLLoader::parse_mdl_file() {
             const mstudiomodel_t *mdl_model = (const mstudiomodel_t *)((const char*)mdl_bodypart + mdl_bodypart->modelindex + sizeof(mstudiomodel_t) * j);
 
             aiNode *pModelNode = new aiNode();
-            pModelNode->mNumChildren = vtx_model->numLODs;
-            pModelNode->mChildren = new aiNode *[vtx_model->numLODs];
+            pModelNode->mNumChildren = 1 /*vtx_model->numLODs*/;
+            pModelNode->mChildren = new aiNode *[1 /*vtx_model->numLODs*/];
             pBodyPartNode->mChildren[j] = pModelNode;
             pModelNode->mParent = pBodyPartNode;
 
-            for(int k = 0; k < vtx_model->numLODs; k++) {
+            for(int k = 0; k < 1 /*vtx_model->numLODs*/; k++) {
                 const ModelLODHeader_t *vtx_lod_header = (const ModelLODHeader_t *)((const char *)vtx_model + vtx_model->lodOffset + sizeof(ModelLODHeader_t) * k);
                 
                 aiNode *pModelLODHeaderNode = new aiNode();

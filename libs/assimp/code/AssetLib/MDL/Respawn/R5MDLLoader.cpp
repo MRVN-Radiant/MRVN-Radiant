@@ -159,7 +159,7 @@ void R5MDLLoader::parse_mdl_file() {
         throw DeadlyImportError("VG has no LOD Headers!");
     
     int iCurrentMesh = 0;
-    for(int k = 0; k < vg_header_->numLODs; k++) {
+    for(int k = 0; k < 1 /*vg_header_->numLODs*/; k++) {
         const ModelLODHeader_t *lod = (const ModelLODHeader_t *)(vg_buffer_ + vg_header_->lodOffset + sizeof(ModelLODHeader_t) * k);
         for(int l = 0; l < lod->numMeshes; l++) {
             const MeshHeader_VG_t *vg_mesh = (const MeshHeader_VG_t *)(vg_buffer_ + vg_header_->meshOffset + sizeof(MeshHeader_VG_t) * l + lod->meshOffset * sizeof(MeshHeader_VG_t));
@@ -192,12 +192,12 @@ void R5MDLLoader::parse_mdl_file() {
             const mstudiomodel_t *model = (const mstudiomodel_t *)((const char*)bodypart + bodypart->modelindex + sizeof(mstudiomodel_t) * j);
 
             aiNode *pModelNode = new aiNode();
-            pModelNode->mNumChildren = vg_header_->numLODs;
-            pModelNode->mChildren = new aiNode *[vg_header_->numLODs];
+            pModelNode->mNumChildren = 1 /*vg_header_->numLODs*/;
+            pModelNode->mChildren = new aiNode *[1 /*vg_header_->numLODs*/];
             pBodyPartNode->mChildren[j] = pModelNode;
             pModelNode->mParent = pBodyPartNode;
 
-            for(int k = 0; k < vg_header_->numLODs; k++) {
+            for(int k = 0; k < 1 /*vg_header_->numLODs*/; k++) {
                 const ModelLODHeader_t *lod = (const ModelLODHeader_t *)(vg_buffer_ + vg_header_->lodOffset + sizeof(ModelLODHeader_t) * k);
 
                 aiNode *pModelLODNode = new aiNode();
