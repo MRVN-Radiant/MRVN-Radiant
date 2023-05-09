@@ -111,6 +111,9 @@ private:
 
     /** VG file buffer class. */
     unsigned char *vg_buffer_;
+
+    /** VG File header */
+    const VertexGroupHeader_t *vg_header_;
 };
 
 } // namespace Respawn

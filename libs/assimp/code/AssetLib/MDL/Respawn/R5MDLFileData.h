@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /**
- * Structs taken from https://github.com/IJARika/respawn-mdl with permission
+ * Structs taken from https://github.com/IJARika/respawn-mdl and https://github.com/r-ex/r5templates with permission
  */
 
 #ifndef AI_R5FILEDATA_INCLUDED
@@ -340,9 +340,170 @@ struct mstudiomesh_t
 	char unk[8]; // these are suposed to be filled on load, however this isn't true??
 } PACK_STRUCT;
 
+struct mstudiotexture_t
+{
+	int32_t sznameindex;
+	uint64_t guid;
+} PACK_STRUCT;
+
 // ------------------------------------------------------------------------------------------------
 // vg
+struct VertexGroupHeader_t
+{
+	int id;		// 0x47567430	'0tvg'
+    //int32_t id <fgcolor=cLtGreen>;             // 0x47567430	'0tvg'
+	int32_t version;	    // 0x1
+	int32_t unk;	        // Usually 0
+	int32_t dataSize;	// Total size of data + header in starpak
 
+	int64_t boneStateChangeOffset; // offset to bone remap buffer
+	int64_t numBoneStateChanges;  // number of "bone remaps" (size: 1)
+
+	int64_t meshOffset;   // offset to mesh buffer
+	int64_t numMeshes;    // number of meshes (size: 0x48)
+
+	int64_t indexOffset;     // offset to index buffer
+	int64_t numIndices;      // number of indices (size: 2 (uint16_t))
+
+	int64_t vertOffset;    // offset to vertex buffer
+	int64_t numVerts;     // number of bytes in vertex buffer
+
+	int64_t extraBoneWeightOffset;   // offset to extended weights buffer
+	int64_t extraBoneWeightSize;    // number of bytes in extended weights buffer
+
+    // there is one for every LOD mesh
+    // i.e, unknownCount == lod.meshCount for all LODs
+	int64_t unknownOffset;   // offset to buffer
+	int64_t numUnknown;    // count (size: 0x30)
+
+	int64_t lodOffset;       // offset to LOD buffer
+	int64_t numLODs;        // number of LODs (size: 0x8)
+
+	int64_t legacyWeightOffset;	// seems to be an offset into the "external weights" buffer for this mesh
+	int64_t numLegacyWeights;   // seems to be the number of "external weights" that this mesh uses
+
+	int64_t stripOffset;    // offset to strips buffer
+	int64_t numStrips;     // number of strips (size: 0x23)
+
+    int32_t unused[16];
+} PACK_STRUCT;
+
+struct ModelLODHeader_t
+{
+	int16_t meshOffset;
+	int16_t numMeshes;
+	float switchPoint;
+} PACK_STRUCT;
+
+struct MeshHeader_VG_t
+{
+	int64_t flags;	// mesh flags
+
+	int32_t vertOffset;			    // start offset for this mesh's vertices
+	int32_t vertCacheSize;		    // number of bytes used from the vertex buffer
+	int32_t numVerts;			    // number of vertices
+
+	int32_t unk1; 
+
+	int32_t extraBoneWeightOffset;	// start offset for this mesh's "extended weights"
+	int32_t extraBoneWeightSize;    // size or count of extended weights
+
+	int32_t indexOffset;			// start offset for this mesh's "indices"
+	int32_t numIndices;				// number of indices
+
+	int32_t legacyWeightOffset;	// seems to be an offset into the "external weights" buffer for this mesh
+	int32_t numLegacyWeights;   // seems to be the number of "external weights" that this mesh uses
+
+	int32_t stripOffset;        // Index into the strips structs
+	int32_t numStrips;
+
+    // might be stuff like topologies and or bonestates
+	int32_t unk[4];
+
+	/*int32_t numBoneStateChanges;
+	int32_t boneStateChangeOffset;
+	// MDL Version 49 and up only
+	int32_t numTopologyIndices;
+	int32_t topologyOffset;*/
+} PACK_STRUCT;
+
+struct StripHeader_t
+{
+	int32_t numIndices;
+	int32_t indexOffset;
+
+	int32_t numVerts;    
+	int32_t vertOffset;
+
+	int16_t numBones;
+
+	uint8_t flags;
+
+	int32_t numBoneStateChanges;
+	int32_t boneStateChangeOffset;
+
+	// MDL Version 49 and up only
+	int32_t numTopologyIndices;
+	int32_t topologyOffset;
+} PACK_STRUCT;
+
+#define VG_POSITION         0x1
+#define VG_PACKED_POSITION  0x2
+#define VG_VERTEX_COLOR     0x10
+#define VG_PACKED_WEIGHTS   0x5000
+#define VG_UV_LAYER2        0x200000000 // what
+
+struct PackedNormalTangent_t
+{
+    int32_t tangent : 10;
+    int32_t norm1 : 9;
+    int32_t norm2 : 9;
+    int32_t norm_sign : 1;
+    int32_t norm_dropped : 2;
+    int32_t binorm_sign : 1; // for tangent
+};
+
+struct Position_t
+{
+	vec3_t xyz;
+};
+
+struct PackedPosition_t
+{
+    uint64_t x : 21;// <read=Str("%f", (this * 0.0009765625) - 1024.0)>;
+    uint64_t y : 21;// <read=Str("%f", (this * 0.0009765625) - 1024.0)>;
+    uint64_t z : 22;// <read=Str("%f", (this * 0.0009765625) - 2048.0)>;
+};
+
+struct TexCoord_t
+{
+	vec2_t st;
+};
+
+struct mstudiovertex_packed_t
+{/*
+    if(mesh.flags & VG_POSITION)
+        Vector3 m_vecPosition;
+    else if(mesh.flags & VG_PACKED_POSITION)
+        Vector64 m_vecPositionPacked;
+
+    if(mesh.flags & VG_PACKED_WEIGHTS)
+        mstudiopackedboneweight_t m_BoneWeightsPacked;
+
+    PackedNormalTangent m_NormalTangentPacked <read=UnpackNormal2>; // packed normal
+    //DWORD m_NormalTangentPacked <read=UnpackNormal>; // packed normal
+
+    // vertex color from vvc
+    if(mesh.flags & VG_VERTEX_COLOR)
+        VertexColor_t m_color;
+
+    Vector2 m_vecTexCoord;
+
+    // same vector2 from vvc
+    if(mesh.flags & VG_UV_LAYER2)
+        Vector2 m_vecTexCoord2;
+*/
+} PACK_STRUCT;
 
 #include <assimp/Compiler/poppack1.h>
 
