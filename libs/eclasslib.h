@@ -141,7 +141,7 @@ public:
 
 	void name_set( const char* name_ ) {
 		m_name = name_;
-		miscmodel_is = ( string_equal_prefix_nocase( name(), "misc_" ) && string_equal_suffix_nocase( name(), "model" ) ) // misc_*model (also misc_model)
+		miscmodel_is = string_equal_nocase( name(), "prop_static" )
 		               || classname_equal( name(), "model_static" );
 	}
 	const char* name() const {

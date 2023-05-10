@@ -402,7 +402,7 @@ void UnparseEntities() {
         /* ydnar: certain entities get stripped from bsp file */
         const char *classname = e.classname();
         #define ENT_IS(x)  striEqual(classname, x)
-        if (ENT_IS("misc_model")
+        if (ENT_IS("prop_static")
          || ENT_IS("_decal")
          || ENT_IS("_skybox")) {
             continue;

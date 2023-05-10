@@ -130,7 +130,7 @@ void Titanfall::LoadAndParseGameLump(rbspHeader_t* header) {
     for( Titanfall::GameLumpProp_t &prop : Titanfall::Bsp::gameLumpProps ) {
         entity_t &model = Titanfall::Ent::entities.emplace_back();
 
-        model.setKeyValue( "classname", "misc_model" );
+        model.setKeyValue( "classname", "prop_static" );
         model.setKeyValue( "model", Titanfall::Bsp::gameLumpPaths.at( prop.modelName ).path );
         StringOutputStream ss;
         ss << prop.origin[0] << " " << prop.origin[1] << " " << prop.origin[2];

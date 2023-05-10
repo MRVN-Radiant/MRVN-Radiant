@@ -18,7 +18,7 @@ What we have:
 What is the current implementation of md3 support? Were are the important
 features that we will need to work with?
 
-"misc_model" is the required classname for any map object
+"prop_static" is the required classname for any map object
 
 entity_t::md3Class
 eclass_t  *md3Class;

@@ -180,7 +180,7 @@ void CompileR1BSPFile() {
             Titanfall::EmitLevelInfoWorldspawn();
 
             Titanfall::EndModel();
-        } else if (ENT_IS("misc_model")) { // Compile as static props into gamelump
+        } else if (ENT_IS("prop_static")) { // Compile as static props into gamelump
             // TODO: use prop_static instead
             // EmitProp(entity);
             continue; // Don't emit as entity
