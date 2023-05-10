@@ -93,30 +93,30 @@ void WriteR2BSPFile(const char *filename) {
     AddLump(file, header.lumps[R2_LUMP_MODELS],            Titanfall::Bsp::models);
     AddLump(file, header.lumps[R2_LUMP_VERTEX_NORMALS],    Titanfall::Bsp::vertexNormals);
     AddLump(file, header.lumps[R2_LUMP_ENTITY_PARTITIONS], Titanfall::Bsp::entityPartitions);
-    /* Game Lump */
-    /* {
-        std::size_t start = ftell(file);
-        header.lumps[R2_LUMP_GAME_LUMP].offset = start;
-        header.lumps[R2_LUMP_GAME_LUMP].length = 36
-                                               + Titanfall2::GameLump.pathCount * sizeof(Titanfall2::GameLump_Path)
-                                               + Titanfall2::GameLump.propCount * sizeof(Titanfall2::GameLump_Prop);
-        Titanfall2::GameLump.offset = start + 20;
-        Titanfall2::GameLump.length = 16
-                                    + Titanfall2::GameLump.pathCount * sizeof(Titanfall2::GameLump_Path)
-                                    + Titanfall2::GameLump.propCount * sizeof(Titanfall2::GameLump_Prop);
-        SafeWrite(file, &Titanfall2::GameLump, sizeof(Titanfall2::GameLump));
-        // need to write vectors separately
-        // paths
-        fseek(file, start + 24, SEEK_SET);
-        SafeWrite(file, Titanfall2::GameLump.paths.data(), 128 * Titanfall2::GameLump.pathCount);
-        //
-        SafeWrite(file, &Titanfall2::GameLump.propCount, 4);
-        SafeWrite(file, &Titanfall2::GameLump.propCount, 4);
-        SafeWrite(file, &Titanfall2::GameLump.propCount, 4);
-        // props
-        SafeWrite(file, Titanfall2::GameLump.props.data(), 64 * Titanfall2::GameLump.propCount);
-        SafeWrite(file, &Titanfall2::GameLump.unk5, 4);
-    }*/
+    // GameLump
+    {
+        header.lumps[R2_LUMP_GAME_LUMP].offset = ftell(file);
+        header.lumps[R2_LUMP_GAME_LUMP].length = sizeof(Titanfall2::GameLumpHeader_t)
+                                               + sizeof(Titanfall2::GameLumpPathHeader_t)
+                                               + sizeof(Titanfall::GameLumpPath_t) * Titanfall2::Bsp::gameLumpPathHeader.numPaths
+                                               + sizeof(Titanfall2::GameLumpPropHeader_t)
+                                               + sizeof(Titanfall2::GameLumpProp_t) * Titanfall2::Bsp::gameLumpPropHeader.numProps
+                                               + sizeof(Titanfall2::GameLumpUnknownHeader_t);
+
+        Titanfall2::Bsp::gameLumpHeader.offset = ftell(file) + sizeof(Titanfall2::GameLumpHeader_t);
+        Titanfall2::Bsp::gameLumpHeader.length = sizeof(Titanfall2::GameLumpPathHeader_t)
+                                              + sizeof(Titanfall::GameLumpPath_t) * Titanfall2::Bsp::gameLumpPathHeader.numPaths
+                                              + sizeof(Titanfall2::GameLumpPropHeader_t)
+                                              + sizeof(Titanfall2::GameLumpProp_t) * Titanfall2::Bsp::gameLumpPropHeader.numProps
+                                              + sizeof(Titanfall2::GameLumpUnknownHeader_t);
+
+        SafeWrite(file, &Titanfall2::Bsp::gameLumpHeader, sizeof(Titanfall2::GameLumpHeader_t));
+        SafeWrite(file, &Titanfall2::Bsp::gameLumpPathHeader, sizeof(Titanfall2::GameLumpPathHeader_t));
+        SafeWrite(file, Titanfall::Bsp::gameLumpPaths.data(), sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPaths.size());
+        SafeWrite(file, &Titanfall2::Bsp::gameLumpPropHeader, sizeof(Titanfall2::GameLumpPropHeader_t));
+        SafeWrite(file, Titanfall2::Bsp::gameLumpProps.data(), sizeof(Titanfall2::GameLumpProp_t) * Titanfall2::Bsp::gameLumpProps.size());
+        SafeWrite(file, &Titanfall2::Bsp::gameLumpUnknownHeader, sizeof(Titanfall2::GameLumpUnknownHeader_t));
+    }
     AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_DATA],  Titanfall::Bsp::textureDataData);
     AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_TABLE], Titanfall::Bsp::textureDataTable);
     AddLump(file, header.lumps[R2_LUMP_WORLD_LIGHTS],              Titanfall2::Bsp::worldLights_stub);  // stub
@@ -173,6 +173,8 @@ void WriteR2BSPFile(const char *filename) {
    Compiles a Titanfall 2 bsp file and sorts entities into ent files
 */
 void CompileR2BSPFile() {
+    Titanfall2::SetUpGameLump();
+
     for (entity_t &entity : entities) {
         const char *pszClassname = entity.classname();
 
@@ -196,7 +198,7 @@ void CompileR2BSPFile() {
         /* props for gamelump */
         } else if (ENT_IS("prop_static")) { // Compile as static props into gamelump
             // TODO: use prop_static instead
-            // EmitProp(entity);
+            Titanfall2::EmitStaticProp(entity);
             continue; // Don't emit as entity
         } else if (ENT_IS("func_occluder")) {
             Titanfall::EmitOcclusionMeshes( entity );
@@ -230,7 +232,7 @@ void CompileR2BSPFile() {
     Titanfall::EmitVisTree();
 
     // Emit level info
-    Titanfall::EmitLevelInfo();
+    Titanfall2::EmitLevelInfo();
 
     // Emit lumps we dont generate yet, but need for the map to load
     Titanfall2::EmitStubs();

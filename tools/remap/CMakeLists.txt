@@ -40,6 +40,7 @@ add_executable(remap
                source/titanfall/titanfall_vis.cpp
                source/titanfall/titanfall.cpp
                source/titanfall/titanfall.h
+               source/titanfall2/titanfall2_vis.cpp
                source/titanfall2/titanfall2.cpp
                source/titanfall2/titanfall2.h
                source/brush.cpp
