@@ -18,7 +18,7 @@
   shaderpath="shaders"
   archivetypes="pk3"
   texturetypes="tga jpg png dds"
-  modeltypes="md3 ase lwo obj 3ds 3d 3mf ac ac3d acc amf ask assbin b3d blend bvh cob csm dae dxf enff fbx glb gltf hmp iqm irr irrmesh lws lxo m3d md2 md5mesh mdc mdl mesh mesh.xml mot ms3d ndo nff off ply pmx prj q3o q3s raw scn sib smd stl ter uc vta x x3d x3db xgl xml zae zgl"
+  modeltypes="rmdl md3 ase lwo obj 3ds 3d 3mf ac ac3d acc amf ask assbin b3d blend bvh cob csm dae dxf enff fbx glb gltf hmp iqm irr irrmesh lws lxo m3d md2 md5mesh mdc mdl mesh mesh.xml mot ms3d ndo nff off ply pmx prj q3o q3s raw scn sib smd stl ter uc vta x x3d x3db xgl xml zae zgl"
   soundtypes="wav"
   maptypes="mapq3"
   shaders="quake3"

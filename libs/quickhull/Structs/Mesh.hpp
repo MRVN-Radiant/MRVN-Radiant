@@ -9,6 +9,7 @@
 #include <string>
 #include <array>
 #include <cassert>
+#include <cstdint>
 #include <limits>
 #include <memory>
 #include "VertexDataSource.hpp"
