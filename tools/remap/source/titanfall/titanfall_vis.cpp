@@ -22,6 +22,7 @@
    ------------------------------------------------------------------------------- */
 
 #include "../remap.h"
+#include "../model.h"
 #include "../bspfile_abstract.h"
 #include "titanfall.h"
 
@@ -504,6 +505,87 @@ void Titanfall::EmitLevelInfoWorldspawn() {
     
     if( li.firstDecalMeshIndex > li.firstTransMeshIndex )
         li.firstDecalMeshIndex = li.firstTransMeshIndex;
+}
+
+/*
+    EmitStaticProp()
+    Emits a static prop
+*/
+void Titanfall::EmitStaticProp(entity_t &e) {
+    const char *model = e.valueForKey("model");
+    int16_t pathIdx = -1;
+    MinMax minmax;
+
+    std::vector<const AssMeshWalker*> meshes = LoadModelWalker( model, 0 );
+    if(meshes.empty()) {
+        Sys_Warning("Failed to load model: %s\n", model);
+        return;
+    }
+
+    Sys_Printf("Emitting static prop: %s\n", model);
+
+    for(std::size_t i = 0; i < Titanfall::Bsp::gameLumpPaths.size(); i++) {
+        Titanfall::GameLumpPath_t &path = Titanfall::Bsp::gameLumpPaths.at(i);
+
+        if(!string_compare_nocase(path.path, model)) {
+            pathIdx = i;
+            break;
+        }
+    }
+
+    if(pathIdx == -1) {
+        Titanfall::Bsp::gameLumpPathHeader.numPaths++;
+        Titanfall::GameLumpPath_t &path = Titanfall::Bsp::gameLumpPaths.emplace_back();
+        strncpy(path.path, model, 127);
+        pathIdx = Titanfall::Bsp::gameLumpPaths.size() - 1;
+    }
+
+    Titanfall::Bsp::gameLumpPropHeader.numProps++;
+    Titanfall::Bsp::gameLumpPropHeader.unk1++;
+    Titanfall::GameLumpProp_t &prop = Titanfall::Bsp::gameLumpProps.emplace_back();
+    Vector3 origin;
+    Vector3 angles;
+    if(!e.read_keyvalue(origin, "origin")) {
+        origin.x() = 0.0f;
+        origin.y() = 0.0f;
+        origin.z() = 0.0f;
+    }
+    if(!e.read_keyvalue(angles, "angles")) {
+        angles.x() = 0.0f;
+        angles.y() = 0.0f;
+        angles.z() = 0.0f;
+    }
+
+    prop.origin = origin;
+    prop.angles = angles;
+    prop.scale = 1.0f;
+    prop.modelName = pathIdx;
+    prop.solid = 6;
+    prop.flags = 4;
+    prop.envCubemap = -1;
+    prop.forcedFadeScale = -1.0f;
+    prop.cpuLevel[0] = -1.0f;
+    prop.cpuLevel[1] = -1.0f;
+    prop.gpuLevel[0] = -1.0f;
+    prop.gpuLevel[1] = -1.0f;
+    prop.lightingOrigin.x() = 1.0f;
+    prop.lightingOrigin.y() = 1.0f;
+    prop.lightingOrigin.z() = 1.0f;
+    prop.disableX360 = -1;
+
+    for ( const auto mesh : meshes )
+    {
+        mesh->forEachFace( [&minmax, &origin]( const Vector3 ( &xyz )[3], const Vector2 ( &st )[3] ){
+			minmax.extend(xyz[0] + origin);
+            minmax.extend(xyz[1] + origin);
+            minmax.extend(xyz[2] + origin);
+		} );
+    }
+
+    Shared::visRef_t &ref = Shared::visRefs.emplace_back();
+
+    ref.minmax = minmax;
+    ref.index = Titanfall::Bsp::models.at(0).meshCount + Titanfall::Bsp::gameLumpProps.size() - 1;
 }
 
 /*

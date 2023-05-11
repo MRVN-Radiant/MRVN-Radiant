@@ -87,7 +87,7 @@ void WriteR1BSPFile(const char *filename) {
     AddLump(file, header.lumps[R1_LUMP_ENTITY_PARTITIONS], Titanfall::Bsp::entityPartitions);
     AddLump(file, header.lumps[R1_LUMP_PHYSICS_COLLIDE],   Titanfall::Bsp::physicsCollide_stub);  // stub
     AddLump(file, header.lumps[R1_LUMP_VERTEX_NORMALS],    Titanfall::Bsp::vertexNormals);
-    // GameLump Stub
+    // GameLump
     {
         header.lumps[R1_LUMP_GAME_LUMP].offset = ftell(file);
         header.lumps[R1_LUMP_GAME_LUMP].length = sizeof(Titanfall::GameLumpHeader_t)
@@ -99,14 +99,16 @@ void WriteR1BSPFile(const char *filename) {
 
         Titanfall::Bsp::gameLumpHeader.offset = ftell(file) + sizeof(Titanfall::GameLumpHeader_t);
         Titanfall::Bsp::gameLumpHeader.length = sizeof(Titanfall::GameLumpPathHeader_t)
-                                              + sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPathHeader.numPaths
-                                              + sizeof(Titanfall::GameLumpPropHeader_t)
-                                              + sizeof(Titanfall::GameLumpProp_t) * Titanfall::Bsp::gameLumpPropHeader.numProps
-                                              + sizeof(Titanfall::GameLumpUnknownHeader_t);
+                                               + sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPathHeader.numPaths
+                                               + sizeof(Titanfall::GameLumpPropHeader_t)
+                                               + sizeof(Titanfall::GameLumpProp_t) * Titanfall::Bsp::gameLumpPropHeader.numProps
+                                               + sizeof(Titanfall::GameLumpUnknownHeader_t);
 
         SafeWrite(file, &Titanfall::Bsp::gameLumpHeader, sizeof(Titanfall::GameLumpHeader_t));
         SafeWrite(file, &Titanfall::Bsp::gameLumpPathHeader, sizeof(Titanfall::GameLumpPathHeader_t));
+        SafeWrite(file, Titanfall::Bsp::gameLumpPaths.data(), sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPaths.size());
         SafeWrite(file, &Titanfall::Bsp::gameLumpPropHeader, sizeof(Titanfall::GameLumpPropHeader_t));
+        SafeWrite(file, Titanfall::Bsp::gameLumpProps.data(), sizeof(Titanfall::GameLumpProp_t) * Titanfall::Bsp::gameLumpProps.size());
         SafeWrite(file, &Titanfall::Bsp::gameLumpUnknownHeader, sizeof(Titanfall::GameLumpUnknownHeader_t));
     }
     AddLump(file, header.lumps[R1_LUMP_TEXTURE_DATA_STRING_DATA],    Titanfall::Bsp::textureDataData);
@@ -182,7 +184,7 @@ void CompileR1BSPFile() {
             Titanfall::EndModel();
         } else if (ENT_IS("prop_static")) { // Compile as static props into gamelump
             // TODO: use prop_static instead
-            // EmitProp(entity);
+            Titanfall::EmitStaticProp(entity);
             continue; // Don't emit as entity
         } else if (ENT_IS("func_occluder")) {
             Titanfall::EmitOcclusionMeshes( entity );

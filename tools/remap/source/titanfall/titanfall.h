@@ -41,6 +41,7 @@ void CompileR1BSPFile();
 
 namespace Titanfall {
     void         SetupGameLump();
+    void         EmitStaticProp(entity_t &e);
     void         BeginModel(entity_t &entity);
     void         EndModel();
     void         EmitEntity(const entity_t &e);
@@ -122,25 +123,32 @@ namespace Titanfall {
     };
 
     struct GameLumpPropHeader_t {
-        uint32_t numProps;
         uint32_t unk0;
+        uint32_t numProps;
         uint32_t unk1;
     };
 
     struct GameLumpProp_t {
-        Vector3   origin;
-        Vector3   angles;
-        float     scale;
-        uint16_t  modelName;
-        uint8_t   solidMode;
-        uint8_t   flags;
-        int8_t    unk[4];
-        float     fadeScale;
-        Vector3   lightingOrigin;
-        int8_t    cpuLevel[2];
-        int8_t    gpuLevel[2];
-        int8_t    diffuseModulation[4];
-        uint16_t  collisionFlags[2];
+        Vector3 origin;
+        Vector3 angles;
+        int16_t firstLeaf;
+        int16_t numLeaves;
+        int16_t modelName;
+        int8_t  solid;
+        int8_t  flags;
+        int16_t skin;
+        int16_t envCubemap;
+        float   fadeMinDist;
+        float   fadeMaxDist;
+        Vector3 lightingOrigin;
+        float   forcedFadeScale;
+        int8_t  cpuLevel[2];
+        int8_t  gpuLevel[2];
+        int32_t diffuseModulation;
+        int32_t disableX360;
+        float   scale;
+        int32_t collisionFlagsAdd;
+        int32_t collisionFlagsRemove;
     };
 
     struct GameLumpUnknownHeader_t {
