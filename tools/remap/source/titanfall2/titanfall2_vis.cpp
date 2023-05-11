@@ -88,15 +88,18 @@ void Titanfall2::EmitStaticProp(entity_t &e) {
     prop.origin = origin;
     prop.angles = angles;
     prop.scale = 1.0f;
-    prop.model_name = pathIdx;
+    prop.modelName = pathIdx;
+    prop.solid = 6;
+    prop.flags = 84;
+    prop.envCubemap = -1;
     prop.fade_scale = -1.0f;
     prop.cpu_level[0] = -1.0f;
     prop.cpu_level[1] = -1.0f;
     prop.gpu_level[0] = -1.0f;
     prop.gpu_level[1] = -1.0f;
     prop.unk.x() = 1.0f;
-    prop.unk.y() = 1.0f;
-    prop.unk.z() = 1.0f;
+    prop.unk.y() = 0.0f;
+    prop.unk.z() = 0.0f;
 
     for ( const auto mesh : meshes )
     {

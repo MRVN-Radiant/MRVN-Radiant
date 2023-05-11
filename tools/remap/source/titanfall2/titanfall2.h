@@ -77,13 +77,11 @@ namespace Titanfall2 {
         Vector3 origin;
         Vector3 angles;
         float   scale;
-        int16_t model_name;
-        int8_t  unk0;
-        int8_t  unk1;
-        int8_t  unk2;
-        int8_t  unk3;
-        int8_t  unk4;
-        int8_t  unk5;
+        int16_t modelName;
+        int8_t  solid; // size: 1
+        int8_t  flags; // size: 1
+        int16_t skin; // size: 2
+        int16_t envCubemap; // size: 2
         float   fade_scale;
         Vector3 unk; // lighting_origin ?
         int8_t  cpu_level[2]; // -1, -1

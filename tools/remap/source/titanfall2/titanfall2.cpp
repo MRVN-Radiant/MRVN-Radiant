@@ -228,7 +228,7 @@ void CompileR2BSPFile() {
 
     // Generate vis tree for worldspawn, we do this here as we'll need portals once we reverse further
     Shared::visRoot = Shared::MakeVisTree(Shared::visRefs, 1e30f);
-    Shared::MergeVisTree(Shared::visRoot);
+    //Shared::MergeVisTree(Shared::visRoot);
     Titanfall::EmitVisTree();
 
     // Emit level info
