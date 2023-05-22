@@ -129,7 +129,7 @@ public:
 };
 
 
-const char EXCLUDE_NAME[] = "misc_model";
+const char EXCLUDE_NAME[] = "prop_static";
 
 class MiscModel :
 	public Snappable

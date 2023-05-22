@@ -87,20 +87,29 @@ void WriteR5BSPFile(const char *filename) {
     AddLump(file, header.lumps[R5_LUMP_ENTITY_PARTITIONS],        Titanfall::Bsp::entityPartitions);
     AddLump(file, header.lumps[R5_LUMP_VERTEX_NORMALS],           Titanfall::Bsp::vertexNormals);
 
-    // GameLump Stub
+    // GameLump
     {
         header.lumps[R5_LUMP_GAME_LUMP].offset = ftell(file);
-        header.lumps[R5_LUMP_GAME_LUMP].length = 40;
+        header.lumps[R5_LUMP_GAME_LUMP].length = sizeof(Titanfall2::GameLumpHeader_t)
+                                               + sizeof(Titanfall2::GameLumpPathHeader_t)
+                                               + sizeof(Titanfall::GameLumpPath_t) * Titanfall2::Bsp::gameLumpPathHeader.numPaths
+                                               + sizeof(Titanfall2::GameLumpPropHeader_t)
+                                               + sizeof(Titanfall2::GameLumpProp_t) * Titanfall2::Bsp::gameLumpPropHeader.numProps
+                                               + sizeof(Titanfall2::GameLumpUnknownHeader_t);
 
-        ApexLegends::GameLump_Stub_t gameLump_stub;
-        SafeWrite(file, &gameLump_stub.version, 4);
-        memcpy(gameLump_stub.magic, "prps", 4);
-        SafeWrite(file, &gameLump_stub.magic, 4);
-        SafeWrite(file, &gameLump_stub.const0, 4);
-        gameLump_stub.offset = LittleLong(ftell(file) + 8);
-        SafeWrite(file, &gameLump_stub.offset, 4);
-        SafeWrite(file, &gameLump_stub.length, 4);
-        SafeWrite(file, &gameLump_stub.zeros, 20);
+        Titanfall2::Bsp::gameLumpHeader.offset = ftell(file) + sizeof(Titanfall2::GameLumpHeader_t);
+        Titanfall2::Bsp::gameLumpHeader.length = sizeof(Titanfall2::GameLumpPathHeader_t)
+                                              + sizeof(Titanfall::GameLumpPath_t) * Titanfall2::Bsp::gameLumpPathHeader.numPaths
+                                              + sizeof(Titanfall2::GameLumpPropHeader_t)
+                                              + sizeof(Titanfall2::GameLumpProp_t) * Titanfall2::Bsp::gameLumpPropHeader.numProps
+                                              + sizeof(Titanfall2::GameLumpUnknownHeader_t);
+
+        SafeWrite(file, &Titanfall2::Bsp::gameLumpHeader, sizeof(Titanfall2::GameLumpHeader_t));
+        SafeWrite(file, &Titanfall2::Bsp::gameLumpPathHeader, sizeof(Titanfall2::GameLumpPathHeader_t));
+        SafeWrite(file, Titanfall::Bsp::gameLumpPaths.data(), sizeof(Titanfall::GameLumpPath_t) * Titanfall::Bsp::gameLumpPaths.size());
+        SafeWrite(file, &Titanfall2::Bsp::gameLumpPropHeader, sizeof(Titanfall2::GameLumpPropHeader_t));
+        SafeWrite(file, Titanfall2::Bsp::gameLumpProps.data(), sizeof(Titanfall2::GameLumpProp_t) * Titanfall2::Bsp::gameLumpProps.size());
+        SafeWrite(file, &Titanfall2::Bsp::gameLumpUnknownHeader, sizeof(Titanfall2::GameLumpUnknownHeader_t));
     }
 
     AddLump(file, header.lumps[R5_LUMP_UNKNOWN_37],              ApexLegends::Bsp::unknown25_stub);            // stub
@@ -148,6 +157,8 @@ void WriteR5BSPFile(const char *filename) {
    Compiles a v47 bsp file
 */
 void CompileR5BSPFile() {
+    ApexLegends::SetupGameLump();
+    
     for (entity_t &entity : entities) {
         const char *pszClassname = entity.classname();
 
@@ -164,6 +175,10 @@ void CompileR5BSPFile() {
             ApexLegends::EmitBVHNode();
 
             ApexLegends::EndModel();
+        }  else if (ENT_IS("prop_static")) { // Compile as static props into gamelump
+            // TODO: use prop_static instead
+            ApexLegends::EmitStaticProp(entity);
+            continue; // Don't emit as entity
         } else if (ENT_IS("func_occluder")) {
             Titanfall::EmitOcclusionMeshes( entity );
             continue; // Don't emit as entity

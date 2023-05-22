@@ -1286,7 +1286,7 @@ void AddTriangleModels( entity_t& eparent ){
 		const entity_t& e = entities[ i ];
 
 		/* convert misc_models into raw geometry */
-		if ( !e.classname_is( "misc_model" ) ) {
+		if ( !e.classname_is( "prop_static" ) ) {
 			continue;
 		}
 

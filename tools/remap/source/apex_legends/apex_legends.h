@@ -40,6 +40,8 @@ void CompileR5BSPFile();
 namespace ApexLegends {
     void        EmitStubs();
 
+    void        SetupGameLump();
+    void        EmitStaticProp(entity_t &e);
     void        EmitEntity(const entity_t &e);
     void        BeginModel(entity_t &entity);
     void        EndModel();

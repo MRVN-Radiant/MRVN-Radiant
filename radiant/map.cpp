@@ -850,7 +850,7 @@ public:
 				return true;
 			}
 			if( !string_equal_nocase_n( "light", classname, 5 ) &&
-			    !string_equal_nocase( "misc_model", classname ) ){
+			    !string_equal_nocase( "prop_static", classname ) ){
 				++m_ents_ingame;
 			}
 		}
