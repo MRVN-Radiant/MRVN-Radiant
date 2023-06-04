@@ -1522,11 +1522,11 @@ void TextureBrowser_checkTagFile(){
 
 	if ( file_exists( rc_filename ) && TagBuilder.OpenXmlDoc( rc_filename ) )
 	{
-		globalOutputStream() << "Loaded tag file " << rc_filename << ".\n";
+		globalOutputStream() << "Loaded tag file " << rc_filename.c_str() << ".\n";
 	}
 	else if ( file_exists( default_filename ) && TagBuilder.OpenXmlDoc( default_filename, rc_filename ) ) // load default tagfile
 	{
-		globalOutputStream() << "Loaded default tag file " << default_filename << ".\n";
+		globalOutputStream() << "Loaded default tag file " << default_filename.c_str() << ".\n";
 	}
 	else
 	{

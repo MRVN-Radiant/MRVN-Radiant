@@ -346,7 +346,7 @@ public:
 void CGameDialog::ScanForGames(){
 	const auto path = StringOutputStream( 256 )( AppPath_get(), "gamepacks/games/" );
 
-	globalOutputStream() << "Scanning for game description files: " << path << '\n';
+	globalOutputStream() << "Scanning for game description files: " << path.c_str() << '\n';
 
 	/*!
 	   \todo FIXME LINUX:
