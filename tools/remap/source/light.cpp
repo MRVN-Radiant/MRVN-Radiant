@@ -653,6 +653,8 @@ float PointToPolygonFormFactor( const Vector3& point, const Vector3& normal, con
    determines the amount of light reaching a sample (luxel or vertex) from a given light
  */
 
+#include <algorithm>
+
 int LightContributionToSample( trace_t *trace ){
 	float angle;
 	float add;
@@ -755,7 +757,7 @@ int LightContributionToSample( trace_t *trace ){
 			}
 
 			/* clamp the distance to prevent super hot spots */
-			dist = std::max( 16.0, sqrt( dist * dist + light->extraDist * light->extraDist ) );
+			dist = std::max( 16.0f, sqrt( dist * dist + light->extraDist * light->extraDist ) );
 
 			add = light->photons / ( dist * dist ) * angle;
 
@@ -820,7 +822,7 @@ int LightContributionToSample( trace_t *trace ){
 		}
 
 		/* clamp the distance to prevent super hot spots */
-		dist = std::max( 16.0, sqrt( dist * dist + light->extraDist * light->extraDist ) );
+		dist = std::max( 16.0f, sqrt( dist * dist + light->extraDist * light->extraDist ) );
 
 		/* angle attenuation */
 		if ( light->flags & LightFlags::AttenAngle ) {
@@ -1188,7 +1190,7 @@ static bool LightContributionToPoint( trace_t *trace ){
 	/* ptpff approximation */
 	if ( light->type == ELightType::Area && faster ) {
 		/* clamp the distance to prevent super hot spots */
-		dist = std::max( 16.0, sqrt( dist * dist + light->extraDist * light->extraDist ) );
+		dist = std::max( 16.0f, sqrt( dist * dist + light->extraDist * light->extraDist ) );
 
 		/* attenuate */
 		add = light->photons / ( dist * dist );
@@ -1236,7 +1238,7 @@ static bool LightContributionToPoint( trace_t *trace ){
 	/* point/spot lights */
 	else if ( light->type == ELightType::Point || light->type == ELightType::Spot ) {
 		/* clamp the distance to prevent super hot spots */
-		dist = std::max( 16.0, sqrt( dist * dist + light->extraDist * light->extraDist ) );
+		dist = std::max( 16.0f, sqrt( dist * dist + light->extraDist * light->extraDist ) );
 
 		/* attenuate */
 		if ( light->flags & LightFlags::AttenLinear ) {

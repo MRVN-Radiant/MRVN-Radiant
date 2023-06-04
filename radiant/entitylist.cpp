@@ -247,9 +247,9 @@ void tree_view_filter( const char *string, bool from_start ){
 
 
 
-extern QAbstractItemModel* scene_graph_get_tree_model();
+//extern QAbstractItemModel* scene_graph_get_tree_model();
 void AttachEntityTreeModel(){
-	getEntityList().m_tree_model = scene_graph_get_tree_model();
+	getEntityList().m_tree_model = nullptr;// scene_graph_get_tree_model();
 	getEntityList().m_tree_view->setModel( getEntityList().m_tree_model );
 
 	QObject::connect( getEntityList().m_tree_view->selectionModel(), &QItemSelectionModel::selectionChanged,

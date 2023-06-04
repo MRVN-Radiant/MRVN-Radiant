@@ -10,4 +10,6 @@ add_library(archivezip MODULE
             archivezip.def
            )
 
-target_link_libraries(archivezip PRIVATE z)
+target_link_libraries(archivezip PRIVATE ${ZLIB_LIBRARIES})
+
+target_include_directories(archivezip PRIVATE ${ZLIB_INCLUDE_DIRS})

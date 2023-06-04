@@ -17,3 +17,5 @@ add_library(image MODULE
            )
 
 target_link_libraries(image PRIVATE ddslib etclib ${JPEG_LIBRARIES})
+
+target_include_directories(image PRIVATE ${JPEG_INCLUDE_DIRS})

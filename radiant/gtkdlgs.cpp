@@ -261,14 +261,15 @@ void Game_constructPreferences( PreferencesPage& page ){
 		s_gameCombo.fsgame_entry->setEnabled( gamecombo.sensitive );
 	} );
 
-	if( globalMappingMode().do_mapping_mode ){
+	// NOTE [Fifty]: Commented out as unused
+	/*if (globalMappingMode().do_mapping_mode) {
 		page.appendCombo(
 			"Mapping mode",
 			(const char*[]){ globalMappingMode().sp_mapping_mode, globalMappingMode().mp_mapping_mode },
 			IntImportCallback( GameModeImportCaller() ),
 			IntExportCallback( GameModeExportCaller() )
 		);
-	}
+	}*/
 }
 
 // =============================================================================

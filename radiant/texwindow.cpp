@@ -273,7 +273,7 @@ public:
 	}
 private:
 	void clampOriginY(){
-		m_originy = std::clamp( m_originy, m_height - totalHeight(), 0 );
+		//m_originy = std::clamp( m_originy, m_height - totalHeight(), 0 );
 	}
 	void evaluateHeight();
 	int totalHeight(){
@@ -1822,7 +1822,7 @@ QWidget* TextureBrowser_constructWindow( QWidget* toplevel ){
 		scroll->setVisible( g_TexBro.m_showTextureScrollbar );
 	}
 
-	{ // tag stuff
+	/* { // tag stuff
 		g_TexBro.m_tagsListWidget = new Tags_QListWidget;
 		g_TexBro.m_tagsListWidget->setSortingEnabled( true );
 		g_TexBro.m_tagsListWidget->setSelectionMode( QAbstractItemView::SelectionMode::ExtendedSelection );
@@ -1847,16 +1847,16 @@ QWidget* TextureBrowser_constructWindow( QWidget* toplevel ){
 
 		//show detached menu over floating tex bro and main wnd...
 		g_TexBro.m_tagsMenu->setParent( g_TexBro.m_tagsListWidget, g_TexBro.m_tagsMenu->windowFlags() ); //don't reset windowFlags
-	}
-
+	}*/
+	
 	{	// Texture/Tag notebook
 		g_TexBro.m_tabs = new QTabWidget;
 		g_TexBro.m_tabs->setFocusPolicy( Qt::FocusPolicy::ClickFocus );
 		g_TexBro.m_tabs->setDocumentMode( true );
 		g_TexBro.m_tabs->setTabBarAutoHide( true );
 		g_TexBro.m_tabs->addTab( g_TexBro.m_treeView, "Textures" );
-		static_cast<QObject*>( g_TexBro.m_tagsListWidget )->setParent( g_TexBro.m_tabs );
-		TextureBrowser_tagsEnableGui( g_TexBro.m_tags );
+		//static_cast<QObject*>( g_TexBro.m_tagsListWidget )->setParent( g_TexBro.m_tabs );
+		//TextureBrowser_tagsEnableGui( g_TexBro.m_tags );
 		vbox->addWidget( g_TexBro.m_tabs );
 
 		QObject::connect( g_TexBro.m_tabs, &QTabWidget::currentChanged, []( int index ){

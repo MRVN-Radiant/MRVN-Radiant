@@ -76,15 +76,27 @@ add_compile_definitions(Q3MAP_VERSION="Dev build")
 add_compile_definitions(QT_NO_KEYWORDS)
 
 # Find dependencies
-include(FindPkgConfig)
-pkg_check_modules(GLIB glib-2.0 REQUIRED)
-pkg_check_modules(PNG libpng REQUIRED)
-pkg_check_modules(LIBXML2 libxml-2.0 REQUIRED)
-pkg_check_modules(ZLIB zlib REQUIRED)
-pkg_check_modules(JPEG libjpeg REQUIRED)
+if (${MSVC}) # Visual studio
+    set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/windeps/cmake)
+    set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/windeps/qt)
+    find_package(Glib2 REQUIRED)
+    find_package(LibPng REQUIRED)
+    find_package(LibXml2 REQUIRED)
+    find_package(ZLib REQUIRED)
+    find_package(LibJpeg REQUIRED)
+    find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
+    find_package(Threads REQUIRED)
+else() # Msys / Linux
+    include(FindPkgConfig)
+    pkg_check_modules(GLIB glib-2.0 REQUIRED)
+    pkg_check_modules(PNG libpng REQUIRED)
+    pkg_check_modules(LIBXML2 libxml-2.0 REQUIRED)
+    pkg_check_modules(ZLIB zlib REQUIRED)
+    pkg_check_modules(JPEG libjpeg REQUIRED)
 
-find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
-find_package(Threads REQUIRED)
+    find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
+    find_package(Threads REQUIRED)
+endif()
 
 # Global include dirs
 include_directories(include libs)

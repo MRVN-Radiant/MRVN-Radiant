@@ -169,7 +169,12 @@ void SafeWrite( FILE *f, const void *buffer, int count ){
    ==============
  */
 bool    FileExists( const char *filename ){
-	return access( filename, R_OK ) == 0;
+	FILE* pFile = fopen(filename, "r");
+
+	if (!pFile) return false;
+	
+	fclose(pFile);
+	return true;
 }
 
 /*

@@ -627,7 +627,7 @@ protected:
 		return QObject::eventFilter( obj, event ); // standard event processing
 	}
 }
-g_pressedKeysFilter;
+g_pressedKeysFilter1;
 
 // =============================================================================
 // SurfaceInspector class
@@ -637,7 +637,7 @@ void SurfaceInspector::BuildDialog(){
 
 	g_guiSettings.addWindow( GetWidget(), "SurfaceInspector/geometry", 99, 99 );
 
-	GetWidget()->installEventFilter( &g_pressedKeysFilter );
+	GetWidget()->installEventFilter( &g_pressedKeysFilter1 );
 
 //.	window_connect_focus_in_clear_focus_widget( window );
 

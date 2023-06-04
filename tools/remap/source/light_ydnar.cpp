@@ -291,53 +291,7 @@ static bool ClusterVisibleToPoint( const Vector3& point, int cluster ){
  */
 
 int ClusterForPointExt( const Vector3& point, float epsilon ){
-	/* get leaf for point 
-	const int leafNum = PointInLeafNum( point );
-	if ( leafNum < 0 ) {
-		return -1;
-	}
-	const bspLeaf_t& leaf = bspLeafs[ leafNum ];
-
-	// get the cluster 
-	const int cluster = leaf.cluster;
-	if ( cluster < 0 ) {
-		return -1;
-	}
-
-	// transparent leaf, so check point against all brushes in the leaf 
-	const int *brushes = &bspLeafBrushes[ leaf.firstBSPLeafBrush ];
-	const int numBSPBrushes = leaf.numBSPLeafBrushes;
-	for ( int i = 0; i < numBSPBrushes; i++ )
-	{
-		// get parts 
-		const int b = brushes[ i ];
-		if ( b > maxOpaqueBrush ) {
-			continue;
-		}
-		if ( !opaqueBrushes[ b ] ) {
-			continue;
-		}
-
-		const bspBrush_t& brush = bspBrushes[ b ];
-		// check point against all planes 
-		bool inside = true;
-		for ( int j = 0; j < brush.numSides && inside; j++ )
-		{
-			const bspPlane_t& plane = bspPlanes[ bspBrushSides[ brush.firstSide + j ].planeNum ];
-			if ( plane3_distance_to_point( plane, point ) > epsilon ) {
-				inside = false;
-			}
-		}
-
-		// if inside, return bogus cluster
-		if ( inside ) {
-			return -1 - b;
-		}
-	}
-
-	// if the point made it this far, it's not inside any opaque brushes 
-	return cluster;
-	*/
+	return 0;
 }
 
 
@@ -1215,7 +1169,7 @@ static float DirtForSample( trace_t *trace ){
 	}
 
 	/* apply gain (does this even do much? heh) */
-	outDirt = std::min( 1.0, pow( gatherDirt / ( numDirtVectors + 1 ), dirtGain ) );
+	outDirt = std::min( 1.0f, pow( gatherDirt / ( numDirtVectors + 1 ), dirtGain ) );
 
 	/* apply scale */
 	outDirt *= dirtScale;

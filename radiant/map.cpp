@@ -2070,7 +2070,7 @@ void DoFind(){
 #include "filterbar.h"
 ////
 void map_autocaulk_selected(){
-	if ( Map_Unnamed( g_map ) ) {
+	/*if (Map_Unnamed(g_map)) {
 		if( !Map_SaveAs() )
 			return;
 	}
@@ -2314,7 +2314,7 @@ void map_autocaulk_selected(){
 		StringOutputStream str( 32 );
 		str << "AutoCaulk " << caulkBrushesWalker.m_caulkedCount << " faces";
 		GlobalUndoSystem().finish( str.c_str() );
-	}
+	}*/
 }
 
 
@@ -2400,8 +2400,8 @@ void Map_Construct(){
 	GlobalCommands_insert( "FindBrush", FreeCaller<DoFind>() );
 	GlobalCommands_insert( "MapInfo", FreeCaller<DoMapInfo>(), QKeySequence( "M" ) );
 
-	GlobalPreferenceSystem().registerPreference( "LastMap", CopiedStringImportStringCaller( g_strLastMap ), CopiedStringExportStringCaller( g_strLastMap ) );
-	GlobalPreferenceSystem().registerPreference( "LoadLastMap", BoolImportStringCaller( g_bLoadLastMap ), BoolExportStringCaller( g_bLoadLastMap ) );
+	//GlobalPreferenceSystem().registerPreference( "LastMap", CopiedStringImportStringCaller( g_strLastMap ), CopiedStringExportStringCaller( g_strLastMap ) );
+	//GlobalPreferenceSystem().registerPreference( "LoadLastMap", BoolImportStringCaller( g_bLoadLastMap ), BoolExportStringCaller( g_bLoadLastMap ) );
 
 	PreferencesDialog_addSettingsPreferences( FreeCaller1<PreferencesPage&, Map_constructPreferences>() );
 

@@ -109,3 +109,7 @@ target_link_libraries(radiant
                       ${LIBXML2_LIBRARIES}
                       ${CMAKE_DL_LIBS}
                      )
+
+if(WIN32)
+    target_link_libraries(radiant dbghelp)
+endif()

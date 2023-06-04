@@ -1529,11 +1529,11 @@ bool ApplyShaderType( const char *name, int *surfaceFlags, int *contentFlags, in
 bool ApplyShaderFlag( const char *name, int *surfaceFlags, int *contentFlags, int *compileFlags );
 
 // Encode the string as a type
-template <char... chars>
-using TemplateString = std::integer_sequence<char, chars...>;
+//template <char... chars>
+//using TemplateString = std::integer_sequence<char, chars...>;
 // Create a user defined literal operator
-template <typename T, T... chars>
-constexpr TemplateString<chars...> operator""_Tstring() { return { }; }
+//template <typename T, T... chars>
+//constexpr TemplateString<chars...> operator""_Tstring() { return { }; }
 /// \brief returns statically evaluated \c surfaceParm_t for the given name or emits \c Error
 //template<char... chars>
 //const surfaceParm_t &GetRequiredSurfaceParm(const TemplateString<chars...>) {

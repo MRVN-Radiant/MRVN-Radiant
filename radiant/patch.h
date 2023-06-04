@@ -211,7 +211,7 @@ public:
 	RenderablePatchWireframe( PatchTesselation& tess ) : m_tess( tess ){
 	}
 	void render( RenderStateFlags state ) const {
-		gl().glVertexPointer( 3, GL_FLOAT, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->vertex );
+		/*gl().glVertexPointer(3, GL_FLOAT, sizeof(ArbitraryMeshVertex), &m_tess.m_vertices.data()->vertex);
 
 		unsigned int indices[m_tess.m_nArrayHeight * 2 + (m_tess.m_nArrayWidth-2)*2 + 1];
 
@@ -246,7 +246,7 @@ public:
 			//	glDrawArrays( GL_LINE_STRIP, i, 2 );
 			//}
 		//}
-		gl().glDrawElements( GL_LINE_STRIP, sizeof(indices)/sizeof(int), GL_UNSIGNED_INT, indices);
+		gl().glDrawElements( GL_LINE_STRIP, sizeof(indices)/sizeof(int), GL_UNSIGNED_INT, indices);*/
 	}
 };
 
