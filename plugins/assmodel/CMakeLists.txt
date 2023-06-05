@@ -16,4 +16,6 @@ target_link_libraries(assmodel PRIVATE
                       Qt5::Gui
                      )
 
-set_target_properties(assmodel PROPERTIES LINK_FLAGS "-Wl,-rpath,../")
+if(NOT ${MSVC})
+    set_target_properties(assmodel PROPERTIES LINK_FLAGS "-Wl,-rpath,../")
+endif()
