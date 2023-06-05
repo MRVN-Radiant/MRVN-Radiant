@@ -5,6 +5,7 @@ add_library(assmodel MODULE
             model.h
             plugin.cpp
             plugin.h
+            assmodel.def
            )
 
 target_include_directories(assmodel PRIVATE
