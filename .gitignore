@@ -22,6 +22,8 @@ libs/assimp/revision.h
 *.exp
 *.lib
 
+*.manifest
+
 # Windows cmake packages
 windeps
 
