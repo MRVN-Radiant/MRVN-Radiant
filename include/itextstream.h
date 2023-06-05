@@ -61,7 +61,7 @@ public:
  */
 template<typename T>
 inline TextOutputStream& operator<<( TextOutputStream& ostream, const T& t ){
-	return ostream_write(ostream, t);
+	return ostream_write( ostream, t );
 }
 
 class NullOutputStream : public TextOutputStream
