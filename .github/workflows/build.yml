@@ -13,9 +13,8 @@ jobs:
     
     steps:
     - name: Download WinDeps
-      uses: wei/wget@v1
-      with:
-        args: https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.0/windeps.7z
+      run: wget https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.0/windeps.7z
+      shell: powershell
     
     - uses: actions/checkout@v3
       with:
