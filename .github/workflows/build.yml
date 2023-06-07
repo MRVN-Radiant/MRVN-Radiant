@@ -33,11 +33,11 @@ jobs:
       run: cmake --build .
       
     - name: Download Install Deps
-      run: Invoke-WebRequest -Uri https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.1/install-release.zip -OutFile install.zip
+      run: Invoke-WebRequest -Uri https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.1/install-release.zip -OutFile install-release.zip
       shell: powershell
       
     - name: Extract Install Deps
-      run: 7z e install.zip -y
+      run: 7z e install-release.zip -y
       
     - name: Where am i
       run: ls
