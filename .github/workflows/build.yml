@@ -13,7 +13,8 @@ jobs:
     
     steps:
     - name: Download WinDeps
-      run: wget https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.0/windeps.7z
+      run: |
+        wget https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.0/windeps.7z
       
     - name: Extract WinDeps
     - uses: edgarrc/action-7z@v1
