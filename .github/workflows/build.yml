@@ -35,7 +35,7 @@ jobs:
 
     - name: Generate Artifact Name
       run: |
-        echo "ARTIFACT_NAME=$(echo MRVN-Radiant_`date -u -Idate`_`git rev-parse --short HEAD`_Linux_${{ matrix.arch }})" >> $GITHUB_ENV
+        echo "ARTIFACT_NAME=$(echo MRVN-Radiant_`date -u -Idate`_`git rev-parse --short HEAD`_Windows_${{ matrix.arch }})" >> $GITHUB_ENV
 
     - uses: actions/upload-artifact@v3
       with:
