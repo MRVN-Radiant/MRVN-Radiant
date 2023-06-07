@@ -25,15 +25,19 @@ jobs:
   
     - name: Setup msvc
       uses: ilammy/msvc-dev-cmd@v1
-    
-    - name: Where am i
-      run: ls
 
     - name: Setup CMake
       run: cmake . -G "Ninja" -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
       run: cmake --build .
+      
+    - name: Download Install Deps
+      run: Invoke-WebRequest -Uri https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.1/install-release.zip -OutFile install-release.zip
+      shell: powershell
+      
+    - name: Extract Install Deps
+      run: 7z x install-release.zip
 
     - name: Generate Artifact Name
       run: echo "ARTIFACT_NAME=$(echo MRVN-Radiant_`date -u -Idate`_`git rev-parse --short HEAD`_Windows_${{ matrix.arch }})" >> $GITHUB_ENV
