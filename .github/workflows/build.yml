@@ -13,17 +13,14 @@ jobs:
     
     steps:
     - name: Download WinDeps
-      run: wget https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.0/windeps.7z
+      run: wget https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.1/windeps.zip
       shell: powershell
+    - name: Extract WinDeps
+      run: 7z x windeps.zip -owindeps
     
     - uses: actions/checkout@v3
       with:
         submodules: recursive
-  
-    - name: Extract WinDeps
-      uses: edgarrc/action-7z@v1
-      with:
-        args: 7z x windeps.7z -owindeps
   
     - name: Setup msvc
       uses: ilammy/msvc-dev-cmd@v1
