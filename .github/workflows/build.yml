@@ -36,8 +36,8 @@ jobs:
       run: cmake --build .
 
     - name: Generate Artifact Name
-      run: |
-        echo "ARTIFACT_NAME=$(echo MRVN-Radiant_`date -u -Idate`_`git rev-parse --short HEAD`_Windows_${{ matrix.arch }})" >> $GITHUB_ENV
+      run: echo "ARTIFACT_NAME=$(echo MRVN-Radiant_`date -u -Idate`_`git rev-parse --short HEAD`_Windows_${{ matrix.arch }})" >> $GITHUB_ENV
+      shell: bash
 
     - uses: actions/upload-artifact@v3
       with:
