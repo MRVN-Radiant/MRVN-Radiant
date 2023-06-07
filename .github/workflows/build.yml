@@ -13,7 +13,7 @@ jobs:
     
     steps:
     - name: Download WinDeps
-      run: wget https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.1/windeps.zip
+      run: Invoke-WebRequest -Uri https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.1/windeps.zip -OutFile windeps.zip
       shell: powershell
     - name: Extract WinDeps
       run: 7z x windeps.zip -owindeps
