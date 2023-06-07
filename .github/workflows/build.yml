@@ -25,6 +25,9 @@ jobs:
   
     - name: Setup msvc
       uses: ilammy/msvc-dev-cmd@v1
+    
+    - name: Where am i
+      run: ls
 
     - name: Setup CMake
       run: cmake . -G "Ninja" -DCMAKE_BUILD_TYPE=Release
