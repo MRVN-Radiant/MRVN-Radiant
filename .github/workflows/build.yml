@@ -38,6 +38,9 @@ jobs:
       
     - name: Extract Install Deps
       run: 7z x install.zip
+      
+    - name: Where am i
+      run: ls
 
     - name: Generate Artifact Name
       run: echo "ARTIFACT_NAME=$(echo MRVN-Radiant_`date -u -Idate`_`git rev-parse --short HEAD`_Windows_${{ matrix.arch }})" >> $GITHUB_ENV
