@@ -3,54 +3,39 @@ name: build
 on: [push,pull_request,workflow_dispatch]
 
 jobs:
-  windows-msys:
+  Windows:
     name: ${{ matrix.config }} Windows ${{ matrix.arch }}
-    runs-on: windows-2019
+    runs-on: windows-2022
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86, x86_64]
-        cc: [gcc]
-        include:
-          - arch: x86
-            msystem: MINGW32
-            prefix: mingw-w64-i686
-
-          - arch: x86_64
-            msystem: MINGW64
-            prefix: mingw-w64-x86_64
-
-    defaults:
-      run:
-        shell: msys2 {0}
-
+        arch: [x86_64]
+    
     steps:
-    - uses: msys2/setup-msys2@v2
-      with:
-        install: ${{ matrix.prefix }}-qt5-base ${{ matrix.prefix }}-libxml2 svn git
-        msystem: ${{ matrix.msystem }}
-        path-type: minimal
-        release: false
-        update: false
-
     - uses: actions/checkout@v3
       with:
         submodules: recursive
+    
+    - name: Download WinDeps
+      run: wget https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.0/windeps.7z
+      
+    - name: Extract WinDeps
+    - uses: edgarrc/action-7z@v1
+      with:
+        args: 7z x windeps.7z -owindeps
+        
+    - name: Setup msvc
+      uses: ilammy/msvc-dev-cmd@v1
 
     - name: Setup CMake
-      run: cmake . -G "MinGW Makefiles"
+      run: cmake . -G "Ninja" - DCMAKE_BUILD_TYPE=Release
 
     - name: Build
       run: cmake --build .
 
-    - name: Install DLLs
-      run: |
-        wget https://www.dropbox.com/s/z1uohnun81682zi/mrvn-radiant-libs.zip
-        unzip -o mrvn-radiant-libs.zip -d "install"
-
     - name: Generate Artifact Name
       run: |
-        echo "ARTIFACT_NAME=$(echo MRVN-Radiant_`date -u -Idate`_`git rev-parse --short HEAD`_Windows_${{ matrix.arch }})" >> $GITHUB_ENV
+        echo "ARTIFACT_NAME=$(echo MRVN-Radiant_`date -u -Idate`_`git rev-parse --short HEAD`_Linux_${{ matrix.arch }})" >> $GITHUB_ENV
 
     - uses: actions/upload-artifact@v3
       with:
@@ -58,7 +43,7 @@ jobs:
         path: install/
         if-no-files-found: error
 
-  linux:
+  Linux:
     name: ${{ matrix.config }} Linux ${{ matrix.arch }}
     runs-on: ubuntu-latest
     strategy:
