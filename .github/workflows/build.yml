@@ -37,7 +37,7 @@ jobs:
       shell: powershell
       
     - name: Extract Install Deps
-      run: 7z e install.zip
+      run: 7z e install.zip -y install
       
     - name: Where am i
       run: ls
