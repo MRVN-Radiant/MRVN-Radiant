@@ -21,13 +21,10 @@ jobs:
       shell: powershell
       
     - name: Extract WinDeps
-      run: 7z x windeps.zip -owindeps
+      run: 7z e windeps.zip
   
     - name: Setup msvc
       uses: ilammy/msvc-dev-cmd@v1
-    
-    - name: hop
-      run: cd windeps
     
     - name: Where am i
       run: ls
