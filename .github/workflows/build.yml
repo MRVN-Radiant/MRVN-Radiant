@@ -12,10 +12,6 @@ jobs:
         arch: [x86_64]
     
     steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: recursive
-    
     - name: Download WinDeps
       run: wget https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.0/windeps.7z
       
@@ -23,6 +19,10 @@ jobs:
     - uses: edgarrc/action-7z@v1
       with:
         args: 7z x windeps.7z -owindeps
+    
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
         
     - name: Setup msvc
       uses: ilammy/msvc-dev-cmd@v1
