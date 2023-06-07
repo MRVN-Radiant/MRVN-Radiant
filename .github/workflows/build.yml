@@ -26,6 +26,9 @@ jobs:
     - name: Setup msvc
       uses: ilammy/msvc-dev-cmd@v1
     
+    - name: hop
+      run: cd windeps
+    
     - name: Where am i
       run: ls
 
