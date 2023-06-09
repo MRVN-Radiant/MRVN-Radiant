@@ -17,8 +17,8 @@
 - Run `cmake . -G "Ninja"`
 - Run `cmake --build .` to build
 
-### MingW ( gcc )
-#### Getting dependencies
+## MingW ( gcc )
+### Getting dependencies
 - Install [msys2](https://www.msys2.org/) and follow installation steps on their website
 - Open the MingW shell
 - Run:
@@ -28,13 +28,13 @@
   ```
 - Use `mingw-w64-x86_64` for 64-bit and `mingw-w64-i686` for 32-bit
 
-#### Compiling
+### Compiling
 - `cd` into the root directory of MRVN-Radiant and run these commands:
   ```sh
   cmake . -G "MinGW Makefiles" -DINSTALL_DLLS=OFF
   cmake --build .
   ```
-#### Note
+### Note
 - To be able to run radiant from file explorer you'll need to copy over some dlls. Thankfully there's a script for this.
   ```sh
   cmake . -G "MinGW Makefiles" -DINSTALL_DLLS=ON
@@ -44,7 +44,7 @@
 - If you get a white screen after launching radiant you'll need to manually delete `OPENGL32.dll` from the `install/` folder. Alternatively you can delete mesa.
 
 ## Linux
-#### Getting dependencies
+### Getting dependencies
 - Dependencies:
     - qt5
     - glib
@@ -53,7 +53,7 @@
     - libpng
     - libjpeg
 
-#### Compiling
+### Compiling
 - `cd` into the root directory of MRVN-Radiant and run these commands:
   ```sh
   cmake . -G "Unix Makefiles"
