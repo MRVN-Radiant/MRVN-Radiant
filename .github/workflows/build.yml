@@ -17,11 +17,11 @@ jobs:
         submodules: recursive
       
     - name: Download WinDeps
-      run: Invoke-WebRequest -Uri https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.2/windeps.zip -OutFile windeps.zip
+      run: Invoke-WebRequest -Uri https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.2/windeps.7z -OutFile windeps.7z
       shell: powershell
       
     - name: Extract WinDeps
-      run: 7z x windeps.zip
+      run: 7z x windeps.7z
   
     - name: Setup msvc
       uses: ilammy/msvc-dev-cmd@v1
