@@ -53,6 +53,11 @@ if(WIN32)
     add_compile_definitions(_WIN32)
 endif()
 
+if(${MSVC})
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
+    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /MANIFEST:NO")
+endif()
+
 # Debug
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     add_compile_definitions(_DEBUG)
