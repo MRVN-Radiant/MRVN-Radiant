@@ -17,6 +17,15 @@ libs/assimp/revision.h
 # Windows binary files
 *.dll
 *.exe
+*.pdb
+*.ilk
+*.exp
+*.lib
+
+*.manifest
+
+# Windows cmake packages
+windeps
 
 # Unix binary files
 *.so

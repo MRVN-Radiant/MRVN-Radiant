@@ -217,6 +217,13 @@ inline TextOutputStreamType& ostream_write( TextOutputStreamType& ostream, const
 	return ostream;
 }
 
+/// \brief Writes a null-terminated \p string to \p ostream.
+template<typename TextOutputStreamType>
+inline TextOutputStreamType& ostream_write(TextOutputStreamType& ostream, char* string) {
+	ostream.write(string, strlen(string));
+	return ostream;
+}
+
 class HexChar
 {
 public:
@@ -332,6 +339,11 @@ inline TextOutputStreamType& ostream_write( TextOutputStreamType& ostream, const
 	return ostream;
 }
 
+/// Template to prevent compile error, DOES NOT WRITE TO THE STREAM
+template<typename TextOutputStreamType, typename T>
+inline TextOutputStreamType& ostream_write(TextOutputStreamType& ostream, const T unk) {
+	return ostream;
+}
 
 /// \brief A wrapper for a TextInputStream optimised for reading a single character at a time.
 template<typename TextInputStreamType, int SIZE = 1024>

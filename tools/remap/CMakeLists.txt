@@ -102,6 +102,8 @@ target_include_directories(remap PRIVATE .
                            ${CMAKE_SOURCE_DIR}/libs/assimp
                            ${LIBXML2_INCLUDE_DIRS}
                            ${GLIB_INCLUDE_DIRS}
+                           ${JPEG_INCLUDE_DIRS}
+                           ${PNG_INCLUDE_DIRS}
                           )
 
 target_link_libraries(remap

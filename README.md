@@ -26,56 +26,6 @@ MRVN-Radiant is a fork of NetRadiant-custom (GtkRadiant 1.4 &rarr; massive rewri
 
 > NOTE: These values are updated manually.
 
-## Compiling
-### Getting dependencies on Windows (Using MinGW)
-- Install [msys2](https://www.msys2.org/) and follow installation steps on their website
-- Open the MingW shell
-- Run:
-  ```sh
-  pacman -S {make,cmake,gcc,pkg-config,unzip,base-devel}
-  pacman -S mingw-w64-x86_64-{cmake,openjpeg,qt5-base,glib2,libxml2,libpng,zlib}
-  ```
-- Use `mingw-w64-x86_64` for 64-bit and `mingw-w64-i686` for 32-bit
-
-### Compiling on Windows
-- `cd` into the root directory of MRVN-Radiant and run these commands:
-  ```sh
-  cmake . -G "MinGW Makefiles" -DINSTALL_DLLS=OFF
-  cmake --build .
-  ```
-### Note
-- To be able to run radiant from file explorer you'll need to copy over some dlls. Thankfully there's a script for this.
-  ```sh
-  cmake . -G "MinGW Makefiles" -DINSTALL_DLLS=ON
-  ```
-- You only need to run this once.
-
-- If you get a white screen after launching radiant you'll need to manually delete `OPENGL32.dll` from the `install/` folder. Alternatively you can delete mesa.
-
-### Getting dependencies on Linux
-- Dependencies:
-    - qt5
-    - glib
-    - libxml2
-    - zlib
-    - libpng
-    - libjpeg
-
-### Compiling on Linux
-- `cd` into the root directory of MRVN-Radiant and run these commands:
-  ```sh
-  cmake . -G "Unix Makefiles"
-  cmake --build .
-  ```
-
-### Some more useful flags when generating a makefile
- - Example: `cmake . -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DBUILD_PLUGINS=OFF`
- - `CMAKE_VERBOSE_MAKEFILE` ON/OFF
- - `CMAKE_BUILD_TYPE` Release/Debug
- - `BUILD_PLUGINS` ON/OFF
- - `BUILD_RADIANT` ON/OFF
- - `BUILD_TOOLS` ON/OFF
-
 ## Running on wayland
  - When running on wayland you'll need to launch with `QT_QPA_PLATFORM=xcb` otherwise the OpenGL viewports wont clear properly.
 

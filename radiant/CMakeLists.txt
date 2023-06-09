@@ -1,7 +1,3 @@
-if(WIN32)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows" )
-endif()
-
 add_executable(radiant
                autosave.cpp
                brushmanip.cpp
@@ -109,3 +105,15 @@ target_link_libraries(radiant
                       ${LIBXML2_LIBRARIES}
                       ${CMAKE_DL_LIBS}
                      )
+
+if(WIN32)
+    if(${MSVC})
+        target_link_options(radiant PRIVATE "/SUBSYSTEM:WINDOWS" "/ENTRY:mainCRTStartup")
+    else()
+        target_link_options(radiant PRIVATE "-mwindows")
+    endif()
+endif()
+
+if(WIN32)
+    target_link_libraries(radiant dbghelp)
+endif()

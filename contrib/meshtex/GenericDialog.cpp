@@ -77,7 +77,8 @@ GenericDialog::SetWindow(QWidget *window)
    // Mark this widget as a modal dialog for it.
    if (_dialog != nullptr)
    {
-      static_cast<QObject*>( _dialog )->setParent( _window );
+      _dialog->setModal(true);
+      //static_cast<QObject*>( _dialog )->setParent( _window );
    }
 }
 

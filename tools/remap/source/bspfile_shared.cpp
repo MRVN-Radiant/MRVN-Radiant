@@ -235,7 +235,9 @@ void Shared::MakeVisReferences() {
     CalculateSAH
     calculates the surface-area-heurestic for a BVHx Tree
 */
-float CalculateSAH(std::vector<Shared::visRef_t> &refs, MinMax &parent, int &axis, float *pos, int type) {
+float CalculateSAH(std::vector<Shared::visRef_t> &refs, MinMax &parent, int &axis, float *pos) {
+    // NOTE [Fifty]: I plan on rewriting this soon
+    const int type = 2;
     MinMax childMinMaxs[type] = {};
     std::size_t childRefCounts[type] = {};
 
@@ -318,7 +320,7 @@ Shared::visNode_t Shared::MakeVisTree(std::vector<Shared::visRef_t> refs, float 
         for (std::size_t i = 0; i < refs.size(); i++) {
             pos[0] = refs.at(i).minmax.mins[axis];
 
-            float cost = CalculateSAH(refs, minmax, axis, pos, 2);
+            float cost = CalculateSAH(refs, minmax, axis, pos);
             // Sys_Printf("%f\n", cost);
             if (cost < bestCost) {
                 bestCost = cost;

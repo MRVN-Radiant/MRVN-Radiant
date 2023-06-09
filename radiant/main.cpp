@@ -121,10 +121,10 @@ void qute_messageHandler( QtMsgType type, const QMessageLogContext &context, con
 	switch (type)
 	{
 	case QtInfoMsg:
-	case QtDebugMsg:    globalOutputStream() << buf; break;
-	case QtWarningMsg:  globalWarningStream() << buf; break;
+	case QtDebugMsg:    globalOutputStream() << buf.c_str(); break;
+	case QtWarningMsg:  globalWarningStream() << buf.c_str(); break;
 	case QtCriticalMsg:
-	case QtFatalMsg:    globalErrorStream() << buf; break;
+	case QtFatalMsg:    globalErrorStream() << buf.c_str(); break;
 	}
 }
 class Lock

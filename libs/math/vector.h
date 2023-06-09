@@ -27,7 +27,7 @@
 #include "generic/vector.h"
 
 #if defined ( _MSC_VER )
-
+/*
 inline int lrint( double flt ){
 	int i;
 
@@ -43,7 +43,7 @@ inline int lrint( double flt ){
 inline __int64 llrint( double f ){
 	return static_cast<__int64>( f + 0.5 );
 }
-
+*/
 #elif defined( __FreeBSD__ )
 
 inline long lrint( double f ){

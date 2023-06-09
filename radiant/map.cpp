@@ -2070,7 +2070,7 @@ void DoFind(){
 #include "filterbar.h"
 ////
 void map_autocaulk_selected(){
-	if ( Map_Unnamed( g_map ) ) {
+	/*if (Map_Unnamed(g_map)) {
 		if( !Map_SaveAs() )
 			return;
 	}
@@ -2314,7 +2314,7 @@ void map_autocaulk_selected(){
 		StringOutputStream str( 32 );
 		str << "AutoCaulk " << caulkBrushesWalker.m_caulkedCount << " faces";
 		GlobalUndoSystem().finish( str.c_str() );
-	}
+	}*/
 }
 
 

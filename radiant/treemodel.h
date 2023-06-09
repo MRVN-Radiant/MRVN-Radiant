@@ -21,6 +21,7 @@
 
 #pragma once
 
+class GraphTreeModel* scene_graph_get_tree_model();
 class GraphTreeModel* graph_tree_model_new();
 void graph_tree_model_delete( GraphTreeModel* model );
 

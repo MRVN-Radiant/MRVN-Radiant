@@ -309,6 +309,9 @@ void xml_message_flush(){
 	xml_SendNode( node );
 }
 
+#include <algorithm>
+#undef min
+
 void xml_message_push( int flag, const char* characters, size_t length ){
 	if( flag != mesege_flag ){
 		xml_message_flush();

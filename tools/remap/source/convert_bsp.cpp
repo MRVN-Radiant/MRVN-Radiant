@@ -243,6 +243,7 @@ int ShiftBSPMain( Args& args ){
 
 int MergeBSPMain( Args& args ){
 	Sys_Printf("I don't work :) - MergeBSPMain");
+	return -1;
 }
 
 

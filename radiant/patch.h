@@ -212,41 +212,11 @@ public:
 	}
 	void render( RenderStateFlags state ) const {
 		gl().glVertexPointer( 3, GL_FLOAT, sizeof( ArbitraryMeshVertex ), &m_tess.m_vertices.data()->vertex );
-
-		unsigned int indices[m_tess.m_nArrayHeight * 2 + (m_tess.m_nArrayWidth-2)*2 + 1];
-
-		// Renders the outline in the XY view
-		// TODO: Improve this, :)
-		for( std::size_t x = 0; x < m_tess.m_nArrayWidth; x++ ) {
-		indices[x] = x;
+		const RenderIndex* strip_indices = m_tess.m_indices.data();
+		for ( std::size_t i = 0; i < m_tess.m_numStrips; i++, strip_indices += m_tess.m_lenStrips )
+		{
+			gl().glDrawElements( GL_QUAD_STRIP, GLsizei( m_tess.m_lenStrips ), RenderIndexTypeID, strip_indices );
 		}
-	
-		for( std::size_t y = 0; y < m_tess.m_nArrayHeight - 2; y++ ) {
-			indices[y + m_tess.m_nArrayWidth] = (y + 1) * m_tess.m_nArrayWidth + m_tess.m_nArrayWidth - 1;
-		}
-	
-		for( std::size_t x = m_tess.m_nArrayWidth; x > 0; x-- ) {
-			indices[m_tess.m_nArrayWidth + m_tess.m_nArrayHeight - 2 + m_tess.m_nArrayWidth - x] = (m_tess.m_nArrayHeight - 1) * m_tess.m_nArrayWidth + x - 1;
-		}
-	
-		for( std::size_t y = 0; y < m_tess.m_nArrayHeight - 2; y++ ) {
-			indices[y + m_tess.m_nArrayWidth *2 + m_tess.m_nArrayHeight -2] = (m_tess.m_nArrayHeight -2-y) * m_tess.m_nArrayWidth;
-		}
-		indices[sizeof(indices) / sizeof(int) - 1] = 0;
-		// Draw vertical lines
-		//for (std::size_t y = 0; y < m_tess.m_nArrayHeight; y++) {
-			//for( std::size_t x = 0; x < m_tess.m_nArrayWidth - 1; x++ ) {
-			//	glDrawArrays( GL_LINE_STRIP, y * m_tess.m_nArrayWidth + x, 2 );
-			//}
-		//}
-
-		// Draw horizontal lines
-		//for( std::size_t y = 0; y < m_tess.m_nArrayHeight; y++ ) {
-			//for( std::size_t i = 0; i < m_tess.m_nArrayWidth - 1; i++ ) {
-			//	glDrawArrays( GL_LINE_STRIP, i, 2 );
-			//}
-		//}
-		gl().glDrawElements( GL_LINE_STRIP, sizeof(indices)/sizeof(int), GL_UNSIGNED_INT, indices);
 	}
 };
 

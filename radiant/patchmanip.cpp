@@ -912,7 +912,8 @@ void DoPatchDeformDlg(){
 
 	auto spin = new SpinBox( -9999, 9999, 64 );
 
-	RadioHBox radioBox = RadioHBox_new( (const char*[]){ "X", "Y", "Z" } );
+	const char* pAxis[] = { "X", "Y", "Z" };
+	RadioHBox radioBox = RadioHBox_new( StringArrayRange(pAxis) );
 	radioBox.m_radio->button( 2 )->setChecked( true );
 
 	{
@@ -986,7 +987,8 @@ void DoPatchThickenDlg(){
 	const int grid = std::max( GetGridSize(), 1.f );
 	auto spin = new SpinBox( -9999, 9999, grid, 2, grid );
 
-	RadioHBox radioBox = RadioHBox_new( (const char*[]){ "X", "Y", "Z", "Normal" } );
+	const char* pAxis[] = { "X", "Y", "Z", "Normal" };
+	RadioHBox radioBox = RadioHBox_new( StringArrayRange(pAxis) );
 	radioBox.m_radio->button( 3 )->setChecked( true );
 
 	auto check = new QCheckBox( "Side walls" );
