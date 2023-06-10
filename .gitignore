@@ -1,17 +1,35 @@
-*.[oda]
-.settings
-out
+# Due to binaries on linux having no extension and having the same name as some folders
+# we need to do this to ignore the binaries, but not the folders ( applies to remap and radiant )
+# https://stackoverflow.com/questions/5711120/gitignore-binary-files-that-have-no-extension
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
+# Unignore all dirs
+!*/
+
+### Normal gitignore:
+# Editor caches
 .vscode
 .vs
-libs/assimp/out
+out
+
+# Cmake
 CMakeFiles
 cmake_install.cmake
 CMakeCache.txt
+cmake_uninstall.cmake
+
+# Unix makefiles
 Makefile
+
+# Assimp
+libs/assimp/out
 libs/assimp/bin
 libs/assimp/generated
 libs/assimp/assimp.pc
-cmake_uninstall.cmake
 libs/assimp/revision.h
 
 # Windows binary files
@@ -30,5 +48,3 @@ windeps
 # Unix binary files
 *.so
 libassimp.*
-radiant
-remap
