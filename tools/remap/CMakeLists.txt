@@ -1,109 +1,76 @@
 add_executable(remap
-               common/bitflags.h
-               common/cmdlib.cpp
-               common/cmdlib.h
-               common/inout_xml.h
-               common/inout.cpp
-               common/inout.h
-               common/jpeg.cpp
-               common/maxworld.h
-               common/md4.cpp
-               common/md4.h
-               common/miniz.cpp
-               common/miniz.h
-               common/mutex.cpp
-               common/mutex.h
-               common/polylib.cpp
-               common/polylib.h
-               common/qimagelib.cpp
-               common/qimagelib.h
-               common/qmath.h
-               common/qpathops.h
-               common/qstringops.h
-               common/qthreads.h
-               common/scriplib.cpp
-               common/scriplib.h
-               common/stringfixedsize.h
-               common/threads.cpp
-               common/unzip.cpp
-               common/unzip.h
-               common/vfs.cpp
-               common/vfs.h
-               source/apex_legends/apex_legends_collisions.cpp
-               source/apex_legends/apex_legends_misc.cpp
-               source/apex_legends/apex_legends_vis.cpp
-               source/apex_legends/apex_legends.cpp
-               source/apex_legends/apex_legends.h
-               source/titanfall/titanfall_collisions.cpp
-               source/titanfall/titanfall_decompile.cpp
-               source/titanfall/titanfall_misc.cpp
-               source/titanfall/titanfall_vis.cpp
-               source/titanfall/titanfall.cpp
-               source/titanfall/titanfall.h
-               source/titanfall2/titanfall2_vis.cpp
-               source/titanfall2/titanfall2.cpp
-               source/titanfall2/titanfall2.h
-               source/brush.cpp
-               source/bsp.cpp
-               source/bspfile_abstract.cpp
-               source/bspfile_abstract.h
-               source/bspfile_shared.cpp
-               source/bspfile_shared.h
-               source/convert_bsp.cpp
-               source/convert_json.cpp
-               source/convert_obj.cpp
-               source/convert_obj.h
-               source/decals.cpp
-               source/exportents.cpp
-               source/facebsp.cpp
-               source/fog.cpp
-               source/games.cpp
-               source/games.h
-               source/help.cpp
-               source/image.cpp
-               source/leakfile.cpp
-               source/light_bounce.cpp
-               source/light_trace.cpp
-               source/light_ydnar.cpp
-               source/light.cpp
-               source/lightmaps_ydnar.cpp
-               source/lump_names.h
-               source/main.cpp
-               source/map.cpp
-               source/mesh.cpp
-               source/model.cpp
-               source/model.h
-               source/patch.cpp
-               source/path_init.cpp
-               source/portals.cpp
-               source/prtfile.cpp
-               source/remap.h
-               source/shaders.cpp
-               source/shaders.h
-               source/surface_extra.cpp
-               source/surface_extra.h
-               source/surface_foliage.cpp
-               source/surface_fur.cpp
-               source/surface_meta.cpp
-               source/surface.cpp
-               source/tjunction.cpp
-               source/tree.cpp
-               source/vis.cpp
-               source/vis.h
-               source/visflow.cpp
-               source/visflow.h
-               source/writebsp.cpp
+               apex_legends/apex_legends_collisions.cpp
+               apex_legends/apex_legends_misc.cpp
+               apex_legends/apex_legends_vis.cpp
+               apex_legends/apex_legends.cpp
+               apex_legends/apex_legends.h
+               titanfall/titanfall_collisions.cpp
+               titanfall/titanfall_decompile.cpp
+               titanfall/titanfall_misc.cpp
+               titanfall/titanfall_vis.cpp
+               titanfall/titanfall.cpp
+               titanfall/titanfall.h
+               titanfall2/titanfall2_vis.cpp
+               titanfall2/titanfall2.cpp
+               titanfall2/titanfall2.h
+               brush.cpp
+               bsp.cpp
+               bspfile_abstract.cpp
+               bspfile_abstract.h
+               bspfile_shared.cpp
+               bspfile_shared.h
+               convert_bsp.cpp
+               convert_json.cpp
+               convert_obj.cpp
+               convert_obj.h
+               decals.cpp
+               exportents.cpp
+               facebsp.cpp
+               fog.cpp
+               games.cpp
+               games.h
+               help.cpp
+               image.cpp
+               leakfile.cpp
+               light_bounce.cpp
+               light_trace.cpp
+               light_ydnar.cpp
+               light.cpp
+               lightmaps_ydnar.cpp
+               lump_names.h
+               main.cpp
+               map.cpp
+               mesh.cpp
+               model.cpp
+               model.h
+               patch.cpp
+               path_init.cpp
+               portals.cpp
+               prtfile.cpp
+               remap.h
+               shaders.cpp
+               shaders.h
+               surface_extra.cpp
+               surface_extra.h
+               surface_foliage.cpp
+               surface_fur.cpp
+               surface_meta.cpp
+               surface.cpp
+               tjunction.cpp
+               tree.cpp
+               vis.cpp
+               vis.h
+               visflow.cpp
+               visflow.h
+               writebsp.cpp
                ${CMAKE_SOURCE_DIR}/icons/remap.rc
               )
 
 target_include_directories(remap PRIVATE .
-                           common
-                           source
+                           ${CMAKE_SOURCE_DIR}/tools/shared
                            ${CMAKE_SOURCE_DIR}/libs/assimp
-                           ${LIBXML2_INCLUDE_DIRS}
-                           ${GLIB_INCLUDE_DIRS}
-                           ${JPEG_INCLUDE_DIRS}
                            ${PNG_INCLUDE_DIRS}
+                           ${LIBXML2_INCLUDE_DIRS}
                           )
 
 target_link_libraries(remap
@@ -114,9 +81,8 @@ target_link_libraries(remap
                       l_net
                       commandlib
                       assimp
+                      ToolsShared
                       Threads::Threads
-                      ${GLIB_LIBRARIES}
-                      ${JPEG_LIBRARIES}
                       ${PNG_LIBRARIES}
                       ${ZLIB_LIBRARIES}
                       ${LIBXML2_LIBRARIES}

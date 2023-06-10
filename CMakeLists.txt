@@ -125,7 +125,8 @@ endif()
 
 # Tools
 if(BUILD_TOOLS)
-    add_subdirectory(tools)
+    add_subdirectory(tools/shared)
+    add_subdirectory(tools/remap)
 endif()
 
 # https://stackoverflow.com/questions/11944060/how-to-detect-target-architecture-using-cmake
