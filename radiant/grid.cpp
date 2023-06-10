@@ -244,6 +244,10 @@ void Grid_registerCommands(){
 
 
 void Grid_constructMenu( QMenu* menu ){
+	create_menu_item_with_mnemonic(menu, "Snap To Grid", "SnapToGrid");
+
+	menu->addSeparator();
+
 	create_check_menu_item_with_mnemonic( menu, "Grid0.125", "SetGrid0.125" );
 	create_check_menu_item_with_mnemonic( menu, "Grid0.25", "SetGrid0.25" );
 	create_check_menu_item_with_mnemonic( menu, "Grid0.5", "SetGrid0.5" );

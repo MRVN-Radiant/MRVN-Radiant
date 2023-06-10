@@ -1086,9 +1086,6 @@ void create_selection_menu( QMenuBar *menubar ){
 	}
 
 	menu->addSeparator();
-	create_menu_item_with_mnemonic( menu, "Snap To Grid", "SnapToGrid" );
-
-	menu->addSeparator();
 
 	{
 		QMenu* submenu = menu->addMenu( "Nudge" );
