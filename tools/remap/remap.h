@@ -1597,7 +1597,6 @@ inline bool  shadersAsBitmap;
 inline bool  lightmapsAsTexcoord;
 
 /* general commandline arguments */
-inline bool  force;
 inline int   patchSubdivisions = 8;  /* ydnar: -patchmeta subdivisions */
 
 /* commandline arguments */

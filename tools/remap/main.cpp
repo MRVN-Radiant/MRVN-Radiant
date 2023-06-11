@@ -84,19 +84,14 @@ int main( int argc, char *argv[] )
 
 	// Read general options first
 	{
-		/* -connect */
+		// -connect
 		if ( args.takeArg( "-connect" ) ) {
 			Broadcast_Setup( args.takeNext() );
 		}
 
-		/* verbose */
-		if ( args.takeArg( "-v" ) ) { // test just once: leave other possible -v for -vis
+		// -verbose
+		if ( args.takeArg( "-verbose" ) ) { // test just once: leave other possible -v for -vis
 			verbose = true;
-		}
-
-		/* force */
-		while ( args.takeArg( "-force" ) ) {
-			force = true;
 		}
 
 		/* patch subdivisions */

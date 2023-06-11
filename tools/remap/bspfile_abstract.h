@@ -67,13 +67,7 @@ void CopyLump(rbspHeader_t *header, int lump, std::vector<DstT> &data) {
     }
 
     if (length % sizeof(SrcT)) {
-        if (force) {
-            Sys_Warning("CopyLump: odd lump size (%d) in lump %d\n", length, lump);
-            data.clear();
-            return;
-        } else {
-            Error("CopyLump: odd lump size (%d) in lump %d", length, lump);
-        }
+        Error("CopyLump: odd lump size (%d) in lump %d", length, lump);
     }
 
     /* copy block of memory and return */
