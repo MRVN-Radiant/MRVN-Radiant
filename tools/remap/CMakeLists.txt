@@ -19,8 +19,6 @@ add_executable(remap
                "bspfile_abstract.h"
                "bspfile_shared.cpp"
                "bspfile_shared.h"
-               "convert_obj.cpp"
-               "convert_obj.h"
                "decals.cpp"
                "exportents.cpp"
                "facebsp.cpp"

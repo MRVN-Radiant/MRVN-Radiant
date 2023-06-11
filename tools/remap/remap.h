@@ -1295,9 +1295,6 @@ void InitPaths(Args &args);
 /* bsp.c */
 int BSPMain(Args& args);
 
-/* convert_obj.c */
-int ConvertBSPToOBJ(char *bspName);
-
 /* brush.c */
 sideRef_t *AllocSideRef(const side_t *side, sideRef_t *next);
 Vector3 SnapWeldVector(const Vector3 &a, const Vector3 &b);
