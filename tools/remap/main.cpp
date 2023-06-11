@@ -61,7 +61,7 @@ static void ExitQ3Map()
 //------------------------------------------------------------
 int main( int argc, char *argv[] )
 {
-	int ret;
+	int ret = 0;
 
 #ifdef WIN32
 	// Set max number of open io streams
@@ -135,9 +135,17 @@ int main( int argc, char *argv[] )
 		Error( "Usage: %s [general options] [options] mapfile\n", args.getArg0() );
 	}
 
-	/* ydnar: otherwise create a bsp */
-	else{
+	// Create bsp
+	if( args.takeArg( "-bsp" ) )
+	{
 		ret = BSPMain( args );
+		Sys_Printf( "BspMain returned: %i\n", ret );
+	}
+
+	// List unknown options
+	while (!args.empty())
+	{
+		Sys_Warning("Unknown option \"%s\"\n", args.takeFront());
 	}
 
 	/* emit time */

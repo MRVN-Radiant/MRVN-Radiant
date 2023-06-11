@@ -818,10 +818,6 @@ int BSPMain( Args& args ){
 			g_bExternalModels = true;
 		}
 		// complain if there's args remaning
-		while( !args.empty() )
-		{
-			Sys_Warning( "Unknown option \"%s\"\n", args.takeFront() );
-		}
 	}
 
 	// Check arg game compatibility
