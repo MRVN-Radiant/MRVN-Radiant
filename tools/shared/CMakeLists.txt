@@ -25,6 +25,7 @@ add_library(ToolsShared STATIC
             "scriplib.h"
             "stringfixedsize.h"
             "threads.cpp"
+            "toolsdef.h"
             "unzip.cpp"
             "unzip.h"
             "vfs.cpp"

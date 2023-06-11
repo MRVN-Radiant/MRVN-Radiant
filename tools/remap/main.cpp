@@ -24,26 +24,29 @@
    This code has been altered significantly from its original form, to support
    several games based on the Quake III Arena engine, in the form of "Q3Map2."
 
+   -------------------------------------------------------------------------------
+
+   "Q3Map2" has been significantly modified in the form of "remap" to support
+   Respawn Entertainment games.
+
    ------------------------------------------------------------------------------- */
 
-
-
-/* dependencies */
 #include "remap.h"
 #include "timer.h"
 
-
-
-static void new_handler(){
+//------------------------------------------------------------
+// Purpose: Allocation error callback
+//------------------------------------------------------------
+static void new_handler()
+{
 	Error( "Memory allocation failed, terminating" );
 }
 
-/*
-   ExitQ3Map()
-   cleanup routine
- */
-
-static void ExitQ3Map(){
+//------------------------------------------------------------
+// Purpose: Cleanups on exit
+//------------------------------------------------------------
+static void ExitQ3Map()
+{
 	/* flush xml send buffer, shut down connection */
 	Broadcast_Shutdown();
 	free( mapDrawSurfs );
@@ -51,28 +54,27 @@ static void ExitQ3Map(){
 
 
 
-/*
-   main()
-   q3map mojo...
- */
-
-int main( int argc, char **argv ){
-	int r;
+//------------------------------------------------------------
+// Purpose: Entry point
+// Input  :
+// Output :
+//------------------------------------------------------------
+int main( int argc, char *argv[] )
+{
+	int ret;
 
 #ifdef WIN32
+	// Set max number of open io streams
 	_setmaxstdio(2048);
 #endif
 
-	/* we want consistent 'randomness' */
+	// We want consistent 'randomness'
 	srand( 0 );
 
-	/* start timer */
+	// Start compilation time timer
 	Timer timer;
 
-	/* this was changed to emit version number over the network */
-	printf( Q3MAP_VERSION "\n" );
-
-	/* set exit call */
+	// Set exit call
 	atexit( ExitQ3Map );
 
 	/* set allocation error callback */
@@ -120,17 +122,14 @@ int main( int argc, char **argv ){
 	/* set number of threads */
 	ThreadSetDefault();
 
-	/* we print out two versions, q3map's main version (since it evolves a bit out of GtkRadiant)
-	   and we put the GtkRadiant version to make it easy to track with what version of Radiant it was built with */
+	// Print emblem and generic version information
+	for( size_t i = 0; i < ARRAYSIZE(REMAP_EMBLEM); i++ )
+	{
+		Sys_Printf( "%s\n", REMAP_EMBLEM[i].c_str() );
+	}
 
-	Sys_Printf("    ________  ____ ___  ____  ____ \n");
-	Sys_Printf("   / ___/ _ \\/ __ `__ \\/ __ `/ __ \\\n");
-	Sys_Printf("  / /  /  __/ / / / / / /_/ / /_/ /\n");
-	Sys_Printf(" /_/   \\___/_/ /_/ /_/\\__,_/ .___/\n");
-	Sys_Printf("                          /_/\n");
-	Sys_Printf( "Remap version: " Q3MAP_VERSION "\n" );    // Remap version
-	Sys_Printf( "Radiant version: " RADIANT_VERSION "\n" ); // Radiant version with which we were built, may not be the same as the one running us!
-	//Sys_Printf( "%s\n", Q3MAP_MOTD );
+	Sys_Printf( "Remap version: " Q3MAP_VERSION "\n" );
+	Sys_Printf( "Radiant version: " RADIANT_VERSION "\n" );
 	Sys_Printf( "%s\n", args.getArg0() );
 	Sys_Printf( "\n" );
 
@@ -144,83 +143,83 @@ int main( int argc, char **argv ){
 
 	/* check if we have enough options left to attempt something */
 	if ( args.empty() ) {
-		Error( "Usage: %s [general options] [options] mapfile\n%s -help for help", args.getArg0(), args.getArg0() );
+		Error( "Usage: %s [general options] [options] mapfile\n", args.getArg0() );
 	}
 
 	/* fixaas */
 	if ( args.takeFront( "-fixaas" ) ) {
-		r = FixAAS( args );
+		ret = FixAAS( args );
 	}
 
 	/* analyze */
 	else if ( args.takeFront( "-analyze" ) ) {
-		r = AnalyzeBSP( args );
+		ret = AnalyzeBSP( args );
 	}
 
 	/* info */
 	else if ( args.takeFront( "-info" ) ) {
-		r = BSPInfo( args );
+		ret = BSPInfo( args );
 	}
 
 	/* vis */
 	else if ( args.takeFront( "-vis" ) ) {
-		r = VisMain( args );
+		ret = VisMain( args );
 	}
 
 	/* light */
 	else if ( args.takeFront( "-light" ) ) {
-		r = LightMain( args );
+		ret = LightMain( args );
 	}
 
 	/* QBall: export entities */
 	else if ( args.takeFront( "-exportents" ) ) {
-		r = ExportEntitiesMain( args );
+		ret = ExportEntitiesMain( args );
 	}
 
 	/* ydnar: lightmap export */
 	else if ( args.takeFront( "-export" ) ) {
-		r = ExportLightmapsMain( args );
+		ret = ExportLightmapsMain( args );
 	}
 
 	/* ydnar: lightmap import */
 	else if ( args.takeFront( "-import" ) ) {
-		r = ImportLightmapsMain( args );
+		ret = ImportLightmapsMain( args );
 	}
 
 	/* ydnar: bsp scaling */
 	else if ( args.takeFront( "-scale" ) ) {
-		r = ScaleBSPMain( args );
+		ret = ScaleBSPMain( args );
 	}
 
 	/* bsp shifting */
 	else if ( args.takeFront( "-shift" ) ) {
-		r = ShiftBSPMain( args );
+		ret = ShiftBSPMain( args );
 	}
 
 	/* ydnar: bsp conversion */
 	else if ( args.takeFront( "-convert" ) ) {
-		r = ConvertBSPMain( args );
+		ret = ConvertBSPMain( args );
 	}
 
 	/* json export/import */
 	else if ( args.takeFront( "-json" ) ) {
-		r = ConvertJsonMain( args );
+		ret = ConvertJsonMain( args );
 	}
 
 	/* merge two bsps */
 	else if ( args.takeFront( "-mergebsp" ) ) {
-		r = MergeBSPMain( args );
+		ret = MergeBSPMain( args );
 	}
 
 
 	/* ydnar: otherwise create a bsp */
 	else{
-		r = BSPMain( args );
+		ret = BSPMain( args );
 	}
 
 	/* emit time */
 	Sys_Printf( "%9.0f seconds elapsed\n", timer.elapsed_sec() );
 
 	/* return any error code */
-	return r;
+	return ret;
 }

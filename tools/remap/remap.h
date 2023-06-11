@@ -31,7 +31,6 @@
 
    ------------------------------------------------------------------------------- */
 
-
 #pragma once
 
 
@@ -50,7 +49,8 @@
 
 
 /* general */
-#include "version.h"  /* ttimo: might want to guard that if built outside of the GtkRadiant tree */
+#include "version.h"
+#include "toolsdef.h"
 
 #include "cmdlib.h"
 #include "qstringops.h"
@@ -78,6 +78,15 @@
 #include "maxworld.h"
 #include "games.h"
 
+
+const static std::string REMAP_EMBLEM[] =
+{
+    R"(    ________  ____ ___  ____  ____ )",
+    R"(   / ___/ _ \/ __ `__ \/ __ `/ __ \)",
+    R"(  / /  /  __/ / / / / / /_/ / /_/ /)",
+    R"( /_/   \___/_/ /_/ /_/\__,_/ .___/ )",
+    R"(                          /_/      )"
+};
 
 /* -------------------------------------------------------------------------------
 
