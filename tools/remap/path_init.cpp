@@ -201,7 +201,6 @@ const game_t *GetGame( const char *arg ){
 
 	/* no matching game */
 	Sys_Warning( "Game \"%s\" is unknown.\n", arg );
-	HelpGames();
 	return NULL;
 }
 

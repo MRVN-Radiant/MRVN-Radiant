@@ -77,19 +77,13 @@ int main( int argc, char *argv[] )
 	// Set exit call
 	atexit( ExitQ3Map );
 
-	/* set allocation error callback */
+	// Set allocation error callback
 	std::set_new_handler( new_handler );
 
 	Args args( argc, argv );
 
-	/* read general options first */
+	// Read general options first
 	{
-		/* -help */
-		if ( args.takeArg( "-h", "--help", "-help" ) ) {
-			HelpMain( args.nextAvailable()? args.takeNext() : nullptr );
-			return 0;
-		}
-
 		/* -connect */
 		if ( args.takeArg( "-connect" ) ) {
 			Broadcast_Setup( args.takeNext() );

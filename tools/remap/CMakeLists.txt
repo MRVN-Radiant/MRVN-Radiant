@@ -29,7 +29,6 @@ add_executable(remap
                "fog.cpp"
                "games.cpp"
                "games.h"
-               "help.cpp"
                "image.cpp"
                "leakfile.cpp"
                "light_bounce.cpp"

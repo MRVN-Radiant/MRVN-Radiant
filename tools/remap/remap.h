@@ -1287,9 +1287,6 @@ public:
 
 inline float Random() { return (float)rand() / RAND_MAX; }  /* returns a pseudorandom number between 0 and 1 */
 
-/* help.c */
-void HelpMain(const char *arg);
-void HelpGames();
 
 /* path_init.c */
 const game_t *GetGame(const char *arg);
