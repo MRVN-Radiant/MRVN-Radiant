@@ -135,21 +135,6 @@ int main( int argc, char *argv[] )
 		Error( "Usage: %s [general options] [options] mapfile\n", args.getArg0() );
 	}
 
-	/* fixaas */
-	if ( args.takeFront( "-fixaas" ) ) {
-		ret = FixAAS( args );
-	}
-
-	/* analyze */
-	else if ( args.takeFront( "-analyze" ) ) {
-		ret = AnalyzeBSP( args );
-	}
-
-	/* info */
-	else if ( args.takeFront( "-info" ) ) {
-		ret = BSPInfo( args );
-	}
-
 	/* vis */
 	else if ( args.takeFront( "-vis" ) ) {
 		ret = VisMain( args );
@@ -175,29 +160,9 @@ int main( int argc, char *argv[] )
 		ret = ImportLightmapsMain( args );
 	}
 
-	/* ydnar: bsp scaling */
-	else if ( args.takeFront( "-scale" ) ) {
-		ret = ScaleBSPMain( args );
-	}
-
-	/* bsp shifting */
-	else if ( args.takeFront( "-shift" ) ) {
-		ret = ShiftBSPMain( args );
-	}
-
-	/* ydnar: bsp conversion */
-	else if ( args.takeFront( "-convert" ) ) {
-		ret = ConvertBSPMain( args );
-	}
-
 	/* json export/import */
 	else if ( args.takeFront( "-json" ) ) {
 		ret = ConvertJsonMain( args );
-	}
-
-	/* merge two bsps */
-	else if ( args.takeFront( "-mergebsp" ) ) {
-		ret = MergeBSPMain( args );
 	}
 
 

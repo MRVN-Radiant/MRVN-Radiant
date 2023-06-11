@@ -1295,15 +1295,6 @@ void InitPaths(Args &args);
 /* bsp.c */
 int BSPMain(Args& args);
 
-/* convert_bsp.c */
-int FixAAS(Args &args);
-int AnalyzeBSP(Args &args);
-int BSPInfo(Args &args);
-int ScaleBSPMain(Args &args);
-int ShiftBSPMain(Args &args);
-int MergeBSPMain(Args &args);
-int ConvertBSPMain(Args &args);
-
 /* convert_map.c */
 int ConvertBSPToMap(char *bspName);
 int ConvertBSPToMap_BP(char *bspName);
