@@ -94,7 +94,7 @@ StringOutputStream g_renderer_stats;
 std::size_t g_count_prims;
 std::size_t g_count_states;
 std::size_t g_count_transforms;
-Timer g_timer;
+CTimer g_timer;
 
 inline void count_prim(){
 	++g_count_prims;

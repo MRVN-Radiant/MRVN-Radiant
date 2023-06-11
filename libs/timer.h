@@ -24,11 +24,11 @@
 #include <chrono>
 
 
-class Timer
+class CTimer
 {
 	std::chrono::time_point<std::chrono::steady_clock> m_start;
 public:
-	Timer(){
+	CTimer(){
 		start();
 	}
 	void start(){
@@ -46,7 +46,7 @@ public:
 
 class DoubleClickTimer
 {
-	Timer m_timer;
+	CTimer m_timer;
 	bool m_fired{};
 public:
 	void click(){

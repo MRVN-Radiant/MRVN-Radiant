@@ -727,7 +727,7 @@ void MakeEntityDecals( const entity_t& e ){
 
 	/* init pacifier */
 	fOld = -1;
-	Timer timer;
+	CTimer timer;
 
 	/* walk the list of decal projectors */
 	for ( i = 0; i < numProjectors; i++ )

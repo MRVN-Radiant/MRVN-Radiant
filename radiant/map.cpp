@@ -946,7 +946,7 @@ void DoMapInfo(){
 
 class ScopeTimer
 {
-	Timer m_timer;
+	CTimer m_timer;
 	const char* m_message;
 public:
 	ScopeTimer( const char* message )

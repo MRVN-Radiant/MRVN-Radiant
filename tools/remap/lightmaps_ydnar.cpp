@@ -606,7 +606,7 @@ void StitchSurfaceLightmaps(){
 
 	/* init pacifier */
 	fOld = -1;
-	Timer timer;
+	CTimer timer;
 
 	/* walk the list of raw lightmaps */
 	numStitched = 0;

@@ -200,7 +200,7 @@ private:
 	int m_entityCreate_x, m_entityCreate_y;
 	bool m_entityCreate;
 
-	Timer m_render_time;
+	CTimer m_render_time;
 
 public:
 	void OnContextMenu();

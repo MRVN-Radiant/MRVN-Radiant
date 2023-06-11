@@ -171,7 +171,7 @@ void ThreadUnlock(){
 void RunThreadsOn( int workcnt, bool showpacifier, void ( *func )( int ) ){
 	HANDLE threadhandle[MAX_THREADS];
 	int i;
-	Timer timer;
+	CTimer timer;
 
 	dispatch = 0;
 	workcount = workcnt;
@@ -266,7 +266,7 @@ void RunThreadsOn( int workcnt, bool showpacifier, void ( *func )( int ) ){
 	pthread_addr_t status;
 	pthread_attr_t attrib;
 	pthread_mutexattr_t mattrib;
-	Timer timer;
+	CTimer timer;
 
 	dispatch = 0;
 	workcount = workcnt;
@@ -369,7 +369,7 @@ void ThreadUnlock(){
 void RunThreadsOn( int workcnt, bool showpacifier, void ( *func )( int ) ){
 	int i;
 	int pid[MAX_THREADS];
-	Timer timer;
+	CTimer timer;
 
 	dispatch = 0;
 	workcount = workcnt;
@@ -530,7 +530,7 @@ void RunThreadsOn( int workcnt, bool showpacifier, void ( *func )( int ) ){
 	pthread_t work_threads[MAX_THREADS];
 	size_t stacksize;
 
-	Timer timer;
+	CTimer timer;
 	int i = 0;
 
 	pacifier  = showpacifier;
@@ -618,7 +618,7 @@ void ThreadUnlock(){
  */
 void RunThreadsOn( int workcnt, bool showpacifier, void ( *func )( int ) ){
 	int i;
-	Timer timer;
+	CTimer timer;
 
 	dispatch = 0;
 	workcount = workcnt;

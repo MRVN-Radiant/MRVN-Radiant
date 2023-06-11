@@ -231,7 +231,7 @@ struct camera_t
 	int m_focus_offset = 0;
 
 	unsigned int movementflags; // movement flags
-	Timer m_keycontrol_timer;
+	CTimer m_keycontrol_timer;
 	float m_keymove_speed_current;
 
 
@@ -963,7 +963,7 @@ public:
 	DeferredDraw m_deferredDraw;
 	DeferredMotion2 m_deferred_motion;
 
-	Timer m_render_time;
+	CTimer m_render_time;
 
 	CamWnd();
 	~CamWnd();
@@ -1012,7 +1012,7 @@ public:
 		return m_cameraview;
 	}
 
-	Timer m_rightClickTimer;
+	CTimer m_rightClickTimer;
 	float m_rightClickMove;
 
 	void selection_motion_freemove( const MotionDeltaValues& delta );
@@ -2132,7 +2132,7 @@ void CamWnd::draw(){
 }
 
 void CamWnd::BenchMark(){
-	Timer timer;
+	CTimer timer;
 	timer.start();
 	for ( int i = 0; i < 100; i++ )
 	{

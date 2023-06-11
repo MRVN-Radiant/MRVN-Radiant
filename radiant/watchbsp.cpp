@@ -99,7 +99,7 @@ private:
 	netmessage_t msg;
 	GPtrArray *m_pCmd;
 // used to timeout EBeginStep
-	Timer m_timeout_timer;
+	CTimer m_timeout_timer;
 	std::size_t m_iCurrentStep;
 	QTimer m_monitoring_timer;
 // name of the map so we can run the engine

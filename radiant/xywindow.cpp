@@ -290,7 +290,7 @@ QMenu* XYWnd::m_mnuDrop = 0;
 
 
 #include "timer.h"
-static Timer g_chasemouse_timer;
+static CTimer g_chasemouse_timer;
 static QTimer g_chasemouse_caller;
 
 void XYWnd::ChaseMouse(){

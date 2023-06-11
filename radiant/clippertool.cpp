@@ -143,7 +143,7 @@ void Clipper_doFlip(){
 }
 
 #include "timer.h"
-Timer g_clipper_timer;
+CTimer g_clipper_timer;
 bool g_clipper_doubleclicked = false;
 std::size_t g_clipper_doubleclicked_point = 0; //monitor clicking the same point twice
 

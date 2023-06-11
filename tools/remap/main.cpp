@@ -72,7 +72,7 @@ int main( int argc, char *argv[] )
 	srand( 0 );
 
 	// Start compilation time timer
-	Timer timer;
+	CTimer timer;
 
 	// Set exit call
 	atexit( ExitQ3Map );

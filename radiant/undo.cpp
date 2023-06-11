@@ -38,7 +38,7 @@
 
 class DebugScopeTimer
 {
-	Timer m_timer;
+	CTimer m_timer;
 	const char* m_operation;
 public:
 	DebugScopeTimer( const char* operation )

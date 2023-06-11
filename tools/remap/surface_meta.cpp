@@ -861,7 +861,7 @@ void MakeEntityMetaTriangles( const entity_t& e ){
 
 	/* init pacifier */
 	int fOld = -1;
-	Timer timer;
+	CTimer timer;
 
 	/* walk the list of surfaces in the entity */
 	for ( int i = e.firstDrawSurf; i < numMapDrawSurfs; ++i )
@@ -1002,7 +1002,7 @@ void FixMetaTJunctions(){
 
 	/* init pacifier */
 	fOld = -1;
-	Timer timer;
+	CTimer timer;
 
 	/* walk triangle list */
 	numTJuncs = 0;
@@ -1157,7 +1157,7 @@ void FixMetaTJunctions(){
 #define EQUAL_NORMAL_EPSILON    0.01f
 
 void SmoothMetaTriangles(){
-	Timer timer;
+	CTimer timer;
 	int numSmoothed = 0;
 
 	/* note it */
@@ -1674,7 +1674,7 @@ void MergeMetaTriangles(){
 
 	/* init pacifier */
 	int fOld = -1;
-	Timer timer;
+	CTimer timer;
 	int numAdded = 0;
 #if 1
 	for( metaTriangle_t& tri : metaTriangles ){
