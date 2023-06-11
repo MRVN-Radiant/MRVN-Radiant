@@ -1295,10 +1295,6 @@ void InitPaths(Args &args);
 /* bsp.c */
 int BSPMain(Args& args);
 
-/* convert_map.c */
-int ConvertBSPToMap(char *bspName);
-int ConvertBSPToMap_BP(char *bspName);
-
 /* convert_obj.c */
 int ConvertBSPToOBJ(char *bspName);
 
