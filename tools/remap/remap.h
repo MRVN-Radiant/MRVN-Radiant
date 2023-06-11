@@ -1454,9 +1454,6 @@ void MakeEntityDecals(const entity_t &e);
 /* map.c */
 std::array<Vector3, 2> TextureAxisFromPlane(const plane_t &plane);
 
-/* vis.c */
-int VisMain(Args &args);
-
 /* light.c  */
 float PointToPolygonFormFactor(const Vector3 &point, const Vector3 &normal, const winding_t &w);
 int LightContributionToSample(trace_t *trace);
@@ -1500,9 +1497,6 @@ int ImportLightmapsMain(Args &args);
 void SetupSurfaceLightmaps();
 void StitchSurfaceLightmaps();
 void StoreSurfaceLightmaps(bool fastAllocate);
-
-/* exportents.c */
-int ExportEntitiesMain(Args &args);
 
 /* image.c */
 const image_t *ImageLoad(const char *name);

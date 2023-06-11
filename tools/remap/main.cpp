@@ -135,19 +135,9 @@ int main( int argc, char *argv[] )
 		Error( "Usage: %s [general options] [options] mapfile\n", args.getArg0() );
 	}
 
-	/* vis */
-	else if ( args.takeFront( "-vis" ) ) {
-		ret = VisMain( args );
-	}
-
 	/* light */
 	else if ( args.takeFront( "-light" ) ) {
 		ret = LightMain( args );
-	}
-
-	/* QBall: export entities */
-	else if ( args.takeFront( "-exportents" ) ) {
-		ret = ExportEntitiesMain( args );
 	}
 
 	/* ydnar: lightmap export */
