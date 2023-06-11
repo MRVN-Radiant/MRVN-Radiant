@@ -4,7 +4,4 @@
 <build name="Simple BSP">
 <command>[remap] -meta "[MapFile]"</command>
 </build>
-<build name="Only entities (Doesn't modify the map!)">
-<command>[remap] -onlyents -meta "[MapFile]"</command>
-</build>
 
