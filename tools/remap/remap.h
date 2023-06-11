@@ -1454,50 +1454,6 @@ void MakeEntityDecals(const entity_t &e);
 /* map.c */
 std::array<Vector3, 2> TextureAxisFromPlane(const plane_t &plane);
 
-/* light.c  */
-float PointToPolygonFormFactor(const Vector3 &point, const Vector3 &normal, const winding_t &w);
-int LightContributionToSample(trace_t *trace);
-void LightingAtSample(trace_t *trace, byte styles[MAX_LIGHTMAPS], Vector3 (&colors)[MAX_LIGHTMAPS]);
-int LightMain(Args &args);
-
-/* light_trace.c */
-void SetupTraceNodes();
-void TraceLine(trace_t *trace);
-float SetupTrace(trace_t *trace);
-
-/* light_bounce.c */
-bool RadSampleImage(const byte *pixels, int width, int height, const Vector2 &st, Color4f &color);
-void RadLightForTriangles(int num, int lightmapNum, rawLightmap_t *lm, const shaderInfo_t *si,
-                          float scale, float subdivide, clipWork_t *cw );
-void RadLightForPatch(int num, int lightmapNum, rawLightmap_t *lm, const shaderInfo_t *si,
-                      float scale, float subdivide, clipWork_t *cw);
-void RadCreateDiffuseLights();
-
-/* light_ydnar.c */
-Vector3b ColorToBytes(const Vector3 &color, float scale);
-void SmoothNormals();
-void MapRawLightmap(int num);
-void SetupDirt();
-void DirtyRawLightmap(int num);
-void SetupFloodLight();
-void FloodlightRawLightmaps();
-float FloodLightForSample(trace_t *trace, float floodLightDistance, bool floodLightLowQuality);
-void IlluminateRawLightmap(int num);
-void IlluminateVertexes(int num);
-void SetupBrushesFlags(int mask_any, int test_any, int mask_all, int test_all);
-void SetupBrushes();
-bool ClusterVisible(int a, int b);
-int ClusterForPointExt(const Vector3 &point, float epsilon);
-void SetupEnvelopes(bool forGrid, bool fastFlag);
-
-/* lightmaps_ydnar.c */
-void ExportLightmaps();
-int ExportLightmapsMain(Args &args);
-int ImportLightmapsMain(Args &args);
-void SetupSurfaceLightmaps();
-void StitchSurfaceLightmaps();
-void StoreSurfaceLightmaps(bool fastAllocate);
-
 /* image.c */
 const image_t *ImageLoad(const char *name);
 

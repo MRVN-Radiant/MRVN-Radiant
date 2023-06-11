@@ -135,21 +135,6 @@ int main( int argc, char *argv[] )
 		Error( "Usage: %s [general options] [options] mapfile\n", args.getArg0() );
 	}
 
-	/* light */
-	else if ( args.takeFront( "-light" ) ) {
-		ret = LightMain( args );
-	}
-
-	/* ydnar: lightmap export */
-	else if ( args.takeFront( "-export" ) ) {
-		ret = ExportLightmapsMain( args );
-	}
-
-	/* ydnar: lightmap import */
-	else if ( args.takeFront( "-import" ) ) {
-		ret = ImportLightmapsMain( args );
-	}
-
 	/* ydnar: otherwise create a bsp */
 	else{
 		ret = BSPMain( args );

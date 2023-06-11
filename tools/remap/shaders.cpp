@@ -640,7 +640,7 @@ static void FinishShader(shaderInfo_t *si) {
             for (x = 0, st[0] = 0.0f; x < si->shaderImage->width; x++, st[0] += o[0]) {
                 /* sample the shader image */
                 Color4f color;
-                RadSampleImage(si->shaderImage->pixels, si->shaderImage->width, si->shaderImage->height, st, color);
+                //RadSampleImage(si->shaderImage->pixels, si->shaderImage->width, si->shaderImage->height, st, color);
 
                 /* determine error squared */
                 const Color4f delta = color - si->averageColor;
