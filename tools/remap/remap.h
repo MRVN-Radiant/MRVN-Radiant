@@ -1302,9 +1302,6 @@ int ConvertBSPToMap_BP(char *bspName);
 /* convert_obj.c */
 int ConvertBSPToOBJ(char *bspName);
 
-/* convert_json.c */
-int ConvertJsonMain(Args &args);
-
 /* brush.c */
 sideRef_t *AllocSideRef(const side_t *side, sideRef_t *next);
 Vector3 SnapWeldVector(const Vector3 &a, const Vector3 &b);

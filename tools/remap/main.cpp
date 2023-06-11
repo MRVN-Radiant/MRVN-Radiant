@@ -160,12 +160,6 @@ int main( int argc, char *argv[] )
 		ret = ImportLightmapsMain( args );
 	}
 
-	/* json export/import */
-	else if ( args.takeFront( "-json" ) ) {
-		ret = ConvertJsonMain( args );
-	}
-
-
 	/* ydnar: otherwise create a bsp */
 	else{
 		ret = BSPMain( args );
