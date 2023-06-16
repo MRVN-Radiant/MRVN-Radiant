@@ -49,7 +49,6 @@ static void ExitReMap()
 {
 	/* flush xml send buffer, shut down connection */
 	Broadcast_Shutdown();
-	free( mapDrawSurfs );
 }
 
 

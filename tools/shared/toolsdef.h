@@ -26,12 +26,14 @@
 #include <string>
 #include <vector>
 #include <unordered_set>
+#include <filesystem>
 
 // Common types to reduce code verbosity
 using std::string;
 using std::vector;
 using std::unordered_set;
 
+namespace fs = std::filesystem;
 
 /* -------------------------------------------------------------------------------
 
