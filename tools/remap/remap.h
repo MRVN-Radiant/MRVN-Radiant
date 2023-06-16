@@ -1355,25 +1355,6 @@ void Leak_feedback(const tree_t &tree);
 void NumberClusters(tree_t &tree);
 void WritePortalFile(const tree_t &tree);
 
-/* writebsp.c */
-void SetModelNumbers();
-void SetLightStyles();
-int EmitShader(const char *shader, const int *contentFlags, const int *surfaceFlags);
-void BeginBSPFile();
-void EndBSPFile(bool do_write);
-void EmitBrushes(entity_t &e);
-void EmitEntityPartitions();
-void EmitEntity(const entity_t &e);
-void EmitMeshes(const entity_t &e);
-void EmitObjReferences();
-void EmitVisTree();
-// void EmitObjReference(Shared::visRef_t ref);
-void EmitModels();
-void EmitLevelInfo();
-void EmitStubs();
-void BeginModel(const entity_t &e);
-void EndModel(const entity_t &e, node_t *headnode);
-
 /* tree.c */
 void FreeTree(tree_t &tree);
 inline node_t *AllocNode(){ return new node_t(); }

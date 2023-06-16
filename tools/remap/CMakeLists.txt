@@ -47,7 +47,6 @@ add_executable(remap
                "surface.cpp"
                "tjunction.cpp"
                "tree.cpp"
-               "writebsp.cpp"
                "${CMAKE_SOURCE_DIR}/icons/remap.rc"
               )
 
