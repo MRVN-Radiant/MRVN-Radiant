@@ -1,7 +1,11 @@
 <?xml version="1.0"?>
 <project version="2.0">
-<var name="remap">"[RadiantPath]remap[ExecutableType]" -v<cond value="[MonitorAddress]"> -connect [MonitorAddress]</cond> -game titanfall2 -fs_basepath "[EnginePath]"<cond value="[GameName]"> -fs_game [GameName]</cond></var>
+<var name="remap_fs">"[RadiantPath]remap[ExecutableType]" -verbose<cond value="[MonitorAddress]"> -connect [MonitorAddress]</cond> -game titanfall2 -fs_basepath "[EnginePath]"<cond value="[GameName]"> -fs_game [GameName]</cond></var>
+<var name="remap">"[RadiantPath]remap[ExecutableType]" -verbose<cond value="[MonitorAddress]"> -connect [MonitorAddress]</cond></var>
 <build name="Simple BSP">
-<command>[remap] -meta "[MapFile]"</command>
+<command>[remap_fs] -bsp "[MapFile]"</command>
+</build>
+<build name="Info">
+<command>[remap] -pause -info "[BspFile]"</command>
 </build>
 

@@ -305,18 +305,10 @@ void InitPaths( Args& args ){
 	/* get the install path for backup */
 	LokiInitPaths( args.getArg0(), homePath, installPath );
 
-	/* set game to default (q3a) */
-	g_game = &g_games[ 0 ];
 
 	/* parse through the arguments and extract those relevant to paths */
 	{
 		/* -game */
-		while ( args.takeArg( "-game" ) ) {
-			g_game = GetGame( args.takeNext() );
-			if ( g_game == NULL ) {
-				g_game = &g_games[ 0 ];
-			}
-		}
 
 		/* -fs_forbiddenpath */
 		while ( args.takeArg( "-fs_forbiddenpath" ) ) {

@@ -45,7 +45,7 @@ static void new_handler()
 //------------------------------------------------------------
 // Purpose: Cleanups on exit
 //------------------------------------------------------------
-static void ExitQ3Map()
+static void ExitReMap()
 {
 	/* flush xml send buffer, shut down connection */
 	Broadcast_Shutdown();
@@ -75,7 +75,7 @@ int main( int argc, char *argv[] )
 	CTimer timer;
 
 	// Set exit call
-	atexit( ExitQ3Map );
+	atexit( ExitReMap );
 
 	// Set allocation error callback
 	std::set_new_handler( new_handler );
@@ -85,30 +85,28 @@ int main( int argc, char *argv[] )
 	// Read general options first
 	{
 		// -connect
-		if ( args.takeArg( "-connect" ) ) {
+		if ( args.takeArg( "-connect" ) )
+		{
 			Broadcast_Setup( args.takeNext() );
 		}
 
 		// -verbose
-		if ( args.takeArg( "-verbose" ) ) { // test just once: leave other possible -v for -vis
+		if ( args.takeArg( "-verbose" ) )
+		{
 			verbose = true;
 		}
 
-		/* patch subdivisions */
-		while ( args.takeArg( "-subdivisions" ) ) {
-			patchSubdivisions = std::max( atoi( args.takeNext() ), 1 );
-		}
-
-		/* threads */
-		while ( args.takeArg( "-threads" ) ) {
+		// Threads
+		while ( args.takeArg( "-threads" ) )
+		{
 			numthreads = atoi( args.takeNext() );
 		}
 	}
 
-	/* init model library */
+	// Init assimp
 	assimp_init();
 
-	/* set number of threads */
+	// Set number of threads 
 	ThreadSetDefault();
 
 	// Print emblem and generic version information
@@ -122,18 +120,21 @@ int main( int argc, char *argv[] )
 	Sys_Printf( "%s\n", args.getArg0() );
 	Sys_Printf( "\n" );
 
-	/* ydnar: new path initialization */
+	// Get game
+	if( args.takeArg( "-game" ) )
+	{
+		g_game = GetGame( args.takeNext() );
+	}
+
+	// Print info about passed bsp
+	if( args.takeArg( "-info" ) )
+	{
+		// TODO [Fifty]: Finish this
+		Sys_Printf("INFO\n");
+	}
+
+	// Init paths
 	InitPaths( args );
-
-	/* set game options */
-	if ( !patchSubdivisions ) {
-		patchSubdivisions = g_game->patchSubdivisions;
-	}
-
-	/* check if we have enough options left to attempt something */
-	if ( args.empty() ) {
-		Error( "Usage: %s [general options] [options] mapfile\n", args.getArg0() );
-	}
 
 	// Create bsp
 	if( args.takeArg( "-bsp" ) )
@@ -142,15 +143,20 @@ int main( int argc, char *argv[] )
 		Sys_Printf( "BspMain returned: %i\n", ret );
 	}
 
-	// List unknown options
-	while (!args.empty())
-	{
-		Sys_Warning("Unknown option \"%s\"\n", args.takeFront());
-	}
-
-	/* emit time */
 	Sys_Printf( "%9.0f seconds elapsed\n", timer.elapsed_sec() );
 
-	/* return any error code */
+	// Pause
+	if( args.takeArg( "-pause" ) )
+	{
+		std::system( "pause" );
+	}
+
+	// List unknown options
+	while( !args.empty() )
+	{
+		Sys_Warning( "Unknown option \"%s\"\n", args.takeFront() );
+	}
+
+	// Return
 	return ret;
 }
