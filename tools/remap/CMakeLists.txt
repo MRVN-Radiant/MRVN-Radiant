@@ -19,7 +19,6 @@ add_executable(remap
                "bspfile_shared.cpp"
                "bspfile_shared.h"
                "decals.cpp"
-               "facebsp.cpp"
                "fog.cpp"
                "games.cpp"
                "games.h"
@@ -45,7 +44,6 @@ add_executable(remap
                "surface_meta.cpp"
                "surface.cpp"
                "tjunction.cpp"
-               "tree.cpp"
                "${CMAKE_SOURCE_DIR}/icons/remap.rc"
               )
 

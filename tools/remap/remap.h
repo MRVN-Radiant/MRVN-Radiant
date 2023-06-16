@@ -1355,10 +1355,6 @@ void Leak_feedback(const tree_t &tree);
 void NumberClusters(tree_t &tree);
 void WritePortalFile(const tree_t &tree);
 
-/* tree.c */
-void FreeTree(tree_t &tree);
-inline node_t *AllocNode(){ return new node_t(); }
-
 /* patch.c */
 void ParsePatch(bool onlyLights, entity_t &mapEnt, int mapPrimitiveNum);
 void PatchMapDrawSurfs(entity_t &e);
@@ -1372,11 +1368,6 @@ void FogDrawSurfaces(const entity_t &e);
 int FogForPoint(const Vector3 &point, float epsilon);
 int FogForBounds(const MinMax &minmax, float epsilon);
 void CreateMapFogs();
-
-/* facebsp.c */
-facelist_t MakeStructuralBSPFaceList(const brushlist_t &list);
-facelist_t MakeVisibleBSPFaceList(const brushlist_t &list);
-tree_t FaceBSP(facelist_t &list);
 
 /* model.c */
 void assimp_init();
