@@ -24,6 +24,11 @@
    This code has been altered significantly from its original form, to support
    several games based on the Quake III Arena engine, in the form of "Q3Map2."
 
+   -------------------------------------------------------------------------------
+
+   "Q3Map2" has been significantly modified in the form of "remap" to support
+   Respawn Entertainment games.
+
    ------------------------------------------------------------------------------- */
 
 /* dependencies */

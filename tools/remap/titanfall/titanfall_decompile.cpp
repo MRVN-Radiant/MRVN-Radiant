@@ -76,7 +76,7 @@ void Titanfall::LoadLumpsAndEntities( rbspHeader_t *header, const char *filename
         
         for( std::string &partition : partitions ) {
             auto name = StringOutputStream(256)( PathExtensionless(filename), partition.c_str() );
-            LoadEntFile( name.c_str(), Titanfall::Bsp::entities );
+            //LoadEntFile( name.c_str(), Titanfall::Bsp::entities );
         }
     }
 

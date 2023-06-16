@@ -24,163 +24,50 @@
    This code has been altered significantly from its original form, to support
    several games based on the Quake III Arena engine, in the form of "Q3Map2."
 
-   ------------------------------------------------------------------------------- */
+   -------------------------------------------------------------------------------
 
+   "Q3Map2" has been significantly modified in the form of "remap" to support
+   Respawn Entertainment games.
+
+   ------------------------------------------------------------------------------- */
 
 /* dependencies */
 #include "remap.h"
 #include "bspfile_abstract.h"
 #include <ctime>
 
-
-
-
-/* -------------------------------------------------------------------------------
-
-   this file was copied out of the common directory in order to not break
-   compatibility with the q3map 1.x tree. it was moved out in order to support
-   the raven bsp format (RBSP) used in soldier of fortune 2 and jedi knight 2.
-
-   since each game has its own set of particular features, the data structures
-   below no longer directly correspond to the binary format of a particular game.
-
-   the translation will be done at bsp load/save time to keep any sort of
-   special-case code messiness out of the rest of the program.
-
-   ------------------------------------------------------------------------------- */
-
-
-/*
-   SwapBlock()
-   if all values are 32 bits, this can be used to swap everything
-*/
-void SwapBlock(int *block, int size) {
-    /* dummy check */
-    if (block == NULL) {
-        return;
-    }
-
-    /* swap */
-    size >>= 2;
-    for (int i = 0; i < size; ++i) {
-        block[i] = LittleLong(block[i]);
-    }
-}
-
-
-/*
-   SwapBlock()
-   if all values are 32 bits, this can be used to swap everything
-*/
-template<typename T>
-void SwapBlock(std::vector<T> &block){
-    const size_t size = (sizeof(T) * block.size()) >> 2;  // get size in integers
-    /* swap */
-    int *intptr = reinterpret_cast<int*>(block.data());
-    for (size_t i = 0; i < size; ++i) {
-        intptr[i] = LittleLong(intptr[i]);
-    }
-}
-
-
-/*
-   SwapBSPFile()
-   byte swaps all data in the abstract bsp
-*/
-static void SwapBSPFile() {}
-
-
-/*
-   LoadEntFile()
-   loads an ent file
-*/
-void LoadEntFile(const char *filename, std::vector<char> &ents) {
-    if (!FileExists(filename)) {
-        return;
-    }
-    /* Open it */
-    MemBuffer f = LoadFile(filename);
-    /* Add to bspEntities */
-    std::vector<char> ent = { (char*)((byte*)f.data() + 10), (char*)((byte*)f.data() + f.size()) };
-    ents.insert(ents.end(), ent.begin(), ent.end());
-}
-
-
-/*
-   LoadBSPFile()
-   loads a bsp file into memory
-*/
-void LoadBSPFile(const char *filename) {
-    /* dummy check */
-    if (g_game == NULL || g_game->load == NULL) {
-        Error("LoadBSPFile: unsupported BSP file format");
-    }
-
-    /* load it, then byte swap the in-memory version */
-    //g_game->load(filename);
-    //SwapBSPFile();
-}
-
-
-/*
-   LoadBSPFilePartially()
-   loads bsp file parts meaningful for autopacker
-*/
-void LoadBSPFilePartially(const char *filename) {
-    /* dummy check */
-    if (g_game == NULL || g_game->load == NULL) {
-        Error("LoadBSPFile: unsupported BSP file format");
-    }
-
-    /* load it, then byte swap the in-memory version */
-    // g_game->load(filename);
-    // LoadIBSPorRBSPFilePartially(filename);
-    // SwapBSPFile();
-}
-
-
-/*
-   WriteBSPFile()
-   writes a bsp file
-*/
-void WriteBSPFile(const char *filename) {
-    char tempname[1024];
+//------------------------------------------------------------
+// Purpose: Writes the bsp file to disk
+// Input  : *pszFileName - Path w/ filename without an extension
+//------------------------------------------------------------
+void WriteBSPFile( const char *pszFileName )
+{
     time_t tm;
 
-    Sys_Printf("Writing %s... ", filename);
+    fs::path phBspFileName(pszFileName);
+    phBspFileName.replace_extension( fs::path(".bsp") );
 
-    /* dummy check */
-    if (g_game == NULL || g_game->write == NULL) {
-        Sys_Printf("Failed!\n");
-        Error("WriteBSPFile: unsupported BSP file format");
-    }
-
+    Sys_Printf("Writing %s... ", phBspFileName.string().c_str() );
     Sys_Printf("Success!\n");
 
-    /* make fake temp name so existing bsp file isn't damaged in case write process fails */
-    time(&tm);
-    sprintf(tempname, "%s.%08X", filename, (int)tm);
-
-    /* byteswap, write the bsp, then swap back so it can be manipulated further */
-    SwapBSPFile();
-    g_game->write(tempname);
-    SwapBSPFile();
-
-    /* replace existing bsp file */
-    remove(filename);
-    rename(tempname, filename);
+    g_game->write( phBspFileName.string().c_str() );
 }
 
 
-/*
-    WriteEntFileHeader()
-*/
-void WriteEntFileHeader(FILE *file) {
-    if (g_game->bspVersion == 47) {
+//------------------------------------------------------------
+// Purpose: Writes the ent header to file
+// Input  : *file
+//------------------------------------------------------------
+void WriteEntFileHeader( FILE *file )
+{
+    if( g_game->bspVersion == 47 )
+    {
         // Apex Legends
         std::string message = "ENTITIES02 num_models=" + std::to_string(ApexLegends::Bsp::levelInfo.at(0).modelCount) + "\n";
         SafeWrite(file, message.c_str(), message.size());
-    } else {
+    }
+    else
+    {
         // Titanfall
         char message[] = "ENTITIES01\n";
         SafeWrite(file, &message, sizeof(message) - 1);
@@ -188,30 +75,35 @@ void WriteEntFileHeader(FILE *file) {
 }
 
 
-/*
-    WriteEntFiles()
-    Writes .ent files used by .bsp
-*/
-void WriteEntFiles(const char *path) {
+//------------------------------------------------------------
+// Purpose: Writes .ent files based on whether they have entities
+// Input  : *path
+//------------------------------------------------------------
+void WriteEntFiles( const char *path )
+{
     // env
-    if (Titanfall::Ent::env.size()) {
-        auto name = StringOutputStream(1024)(PathExtensionless(path), "_env.ent");
-        Sys_Printf("Writing %s... ", name.c_str());
+    if( Titanfall::Ent::env.size() )
+    {
+        fs::path phEntFileName( path );
+        phEntFileName += fs::path( "_env.ent" );
+        Sys_Printf( "Writing %s... ", phEntFileName.string().c_str() );
 
-        FILE *file = SafeOpenWrite(name);
-        WriteEntFileHeader(file);
-        Titanfall::Ent::env.emplace_back('\0');
-        SafeWrite(file, Titanfall::Ent::env.data(), Titanfall::Ent::env.size());
+        FILE *file = SafeOpenWrite( phEntFileName.string().c_str() );
+        WriteEntFileHeader( file );
+        Titanfall::Ent::env.emplace_back( '\0' );
+        SafeWrite( file, Titanfall::Ent::env.data(), Titanfall::Ent::env.size() );
         fclose(file);
 
         Sys_Printf("Success!\n");
     }
     // fx
-    if (Titanfall::Ent::fx.size()) {
-        auto name = StringOutputStream(1024)(PathExtensionless(path), "_fx.ent");
-        Sys_Printf("Writing %s... ", name.c_str());
+    if( Titanfall::Ent::fx.size() )
+    {
+        fs::path phEntFileName( path );
+        phEntFileName += fs::path( "_fx.ent" );
+        Sys_Printf( "Writing %s... ", phEntFileName.string().c_str() );
 
-        FILE *file = SafeOpenWrite(name);
+        FILE *file = SafeOpenWrite( phEntFileName.string().c_str() );
         WriteEntFileHeader(file);
         Titanfall::Ent::fx.emplace_back('\0');
         SafeWrite(file, Titanfall::Ent::fx.data(), Titanfall::Ent::fx.size());
@@ -220,11 +112,13 @@ void WriteEntFiles(const char *path) {
         Sys_Printf("Success!\n");
     }
     // script
-    if (Titanfall::Ent::script.size()) {
-        auto name = StringOutputStream(1024)(PathExtensionless(path), "_script.ent");
-        Sys_Printf("Writing %s... ", name.c_str());
+    if( Titanfall::Ent::script.size() )
+    {
+        fs::path phEntFileName( path );
+        phEntFileName += fs::path( "_script.ent" );
+        Sys_Printf( "Writing %s... ", phEntFileName.string().c_str() );
 
-        FILE *file = SafeOpenWrite(name);
+        FILE *file = SafeOpenWrite( phEntFileName.string().c_str() );
         WriteEntFileHeader(file);
         Titanfall::Ent::script.emplace_back('\0');
         SafeWrite(file, Titanfall::Ent::script.data(), Titanfall::Ent::script.size());
@@ -233,11 +127,13 @@ void WriteEntFiles(const char *path) {
         Sys_Printf("Success!\n");
     }
     // snd
-    if (Titanfall::Ent::snd.size()) {
-        auto name = StringOutputStream(1024)(PathExtensionless(path), "_snd.ent");
-        Sys_Printf("Writing %s... ", name.c_str());
+    if( Titanfall::Ent::snd.size() )
+    {
+        fs::path phEntFileName( path );
+        phEntFileName += fs::path( "_snd.ent" );
+        Sys_Printf( "Writing %s... ", phEntFileName.string().c_str() );
 
-        FILE *file = SafeOpenWrite(name);
+        FILE *file = SafeOpenWrite( phEntFileName.string().c_str() );
         WriteEntFileHeader(file);
         Titanfall::Ent::snd.emplace_back('\0');
         SafeWrite(file, Titanfall::Ent::snd.data(), Titanfall::Ent::snd.size());
@@ -246,28 +142,16 @@ void WriteEntFiles(const char *path) {
         Sys_Printf("Success!\n");
     }
     // spawn
-    if (Titanfall::Ent::spawn.size()) {
-        auto name = StringOutputStream(1024)(PathExtensionless(path), "_spawn.ent");
-        Sys_Printf("Writing %s... ", name.c_str());
+    if( Titanfall::Ent::spawn.size() )
+    {
+        fs::path phEntFileName( path );
+        phEntFileName += fs::path( "_spawn.ent" );
+        Sys_Printf( "Writing %s... ", phEntFileName.string().c_str() );
 
-        FILE *file = SafeOpenWrite(name);
+        FILE *file = SafeOpenWrite( phEntFileName.string().c_str() );
         WriteEntFileHeader(file);
         Titanfall::Ent::spawn.emplace_back('\0');
         SafeWrite(file, Titanfall::Ent::spawn.data(), Titanfall::Ent::spawn.size());
-        fclose(file);
-
-        Sys_Printf("Success!\n");
-    }
-    // extra
-    // has contents only when -onlyentities argument is used, doesn't get referenced by the BSP!
-    if (Titanfall::Ent::extra.size()) {
-        auto name = StringOutputStream(1024)(PathExtensionless(path), "_extra.ent");
-        Sys_Printf("Writing %s... ", name.c_str());
-
-        FILE* file = SafeOpenWrite(name);
-        WriteEntFileHeader(file);
-        Titanfall::Ent::extra.emplace_back('\0');
-        SafeWrite(file, Titanfall::Ent::extra.data(), Titanfall::Ent::extra.size());
         fclose(file);
 
         Sys_Printf("Success!\n");

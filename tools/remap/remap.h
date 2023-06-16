@@ -1490,10 +1490,6 @@ shaderInfo_t *ShaderInfoForShaderNull(const char *shader);
 
 
 /* bspfile_abstract.c */
-void SwapBlock(int *block, int size);
-void LoadEntFile(const char *filename, std::vector<char> &ents);
-void LoadBSPFile(const char *filename);
-void LoadBSPFilePartially(const char *filename);
 void WriteBSPFile(const char *filename);
 void WriteEntFiles(const char *path );
 
