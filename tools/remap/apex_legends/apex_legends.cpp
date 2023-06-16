@@ -28,15 +28,6 @@
 
 
 /*
-   LoadR2BSPFile()
-   loads a titanfall2 bsp file
-*/
-void LoadR5BSPFile(rbspHeader_t *header, const char *filename) {
-    // Nothing yet
-}
-
-
-/*
    WriteR2BSPFile()
    writes a apex bsp file
 */

@@ -5,7 +5,6 @@ add_executable(remap
                "apex_legends/apex_legends.cpp"
                "apex_legends/apex_legends.h"
                "titanfall/titanfall_collisions.cpp"
-               "titanfall/titanfall_decompile.cpp"
                "titanfall/titanfall_misc.cpp"
                "titanfall/titanfall_vis.cpp"
                "titanfall/titanfall.cpp"

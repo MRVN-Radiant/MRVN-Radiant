@@ -29,16 +29,6 @@
 
 
 /*
-   LoadR2BSPFile()
-   loads a r1 bsp file
-*/
-void LoadR1BSPFile(rbspHeader_t *header, const char *filename) {
-    Titanfall::LoadLumpsAndEntities(header, filename);
-    Titanfall::ParseLoadedBSP();
-}
-
-
-/*
    WriteR2BSPFile()
    writes a r1 bsp file
 */

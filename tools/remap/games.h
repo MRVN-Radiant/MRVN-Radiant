@@ -174,8 +174,6 @@ struct game_t {
     bool            patchShadows;                  /* patch casting enabled */
     const char     *bspIdent;                      /* 4-letter bsp file prefix */
     int             bspVersion;                    /* bsp version to use */
-    typedef void    (*bspLoadFunc)(rbspHeader_t*, const char*);
-    bspLoadFunc     load;
     typedef void    (*bspWriteFunc)(const char*);
     bspWriteFunc    write;
     typedef void    (*bspCompileFunc)();

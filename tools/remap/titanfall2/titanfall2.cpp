@@ -27,18 +27,6 @@
 #include <ctime>
 
 
-
-/* funcs */
-/*
-   LoadR2BSPFile()
-   loads a titanfall2 bsp file
-*/
-void LoadR2BSPFile( rbspHeader_t *header, const char *filename ) {
-    Titanfall::LoadLumpsAndEntities( header, filename );
-    Titanfall::ParseLoadedBSP();
-}
-
-
 /*
    WriteR2BSPFile()
    writes a titanfall2 bsp file and it's .ent files

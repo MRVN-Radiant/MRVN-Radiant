@@ -68,7 +68,6 @@ struct game_titanfallonline : game_t {
         false,                  /* patch casting enabled */
         "rBSP",                 /* bsp file prefix */
         29,                     /* bsp file version */
-        LoadR1BSPFile,          /* bsp load function */
         WriteR1BSPFile,         /* bsp write function */
         CompileR1BSPFile,
         // Shader Type
@@ -165,7 +164,6 @@ struct game_titanfall2 : game_t {
         false,                  /* patch casting enabled */
         "rBSP",                 /* bsp file prefix */
         37,                     /* bsp file version */
-        LoadR2BSPFile,          /* bsp load function */
         WriteR2BSPFile,         /* bsp write function */
         CompileR2BSPFile,
         // Shader Type
@@ -262,7 +260,6 @@ struct game_apexlegends : game_t {
         false,                  /* patch casting enabled */
         "rBSP",                 /* bsp file prefix */
         47,                     /* bsp file version */
-        LoadR5BSPFile,          /* bsp load function */
         WriteR5BSPFile,         /* bsp write function */
         CompileR5BSPFile,
         // Shader Type
