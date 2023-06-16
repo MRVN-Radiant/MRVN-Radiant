@@ -1,5 +1,8 @@
 add_library(ToolsShared STATIC
-			"bitflags.h"
+            "vfs/membuffer.h"
+            "vfs/vfs.cpp"
+            "vfs/vfs.h"
+            "bitflags.h"
             "cmdlib.cpp"
             "cmdlib.h"
             "inout_xml.h"
@@ -27,9 +30,7 @@ add_library(ToolsShared STATIC
             "threads.cpp"
             "toolsdef.h"
             "unzip.cpp"
-            "unzip.h"
-            "vfs.cpp"
-            "vfs.h")
+            "unzip.h")
 
 target_include_directories(ToolsShared PRIVATE .
                            ${LIBXML2_INCLUDE_DIRS}

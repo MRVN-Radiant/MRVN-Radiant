@@ -90,7 +90,7 @@ public:
 	 * @return true if there is a file with this path, else false.
 	 */
 	bool Exists( const char* pFile ) const override {
-		return vfsGetFileCount( pFile ) != 0;
+		return vfsFileExists( pFile );
 	}
 
 	// -------------------------------------------------------------------
@@ -117,7 +117,7 @@ public:
 	 *  you probably have to supply an own implementation of IOStream as well.
 	 */
 	Assimp::IOStream* Open( const char* pFile, const char* pMode = "rb" ) override {
-		if ( MemBuffer boo = vfsLoadFile( pFile ) ) {
+		if ( CMemBuffer boo = vfsLoadFile( pFile ) ) {
 			return new Assimp::MemoryIOStream( boo.release(), boo.size(), true );
 		}
 		return nullptr;
@@ -1019,7 +1019,7 @@ void InsertModel( const char *name, const char *skin, int frame, const Matrix4& 
 		else
 			skinfilename( PathExtensionless( name ), '_', skin, ".skin" ); // Q3 naming: models/players/sarge/head_roderic.skin for models/players/sarge/head.md3
 
-		if ( MemBuffer skinfile = vfsLoadFile( skinfilename ) ) {
+		if ( CMemBuffer skinfile = vfsLoadFile( skinfilename ) ) {
 			Sys_Printf( "Using skin %s of %s\n", skin, name );
 			for ( char *skinfilenextptr, *skinfileptr = skinfile.data(); !strEmpty( skinfileptr ); skinfileptr = skinfilenextptr )
 			{

@@ -800,31 +800,6 @@ shaderInfo_t *ShaderInfoForShader(const char *shaderName) {
 }
 
 
-
-static void Parse1DMatrixAppend(ShaderTextCollector &text, int x, float *m) {
-    if (!text.GetToken(true) || !strEqual(token, "(")) {
-        Error("Parse1DMatrixAppend(): line %d: '(' not found!\n"
-              "File location be: %s\n",  // yarr
-              scriptline, g_strLoadedFileLocation);
-    }
-
-    for (int i = 0; i < x; i++) {
-        if (!text.GetToken(false)) {
-            Error("Parse1DMatrixAppend(): line %d: Number not found!\n"
-                  "File location be: %s\n",  // yarr
-              scriptline, g_strLoadedFileLocation);
-        }
-        m[i] = atof(token);
-    }
-
-    if (!text.GetToken(true) || !strEqual(token, ")")) {
-        Error("Parse1DMatrixAppend(): line %d: ')' not found!\n"
-              "File location be: %s\n",  // yarr
-          scriptline, g_strLoadedFileLocation);
-    }
-}
-
-
 /*
    ParseShaderFile()
    parses a shader file into discrete shaderInfo_t
@@ -850,7 +825,7 @@ static void ParseShaderFile(const char *filename) {
                   "Found instead: %s\n"
                   "Last known shader: %s\n"
                   "File location be: %s\n",  // yarr
-                  filename, scriptline, token, si->shader.c_str(), g_strLoadedFileLocation);
+                  filename, scriptline, token, si->shader.c_str(), "UNK");
         }
 
         while (text.GetToken(true) && !strEqual(token, "}")) {
@@ -921,7 +896,7 @@ static void ParseShaderFile(const char *filename) {
 */
 static void ParseCustomInfoParms() {
     /* file exists? */
-    if (vfsGetFileCount("scripts/custinfoparms.txt") == 0) {
+    if (!vfsFileExists("scripts/custinfoparms.txt")) {
         return;
     }
 
@@ -972,60 +947,19 @@ static void ParseCustomInfoParms() {
    on linux there's an additional twist, we actually merge the stuff from ~/.q3a/ and from the base dir
 */
 void LoadShaderInfo() {
-    std::vector<CopiedString> shaderFiles;
-
-    /* rr2do2: parse custom infoparms first */
-    if (useCustomInfoParms) {
-        ParseCustomInfoParms();
-    }
-
-    /* we can pile up several shader files, the one in baseq3 and ones in the mod dir or other spots */
-    const auto  filename = StringOutputStream(64)(g_game->shaderPath, "/shaderlist.txt");
-    const int   count = vfsGetFileCount(filename);
-
-    /* load them all */
-    for (int i = 0; i < count; i++) {
-        /* load shader list */
-        LoadScriptFile(filename, i);
-
-        /* parse it */
-        while (GetToken(true)) {
-            /* check for duplicate entries */
-            const auto contains = [&shaderFiles](const char *file) {
-                for (const CopiedString& str : shaderFiles) {
-                    if (striEqual(str.c_str(), file)) {
-                        return true;
-                    }
-                }
-                return false;
-            };
-
-            if (!path_extension_is(token , "shader")) {
-                strcatQ(token, ".shader", std::size(token));
-            }
-
-            /* new shader file */
-            if (!contains(token)) {
-                shaderFiles.emplace_back(token);
-            }
-        }
-    }
-
-    if (shaderFiles.empty()) {
-        Sys_Printf("%s", "No shaderlist.txt found: loading all shaders\n");
-        shaderFiles = vfsListShaderFiles(g_game->shaderPath);
-    }
-
-    /* parse the shader files */
-    for (const CopiedString& file : shaderFiles) {
-            ParseShaderFile(StringOutputStream(64)(g_game->shaderPath, '/', file));
+    vector<string> shaderFiles;
+    shaderFiles = vfsGetListOfFilesRecursive(g_game->shaderPath, ".shader");
+    
+    // Parse all shader files
+    for( const string& file : shaderFiles ) {
+        ParseShaderFile( (string(g_game->shaderPath) + "/" + file).c_str() );
     }
 
     /* emit some statistics */
-    Sys_FPrintf(SYS_VRB, "%9d shaderInfo\n", numShaderInfo);
+    Sys_Printf( "%9d shaderInfo\n", numShaderInfo);
 
-    if (numShaderInfo == 0)
-            Sys_FPrintf(SYS_WRN, "WARNING: 0 shaders loaded! Make sure you setup your shader directory and shader definitions properly!\n");
+    if( numShaderInfo == 0 )
+        Sys_Warning( "WARNING: 0 shaders loaded! Make sure you setup your shader directory and shader definitions properly!\n" );
     
-    Sys_FPrintf(SYS_VRB, "\n");
+    Sys_Printf( "\n" );
 }

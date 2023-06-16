@@ -230,7 +230,7 @@ static std::forward_list<image_t> images;
 static struct construct_default_image
 {
 	construct_default_image(){
-		images.emplace_front( DEFAULT_IMAGE, DEFAULT_IMAGE, 64, 64, void_ptr( memset( safe_malloc( 64 * 64 * 4 ), 255, 64 * 64 * 4 ) ) );
+		images.emplace_front( DEFAULT_IMAGE, DEFAULT_IMAGE, 64, 64, CVoidPtr( memset( safe_malloc( 64 * 64 * 4 ), 255, 64 * 64 * 4 ) ) );
 	}
 } s_construct_default_image;
 
@@ -281,7 +281,7 @@ const image_t *ImageLoad( const char *name ){
 	byte *pixels = nullptr;
 	int width, height;
 	char filename[ 1024 ];
-	MemBuffer buffer;
+	CMemBuffer buffer;
 	bool alphaHack = false;
 
 	/* attempt to load various formats */

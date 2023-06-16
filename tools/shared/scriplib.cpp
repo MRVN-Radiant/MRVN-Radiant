@@ -21,12 +21,12 @@
 
 // scriplib.c
 
-#include "cmdlib.h"
+#include "vfs/membuffer.h"
 #include "inout.h"
 #include "qstringops.h"
 #include "qpathops.h"
 #include "scriplib.h"
-#include "vfs.h"
+#include "vfs/vfs.h"
 #include <list>
 #include <cerrno>
 
@@ -41,10 +41,10 @@
 struct script_t
 {
 	const CopiedString filename;
-	const MemBuffer buffer;
+	const CMemBuffer buffer;
 	const char *it, *end;
 	int line;
-	script_t( const char *filename, MemBuffer&& buffer_ ) :
+	script_t( const char *filename, CMemBuffer&& buffer_ ) :
 		filename( filename ),
 		buffer( std::move( buffer_ ) ),
 		it( buffer.data() ),
@@ -66,7 +66,7 @@ bool tokenready;                     // only true if UnGetToken was just called
    ==============
  */
 static bool AddScriptToStack( const char *filename, int index, bool verbose ){
-	if ( MemBuffer buffer = vfsLoadFile( filename, index ) ) {
+	if ( CMemBuffer buffer = vfsLoadFile( filename) ) {
 		if( verbose ){
 			if ( index > 0 )
 				Sys_Printf( "       Entering %s (%d)\n", filename, index + 1 );
@@ -108,7 +108,7 @@ bool LoadScriptFile( const char *filename, int index /* = 0 */, bool verbose /* 
 void ParseFromMemory( char *buffer, size_t size ){
 	scriptstack.clear();
 	tokenready = false;
-	MemBuffer bu( size );
+	CMemBuffer bu( size );
 	memcpy( bu.data(), buffer, size );
 	scriptstack.emplace_back( "memory buffer", std::move( bu ) );
 }
@@ -136,7 +136,7 @@ void UnGetToken(){
 
 static bool EndOfScript( bool crossline ){
 	if ( !crossline ) {
-		Error( "Line %i is incomplete\nFile location be: %s\n", scriptline, g_strLoadedFileLocation );
+		Error( "Line %i is incomplete\nFile location be: %s\n", scriptline, "UNK");
 	}
 
 	scriptstack.pop_back();
@@ -181,7 +181,7 @@ skipspace:
 	{
 		if ( *script.it++ == '\n' ) {
 			if ( !crossline ) {
-				Error( "Line %i is incomplete\nFile location be: %s\n", scriptline, g_strLoadedFileLocation );
+				Error( "Line %i is incomplete\nFile location be: %s\n", scriptline, "UNK" );
 			}
 			script.line++;
 			scriptline = script.line;
@@ -196,7 +196,7 @@ skipspace:
 	if ( *script.it == ';' || *script.it == '#'
 	     || ( script.it[0] == '/' && script.it[1] == '/' ) ) {
 		if ( !crossline ) {
-			Error( "Line %i is incomplete\nFile location be: %s\n", scriptline, g_strLoadedFileLocation );
+			Error( "Line %i is incomplete\nFile location be: %s\n", scriptline, "UNK" );
 		}
 		while ( *script.it++ != '\n' )
 			if ( script.it >= script.end ) {
@@ -214,7 +214,7 @@ skipspace:
 		{
 			if ( *script.it == '\n' ) {
 				if ( !crossline ) {
-					Error( "Line %i is incomplete\nFile location be: %s\n", scriptline, g_strLoadedFileLocation );
+					Error( "Line %i is incomplete\nFile location be: %s\n", scriptline, "UNK" );
 				}
 				script.line++;
 				scriptline = script.line;
@@ -243,7 +243,7 @@ skipspace:
 				break;
 			}
 			if ( token_p == token + MAXTOKEN ) {
-				Error( "Token too large on line %i\nFile location be: %s\n", scriptline, g_strLoadedFileLocation );
+				Error( "Token too large on line %i\nFile location be: %s\n", scriptline, "UNK" );
 			}
 		}
 		script.it++;
@@ -256,7 +256,7 @@ skipspace:
 				break;
 			}
 			if ( token_p == token + MAXTOKEN ) {
-				Error( "Token too large on line %i\nFile location be: %s\n", scriptline, g_strLoadedFileLocation );
+				Error( "Token too large on line %i\nFile location be: %s\n", scriptline, "UNK" );
 			}
 		}
 	}
@@ -308,7 +308,7 @@ void MatchToken( const char *match ) {
 	GetToken( true );
 
 	if ( !strEqual( token, match ) ) {
-		Error( "MatchToken( \"%s\" ) failed at line %i in file %s", match, scriptline, g_strLoadedFileLocation );
+		Error( "MatchToken( \"%s\" ) failed at line %i in file %s", match, scriptline, "UNK" );
 	}
 }
 

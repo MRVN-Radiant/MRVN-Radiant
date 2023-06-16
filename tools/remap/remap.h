@@ -62,7 +62,7 @@
 #include "qthreads.h"
 #include "inout.h"
 #include "inout_xml.h"
-#include "vfs.h"
+#include "vfs/vfs.h"
 #include "md4.h"
 
 #include "stringfixedsize.h"
@@ -1869,7 +1869,7 @@ inline std::vector<int>             bspDrawIndexes;
             if (allocated == 0)                       { allocated = def; }\
             while (reqitem >= allocated && allocated) { allocated *= 2; }\
             if (!allocated || allocated > 2147483647 / (int)sizeof(*ptr)) { Error(#ptr " over 2 GB"); }\
-            ptr = void_ptr(realloc(ptr, sizeof(*ptr) * allocated));\
+            ptr = CVoidPtr(realloc(ptr, sizeof(*ptr) * allocated));\
             if (!ptr) { Error(#ptr " out of memory"); }\
         }\
     } while (0)
@@ -1878,7 +1878,7 @@ inline std::vector<int>             bspDrawIndexes;
     do {\
         if (used >= allocated) {\
             allocated += add;\
-            ptr = void_ptr(realloc(ptr, sizeof(*ptr) * allocated));\
+            ptr = CVoidPtr(realloc(ptr, sizeof(*ptr) * allocated));\
             if (!ptr) { Error(#ptr " out of memory"); }\
         }\
     } while (0)

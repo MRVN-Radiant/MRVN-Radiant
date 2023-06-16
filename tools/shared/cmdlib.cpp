@@ -47,7 +47,7 @@
 #endif
 
 
-void_ptr safe_malloc( size_t size ){
+CVoidPtr safe_malloc( size_t size ){
 	void *p = malloc( size );
 	if ( !p ) {
 		Error( "safe_malloc failed on allocation of %zu bytes", size );
@@ -55,7 +55,7 @@ void_ptr safe_malloc( size_t size ){
 	return p;
 }
 
-void_ptr safe_calloc( size_t size ){
+CVoidPtr safe_calloc( size_t size ){
 	void *p = calloc( 1, size );
 	if ( !p ) {
 		Error( "safe_calloc failed on allocation of %zu bytes", size );
@@ -149,7 +149,7 @@ FILE *SafeOpenRead( const char *filename, const char *mode ){
 }
 
 
-void SafeRead( FILE *f, MemBuffer& buffer ){
+void SafeRead( FILE *f, CMemBuffer& buffer ){
 	if ( fread( buffer.data(), 1, buffer.size(), f ) != buffer.size() ) {
 		Error( "File read failure" );
 	}
@@ -182,9 +182,9 @@ bool    FileExists( const char *filename ){
    LoadFile
    ==============
  */
-MemBuffer LoadFile( const char *filename ){
+CMemBuffer LoadFile( const char *filename ){
 	FILE *f = SafeOpenRead( filename );
-	MemBuffer buffer( Q_filelength( f ) );
+	CMemBuffer buffer( Q_filelength( f ) );
 	SafeRead( f, buffer );
 	fclose( f );
 

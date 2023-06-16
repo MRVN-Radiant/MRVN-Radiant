@@ -25,7 +25,7 @@
 #include "qpathops.h"
 #include "etclib.h"
 #include "qimagelib.h"
-#include "vfs.h"
+#include "vfs/vfs.h"
 
 int fgetLittleShort( FILE *f ){
 	byte b1, b2;
@@ -208,7 +208,7 @@ void LoadLBM( const char *filename, byte **picture, byte **palette ){
 //
 // load the LBM
 //
-	MemBuffer file = LoadFile( filename );
+	CMemBuffer file = LoadFile( filename );
 
 //
 // parse the LBM header
@@ -470,7 +470,7 @@ void LoadPCX( const char *filename, byte **pic, byte **palette, int *width, int 
 
 
 	/* load the file */
-	MemBuffer buffer = vfsLoadFile( filename );
+	CMemBuffer buffer = vfsLoadFile( filename );
 	if ( !buffer ) {
 		Error( "LoadPCX: Couldn't read %s", filename );
 	}
@@ -687,7 +687,7 @@ void LoadBMP( const char *filename, byte **pic, byte **palette, int *width, int 
 	byte *in;
 	int len, pos = 0;
 
-	MemBuffer buffer = vfsLoadFile( filename );
+	CMemBuffer buffer = vfsLoadFile( filename );
 	if ( !buffer ) {
 		Error( "Couldn't read %s", filename );
 	}
@@ -1101,7 +1101,7 @@ void LoadTGABuffer( const byte *f, const size_t dataSize, byte **pic, int *width
    =============
  */
 void LoadTGA( const char *name, byte **pixels, int *width, int *height ){
-	if ( MemBuffer buffer = vfsLoadFile( name ) )
+	if ( CMemBuffer buffer = vfsLoadFile( name ) )
 		LoadTGABuffer( buffer.data(), buffer.size(), pixels, width, height );
 	else
 		Error( "Couldn't read %s", name );
