@@ -25,10 +25,12 @@
 
 #include <string>
 #include <vector>
+#include <unordered_set>
 
 // Common types to reduce code verbosity
 using std::string;
 using std::vector;
+using std::unordered_set;
 
 
 /* -------------------------------------------------------------------------------
