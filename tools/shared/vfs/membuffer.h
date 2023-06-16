@@ -51,31 +51,59 @@ class CMemBuffer
 	byte* m_pData;
 
 public:
+	//------------------------------------------------------------
+	// Purpose: Constructors
+	//------------------------------------------------------------
 	CMemBuffer() : m_pData(nullptr), m_size(0) {}
-	explicit CMemBuffer(size_t size) : m_pData(new byte[size + 1]), m_size(size) {
-		m_pData[m_size] = '\0';         // NOTE: when loading a file, you have to allocate one extra byte and set it to \0
+
+	explicit CMemBuffer(size_t size) : m_pData(new byte[size + 1]), m_size(size)
+	{
+		m_pData[m_size] = '\0';
 	}
+
 	CMemBuffer(CMemBuffer&& other) noexcept : m_pData(std::exchange(other.m_pData, nullptr)), m_size(other.m_size) {}
+
+
+	//------------------------------------------------------------
+	// Purpose: Destructor
+	//------------------------------------------------------------
+	~CMemBuffer() {
+		delete[] m_pData;
+	}
+
+	//------------------------------------------------------------
+	// Purpose: Returns pointer to buffer
+	//------------------------------------------------------------
+	CVoidPtr data() const {
+		return m_pData;
+	}
+	
+	//------------------------------------------------------------
+	// Purpose: Returns size of buffer
+	//------------------------------------------------------------
+	size_t size() const {
+		return m_size;
+	}
+	//------------------------------------------------------------
+	// Purpose: bool operator
+	//------------------------------------------------------------
+	operator bool() const {
+		return m_pData != nullptr;
+	}
+
+	//------------------------------------------------------------
+	// Purpose: asignment operator
+	//------------------------------------------------------------
+
 	CMemBuffer& operator=(CMemBuffer&& other) noexcept {
 		std::swap(m_pData, other.m_pData);
 		std::swap(m_size, other.m_size);
 		return *this;
 	}
-	~CMemBuffer() {
-		delete[] m_pData;
-	}
-	CVoidPtr data() const {
-		return m_pData;
-	}
-	/// \return correct buffer size in bytes, if it's not empty. May be not used for validity check!
-	size_t size() const {
-		return m_size;
-	}
-	/// \return true, if there is managed buffer
-	operator bool() const {
-		return m_pData != nullptr;
-	}
-	/// \brief Delegates the ownership. Obtained buffer must be deallocated by \c delete[]
+	//------------------------------------------------------------
+	// Purpose: Delegates the ownership. Obtained buffer must be
+	//          deallocated by delete[]
+	//------------------------------------------------------------
 	CVoidPtr release() {
 		return std::exchange(m_pData, nullptr);
 	}
