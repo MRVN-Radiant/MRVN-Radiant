@@ -1399,14 +1399,6 @@ void FilterDrawsurfsIntoTree(entity_t &e, tree_t &tree);
 /* surface_fur.c */
 void Fur(mapDrawSurface_t *src);
 
-/* ydnar: surface_meta.c */
-void ClearMetaTriangles();
-void MakeEntityMetaTriangles(const entity_t &e);
-void FixMetaTJunctions();
-void SmoothMetaTriangles();
-void MergeMetaTriangles();
-void EmitMetaStats();  // vortex: print meta statistics even in no-verbose mode
-
 /* surface_extra.c */
 void SetDefaultSampleSize(int sampleSize);
 void SetSurfaceExtra(const mapDrawSurface_t &ds);

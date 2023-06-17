@@ -40,7 +40,6 @@ add_executable(remap
                "surface_extra.cpp"
                "surface_extra.h"
                "surface_fur.cpp"
-               "surface_meta.cpp"
                "surface.cpp"
                "${CMAKE_SOURCE_DIR}/icons/remap.rc"
               )
