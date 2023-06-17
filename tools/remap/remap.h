@@ -1396,9 +1396,6 @@ void SubdivideFaceSurfaces(const entity_t &e);
 void AddEntitySurfaceModels(entity_t &e);
 void FilterDrawsurfsIntoTree(entity_t &e, tree_t &tree);
 
-/* surface_fur.c */
-void Fur(mapDrawSurface_t *src);
-
 /* surface_extra.c */
 void SetDefaultSampleSize(int sampleSize);
 void SetSurfaceExtra(const mapDrawSurface_t &ds);
