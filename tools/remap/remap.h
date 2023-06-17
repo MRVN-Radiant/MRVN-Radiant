@@ -907,6 +907,12 @@ struct node_t {
 };
 
 
+struct tree_t {
+    node_t *headnode;
+    node_t  outside_node;
+    MinMax  minmax;
+};
+
 class Args {
 private:
     const char                               *m_arg0;
@@ -1030,28 +1036,6 @@ inline int FindFloatPlane(const Vector3 &normal, float dist, int numPoints, cons
 bool PlaneEqual(const plane_t &p, const Plane3f &plane);
 bool SnapNormal(Vector3 &normal);
 void AddBrushBevels();
-
-/* portals.c */
-bool PortalPassable(const portal_t *p);
-void RemovePortalFromNode(portal_t *portal, node_t *l);
-
-enum class EFloodEntities {
-    Leaked,
-    Good,
-    Empty
-};
-
-EFloodEntities FloodEntities(tree_t &tree);
-void FillOutside(node_t *headnode);
-void FloodAreas(tree_t &tree);
-inline portal_t *AllocPortal() { return new portal_t(); }
-inline void FreePortal(portal_t *p) { delete p; }
-void MakeTreePortals(tree_t &tree);
-
-
-/* prtfile.c */
-void NumberClusters(tree_t &tree);
-void WritePortalFile(const tree_t &tree);
 
 /* patch.c */
 void ParsePatch(bool onlyLights, entity_t &mapEnt, int mapPrimitiveNum);

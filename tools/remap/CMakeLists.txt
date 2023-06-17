@@ -29,8 +29,6 @@ add_executable(remap
                "model.h"
                "patch.cpp"
                "path_init.cpp"
-               "portals.cpp"
-               "prtfile.cpp"
                "remap.h"
                "shaders.cpp"
                "shaders.h"
