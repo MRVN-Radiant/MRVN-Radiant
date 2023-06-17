@@ -1360,10 +1360,6 @@ void ParsePatch(bool onlyLights, entity_t &mapEnt, int mapPrimitiveNum);
 
 /* model.c */
 void assimp_init();
-void InsertModel(const char *name, const char *skin, int frame, const Matrix4 &transform,
-                 const std::list<remap_t> *remaps, shaderInfo_t *celShader,
-                 entity_t &entity, int castShadows, int recvShadows, int spawnFlags,
-                 float lightmapScale, int lightmapSampleSize, float shadeAngle, float clipDepth );
 
 /* map.c */
 std::array<Vector3, 2> TextureAxisFromPlane(const plane_t &plane);
