@@ -271,40 +271,6 @@ void InjectCommandLine(const char *stage, const std::vector<const char*> &args) 
 
 
 /*
-   UnparseEntities()
-   generates the entdata string from all the entities.
-   this allows the utilities to add or remove key/value
-   pairs to the data created by the map editor
-*/
-void UnparseEntities() {
-    StringOutputStream data(8192);
-    for (std::size_t i = 0; i < numBSPEntities && i < entities.size(); ++i) {  // run through entity list
-        const entity_t &e = entities[i];
-        if (e.epairs.empty()) {
-            continue;  // ent got removed
-        }
-        /* ydnar: certain entities get stripped from bsp file */
-        const char *classname = e.classname();
-        #define ENT_IS(x)  striEqual(classname, x)
-        if (ENT_IS("prop_static")
-         || ENT_IS("_decal")
-         || ENT_IS("_skybox")) {
-            continue;
-        }
-        #undef ENT_IS
-
-        data << "{\n";
-        for (const auto &ep : e.epairs) {
-            data << '\"' << StripTrailing(ep.key.c_str()) << "\" \"" << StripTrailing(ep.value.c_str()) << "\"\n";
-        }
-        data << "}\n";
-    }
-
-    bspEntData = { data.begin(), data.end() + 1 };  // include '\0'
-}
-
-
-/*
    PrintEntity()
    prints an entity's epairs to the console
 */

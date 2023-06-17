@@ -907,306 +907,6 @@ struct node_t {
 };
 
 
-struct portal_t {
-    plane_t    plane;
-    node_t    *onnode;        /* NULL = outside box */
-    node_t    *nodes[2];      /* [0] = front, [1] = back side of plane */
-    portal_t  *next[2];
-    winding_t  winding;
-
-    bool       sidefound;     /* false if ->side hasn't been checked */
-    int        compileFlags;  /* from original face that caused the split */
-};
-
-
-struct tree_t {
-    node_t *headnode;
-    node_t  outside_node;
-    MinMax  minmax;
-};
-
-
-/* -------------------------------------------------------------------------------
-
-   light structures
-
-   ------------------------------------------------------------------------------- */
-
-enum class ELightType {
-    Point,
-    Area,
-    Spot,
-    Sun
-};
-
-
-struct LightFlags : BitFlags<std::uint32_t, LightFlags> {
-    constexpr static BitFlags AttenLinear    { 1 <<  0 };
-    constexpr static BitFlags AttenAngle     { 1 <<  1 };
-    constexpr static BitFlags AttenDistance  { 1 <<  2 };
-    constexpr static BitFlags Twosided       { 1 <<  3 };
-    constexpr static BitFlags Grid           { 1 <<  4 };
-    constexpr static BitFlags Surfaces       { 1 <<  5 };
-    constexpr static BitFlags Dark           { 1 <<  6 };  /* probably never use this */
-    constexpr static BitFlags Fast           { 1 <<  7 };
-    constexpr static BitFlags FastTemp       { 1 <<  8 };
-    constexpr static BitFlags Negative       { 1 <<  9 };
-    constexpr static BitFlags Unnormalized   { 1 << 10 };  /* vortex: do not normalize _color */
-
-    constexpr static BitFlags FastActual     { Fast | FastTemp };
-
-    constexpr static BitFlags DefaultSun     { AttenAngle                  | Grid | Surfaces        };
-    constexpr static BitFlags DefaultArea    { AttenAngle  | AttenDistance | Grid | Surfaces        };
-    constexpr static BitFlags DefaultQ3A     { AttenAngle  | AttenDistance | Grid | Surfaces | Fast };
-    constexpr static BitFlags DefaultWolf    { AttenLinear | AttenDistance | Grid | Surfaces | Fast };
-};
-
-
-/* ydnar: new light struct with flags */
-struct light_t {
-    ELightType          type;
-    LightFlags          flags;             /* ydnar: condensed all the booleans into one flags int */
-    const shaderInfo_t *si;
-
-    Vector3             origin {0};
-    Vector3             normal {0};        /* for surfaces, spotlights, and suns */
-    float               dist;              /* plane location along normal */
-
-    float               photons;
-    int                 style;
-    Vector3             color {0};
-    float               radiusByDist;      /* for spotlights */
-    float               fade;              /* ydnar: from wolf, for linear lights */
-    float               angleScale;        /* ydnar: stolen from vlight for K */
-    float               extraDist;         /* "extra dimension" distance of the light, to kill hot spots */
-
-    float               add;               /* ydnar: used for area lights */
-    float               envelope;          /* ydnar: units until falloff < tolerance */
-    float               envelope2;         /* ydnar: envelope squared (tiny optimization) */
-    MinMax              minmax;            /* ydnar: pvs envelope */
-    int                 cluster;           /* ydnar: cluster light falls into */
-
-    winding_t           w;
-
-    float               falloffTolerance;  /* ydnar: minimum attenuation threshold */
-    float               filterRadius;      /* ydnar: lightmap filter radius in world units, 0 == default */
-};
-
-
-struct trace_t {
-    /* constant input */
-    bool            testOcclusion;
-    bool            forceSunlight;
-    bool            testAll;
-    int             recvShadows;
-
-    int             numSurfaces;
-    int            *surfaces;
-
-    int             numLights;
-    const light_t **lights;
-
-    bool            twoSided;
-
-    /* per-sample input */
-    int             cluster;
-    Vector3         origin;
-    Vector3         normal;
-    float           inhibitRadius;  /* sphere in which occluding geometry is ignored */
-
-    /* per-light input */
-    const light_t  *light;
-    Vector3         end;
-
-    /* calculated input */
-    Vector3         displacement;
-    Vector3         direction;
-    float           distance;
-
-    /* input and output */
-    Vector3         color;  /* starts out at full color, may be reduced if transparent surfaces are crossed */
-    Vector3         directionContribution;  /* result contribution to the deluxe map */
-
-    /* output */
-    Vector3         hit;
-    int             compileFlags;  /* for determining surface compile flags traced through */
-    bool            passSolid;
-    bool            opaque;
-    float           forceSubsampling;  /* needs subsampling (alphashadow), value = max color contribution possible from it */
-
-    /* working data */
-    int             numTestNodes;
-    int             testNodes[MAX_TRACE_TEST_NODES];
-};
-
-
-/* must be identical to bspDrawVert_t except for float color! */
-struct radVert_t {
-    Vector3  xyz;
-    Vector2  st;
-    Vector2  lightmap[MAX_LIGHTMAPS];
-    Vector3  normal;
-    Color4f  color[MAX_LIGHTMAPS];
-};
-
-
-struct radWinding_t {
-    int        numVerts;
-    radVert_t  verts[MAX_POINTS_ON_WINDING];
-};
-
-
-/* crutch for poor local allocations in win32 smp */
-struct clipWork_t {
-    float       dists[MAX_POINTS_ON_WINDING + 4];
-    EPlaneSide  sides[MAX_POINTS_ON_WINDING + 4];
-};
-
-
-/* ydnar: new lightmap handling code */
-struct outLightmap_t {
-    int                 lightmapNum;
-    int                 extLightmapNum;
-    int                 customWidth;
-    int                 customHeight;
-    int                 numLightmaps;
-    int                 freeLuxels;
-    int                 numShaders;
-    const shaderInfo_t *shaders[MAX_LIGHTMAP_SHADERS];
-    byte               *lightBits;
-    Vector3b           *bspLightBytes;
-    Vector3b           *bspDirBytes;
-};
-
-
-struct SuperLuxel {
-    Vector3  value;
-    float    count;
-};
-
-
-struct SuperFloodLight {
-    Vector3  value;
-    float    scale;
-};
-
-
-struct rawLightmap_t {
-    bool             finished;
-    bool             splotchFix;
-    bool             wrap[2];
-    int              customWidth;
-    int              customHeight;
-    float            brightness;
-    float            filterRadius;
-
-    int              firstLightSurface;  /* index into lightSurfaces */
-    int              numLightSurfaces;
-    int              numLightClusters;
-    int             *lightClusters;
-
-    int              sampleSize;
-    int              actualSampleSize;
-    int              axisNum;
-
-    /* vortex: per-surface floodlight */
-    float            floodlightDirectionScale;
-    Vector3          floodlightRGB;
-    float            floodlightIntensity;
-    float            floodlightDistance;
-
-    int              entityNum;
-    int              recvShadows;
-    MinMax           minmax;
-    Vector3          axis;
-    Vector3          origin;
-    Vector3         *vecs;
-    Plane3f         *plane;
-    int              w;
-    int              h;
-    int              sw;
-    int              sh;
-    int              used;
-
-    bool             solid[MAX_LIGHTMAPS];
-    Vector3          solidColor[MAX_LIGHTMAPS];
-
-    int              numStyledTwins;
-    rawLightmap_t   *twins[MAX_LIGHTMAPS];
-
-    int              outLightmapNums[MAX_LIGHTMAPS];
-    int              twinNums[MAX_LIGHTMAPS];
-    int              lightmapX[MAX_LIGHTMAPS];
-    int              lightmapY[MAX_LIGHTMAPS];
-    byte             styles[MAX_LIGHTMAPS];
-    Vector3         *bspLuxels[MAX_LIGHTMAPS];
-    Vector3         *radLuxels[MAX_LIGHTMAPS];
-    SuperLuxel      *superLuxels[MAX_LIGHTMAPS];
-    byte            *superFlags;
-    Vector3         *superOrigins;
-    Vector3         *superNormals;
-    float           *superDirt;
-    int             *superClusters;
-
-    Vector3         *superDeluxels;  /* average light direction */
-    Vector3         *bspDeluxels;
-    SuperFloodLight *superFloodLight;
-
-    Vector3               &getBspLuxel(int lightmapNum, int x, int y)          { return bspLuxels[lightmapNum][y * w + x]; }
-    const Vector3         &getBspLuxel(int lightmapNum, int x, int y) const    { return bspLuxels[lightmapNum][y * w + x]; }
-    Vector3               &getRadLuxel(int lightmapNum, int x, int y)          { return radLuxels[lightmapNum][y * w + x]; }
-    const Vector3         &getRadLuxel(int lightmapNum, int x, int y) const    { return radLuxels[lightmapNum][y * w + x]; }
-    SuperLuxel            &getSuperLuxel(int lightmapNum, int x, int y)        { return superLuxels[lightmapNum][y * sw + x]; }
-    const SuperLuxel      &getSuperLuxel(int lightmapNum, int x, int y) const  { return superLuxels[lightmapNum][y * sw + x]; }
-    byte                  &getSuperFlag(int x, int y)                          { return superFlags[y * sw + x]; }
-    const byte            &getSuperFlag(int x, int y) const                    { return superFlags[y * sw + x]; }
-    Vector3               &getSuperOrigin(int x, int y)                        { return superOrigins[y * sw + x]; }
-    const Vector3         &getSuperOrigin(int x, int y) const                  { return superOrigins[y * sw + x]; }
-    Vector3               &getSuperNormal(int x, int y)                        { return superNormals[y * sw + x]; }
-    const Vector3         &getSuperNormal(int x, int y) const                  { return superNormals[y * sw + x]; }
-    float                 &getSuperDirt(int x, int y)                          { return superDirt[y * sw + x]; }
-    const float           &getSuperDirt(int x, int y) const                    { return superDirt[y * sw + x]; }
-    int                   &getSuperCluster(int x, int y)                       { return superClusters[y * sw + x]; }
-    const int             &getSuperCluster(int x, int y) const                 { return superClusters[y * sw + x]; }
-    Vector3               &getSuperDeluxel(int x, int y)                       { return superDeluxels[y * sw + x]; }
-    const Vector3         &getSuperDeluxel(int x, int y) const                 { return superDeluxels[y * sw + x]; }
-    Vector3               &getBspDeluxel(int x, int y)                         { return bspDeluxels[y * w + x]; }
-    const Vector3         &getBspDeluxel(int x, int y) const                   { return bspDeluxels[y * w + x]; }
-    SuperFloodLight       &getSuperFloodLight(int x, int y)                    { return superFloodLight[y * sw + x]; }
-    const SuperFloodLight &getSuperFloodLight(int x, int y) const              { return superFloodLight[y * sw + x]; }
-};
-
-
-struct rawGridPoint_t {
-    Vector3  ambient[MAX_LIGHTMAPS];
-    Vector3  directed[MAX_LIGHTMAPS];
-    Vector3  dir;
-    byte     styles[MAX_LIGHTMAPS];
-};
-
-
-struct surfaceInfo_t {
-    int                 modelindex;
-    const shaderInfo_t *si;
-    rawLightmap_t      *lm;
-    int                 parentSurfaceNum;
-    int                 childSurfaceNum;
-    int                 entityNum;
-    int                 castShadows;
-    int                 recvShadows;
-    int                 sampleSize;
-    int                 patchIterations;
-    float               longestCurve;
-    Plane3f            *plane;
-    Vector3             axis;
-    MinMax              minmax;
-    bool                hasLightmap;
-    bool                approximated;
-    int                 firstSurfaceCluster;
-    int                 numSurfaceClusters;
-};
-
-
 class Args {
 private:
     const char                               *m_arg0;
@@ -1384,7 +1084,6 @@ void WriteEntFiles(const char *path );
 
 void ParseEPair(std::list<epair_t> &epairs);
 void ParseEntities();
-void UnparseEntities();
 void PrintEntity(const entity_t *ent);
 
 entity_t *FindTargetEntity(const char *target);
@@ -1397,62 +1096,29 @@ void InjectCommandLine(const char *stage, const std::vector<const char*> &args);
    bsp/general global variables
 
    ------------------------------------------------------------------------------- */
+// NOTE [Fifty]: Referenced in other source files so keeping untill i get to those
 
 /* general */
 inline shaderInfo_t *shaderInfo;
 inline int           numShaderInfo;
 
 inline String512     mapName;  /* ydnar: per-map custom shaders for larger lightmaps */
-inline CopiedString  mapShaderFile;
 
-/* can't code */
-inline bool  doingBSP;
-
-// for .ase conversion
-inline bool  shadersAsBitmap;
-inline bool  lightmapsAsTexcoord;
 
 /* general commandline arguments */
 inline int   patchSubdivisions = 8;  /* ydnar: -patchmeta subdivisions */
 
 /* commandline arguments */
-inline bool  verboseEntities;
-inline bool  useCustomInfoParms;
-inline bool  leaktest;
 inline bool  nodetail;
-inline bool  nosubdivide;
-inline bool  notjunc;
 inline bool  fulldetail;
 inline bool  nowater;
 inline bool  noCurveBrushes;
-inline bool  fakemap;
-inline bool  nofog;
 inline bool  noHint;                    /* ydnar */
-inline bool  renameModelShaders;        /* ydnar */
-inline bool  skyFixHack;                /* ydnar */
-inline bool  bspAlternateSplitWeights;  /* 27 */
-inline bool  deepBSP;                   /* div0 */
-inline bool  maxAreaFaceSurface;        /* divVerent */
 
-inline int        maxLMSurfaceVerts = 64;    /* ydnar */
 inline int        maxSurfaceVerts = 999;     /* ydnar */
-inline int        maxSurfaceIndexes = 6000;  /* ydnar */
-inline float      npDegrees;                 /* ydnar: nonplanar degrees */
 inline int        bevelSnap;                 /* ydnar: bevel plane snap */
-inline bool       flat;
-inline bool       meta;
-inline bool       patchMeta;
-inline bool       emitFlares;
-inline bool       debugSurfaces;
-inline bool       debugInset;
-inline bool       debugPortals;
 inline bool       debugClip;                 /* debug model autoclipping */
-inline float      clipDepthGlobal = 2.0f;
-inline int        metaAdequateScore = -1;
-inline int        metaGoodScore = -1;
-inline bool       g_noob;
 inline String512  globalCelShader;
-inline bool       keepLights;
 
 inline bool  g_bExternalModels;
 
@@ -1503,248 +1169,21 @@ inline MinMax  g_mapMinmax;
 
 inline const MinMax  c_worldMinmax(Vector3(MIN_WORLD_COORD), Vector3(MAX_WORLD_COORD));
 
-inline int                 defaultFogNum = -1;  /* ydnar: cleaner fog handling */
-inline std::vector<fog_t>  mapFogs;
 
 inline brush_t     buildBrush;
 inline EBrushType  g_brushType = EBrushType::Undefined;
 
-
-/* surface stuff */
-inline mapDrawSurface_t *mapDrawSurfs;
+inline mapDrawSurface_t* mapDrawSurfs;
 inline int               numMapDrawSurfs;
-
-inline int  numSurfacesByType[static_cast<std::size_t>(ESurfaceType::Shader) + 1];
-inline int  numStripSurfaces;
-inline int  numMaxAreaSurfaces;
-inline int  numFanSurfaces;
-inline int  numMergedSurfaces;
-inline int  numMergedVerts;
-
-inline int  numRedundantIndexes;
-
-inline int  numSurfaceModels;
-
-inline const Vector3b  debugColors[12] = {{255,   0,   0},  {192, 128, 128},  {255, 255,   0},  {192, 192, 128},
-                                          {  0, 255, 255},  {128, 192, 192},  {  0,   0, 255},  {128, 128, 192},
-                                          {255,   0, 255},  {192, 128, 192},  {  0, 255,   0},  {128, 192, 128}};
 inline int      skyboxArea = -1;
 inline Matrix4  skyboxTransform;
-
-
-/* -------------------------------------------------------------------------------
-
-   light global variables
-
-   ------------------------------------------------------------------------------- */
-
-/* commandline arguments */
-inline bool   wolfLight;
-inline float  extraDist;
-inline bool   loMem;
-inline bool   noStyles;
-
-// inline int sampleSize = DEFAULT_LIGHTMAP_SAMPLE_SIZE;
-// inline int minSampleSize = DEFAULT_LIGHTMAP_MIN_SAMPLE_SIZE;
-inline float  noVertexLighting;
-inline bool   noLightmaps;
-inline bool   noGridLighting;
-
-inline bool  noTrace;
-inline bool  noSurfaces;
-inline bool  patchShadows;
-inline bool  cpmaHack;
-
-inline bool  deluxemap;
-inline bool  debugDeluxemap;
-inline int   deluxemode;
-/* deluxemap format (0 - modelspace,
-                     1 - tangentspace with renormalization,
-                     2 - tangentspace without renormalization) */
-
-inline bool        fast;
-inline bool        fastpoint = true;
-inline bool        faster;
-inline bool        fastgrid;
-inline bool        fastbounce;
-inline bool        cheap;
-inline bool        cheapgrid;
-inline int         bounce;
-inline bool        bounceOnly;
-inline bool        bouncing;
-inline bool        bouncegrid;
-inline bool        normalmap;
-inline bool        trisoup;
-inline bool        shade;
-inline float       shadeAngleDegrees;
-inline int         superSample;
-inline int         lightSamples = 1;
-inline bool        lightRandomSamples;
-inline int         lightSamplesSearchBoxSize = 1;
-inline bool        filter;
-inline bool        dark;
-inline bool        sunOnly;
-inline int         approximateTolerance;
-inline bool        noCollapse;
-inline int         lightmapSearchBlockSize;
-inline bool        exportLightmaps;
-inline bool        externalLightmaps;
 inline int         lmCustomSizeW = LIGHTMAP_WIDTH;
 inline int         lmCustomSizeH = LIGHTMAP_WIDTH;
-inline const char *lmCustomDir;
-inline int         lmLimitSize;
-
-inline bool  lightmapTriangleCheck;
-inline bool  lightmapExtraVisClusterNudge;
-inline bool  lightmapFill;
-inline bool  lightmapPink;
-
-inline bool   dirty;
-inline bool   dirtDebug;
-inline int    dirtMode;
-inline float  dirtDepth = 128.0f;
-inline float  dirtScale =   1.0f;
-inline float  dirtGain  =   1.0f;
-
-/* 27: floodlighting */
-inline bool     debugnormals;
-inline bool     floodlighty;
-inline bool     floodlight_lowquality;
-inline Vector3  floodlightRGB;
-inline float    floodlightIntensity      =  128.0f;
-inline float    floodlightDistance       = 1024.0f;
-inline float    floodlightDirectionScale =    1.0f;
-
-inline bool  dump;
-inline bool  debug;
-inline bool  debugAxis;
-inline bool  debugCluster;
-inline bool  debugOrigin;
-inline bool  lightmapBorder;
-inline int   debugSampleSize;  // 1 = warn;  0 = warn if lmsize > 128
-
-/* for run time tweaking of light sources */
-inline float  pointScale                = 7500.0f;
-inline float  spotScale                 = 7500.0f;
-inline float  areaScale                 =    0.25f;
-inline float  skyScale                  =    1.0f;
-inline float  bounceScale               =    0.25f;
-inline float  bounceColorRatio          =    1.0f;
 inline float  vertexglobalscale         =    1.0f;
 inline float  g_backsplashFractionScale =    1.0f;
 inline float  g_backsplashDistance      = -999.0f;
-
-/* jal: alternative angle attenuation curve */
-inline bool  lightAngleHL;
-
-/* vortex: gridscale and gridambientscale */
-inline float  gridScale          = 1.0f;
-inline float  gridAmbientScale   = 1.0f;
-inline float  gridDirectionality = 1.0f;
-inline float  gridAmbientDirectionality;
-inline bool   inGrid;
-
-/* ydnar: lightmap gamma/compensation */
-inline float  lightmapGamma        = 1.0f;
-inline float  lightmapsRGB;
-inline float  texturesRGB;
-inline float  colorsRGB;
-inline float  lightmapExposure;
-inline float  lightmapCompensate   = 1.0f;
 inline float  lightmapBrightness   = 1.0f;
-inline float  lightmapContrast     = 1.0f;
-inline float  g_lightmapSaturation = 1.0f;
 
-/* ydnar: for runtime tweaking of falloff tolerance */
-inline float        falloffTolerance      = 1.0f;
-inline const bool   exactPointToPolygon  = true;
-inline const float  formFactorValueScale = 3.0f;
-inline const float  linearScale          = 1.0f / 8000.0f;
-
-inline std::list<light_t>  lights;
-inline int                 numPointLights;
-inline int                 numSpotLights;
-inline int                 numSunLights;
-
-/* ydnar: for luxel placement */
-inline int  numSurfaceClusters;
-inline int  maxSurfaceClusters;
-inline int *surfaceClusters;
-
-/* ydnar: for radiosity */
-inline int          numDiffuseLights;
-inline int          numBrushDiffuseLights;
-inline int          numTriangleDiffuseLights;
-inline int          numPatchDiffuseLights;
-inline const float  diffuseSubdivide    = 256.0f;
-inline const float  minDiffuseSubdivide = 64.0f;
-inline int          numDiffuseSurfaces;
-
-/* ydnar: general purpose extra copy of drawvert list */
-inline std::vector<bspDrawVert_t>  yDrawVerts;
-
-inline const int  defaultLightSubdivide = 999;
-
-inline Vector3  ambientColor;
-inline Vector3  minLight;
-inline Vector3  inVertexLight;
-inline Vector3  minGridLight;
-inline float    maxLight = 255.f;
-
-/* ydnar: light optimization */
-inline float  subdivideThreshold = DEFAULT_SUBDIVIDE_THRESHOLD;
-
-inline int                        maxOpaqueBrush;
-inline std::vector<std::uint8_t>  opaqueBrushes;
-
-inline int  gridBoundsCulled;
-inline int  gridEnvelopeCulled;
-
-inline int  lightsBoundsCulled;
-inline int  lightsEnvelopeCulled;
-inline int  lightsPlaneCulled;
-inline int  lightsClusterCulled;
-
-/* ydnar: list of surface information necessary for lightmap calculation */
-inline surfaceInfo_t *surfaceInfos;
-
-/* clumps of surfaces that share a raw lightmap */
-inline int  numLightSurfaces;
-inline int *lightSurfaces;
-
-/* raw lightmaps */
-inline int            numRawLightmaps;
-inline rawLightmap_t *rawLightmaps;
-inline int           *sortLightmaps;
-
-/* vertex luxels */
-inline Vector3 *vertexLuxels[MAX_LIGHTMAPS];
-inline Vector3 *radVertexLuxels[MAX_LIGHTMAPS];
-
-inline Vector3 &getVertexLuxel(int lightmapNum, int vertexNum)    { return vertexLuxels[lightmapNum][vertexNum]; }
-inline Vector3 &getRadVertexLuxel(int lightmapNum, int vertexNum) { return radVertexLuxels[lightmapNum][vertexNum]; }
-
-/* bsp lightmaps */
-inline int            numLightmapShaders;
-inline int            numSolidLightmaps;
-inline int            numOutLightmaps;
-inline int            numBSPLightmaps;
-inline int            numExtLightmaps;
-inline outLightmap_t *outLightmaps;
-
-/* grid points */
-inline std::vector<rawGridPoint_t>  rawGridPoints;
-
-inline int  numLuxels;
-inline int  numLuxelsMapped;
-inline int  numLuxelsOccluded;
-inline int  numLuxelsIlluminated;
-inline int  numVertsIlluminated;
-
-/* lightgrid */
-inline Vector3  gridMins;
-inline int      gridBounds[3];
-inline Vector3  gridSize = {64, 64, 128};
 
 
 /* -------------------------------------------------------------------------------
@@ -1756,25 +1195,6 @@ inline Vector3  gridSize = {64, 64, 128};
 /* global helpers */
 inline std::size_t            numBSPEntities;
 inline std::vector<entity_t>  entities;
-
-/* Used only for loading, when saving each game has it's own vectors */
-inline std::vector<char>      bspEntities;
-
-/* Old lumps, these need to go */
-inline std::vector<bspShader_t>     bspShaders;
-inline std::vector<char>            bspEntData;
-inline std::vector<bspLeaf_t>       bspLeafs;  // MAX_MAP_LEAFS
-inline std::vector<bspPlane_t>      bspPlanes;
-inline std::vector<bspNode_t>       bspNodes;
-inline std::vector<int>             bspLeafSurfaces;
-inline std::vector<int>             bspLeafBrushes;
-inline std::vector<bspBrush_t>      bspBrushes;
-inline std::vector<bspBrushSide_t>  bspBrushSides;
-inline std::vector<byte>            bspLightBytes;
-inline std::vector<bspGridPoint_t>  bspGridPoints;
-inline std::vector<byte>            bspVisBytes;  // MAX_MAP_VISIBILITY
-inline std::vector<bspDrawVert_t>   bspDrawVerts;
-inline std::vector<int>             bspDrawIndexes;
 
 
 #define CHECK_FLAG(value, flag) (value & flag) == flag
