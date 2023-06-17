@@ -1399,9 +1399,6 @@ void FilterDrawsurfsIntoTree(entity_t &e, tree_t &tree);
 /* surface_fur.c */
 void Fur(mapDrawSurface_t *src);
 
-/* surface_foliage.c */
-void Foliage(mapDrawSurface_t *src, entity_t &entity);
-
 /* ydnar: surface_meta.c */
 void ClearMetaTriangles();
 void MakeEntityMetaTriangles(const entity_t &e);

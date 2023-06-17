@@ -39,7 +39,6 @@ add_executable(remap
                "shaders.h"
                "surface_extra.cpp"
                "surface_extra.h"
-               "surface_foliage.cpp"
                "surface_fur.cpp"
                "surface_meta.cpp"
                "surface.cpp"
