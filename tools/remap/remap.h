@@ -1396,10 +1396,6 @@ void SubdivideFaceSurfaces(const entity_t &e);
 void AddEntitySurfaceModels(entity_t &e);
 void FilterDrawsurfsIntoTree(entity_t &e, tree_t &tree);
 
-/* decals.c */
-void ProcessDecals();
-void MakeEntityDecals(const entity_t &e);
-
 /* map.c */
 std::array<Vector3, 2> TextureAxisFromPlane(const plane_t &plane);
 

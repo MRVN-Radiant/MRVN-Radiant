@@ -18,7 +18,6 @@ add_executable(remap
                "bspfile_abstract.h"
                "bspfile_shared.cpp"
                "bspfile_shared.h"
-               "decals.cpp"
                "fog.cpp"
                "games.cpp"
                "games.h"
