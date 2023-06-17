@@ -1348,8 +1348,6 @@ inline portal_t *AllocPortal() { return new portal_t(); }
 inline void FreePortal(portal_t *p) { delete p; }
 void MakeTreePortals(tree_t &tree);
 
-/* leakfile.c */
-void Leak_feedback(const tree_t &tree);
 
 /* prtfile.c */
 void NumberClusters(tree_t &tree);

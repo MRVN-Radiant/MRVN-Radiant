@@ -21,7 +21,6 @@ add_executable(remap
                "games.cpp"
                "games.h"
                "image.cpp"
-               "leakfile.cpp"
                "lump_names.h"
                "main.cpp"
                "map.cpp"
