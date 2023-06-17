@@ -1359,13 +1359,6 @@ void WritePortalFile(const tree_t &tree);
 void ParsePatch(bool onlyLights, entity_t &mapEnt, int mapPrimitiveNum);
 void PatchMapDrawSurfs(entity_t &e);
 
-/* fog.c */
-winding_t WindingFromDrawSurf(const mapDrawSurface_t *ds);
-void FogDrawSurfaces(const entity_t &e);
-int FogForPoint(const Vector3 &point, float epsilon);
-int FogForBounds(const MinMax &minmax, float epsilon);
-void CreateMapFogs();
-
 /* model.c */
 void assimp_init();
 void InsertModel(const char *name, const char *skin, int frame, const Matrix4 &transform,
