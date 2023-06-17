@@ -1379,25 +1379,6 @@ void TCMod(const tcMod_t &mod, Vector2 &st);
 bool ApplyShaderType( const char *name, int *surfaceFlags, int *contentFlags, int *compileFlags );
 bool ApplyShaderFlag( const char *name, int *surfaceFlags, int *contentFlags, int *compileFlags );
 
-// Encode the string as a type
-//template <char... chars>
-//using TemplateString = std::integer_sequence<char, chars...>;
-// Create a user defined literal operator
-//template <typename T, T... chars>
-//constexpr TemplateString<chars...> operator""_Tstring() { return { }; }
-/// \brief returns statically evaluated \c surfaceParm_t for the given name or emits \c Error
-//template<char... chars>
-//const surfaceParm_t &GetRequiredSurfaceParm(const TemplateString<chars...>) {
-//    static constexpr char  str[sizeof...(chars) + 1] = { chars..., '\0' };  // Recover the character data
-//        static const  surfaceParm_t *const sp = GetSurfaceParm(str);
-//        ENSURE(sp != nullptr);
-//    return *sp;
-//}
-
-void BeginMapShaderFile(const char *mapFile);
-void WriteMapShaderFile();
-const shaderInfo_t *CustomShader(const shaderInfo_t *si, const char *find, char *replace);
-void EmitVertexRemapShader(char *from, char *to);
 void LoadShaderInfo();
 shaderInfo_t *ShaderInfoForShader(const char *shader);
 shaderInfo_t *ShaderInfoForShaderNull(const char *shader);
