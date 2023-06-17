@@ -1357,7 +1357,6 @@ void WritePortalFile(const tree_t &tree);
 
 /* patch.c */
 void ParsePatch(bool onlyLights, entity_t &mapEnt, int mapPrimitiveNum);
-void PatchMapDrawSurfs(entity_t &e);
 
 /* model.c */
 void assimp_init();
@@ -1365,29 +1364,6 @@ void InsertModel(const char *name, const char *skin, int frame, const Matrix4 &t
                  const std::list<remap_t> *remaps, shaderInfo_t *celShader,
                  entity_t &entity, int castShadows, int recvShadows, int spawnFlags,
                  float lightmapScale, int lightmapSampleSize, float shadeAngle, float clipDepth );
-void AddTriangleModels(entity_t &eparent);
-
-/* surface.c */
-mapDrawSurface_t *AllocDrawSurface(ESurfaceType type);
-void StripFaceSurface(mapDrawSurface_t *ds);
-void MaxAreaFaceSurface(mapDrawSurface_t *ds);
-Vector3 CalcLightmapAxis(const Vector3 &normal);
-void ClassifySurfaces(int numSurfs, mapDrawSurface_t *ds);
-void ClassifyEntitySurfaces(const entity_t &e);
-void TidyEntitySurfaces(const entity_t &e);
-mapDrawSurface_t *CloneSurface(mapDrawSurface_t *src, shaderInfo_t *si);
-bool IsTriangleDegenerate(bspDrawVert_t *points, int a, int b, int c);
-void ClearSurface(mapDrawSurface_t *ds);
-mapDrawSurface_t *DrawSurfaceForSide(const entity_t &e, const brush_t &b, const side_t &s, const winding_t &w);
-mapDrawSurface_t *DrawSurfaceForMesh(const entity_t &e, parseMesh_t *p, mesh_t *mesh);
-mapDrawSurface_t *DrawSurfaceForFlare(int entNum, const Vector3 &origin, const Vector3 &normal,
-                                      const Vector3 &color, const char *flareShader, int lightStyle);
-void ClipSidesIntoTree(entity_t &e, const tree_t &tree);
-void MakeDebugPortalSurfs(const tree_t &tree);
-void MakeFogHullSurfs(const char *shader);
-void SubdivideFaceSurfaces(const entity_t &e);
-void AddEntitySurfaceModels(entity_t &e);
-void FilterDrawsurfsIntoTree(entity_t &e, tree_t &tree);
 
 /* map.c */
 std::array<Vector3, 2> TextureAxisFromPlane(const plane_t &plane);
