@@ -1359,9 +1359,6 @@ void WritePortalFile(const tree_t &tree);
 void ParsePatch(bool onlyLights, entity_t &mapEnt, int mapPrimitiveNum);
 void PatchMapDrawSurfs(entity_t &e);
 
-/* tjunction.c */
-void FixTJunctions(const entity_t &e);
-
 /* fog.c */
 winding_t WindingFromDrawSurf(const mapDrawSurface_t *ds);
 void FogDrawSurfaces(const entity_t &e);

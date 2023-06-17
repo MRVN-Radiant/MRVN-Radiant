@@ -43,7 +43,6 @@ add_executable(remap
                "surface_fur.cpp"
                "surface_meta.cpp"
                "surface.cpp"
-               "tjunction.cpp"
                "${CMAKE_SOURCE_DIR}/icons/remap.rc"
               )
 
