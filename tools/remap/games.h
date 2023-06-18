@@ -24,24 +24,28 @@
 /* marker */
 #pragma once
 
-#include <vector>
+#include "toolsdef.h"
 
-
-struct bspLump_t {
+//------------------------------------------------------------
+// Header lump information
+struct Lump_t {
         int offset, length, lumpVer, padding;
 };
 
-struct rbspHeader_t {
-    char  ident[4];    /* rBSP */
-    int   version;     /* 37 for r2 */
-    int   mapVersion;  /* 30 */
-    int   maxLump;     /* 127 */
+//------------------------------------------------------------
+// BSP File header
+struct BSPHeader_t {
+    char  ident[4];   // rBSP
+    int   version;    // 29 - r1; 37 - r2; 47 - r5
+    int   mapVersion; //
+    int   lastLump;   // 127
 
-    bspLump_t  lumps[128];
+    Lump_t  lumps[128];
 };
 
 
-/* ydnar: compiler flags, because games have widely varying content/surface flags */
+//------------------------------------------------------------
+// ydnar: compiler flags, because games have widely varying content/surface flags
 const int C_SOLID                = 0x00000001;
 const int C_TRANSLUCENT          = 0x00000002;
 const int C_STRUCTURAL           = 0x00000004;
@@ -63,19 +67,19 @@ const int C_OB                   = 0x00020000;  /* skip -noob for this */
 const int C_DECAL                = 0x00040000;  /* Titanfall decal mesh */
 const int C_DETAIL               = 0x08000000;  /* THIS MUST BE THE SAME AS IN RADIANT! */
 
+//------------------------------------------------------------
 // Surface flags
 const int S_SKY_2D               = 0x00000002;
 const int S_SKY                  = 0x00000004;
 const int S_TRANSLUCENT          = 0x00000010;
-// NOTE: VERTEX_RESERVED_X might be selected w/ an unknown in Mesh_t
 const int S_VERTEX_LIT_FLAT      = 0x00000000;
 const int S_VERTEX_LIT_BUMP      = 0x00000200;
 const int S_VERTEX_UNLIT         = 0x00000400;
 const int S_VERTEX_UNLIT_TS      = 0x00000600;
-// const int S_VERTEX_BLINN_PHONG   = ?
 
 const int S_MESH_UNKNOWN         = 0x00100000;
 
+//------------------------------------------------------------
 // Collision flags
 const int CONTENTS_SOLID                = 0x00000001;  // Everything collides with me
 const int CONTENTS_WINDOW               = 0x00000002;
@@ -112,13 +116,15 @@ const int CONTENTS_SOUNDTRIGGER         = 0x00000400;
 const int CONTENTS_OCCLUDESOUND         = 0x00001000;
 const int CONTENTS_NOAIRDROP            = 0x01000000;
 const int CONTENTS_BLOCK_PING           = 0x20000000;
-
+//------------------------------------------------------------
+// Generic set of flags used often
 const int MASK_UNLIT_GENERIC            = S_VERTEX_UNLIT;
 const int MASK_LIT_FLAT_GENERIC         = S_VERTEX_LIT_FLAT;
 const int MASK_LIT_BUMP_GENERIC         = S_VERTEX_LIT_BUMP;
 const int MASK_UNLIT_TS_GENERIC         = S_VERTEX_UNLIT_TS;
 
-
+//------------------------------------------------------------
+// 
 struct ShaderType_t {
     const char *name;
     int surfaceFlags, surfaceFlagsClear;
@@ -126,64 +132,34 @@ struct ShaderType_t {
     int compileFlags, compileFlagsClear;
 };
 
+//------------------------------------------------------------
+// 
 struct ShaderFlag_t {
     const char* name;
     int flags, flagsClear;
 };
 
-/* ydnar: for multiple game support */
-struct surfaceParm_t {
-    const char *name;
-    int  contentFlags, contentFlagsClear;
-    int  surfaceFlags, surfaceFlagsClear;
-    int  compileFlags, compileFlagsClear;
-};
-
-enum class EMiniMapMode {
-    Gray,
-    Black,
-    White
-};
-
-
-struct game_t {
-    const char     *arg;                           /* -game matches this */
-    const char     *gamePath;                      /* main game data dir */
-    const char     *homeBasePath;                  /* home sub-dir on unix */
-    const char     *magic;                         /* magic word for figuring out base path */
-    const char     *shaderPath;                    /* shader directory */
-    int             maxLMSurfaceVerts;             /* default maximum lightmapped surface verts */
-    int             maxSurfaceVerts;               /* default maximum surface verts */
-    int             maxSurfaceIndexes;             /* default maximum surface indexes (tris * 3) */
-    bool            emitFlares;                    /* when true, emit flare surfaces */
-    const char     *flareShader;                   /* default flare shader (MUST BE SET) */
-    bool            wolfLight;                     /* when true, lights work like wolf q3map  */
-    int             lightmapSize;                  /* bsp lightmap width/height */
-    float           lightmapGamma;                 /* default lightmap gamma */
-    bool            lightmapsRGB;                  /* default lightmap sRGB mode */
-    bool            texturesRGB;                   /* default texture sRGB mode */
-    bool            colorsRGB;                     /* default color sRGB mode */
-    float           lightmapExposure;              /* default lightmap exposure */
-    float           lightmapCompensate;            /* default lightmap compensate value */
-    float           gridScale;                     /* vortex: default lightgrid scale (affects both directional and ambient spectres) */
-    float           gridAmbientScale;              /* vortex: default lightgrid ambient spectre scale */
-    bool            lightAngleHL;                  /* jal: use half-lambert curve for light angle attenuation */
-    bool            noStyles;                      /* use lightstyles hack or not */
-    bool            keepLights;                    /* keep light entities on bsp */
-    int             patchSubdivisions;             /* default patchMeta subdivisions tolerance */
-    bool            patchShadows;                  /* patch casting enabled */
-    const char     *bspIdent;                      /* 4-letter bsp file prefix */
-    int             bspVersion;                    /* bsp version to use */
+//------------------------------------------------------------
+// Game-specific description
+struct Game_t {
+    const char     *arg;                           // -game matches this
+    const char     *shaderPath;                    // shader directory; // TODO [Fifty]: As this needs to match with radiant maybe hard-code this
+    const char     *bspIdent;                      // 4-letter bsp file prefix
+    int             bspVersion;                    // bsp version to use
     typedef void    (*bspWriteFunc)(const char*);
-    bspWriteFunc    write;
+    bspWriteFunc    write;                         // Writes bsp to disk
     typedef void    (*bspCompileFunc)();
-    bspCompileFunc  compile;
+    bspCompileFunc  compile;                       // Compiles the bsp
     std::vector<ShaderType_t> shaderTypes;
     std::vector<ShaderFlag_t> surfaceFlags;
     std::vector<ShaderFlag_t> contentFlags;
     std::vector<ShaderFlag_t> compileFlags;
 };
 
+//------------------------------------------------------------
+// Globals
+extern const vector<Game_t>  g_games;
+extern const Game_t         *g_pGame;
 
-extern const std::vector<game_t>  g_games;
-extern const game_t              *g_game;
+//------------------------------------------------------------
+const Game_t* GetGame( const char* arg );

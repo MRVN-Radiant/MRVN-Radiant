@@ -36,7 +36,7 @@
    adds a lump to an outgoing bsp file
 */
 template<typename T>
-void AddLump(FILE *file, bspLump_t &lump, const std::vector<T> &data) {
+void AddLump(FILE *file, Lump_t &lump, const std::vector<T> &data) {
     const int length = sizeof(T) * data.size();
     /* add lump to bsp file header */
     lump.offset = LittleLong(ftell(file));
@@ -55,7 +55,7 @@ void AddLump(FILE *file, bspLump_t &lump, const std::vector<T> &data) {
    copies a bsp file lump into a destination buffer
 */
 template<typename DstT, typename SrcT = DstT>
-void CopyLump(rbspHeader_t *header, int lump, std::vector<DstT> &data) {
+void CopyLump(BSPHeader_t *header, int lump, std::vector<DstT> &data) {
     /* get lump length and offset */
     uint32_t length = header->lumps[lump].length;
     uint32_t offset = header->lumps[lump].offset;

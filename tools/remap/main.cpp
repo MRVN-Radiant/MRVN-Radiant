@@ -122,7 +122,7 @@ int main( int argc, char *argv[] )
 	// Get game
 	if( args.takeArg( "-game" ) )
 	{
-		g_game = GetGame( args.takeNext() );
+		g_pGame = GetGame( args.takeNext() );
 	}
 
 	// Print info about passed bsp

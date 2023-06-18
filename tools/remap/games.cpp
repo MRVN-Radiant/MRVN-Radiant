@@ -37,39 +37,16 @@
 #include "qstringops.h"
 #include "inout.h"
 
-
-struct game_titanfallonline : game_t {
-    /* most of this is copied over, just want to get vis tree injected first */
-    game_titanfallonline() : game_t {
-        "titanfallonline",      /* -game x */
-        "assets",               /* default base game data dir */
-        ".assets",              /* unix home sub-dir */
-        "soldier",              /* magic path word */
-        "shaders",              /* shader directory */
-        64,                     /* max lightmapped surface verts */
-        999,                    /* max surface verts */
-        6000,                   /* max surface indexes */
-        true,                   /* flares */
-        "gfx/misc/lens_flare",  /* default flare shader */
-        false,                  /* wolf lighting model? */
-        128,                    /* lightmap width/height */
-        1.0f,                   /* lightmap gamma */
-        false,                  /* lightmap sRGB */
-        false,                  /* texture sRGB */
-        false,                  /* color sRGB */
-        0.0f,                   /* lightmap exposure */
-        1.0f,                   /* lightmap compensate */
-        1.0f,                   /* lightgrid scale */
-        1.0f,                   /* lightgrid ambient scale */
-        false,                  /* light angle attenuation uses half-lambert curve */
-        false,                  /* disable shader lightstyles hack */
-        false,                  /* keep light entities on bsp */
-        8,                      /* default patchMeta subdivisions tolerance */
-        false,                  /* patch casting enabled */
-        "rBSP",                 /* bsp file prefix */
-        29,                     /* bsp file version */
-        WriteR1BSPFile,         /* bsp write function */
-        CompileR1BSPFile,
+//------------------------------------------------------------
+// Titanfall Online
+struct game_titanfallonline : Game_t {
+    game_titanfallonline() : Game_t {
+        "titanfallonline",      // -game x
+        "shaders",              // shader directory
+        "rBSP",                 // bsp file header magic
+        29,                     // bsp file version
+        WriteR1BSPFile,         // bsp write function
+        CompileR1BSPFile,       // bsp compile function
         // Shader Type
         {
             // name                     surfaceFlags, surfaceFlagsClear,    contentsFlags, contentsFlagsClear, compileFlags, compileFlagsClear
@@ -132,40 +109,16 @@ struct game_titanfallonline : game_t {
     }{}
 };
 
-
-/* titanfall2 */
-struct game_titanfall2 : game_t {
-    /* most of this is copied over, just want to get vis tree injected first */
-    game_titanfall2() : game_t {
-        "titanfall2",           /* -game x */
-        "assets",               /* default base game data dir */
-        ".assets",              /* unix home sub-dir */
-        "soldier",              /* magic path word */
-        "shaders",              /* shader directory */
-        64,                     /* max lightmapped surface verts */
-        999,                    /* max surface verts */
-        6000,                   /* max surface indexes */
-        true,                   /* flares */
-        "gfx/misc/lens_flare",  /* default flare shader */
-        false,                  /* wolf lighting model? */
-        128,                    /* lightmap width/height */
-        1.0f,                   /* lightmap gamma */
-        false,                  /* lightmap sRGB */
-        false,                  /* texture sRGB */
-        false,                  /* color sRGB */
-        0.0f,                   /* lightmap exposure */
-        1.0f,                   /* lightmap compensate */
-        1.0f,                   /* lightgrid scale */
-        1.0f,                   /* lightgrid ambient scale */
-        false,                  /* light angle attenuation uses half-lambert curve */
-        false,                  /* disable shader lightstyles hack */
-        false,                  /* keep light entities on bsp */
-        8,                      /* default patchMeta subdivisions tolerance */
-        false,                  /* patch casting enabled */
-        "rBSP",                 /* bsp file prefix */
-        37,                     /* bsp file version */
-        WriteR2BSPFile,         /* bsp write function */
-        CompileR2BSPFile,
+//------------------------------------------------------------
+// Titanfall 2
+struct game_titanfall2 : Game_t {
+    game_titanfall2() : Game_t {
+        "titanfall2",           // -game x
+        "shaders",              // shader directory
+        "rBSP",                 // bsp file header magic
+        37,                     // bsp file version
+        WriteR2BSPFile,         // bsp write function
+        CompileR2BSPFile,       // bsp compile function
         // Shader Type
         {
             // name                     surfaceFlags, surfaceFlagsClear,    contentsFlags, contentsFlagsClear, compileFlags, compileFlagsClear
@@ -228,40 +181,16 @@ struct game_titanfall2 : game_t {
     }{}
 };
 
-
-/* apex legends */
-struct game_apexlegends : game_t {
-    /* most of this is copied over, just want to get vis tree injected first */
-    game_apexlegends() : game_t {
-        "apexlegends",          /* -game x */
-        "assets",               /* default base game data dir */
-        ".assets",              /* unix home sub-dir */
-        "soldier",              /* magic path word */
-        "shaders",              /* shader directory */
-        64,                     /* max lightmapped surface verts */
-        999,                    /* max surface verts */
-        6000,                   /* max surface indexes */
-        true,                   /* flares */
-        "gfx/misc/lens_flare",  /* default flare shader */
-        false,                  /* wolf lighting model? */
-        128,                    /* lightmap width/height */
-        1.0f,                   /* lightmap gamma */
-        false,                  /* lightmap sRGB */
-        false,                  /* texture sRGB */
-        false,                  /* color sRGB */
-        0.0f,                   /* lightmap exposure */
-        1.0f,                   /* lightmap compensate */
-        1.0f,                   /* lightgrid scale */
-        1.0f,                   /* lightgrid ambient scale */
-        false,                  /* light angle attenuation uses half-lambert curve */
-        false,                  /* disable shader lightstyles hack */
-        false,                  /* keep light entities on bsp */
-        8,                      /* default patchMeta subdivisions tolerance */
-        false,                  /* patch casting enabled */
-        "rBSP",                 /* bsp file prefix */
-        47,                     /* bsp file version */
-        WriteR5BSPFile,         /* bsp write function */
-        CompileR5BSPFile,
+//------------------------------------------------------------
+// Apex Legends
+struct game_apexlegends : Game_t {
+    game_apexlegends() : Game_t {
+        "apexlegends",          // -game x
+        "shaders",              // shader directory
+        "rBSP",                 // bsp file header magic
+        47,                     // bsp file version
+        WriteR5BSPFile,         // bsp write function
+        CompileR5BSPFile,       // bsp compile function
         // Shader Type
         {
             // name                     surfaceFlags, surfaceFlagsClear,    contentsFlags, contentsFlagsClear, compileFlags, compileFlagsClear
@@ -328,9 +257,44 @@ struct game_apexlegends : game_t {
     }{}
 };
 
+//------------------------------------------------------------
+// Globals
+const vector<Game_t> g_games = { game_titanfallonline(),
+                                 game_titanfall2(),
+                                 game_apexlegends()
+                               };
+const Game_t *g_pGame = &g_games[0];
 
-const std::vector<game_t> g_games = { game_titanfallonline(),
-                                      game_titanfall2(),
-                                      game_apexlegends()
-                                    };
-const game_t *g_game = &g_games[0];
+//------------------------------------------------------------
+// Purpose: Gets pointer to game
+// Input  : &arg - The name fo the game
+//------------------------------------------------------------
+const Game_t *GetGame( const char *arg ){
+	// Dummy check
+	if ( strEmptyOrNull( arg ) ) {
+		return NULL;
+	}
+
+	// Joke
+	if ( striEqual( arg, "quake1" ) ||
+	     striEqual( arg, "quake2" ) ||
+	     striEqual( arg, "unreal" ) ||
+	     striEqual( arg, "ut2k3" ) ||
+	     striEqual( arg, "dn3d" ) ||
+	     striEqual( arg, "dnf" ) ||
+	     striEqual( arg, "hl" ) ) {
+		Sys_Printf( "April fools, silly rabbit!\n" );
+		exit( 0 );
+	}
+
+	// Find the game
+	for( const Game_t& game : g_games )
+	{
+		if ( striEqual( arg, game.arg ) )
+			return &game;
+	}
+
+	/* no matching game */
+	Sys_Warning( "Game \"%s\" is unknown.\n", arg );
+	return NULL;
+}

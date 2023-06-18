@@ -34,7 +34,6 @@
 
 
 static bool           g_warnImage = true;
-static surfaceParm_t  custSurfaceParms[256];
 static int            numCustSurfaceParms;
 
 
@@ -201,7 +200,7 @@ static void TCModRotate(tcMod_t &mod, float euler) {
 */
 const ShaderType_t *GetShaderType( const char *name ) {
     // Walk the current game's shader type vector
-    for( const ShaderType_t &st : g_game->shaderTypes ) {
+    for( const ShaderType_t &st : g_pGame->shaderTypes ) {
         if ( striEqual(name, st.name) ) {
             return &st;
         }
@@ -257,9 +256,9 @@ ShaderFlag_t *GetShaderFlag( const char *name, std::vector<ShaderFlag_t> flags )
 */
 bool ApplyShaderFlag( const char *name, int *surfaceFlags, int *contentFlags, int *compileFlags ) {
     ShaderFlag_t *sf = nullptr;
-    if( surfaceFlags != nullptr ) { sf = GetShaderFlag(name, g_game->surfaceFlags); }
-    if( contentFlags != nullptr ) { sf = GetShaderFlag(name, g_game->contentFlags); }
-    if( compileFlags != nullptr ) { sf = GetShaderFlag(name, g_game->compileFlags); }
+    if( surfaceFlags != nullptr ) { sf = GetShaderFlag(name, g_pGame->surfaceFlags); }
+    if( contentFlags != nullptr ) { sf = GetShaderFlag(name, g_pGame->contentFlags); }
+    if( compileFlags != nullptr ) { sf = GetShaderFlag(name, g_pGame->compileFlags); }
 
 
     if( sf != nullptr ) {
@@ -628,56 +627,6 @@ static void ParseShaderFile(const char *filename) {
 
 
 /*
-   ParseCustomInfoParms() - rr2do2
-   loads custom info parms file for mods
-*/
-static void ParseCustomInfoParms() {
-    /* file exists? */
-    if (!vfsFileExists("scripts/custinfoparms.txt")) {
-        return;
-    }
-
-    /* load it */
-    LoadScriptFile("scripts/custinfoparms.txt");
-
-    /* clear the array */
-    memset(custSurfaceParms, 0, sizeof(custSurfaceParms));
-    numCustSurfaceParms = 0;
-    bool parsed = false;
-
-    /* parse custom contentflags */
-    MatchToken("{");
-    while (GetToken(true) && !(parsed = strEqual(token, "}"))) {
-        custSurfaceParms[numCustSurfaceParms].name = copystring(token);
-        GetToken(false);
-        sscanf(token, "%x", &custSurfaceParms[numCustSurfaceParms].contentFlags);
-        numCustSurfaceParms++;
-    }
-
-    /* any content? */
-    if (!parsed) {
-        Sys_Warning("Couldn't find valid custom contentsflag section\n");
-        return;
-    }
-
-    /* parse custom surfaceflags */
-    MatchToken("{");
-    parsed = false;
-    while (GetToken(true) && !(parsed = strEqual(token, "}"))) {
-        custSurfaceParms[numCustSurfaceParms].name = copystring(token);
-        GetToken(false);
-        sscanf(token, "%x", &custSurfaceParms[numCustSurfaceParms].surfaceFlags);
-        numCustSurfaceParms++;
-    }
-
-    /* any content? */
-    if (!parsed) {
-        Sys_Warning("Couldn't find valid custom surfaceflag section\n");
-    }
-}
-
-
-/*
    LoadShaderInfo()
    the shaders are parsed out of shaderlist.txt from a main directory
    that is, if using -fs_game we ignore the shader scripts that might be in baseq3/
@@ -685,11 +634,11 @@ static void ParseCustomInfoParms() {
 */
 void LoadShaderInfo() {
     vector<string> shaderFiles;
-    shaderFiles = vfsGetListOfFilesRecursive(g_game->shaderPath, ".shader");
+    shaderFiles = vfsGetListOfFilesRecursive(g_pGame->shaderPath, ".shader");
     
     // Parse all shader files
     for( const string& file : shaderFiles ) {
-        ParseShaderFile( (string(g_game->shaderPath) + "/" + file).c_str() );
+        ParseShaderFile( (string(g_pGame->shaderPath) + "/" + file).c_str() );
     }
 
     /* emit some statistics */

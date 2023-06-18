@@ -33,13 +33,13 @@
    writes a r1 bsp file
 */
 void WriteR1BSPFile(const char *filename) {
-    rbspHeader_t  header {};
+    BSPHeader_t  header {};
 
     // Set up header
-    memcpy(header.ident, g_game->bspIdent, 4);
-    header.version = LittleLong(g_game->bspVersion);
+    memcpy(header.ident, g_pGame->bspIdent, 4);
+    header.version = LittleLong(g_pGame->bspVersion);
     header.mapVersion = 6;
-    header.maxLump = 127;
+    header.lastLump = 127;
 
     // This should be automated maybe
     header.lumps[0x02].lumpVer = 1;

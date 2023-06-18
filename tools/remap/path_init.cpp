@@ -35,39 +35,7 @@
 #include "remap.h"
 
 
-//------------------------------------------------------------
-// Purpose: Gets pointer to game
-// Input  : &arg - The name fo the game
-//------------------------------------------------------------
-const game_t *GetGame( const char *arg ){
-	// Dummy check
-	if ( strEmptyOrNull( arg ) ) {
-		return NULL;
-	}
 
-	// Joke
-	if ( striEqual( arg, "quake1" ) ||
-	     striEqual( arg, "quake2" ) ||
-	     striEqual( arg, "unreal" ) ||
-	     striEqual( arg, "ut2k3" ) ||
-	     striEqual( arg, "dn3d" ) ||
-	     striEqual( arg, "dnf" ) ||
-	     striEqual( arg, "hl" ) ) {
-		Sys_Printf( "April fools, silly rabbit!\n" );
-		exit( 0 );
-	}
-
-	/* test it */
-	for( const game_t& game : g_games )
-	{
-		if ( striEqual( arg, game.arg ) )
-			return &game;
-	}
-
-	/* no matching game */
-	Sys_Warning( "Game \"%s\" is unknown.\n", arg );
-	return NULL;
-}
 
 
 //------------------------------------------------------------
@@ -76,7 +44,7 @@ const game_t *GetGame( const char *arg ){
 //------------------------------------------------------------
 void InitPaths( Args& args )
 {
-	if( g_game == NULL )
+	if( g_pGame == NULL )
 	{
 		Sys_Warning( "Not running InitPaths as g_game is NULL! This is expected when running with -info.\n" );
 		return;

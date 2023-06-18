@@ -14,8 +14,6 @@ add_library(ToolsShared STATIC
             "md4.h"
             "miniz.cpp"
             "miniz.h"
-            "mutex.cpp"
-            "mutex.h"
             "polylib.cpp"
             "polylib.h"
             "qimagelib.cpp"

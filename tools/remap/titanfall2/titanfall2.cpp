@@ -32,13 +32,13 @@
    writes a titanfall2 bsp file and it's .ent files
 */
 void WriteR2BSPFile(const char *filename) {
-    rbspHeader_t header{};
+    BSPHeader_t header{};
 
     /* set up header */
-    memcpy(header.ident, g_game->bspIdent, 4);
-    header.version = LittleLong(g_game->bspVersion);
+    memcpy(header.ident, g_pGame->bspIdent, 4);
+    header.version = LittleLong(g_pGame->bspVersion);
     header.mapVersion = 30;
-    header.maxLump = 127;
+    header.lastLump = 127;
 
     /* This should be automated maybe */
     header.lumps[0x01].lumpVer = 1;

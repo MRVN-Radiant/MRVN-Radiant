@@ -995,7 +995,6 @@ inline float Random() { return (float)rand() / RAND_MAX; }  /* returns a pseudor
 
 
 /* path_init.c */
-const game_t *GetGame(const char *arg);
 void InitPaths(Args &args);
 
 /* bsp.c */

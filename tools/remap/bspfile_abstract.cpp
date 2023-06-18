@@ -50,7 +50,7 @@ void WriteBSPFile( const char *pszFileName )
     Sys_Printf("Writing %s... ", phBspFileName.string().c_str() );
     Sys_Printf("Success!\n");
 
-    g_game->write( phBspFileName.string().c_str() );
+    g_pGame->write( phBspFileName.string().c_str() );
 }
 
 
@@ -60,7 +60,7 @@ void WriteBSPFile( const char *pszFileName )
 //------------------------------------------------------------
 void WriteEntFileHeader( FILE *file )
 {
-    if( g_game->bspVersion == 47 )
+    if( g_pGame->bspVersion == 47 )
     {
         // Apex Legends
         std::string message = "ENTITIES02 num_models=" + std::to_string(ApexLegends::Bsp::levelInfo.at(0).modelCount) + "\n";
@@ -415,18 +415,5 @@ void GetEntityShadowFlags(const entity_t *ent, const entity_t *ent2, int *castSh
     if (recvShadows != NULL) {
         (ent != NULL && ent->read_keyvalue(*recvShadows, "_receiveShadows", "_rs")) ||
         (ent2 != NULL && ent2->read_keyvalue(*recvShadows, "_receiveShadows", "_rs"));
-    }
-
-    /* vortex: game-specific default entity keys */
-    if (striEqual(g_game->magic, "dq") || striEqual(g_game->magic, "prophecy")) {
-        /* vortex: deluxe quake default shadow flags */
-        if (ent->classname_is("func_wall")) {
-            if (recvShadows != NULL) {
-                *recvShadows = 1;
-            }
-            if (castShadows != NULL) {
-                *castShadows = 1;
-            }
-        }
     }
 }

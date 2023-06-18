@@ -56,7 +56,7 @@ void WriteBspFiles( const char* szMapFileName)
 //------------------------------------------------------------
 int BSPMain( Args& args )
 {
-	if( g_game == NULL )
+	if( g_pGame == NULL )
 	{
 		Sys_Warning( "Not running BSPMain as g_game is NULL! This is an error, make sure to specify -game argument!\n" );
 		return -1;
@@ -78,7 +78,7 @@ int BSPMain( Args& args )
 	}
 
 	// Check arg game compatibility
-	if( g_game->bspVersion == 29 && g_bExternalModels )
+	if( g_pGame->bspVersion == 29 && g_bExternalModels )
 	{
 		// NOTE [Fifty]: "External models", brush entities defined in .ent files aren't supported in titanfall 1
 		Sys_Warning( "Game: \"titanfallonline\" doesn't support the \"-externalmodels\" flag!\n" );
@@ -96,7 +96,7 @@ int BSPMain( Args& args )
 	
 	// Compile map
 	Sys_FPrintf( SYS_VRB, "--- CompileMap ---\n" );
-	g_game->compile();
+	g_pGame->compile();
 	Sys_Printf( "\n" );
 
 	// Write .bsp and .ent files

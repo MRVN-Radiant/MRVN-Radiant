@@ -32,13 +32,13 @@
    writes a apex bsp file
 */
 void WriteR5BSPFile(const char *filename) {
-    rbspHeader_t header{};
+    BSPHeader_t header{};
 
     /* set up header */
-    memcpy(header.ident, g_game->bspIdent, 4);
-    header.version = LittleLong(g_game->bspVersion);
+    memcpy(header.ident, g_pGame->bspIdent, 4);
+    header.version = LittleLong(g_pGame->bspVersion);
     header.mapVersion = 30;
-    header.maxLump = 127;
+    header.lastLump = 127;
 
     /* write initial header */
     FILE* file = SafeOpenWrite(filename);
