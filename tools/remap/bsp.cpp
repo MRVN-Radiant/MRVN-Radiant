@@ -70,7 +70,8 @@ int BSPMain( Args& args )
 
 	// Process arguments
 	{
-		while ( args.takeArg( "-externalmodels" ) ) {
+		if( args.takeArg( "-externalmodels" ) )
+		{
 			Sys_Printf( "External models enabled\n" );
 			g_bExternalModels = true;
 		}
