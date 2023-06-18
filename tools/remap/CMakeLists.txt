@@ -24,7 +24,6 @@ add_executable(remap
                "lump_names.h"
                "main.cpp"
                "map.cpp"
-               "mesh.cpp"
                "model.cpp"
                "model.h"
                "patch.cpp"

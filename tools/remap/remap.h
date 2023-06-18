@@ -1009,21 +1009,6 @@ void FilterDetailBrushesIntoTree(const entity_t &e, tree_t &tree);
 void FilterStructuralBrushesIntoTree(const entity_t &e, tree_t &tree);
 bool WindingIsTiny(const winding_t &w);
 
-/* mesh.c */
-void LerpDrawVert(const bspDrawVert_t *a, const bspDrawVert_t *b, bspDrawVert_t *out);
-void LerpDrawVertAmount(bspDrawVert_t *a, bspDrawVert_t *b, float amount, bspDrawVert_t *out);
-void FreeMesh(mesh_t *m);
-mesh_t *CopyMesh(mesh_t *mesh);
-void PrintMesh(mesh_t *m);
-mesh_t *TransposeMesh(mesh_t *in);
-void InvertMesh(mesh_t *m);
-mesh_t *SubdivideMesh(mesh_t in, float maxError, float minLength);
-int IterationsForCurve(float len, int subdivisions);
-mesh_t *SubdivideMesh2(mesh_t in, int iterations);
-mesh_t *RemoveLinearMeshColumnsRows(mesh_t *in);
-void MakeMeshNormals(mesh_t in);
-void PutMeshOnCurve(mesh_t in);
-
 /* map.c */
 void LoadMapFile(const char *filename, bool onlyLights, bool noCollapseGroups);
 int FindFloatPlane(const Plane3f &plane, int numPoints, const Vector3 *points);
