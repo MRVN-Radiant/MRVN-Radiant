@@ -105,3 +105,125 @@ int BSPMain( Args& args )
 	// Return to sender
 	return 0;
 }
+
+//------------------------------------------------------------
+// Purpose: Writes the bsp file to disk
+// Input  : *pszFileName - Path w/ filename without an extension
+//------------------------------------------------------------
+void WriteBSPFile( const char *pszFileName )
+{
+    time_t tm;
+
+    fs::path phBspFileName(pszFileName);
+    phBspFileName.replace_extension( fs::path(".bsp") );
+
+    Sys_Printf("Writing %s... ", phBspFileName.string().c_str() );
+    Sys_Printf("Success!\n");
+
+    g_pGame->write( phBspFileName.string().c_str() );
+}
+
+
+//------------------------------------------------------------
+// Purpose: Writes the ent header to file
+// Input  : *file
+//------------------------------------------------------------
+void WriteEntFileHeader( FILE *file )
+{
+    if( g_pGame->bspVersion == 47 )
+    {
+        // Apex Legends
+        std::string message = "ENTITIES02 num_models=" + std::to_string(ApexLegends::Bsp::levelInfo.at(0).modelCount) + "\n";
+        SafeWrite(file, message.c_str(), message.size());
+    }
+    else
+    {
+        // Titanfall
+        char message[] = "ENTITIES01\n";
+        SafeWrite(file, &message, sizeof(message) - 1);
+    }
+}
+
+
+//------------------------------------------------------------
+// Purpose: Writes .ent files based on whether they have entities
+// Input  : *path
+//------------------------------------------------------------
+void WriteEntFiles( const char *path )
+{
+    // env
+    if( Titanfall::Ent::env.size() )
+    {
+        fs::path phEntFileName( path );
+        phEntFileName += fs::path( "_env.ent" );
+        Sys_Printf( "Writing %s... ", phEntFileName.string().c_str() );
+
+        FILE *file = SafeOpenWrite( phEntFileName.string().c_str() );
+        WriteEntFileHeader( file );
+        Titanfall::Ent::env.emplace_back( '\0' );
+        SafeWrite( file, Titanfall::Ent::env.data(), Titanfall::Ent::env.size() );
+        fclose(file);
+
+        Sys_Printf("Success!\n");
+    }
+    // fx
+    if( Titanfall::Ent::fx.size() )
+    {
+        fs::path phEntFileName( path );
+        phEntFileName += fs::path( "_fx.ent" );
+        Sys_Printf( "Writing %s... ", phEntFileName.string().c_str() );
+
+        FILE *file = SafeOpenWrite( phEntFileName.string().c_str() );
+        WriteEntFileHeader(file);
+        Titanfall::Ent::fx.emplace_back('\0');
+        SafeWrite(file, Titanfall::Ent::fx.data(), Titanfall::Ent::fx.size());
+        fclose(file);
+
+        Sys_Printf("Success!\n");
+    }
+    // script
+    if( Titanfall::Ent::script.size() )
+    {
+        fs::path phEntFileName( path );
+        phEntFileName += fs::path( "_script.ent" );
+        Sys_Printf( "Writing %s... ", phEntFileName.string().c_str() );
+
+        FILE *file = SafeOpenWrite( phEntFileName.string().c_str() );
+        WriteEntFileHeader(file);
+        Titanfall::Ent::script.emplace_back('\0');
+        SafeWrite(file, Titanfall::Ent::script.data(), Titanfall::Ent::script.size());
+        fclose(file);
+
+        Sys_Printf("Success!\n");
+    }
+    // snd
+    if( Titanfall::Ent::snd.size() )
+    {
+        fs::path phEntFileName( path );
+        phEntFileName += fs::path( "_snd.ent" );
+        Sys_Printf( "Writing %s... ", phEntFileName.string().c_str() );
+
+        FILE *file = SafeOpenWrite( phEntFileName.string().c_str() );
+        WriteEntFileHeader(file);
+        Titanfall::Ent::snd.emplace_back('\0');
+        SafeWrite(file, Titanfall::Ent::snd.data(), Titanfall::Ent::snd.size());
+        fclose(file);
+
+        Sys_Printf("Success!\n");
+    }
+    // spawn
+    if( Titanfall::Ent::spawn.size() )
+    {
+        fs::path phEntFileName( path );
+        phEntFileName += fs::path( "_spawn.ent" );
+        Sys_Printf( "Writing %s... ", phEntFileName.string().c_str() );
+
+        FILE *file = SafeOpenWrite( phEntFileName.string().c_str() );
+        WriteEntFileHeader(file);
+        Titanfall::Ent::spawn.emplace_back('\0');
+        SafeWrite(file, Titanfall::Ent::spawn.data(), Titanfall::Ent::spawn.size());
+        fclose(file);
+
+        Sys_Printf("Success!\n");
+    }
+}

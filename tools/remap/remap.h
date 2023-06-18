@@ -998,7 +998,9 @@ inline float Random() { return (float)rand() / RAND_MAX; }  /* returns a pseudor
 void InitPaths(Args &args);
 
 /* bsp.c */
-int BSPMain(Args& args);
+int BSPMain( Args& args );
+void WriteBSPFile(const char *filename);
+void WriteEntFiles(const char *path );
 
 /* brush.c */
 sideRef_t *AllocSideRef(const side_t *side, sideRef_t *next);
@@ -1047,8 +1049,6 @@ shaderInfo_t *ShaderInfoForShaderNull(const char *shader);
 
 
 /* bspfile_abstract.c */
-void WriteBSPFile(const char *filename);
-void WriteEntFiles(const char *path );
 
 void ParseEPair(std::list<epair_t> &epairs);
 void ParseEntities();
