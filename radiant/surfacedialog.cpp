@@ -77,6 +77,7 @@
 #include "grid.h"
 #include "textureentry.h"
 
+#include "patchnode.h"
 
 class Increment
 {

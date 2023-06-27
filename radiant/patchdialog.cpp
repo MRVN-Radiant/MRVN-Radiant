@@ -38,6 +38,7 @@
 #include "mainframe.h"
 #include "patchmanip.h"
 #include "patch.h"
+#include "patchnode.h"
 
 
 class PatchFixedSubdivisions

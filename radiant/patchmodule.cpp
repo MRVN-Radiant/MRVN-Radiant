@@ -26,6 +26,7 @@
 
 #include "patch.h"
 #include "patchmanip.h"
+#include "patchnode.h"
 
 #include "qe3.h"
 

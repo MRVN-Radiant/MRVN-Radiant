@@ -25,6 +25,7 @@
 #include "brush.h"
 #include "brushtokens.h"
 #include "brushxml.h"
+#include "map/mapwriter.h"
 
 class BrushNode :
 	public scene::Node::Symbiot,
@@ -47,6 +48,7 @@ class BrushNode :
 			NodeContainedCast<BrushNode, MapExporter>::install( m_casts );
 			NodeContainedCast<BrushNode, Nameable>::install( m_casts );
 			NodeContainedCast<BrushNode, BrushDoom3>::install( m_casts );
+			NodeContainedCast<BrushNode, IBrushExporter>::install( m_casts );
 		}
 		NodeTypeCastTable& get(){
 			return m_casts;
@@ -61,6 +63,8 @@ class BrushNode :
 	BrushTokenExporter m_mapExporter;
 	BrushXMLImporter m_xmlImporter;
 	BrushXMLExporter m_xmlExporter;
+
+	CBrushExporter m_BrushExporter;
 
 public:
 
@@ -94,13 +98,19 @@ public:
 		return m_brush;
 	}
 
+	IBrushExporter& get(NullType<IBrushExporter>)
+	{
+		return m_BrushExporter;
+	}
+
 	BrushNode() :
 		m_node( this, this, StaticTypeCasts::instance().get() ),
 		m_brush( m_node, InstanceSetEvaluateTransform<BrushInstance>::Caller( m_instances ), InstanceSet::BoundsChangedCaller( m_instances ) ),
 		m_mapImporter( m_brush ),
 		m_mapExporter( m_brush ),
 		m_xmlImporter( m_brush ),
-		m_xmlExporter( m_brush ){
+		m_xmlExporter( m_brush ),
+		m_BrushExporter( m_brush ){
 	}
 	BrushNode( const BrushNode& other ) :
 		scene::Node::Symbiot( other ),
@@ -111,7 +121,8 @@ public:
 		m_mapImporter( m_brush ),
 		m_mapExporter( m_brush ),
 		m_xmlImporter( m_brush ),
-		m_xmlExporter( m_brush ){
+		m_xmlExporter( m_brush ),
+		m_BrushExporter( m_brush ){
 	}
 	void release(){
 		delete this;

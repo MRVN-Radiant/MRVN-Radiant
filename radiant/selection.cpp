@@ -52,6 +52,8 @@
 
 #include "grid.h"
 
+#include "patchnode.h"
+
 int g_SELECT_EPSILON = 12;
 
 struct Pivot2World

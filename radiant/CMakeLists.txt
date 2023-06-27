@@ -1,4 +1,8 @@
 add_executable(radiant
+               "map/mapmodule.cpp"
+               "map/mapmodule.h"
+               "map/mapwriter.cpp"
+               "map/mapwriter.h"
                "autosave.cpp"
                "brushmanip.cpp"
                "brushmodule.cpp"
@@ -47,6 +51,7 @@ add_executable(radiant
                "patchdialog.cpp"
                "patchmanip.cpp"
                "patchmodule.cpp"
+               "patchnode.h"
                "patch.cpp"
                "pluginapi.cpp"
                "pluginmanager.cpp"
@@ -82,8 +87,7 @@ add_executable(radiant
                "windowobservers.cpp"
                "xmlstuff.cpp"
                "xywindow.cpp"
-               "${CMAKE_SOURCE_DIR}/icons/radiant.rc"
-)
+               "${CMAKE_SOURCE_DIR}/icons/radiant.rc")
 
 target_include_directories(radiant PRIVATE .
                            ${LIBXML2_INCLUDE_DIRS}

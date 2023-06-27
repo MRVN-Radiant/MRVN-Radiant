@@ -44,6 +44,7 @@
 #include "patch.h"
 #include "grid.h"
 #include "patchdialog.h"
+#include "patchnode.h"
 
 PatchCreator* g_patchCreator = 0;
 
