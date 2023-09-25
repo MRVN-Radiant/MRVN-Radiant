@@ -48,9 +48,9 @@ namespace Shared {
     struct Mesh_t {
         MinMax                 minmax;
         shaderInfo_t          *shaderInfo;
-        // TODO: MinMax2D  lightmapBounds;
         std::vector<Vertex_t>  vertices;
         std::vector<uint16_t>  triangles;
+        // std::vector<MinMax2D>  lightmapBounds;
     };
 
     struct visRef_t {
