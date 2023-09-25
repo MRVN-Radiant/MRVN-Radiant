@@ -38,14 +38,14 @@ void Titanfall::EmitCollisionGrid(entity_t &e) {
     // Sort brushes
     for (brush_t &brush : e.brushes) {
         int skySides = 0;
-
         for (const side_t &side : brush.sides) {
             if (side.bevel) { continue; }
+            brush.contentFlags |= side.shaderInfo->contentFlags;
+            // contentClearFlags?
             if (CHECK_FLAG(side.shaderInfo->compileFlags, C_SKY)) {
                 skySides++;
             }
         }
-
         if (skySides) {
             modelBrushes.emplace_back(&brush);
             continue;
@@ -247,11 +247,12 @@ void Titanfall::EmitBrush(brush_t &brush) {
         else if (normal[2] == -1.0f) { axials[4] = side.shaderInfo; }
     }
 
+    // testing for skipped axial faces
     int test = 0;
     for (int i = 0; i < 6; i++) {
         if (axials[i] != nullptr) {
-            // Titanfall::Bsp::cmBrushSideProperties.emplace_back(Titanfall::EmitTextureData(*axials[i]));
-            Titanfall::Bsp::cmBrushSideProperties.emplace_back(0);
+            Titanfall::Bsp::cmBrushSideProperties.emplace_back(Titanfall::EmitTextureData(*axials[i]));
+            // Titanfall::Bsp::cmBrushSideProperties.emplace_back(0);
         } else {
             test++;
             Titanfall::Bsp::cmBrushSideProperties.emplace_back(MASK_DISCARD);
@@ -260,8 +261,7 @@ void Titanfall::EmitBrush(brush_t &brush) {
 
 #if 1
     for (const side_t &side : cuttingSides) {
-        Vector3 normal = side.plane.normal();
-        SnapNormal(normal);
+        Vector3 normal = side.plane.normal(); SnapNormal(normal);
         if (normal[0] == -1.0f || normal[0] == 1.0f || (normal[0] == 0.0f && normal[1] == 0.0f)
          || normal[1] == -1.0f || normal[1] == 1.0f || (normal[1] == 0.0f && normal[2] == 0.0f)
          || normal[2] == -1.0f || normal[2] == 1.0f || (normal[2] == 0.0f && normal[0] == 0.0f) || side.bevel) {
