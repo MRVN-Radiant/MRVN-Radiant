@@ -183,48 +183,48 @@ namespace Titanfall {
     struct VertexUnlit_t {
         uint32_t  vertexIndex;
         uint32_t  normalIndex;
-        Vector2   uv0;
-        uint32_t  unknown;
+        Vector2   textureUV;
+        Color4b   colour;
     };
 
     // 0x48
     struct VertexLitFlat_t {
         uint32_t  vertexIndex;
         uint32_t  normalIndex;
-        Vector2   uv0;
-        uint32_t  unknown0;
-        uint32_t  unknown1;
-        uint32_t  unknown2;
-        uint32_t  unknown3;
-        uint32_t  unknown4;
+        Vector2   textureUV;
+        Color4b   colour;
+        Vector2   lightmapUV;
+        Vector2   lightmapStep;
     };
 
     // 0x49
     struct VertexLitBump_t {
         uint32_t  vertexIndex;
         uint32_t  normalIndex;
-        Vector2   uv0;
-        int32_t   negativeOne;
-        Vector2   uv1;
-        uint32_t  unk[4];
+        Vector2   textureUV;
+        Color4b   colour;
+        Vector2   lightmapUV;
+        Vector2   lightmapStep;
+        uint32_t  tangentIndex[2];  // S & T
     };
 
     // 0x4A
     struct VertexUnlitTS_t {
         uint32_t  vertexIndex;
         uint32_t  normalIndex;
-        Vector2   uv0;
-        uint32_t  unknown0;
-        uint32_t  unknown1;
-        uint32_t  unknown2;
+        Vector2   textureUV;
+        Color4b   colour;
+        uint32_t  tangentIndex[2];  // S & T
     };
 
     // 0x4B
     struct VertexBlinnPhong_t {
         uint32_t  vertexIndex;
         uint32_t  normalIndex;
-        uint32_t  unknown0;
-        uint32_t  unknown1;
+        Vector2   textureUV;
+        Color4b   colour;
+        Vector2   lightmapUV;
+        float     tangentQuaternion[4];
     };
 
     // 0x50

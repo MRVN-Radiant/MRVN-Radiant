@@ -62,20 +62,26 @@ void Shared::MakeMeshes(const entity_t &e) {
                 // Texturing
                 // This is taken from surface.cpp, It somewhat works
                 // TODO: Make this work better
-                Vector2  st;
+                Vector2  textureUV, lightmapUV;
                 Vector3  vTranslated, texX, texY;
                 float    x, y;
                 ComputeAxisBase(side.plane.normal(), texX, texY);
                 vTranslated = vertex + e.originbrush_origin;
+                // st vectors -> uv coords
                 x = vector3_dot(vTranslated, texX);
                 y = vector3_dot(vTranslated, texY);
-                st[0] = side.texMat[0][0] * x + side.texMat[0][1] * y + side.texMat[0][2];
-                st[1] = side.texMat[1][0] * x + side.texMat[1][1] * y + side.texMat[1][2];
+                lightmapUV = {x, y};
+                // TODO: valve 220 st vector projection
+                textureUV[0] = side.texMat[0][0] * x + side.texMat[0][1] * y + side.texMat[0][2];
+                textureUV[1] = side.texMat[1][0] * x + side.texMat[1][1] * y + side.texMat[1][2];
 
                 Shared::Vertex_t &sv = mesh.vertices.emplace_back();
-                sv.xyz = vertex;
-                sv.st = st;
-                sv.normal = normal;
+                sv.xyz          = vertex;
+                sv.normal       = normal;
+                sv.textureUV    = textureUV;
+                sv.colour       = {0xFF, 0xFF, 0xFF, 0xFF};  // TODO: get from .map/.vmf
+                sv.lightmapUV   = lightmapUV;  // TODO: side.lightmapScale
+                sv.lightmapStep = {0.0f, 0.0f};  // unused
             }
 
             // Create triangles for side
@@ -101,9 +107,9 @@ void Shared::MakeMeshes(const entity_t &e) {
         for (int index = 0; index < (patchMesh.width * patchMesh.height); index++) {
             Shared::Vertex_t &vertex = mesh.vertices.emplace_back();
 
-            vertex.xyz = patchMesh.verts[index].xyz;
-            vertex.normal = patchMesh.verts[index].normal;
-            vertex.st = patchMesh.verts[index].st;
+            vertex.xyz       = patchMesh.verts[index].xyz;
+            vertex.normal    = patchMesh.verts[index].normal;
+            vertex.textureUV = patchMesh.verts[index].st;
 
             mesh.minmax.extend(vertex.xyz);
         }
@@ -213,6 +219,8 @@ void Shared::MakeMeshes(const entity_t &e) {
     COPY_MESHES(trans_meshes);
     COPY_MESHES(sky_meshes);
     #undef COPY_MESHES
+
+    // TODO: pack lightmaps for lit meshes
 }
 
 

@@ -192,20 +192,20 @@ void ApexLegends::EmitVertexUnlit(Shared::Vertex_t &vertex) {
     ApexLegends::VertexUnlit_t& ul = ApexLegends::Bsp::vertexUnlitVertices.emplace_back();
     ul.vertexIndex = Titanfall::EmitVertex(vertex.xyz);
     ul.normalIndex = Titanfall::EmitVertexNormal(vertex.normal);
-    ul.uv0 = vertex.st;
+    ul.uv0         = vertex.textureUV;
 }
 
 
 /*
     EmitVertexLitFlat
     Saves a vertex into ApexLegends::Bsp::vertexLitFlatVertices
-    NOTE: Lit Flat crashes r5r and so is substituted with VertexUnlit in EmitMeshes 
+    NOTE: Lit Flat crashes r5r and so is substituted with VertexUnlit in EmitMeshes
 */
 void ApexLegends::EmitVertexLitFlat(Shared::Vertex_t &vertex) {
     ApexLegends::VertexLitFlat_t& lf = ApexLegends::Bsp::vertexLitFlatVertices.emplace_back();
     lf.vertexIndex = Titanfall::EmitVertex(vertex.xyz);
     lf.normalIndex = Titanfall::EmitVertexNormal(vertex.normal);
-    lf.uv0 = vertex.st;
+    lf.uv0         = vertex.textureUV;
 }
 
 
@@ -217,7 +217,7 @@ void ApexLegends::EmitVertexLitBump(Shared::Vertex_t &vertex) {
     ApexLegends::VertexLitBump_t& lv = ApexLegends::Bsp::vertexLitBumpVertices.emplace_back();
     lv.vertexIndex = Titanfall::EmitVertex(vertex.xyz);
     lv.normalIndex = Titanfall::EmitVertexNormal(vertex.normal);
-    lv.uv0 = vertex.st;
+    lv.uv0         = vertex.textureUV;
     lv.negativeOne = -1;
 }
 
@@ -230,7 +230,7 @@ void ApexLegends::EmitVertexUnlitTS(Shared::Vertex_t &vertex) {
     ApexLegends::VertexUnlitTS_t& ul = ApexLegends::Bsp::vertexUnlitTSVertices.emplace_back();
     ul.vertexIndex = Titanfall::EmitVertex(vertex.xyz);
     ul.normalIndex = Titanfall::EmitVertexNormal(vertex.normal);
-    ul.uv0 = vertex.st;
+    ul.uv0         = vertex.textureUV;
 }
 
 /*
@@ -405,10 +405,10 @@ void ApexLegends::EmitStaticProp(entity_t &e) {
     for ( const auto mesh : meshes )
     {
         mesh->forEachFace( [&minmax, &origin]( const Vector3 ( &xyz )[3], const Vector2 ( &st )[3] ){
-			minmax.extend(xyz[0] + origin);
+                        minmax.extend(xyz[0] + origin);
             minmax.extend(xyz[1] + origin);
             minmax.extend(xyz[2] + origin);
-		} );
+                } );
     }
 
     Shared::visRef_t &ref = Shared::visRefs.emplace_back();

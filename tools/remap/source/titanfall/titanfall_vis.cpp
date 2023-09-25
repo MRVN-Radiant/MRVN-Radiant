@@ -139,11 +139,11 @@ void Titanfall::EmitOcclusionMeshes( const entity_t &entity ) {
             // Skip bevels as they have no windings
             if( side.bevel )
                 continue;
-            
+
             // Skip degenerate windings as they contribute no faces
             if( side.winding.size() < 3 )
                 continue;
-            
+
             for (std::size_t i = 0; i < side.winding.size() - 2; i++) {
                 for (int j = 0; j < 3; j++) {
                     int vertIndex = (j == 0) ? 0 : i + j;
@@ -324,7 +324,8 @@ void Titanfall::EmitVertexUnlit(Shared::Vertex_t &vertex) {
     Titanfall::VertexUnlit_t &ul = Titanfall::Bsp::vertexUnlitVertices.emplace_back();
     ul.vertexIndex = Titanfall::EmitVertex(vertex.xyz);
     ul.normalIndex = Titanfall::EmitVertexNormal(vertex.normal);
-    ul.uv0 = vertex.st;
+    ul.textureUV   = vertex.textureUV;
+    ul.colour      = vertex.colour;
 }
 
 
@@ -334,9 +335,12 @@ void Titanfall::EmitVertexUnlit(Shared::Vertex_t &vertex) {
 */
 void Titanfall::EmitVertexLitFlat(Shared::Vertex_t &vertex) {
     Titanfall::VertexLitFlat_t &lf = Titanfall::Bsp::vertexLitFlatVertices.emplace_back();
-    lf.vertexIndex = Titanfall::EmitVertex(vertex.xyz);
-    lf.normalIndex = Titanfall::EmitVertexNormal(vertex.normal);
-    lf.uv0 = vertex.st;
+    lf.vertexIndex  = Titanfall::EmitVertex(vertex.xyz);
+    lf.normalIndex  = Titanfall::EmitVertexNormal(vertex.normal);
+    lf.textureUV    = vertex.textureUV;
+    lf.colour       = vertex.colour;
+    lf.lightmapUV   = vertex.lightmapUV;
+    lf.lightmapStep = vertex.lightmapStep;
 }
 
 
@@ -346,10 +350,13 @@ void Titanfall::EmitVertexLitFlat(Shared::Vertex_t &vertex) {
 */
 void Titanfall::EmitVertexLitBump(Shared::Vertex_t &vertex) {
     Titanfall::VertexLitBump_t &lv = Titanfall::Bsp::vertexLitBumpVertices.emplace_back();
-    lv.vertexIndex = Titanfall::EmitVertex(vertex.xyz);
-    lv.normalIndex = Titanfall::EmitVertexNormal(vertex.normal);
-    lv.uv0 = vertex.st;
-    lv.negativeOne = -1;
+    lv.vertexIndex  = Titanfall::EmitVertex(vertex.xyz);
+    lv.normalIndex  = Titanfall::EmitVertexNormal(vertex.normal);
+    lv.textureUV    = vertex.textureUV;
+    lv.colour       = vertex.colour;
+    lv.lightmapUV   = vertex.lightmapUV;
+    lv.lightmapStep = vertex.lightmapStep;
+    // TODO: tangentIndex
 }
 
 
@@ -361,7 +368,9 @@ void Titanfall::EmitVertexUnlitTS(Shared::Vertex_t &vertex) {
     Titanfall::VertexUnlitTS_t &ul = Titanfall::Bsp::vertexUnlitTSVertices.emplace_back();
     ul.vertexIndex = Titanfall::EmitVertex(vertex.xyz);
     ul.normalIndex = Titanfall::EmitVertexNormal(vertex.normal);
-    ul.uv0 = vertex.st;
+    ul.textureUV   = vertex.textureUV;
+    ul.colour      = vertex.colour;
+    // TODO: tangentIndex
 }
 
 
@@ -373,6 +382,10 @@ void Titanfall::EmitVertexBlinnPhong(Shared::Vertex_t &vertex) {
     Titanfall::VertexBlinnPhong_t &bp = Titanfall::Bsp::vertexBlinnPhongVertices.emplace_back();
     bp.vertexIndex = Titanfall::EmitVertex(vertex.xyz);
     bp.normalIndex = Titanfall::EmitVertexNormal(vertex.normal);
+    bp.textureUV   = vertex.textureUV;
+    bp.colour      = vertex.colour;
+    bp.lightmapUV  = vertex.lightmapUV;
+    // TODO: tangentQuaternion
 }
 
 
@@ -394,9 +407,9 @@ void Titanfall::EmitMeshes(const entity_t &e) {
         m.vertexCount = mesh.vertices.size();
         m.triOffset = Titanfall::Bsp::meshIndices.size();
         m.triCount = mesh.triangles.size() / 3;
-        
+
         int vertexOffset = 0;
-        
+
         if (CHECK_FLAG(mesh.shaderInfo->surfaceFlags, S_VERTEX_UNLIT_TS)) {
             m.vertexType = 3;
             vertexOffset = Titanfall::Bsp::vertexUnlitTSVertices.size();
@@ -502,7 +515,7 @@ void Titanfall::EmitLevelInfoWorldspawn() {
 
     if( li.firstTransMeshIndex > li.firstSkyMeshIndex )
         li.firstTransMeshIndex = li.firstSkyMeshIndex;
-    
+
     if( li.firstDecalMeshIndex > li.firstTransMeshIndex )
         li.firstDecalMeshIndex = li.firstTransMeshIndex;
 }
@@ -576,10 +589,10 @@ void Titanfall::EmitStaticProp(entity_t &e) {
     for ( const auto mesh : meshes )
     {
         mesh->forEachFace( [&minmax, &origin]( const Vector3 ( &xyz )[3], const Vector2 ( &st )[3] ){
-			minmax.extend(xyz[0] + origin);
+                        minmax.extend(xyz[0] + origin);
             minmax.extend(xyz[1] + origin);
             minmax.extend(xyz[2] + origin);
-		} );
+                } );
     }
 
     Shared::visRef_t &ref = Shared::visRefs.emplace_back();

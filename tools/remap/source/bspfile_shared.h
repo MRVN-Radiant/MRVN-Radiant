@@ -38,12 +38,17 @@ namespace Shared {
     struct Vertex_t {
         Vector3  xyz;
         Vector3  normal;
-        Vector2  st;
+        Vector2  textureUV;
+        Color4b  colour;
+        Vector2  lightmapUV;
+        Vector2  lightmapStep;
+        // TODO: tangentIndices / Quaternion
     };
 
     struct Mesh_t {
         MinMax                 minmax;
         shaderInfo_t          *shaderInfo;
+        // TODO: MinMax2D  lightmapBounds;
         std::vector<Vertex_t>  vertices;
         std::vector<uint16_t>  triangles;
     };
