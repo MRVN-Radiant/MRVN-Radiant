@@ -24,6 +24,7 @@
 #pragma once
 
 #include "remap.h"
+#include <set>
 
 
 /*
@@ -48,9 +49,15 @@ namespace Shared {
     struct Mesh_t {
         MinMax                 minmax;
         shaderInfo_t          *shaderInfo;
+        int                    lightmapPage;
         std::vector<Vertex_t>  vertices;
         std::vector<uint16_t>  triangles;
-        // std::vector<MinMax2D>  lightmapBounds;
+    };
+
+    struct Island_t {
+        MinMax2D  bounds;
+        int       mesh;
+        int       lightmapPage;
     };
 
     struct visRef_t {

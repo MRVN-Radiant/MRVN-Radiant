@@ -33,6 +33,9 @@ void Shared::MakeMeshes(const entity_t &e) {
     // Multiple entities can have meshes, make sure we clear before making new meshes
     Shared::meshes.clear();
 
+    std::vector<Shared::Island_t>  lightmap_islands;
+
+    int mesh_index = 0;
     // Loop through brushes
     for (const brush_t &brush : e.brushes) {
         // Loop through sides
@@ -51,6 +54,7 @@ void Shared::MakeMeshes(const entity_t &e) {
 
             Shared::Mesh_t &mesh = Shared::meshes.emplace_back();
             mesh.shaderInfo = side.shaderInfo;
+            Shared::Island_t  island;
 
             Vector3 normal = side.plane.normal();
 
@@ -70,7 +74,8 @@ void Shared::MakeMeshes(const entity_t &e) {
                 // st vectors -> uv coords
                 x = vector3_dot(vTranslated, texX);
                 y = vector3_dot(vTranslated, texY);
-                lightmapUV = {x, y};
+                // TODO: scale lightmapUV by side.luxelScale
+                lightmapUV = {x / 16, y / 16};
                 // TODO: valve 220 st vector projection
                 textureUV[0] = side.texMat[0][0] * x + side.texMat[0][1] * y + side.texMat[0][2];
                 textureUV[1] = side.texMat[1][0] * x + side.texMat[1][1] * y + side.texMat[1][2];
@@ -79,9 +84,18 @@ void Shared::MakeMeshes(const entity_t &e) {
                 sv.xyz          = vertex;
                 sv.normal       = normal;
                 sv.textureUV    = textureUV;
-                sv.colour       = {0xFF, 0xFF, 0xFF, 0xFF};  // TODO: get from .map/.vmf
-                sv.lightmapUV   = lightmapUV;  // TODO: side.lightmapScale
+                sv.colour       = {0xFF, 0xFF, 0xFF, 0xFF};
+                sv.lightmapUV   = lightmapUV;
                 sv.lightmapStep = {0.0f, 0.0f};  // unused
+
+                island.bounds.extend(lightmapUV);
+            }
+
+            if (shaderInfo->surfaceFlags & 0x600 < 0x400) {  // mesh is lit
+                island.mesh = mesh_index;
+                lightmap_islands.push_back(island);
+            } else {
+                mesh.lightmapPage = -1;
             }
 
             // Create triangles for side
@@ -91,6 +105,8 @@ void Shared::MakeMeshes(const entity_t &e) {
                     mesh.triangles.emplace_back(vert_index);
                 }
             }
+
+            mesh_index++;
         }
     }
 
@@ -102,16 +118,30 @@ void Shared::MakeMeshes(const entity_t &e) {
 
         Shared::Mesh_t &mesh = Shared::meshes.emplace_back();
         mesh.shaderInfo = patch->shaderInfo;
+        Shared::Island_t  island;
 
         // Get vertices
         for (int index = 0; index < (patchMesh.width * patchMesh.height); index++) {
             Shared::Vertex_t &vertex = mesh.vertices.emplace_back();
 
-            vertex.xyz       = patchMesh.verts[index].xyz;
-            vertex.normal    = patchMesh.verts[index].normal;
-            vertex.textureUV = patchMesh.verts[index].st;
+            vertex.xyz          = patchMesh.verts[index].xyz;
+            vertex.normal       = patchMesh.verts[index].normal;
+            vertex.textureUV    = patchMesh.verts[index].st;
+            vertex.colour       = {0xFF, 0xFF, 0xFF, 0xFF};  // TODO: patchMesh.verts[index].colour
+            Vector2  lightmapUV = {patchMesh.verts[index].st[0] / 16,
+                                   patchMesh.verts[index].st[1] / 16};  // TODO: patchMesh.luxelScale
+            vertex.lightmapUV   = lightmapUV;
+            vertex.lightmapStep = {0.0f, 0.0f};  // unused
 
             mesh.minmax.extend(vertex.xyz);
+            island.bounds.extend(lightmapUV);
+        }
+
+        if (shaderInfo->surfaceFlags & 0x600 < 0x400) {  // mesh is lit
+            island.mesh = mesh_index;
+            lightmap_islands.push_back(island);
+        } else {
+            mesh.lightmapPage = -1;
         }
 
         // Make triangles
@@ -128,8 +158,28 @@ void Shared::MakeMeshes(const entity_t &e) {
                 mesh.triangles.emplace_back(index + 1);
             }
         }
+
         patch = patch->next;
+        mesh_index++;
     }
+
+    // // Pack lightmap uv islands
+    // int total_texels = 0;
+    // for (Shared Island_t &island : lightmap_islands) {
+    //     total_texels += island.area();  // also a sort key
+    // }
+    // int num_lightmap_pages = (total_texels / (1024 * 1024)) + 1;
+    // // NOTE: approximate, doesn't account for packing algo effeciency
+    // // sort islands
+    // // might be more efficient to sort indices based on a list of areas, rather than multiple area calculations
+    // std::sort(lightmap_islands.begin(), lightmap_islands.end(),
+    //           [](MinMax2D a, MinMax2D b) { return a.area() > b.area(); });
+    // // organise islands into pages
+    // std::vector<std::vector<Island_t>>  lightmap_pages;
+    // // pack lightmap pages
+    // MinMax2D row({island.width, 0}, {1024 - island.width, island.height});
+    // // islands that don't fit in their page move to a 'leftovers' page
+    // // apply island transforms to island.mesh.vertices.lightmapUV (including pixel coords -> uv coords scale)
 
     // Combine all meshes based on shaderInfo and AABB tests
     std::size_t index = 0;
@@ -147,44 +197,29 @@ void Shared::MakeMeshes(const entity_t &e) {
 
         // Get mesh which we then compare to the rest, maybe combine, maybe not
         Shared::Mesh_t &mesh1 = Shared::meshes.at(index);
-
         for (std::size_t i = 0; i < Shared::meshes.size(); i++) {
-                // We dont want to compare the same mesh
-                if (index == i) {
-                    continue;
-                }
+            if (index == i) { continue; }  // We dont want to compare the same mesh
 
-                Shared::Mesh_t &mesh2 = Shared::meshes.at(i);
+            Shared::Mesh_t &mesh2 = Shared::meshes.at(i);
 
-                if( mesh1.triangles.size() + mesh2.triangles.size() > 63000 )
-                    continue;
+            if (mesh1.triangles.size() + mesh2.triangles.size() > 63000
+             || mesh1.lightmapPage != mesh2.lightmapPage
+             || !striEqual(mesh1.shaderInfo->shader.c_str(), mesh2.shaderInfo->shader.c_str())
+             || !mesh1.minmax.test(mesh2.minmax)) {
+                continue;
+            }
 
-                // Check if they have the same shader
-                if (!striEqual(mesh1.shaderInfo->shader.c_str(), mesh2.shaderInfo->shader.c_str())) {
-                    continue;
-                }
+            // All tests passed! We can combine these meshes
+            for (uint16_t &triIndex : mesh2.triangles) {
+                mesh1.triangles.emplace_back(triIndex + mesh1.vertices.size());
+            }
+            mesh1.vertices.insert(mesh1.vertices.end(), mesh2.vertices.begin(), mesh2.vertices.end());
+            mesh1.minmax.extend(mesh2.minmax);
 
-                // Check if they're intersecting
-                if (!mesh1.minmax.test(mesh2.minmax)) {
-                    continue;
-                }
-
-                // Combine them
-                // Triangles
-                for (uint16_t &triIndex : mesh2.triangles) {
-                    mesh1.triangles.emplace_back(triIndex + mesh1.vertices.size());
-                }
-
-                // Copy over vertices
-                mesh1.vertices.insert(mesh1.vertices.end(), mesh2.vertices.begin(), mesh2.vertices.end());
-
-                // Update minmax
-                mesh1.minmax.extend(mesh2.minmax);
-
-                // Delete mesh we combined as to not create duplicates
-                Shared::meshes.erase(Shared::meshes.begin() + i);
-                iterationsSinceCombine = 0;
-                break;
+            // Delete mesh we combined as to not create duplicates
+            Shared::meshes.erase(Shared::meshes.begin() + i);
+            iterationsSinceCombine = 0;
+            break;
         }
 
         iterationsSinceCombine++;
