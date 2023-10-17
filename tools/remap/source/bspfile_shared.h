@@ -57,7 +57,6 @@ namespace Shared {
     struct Island_t {
         MinMax2D  bounds;
         int       mesh;
-        int       lightmapPage;
     };
 
     struct visRef_t {
@@ -75,9 +74,11 @@ namespace Shared {
     inline std::vector<Mesh_t>    meshes;
     inline std::vector<visRef_t>  visRefs;
     inline visNode_t              visRoot;
+    inline std::vector<Island_t>  islands;
     /* Functions */
     void MakeMeshes(const entity_t &e);
     void MakeVisReferences();
     visNode_t MakeVisTree(std::vector<Shared::visRef_t> refs, float parentCost);
     void MergeVisTree(Shared::visNode_t &node);
+    void MakeLightmapUVs();
 }
