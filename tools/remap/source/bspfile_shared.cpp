@@ -90,7 +90,7 @@ void Shared::MakeMeshes(const entity_t &e) {
                 island.bounds.extend(lightmapUV);
             }
 
-            if (shaderInfo->surfaceFlags & 0x600 < 0x400) {  // mesh is lit
+            if ((shaderInfo->surfaceFlags & 0x600) < 0x400) {  // mesh is lit
                 island.mesh = mesh_index;
                 Shared::islands.push_back(island);
             } else {
