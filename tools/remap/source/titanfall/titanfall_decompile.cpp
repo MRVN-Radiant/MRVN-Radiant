@@ -29,28 +29,28 @@
 void Titanfall::LoadLumpsAndEntities( rbspHeader_t *header, const char *filename ) {
     
     // Load bsp lumps
-    CopyLump((rbspHeader_t*)header, R1_LUMP_ENTITIES, Titanfall::Bsp::entities);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_PLANES, Titanfall::Bsp::planes);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_VERTEX_NORMALS, Titanfall::Bsp::vertexNormals);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_VERTICES, Titanfall::Bsp::vertices);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_TEXTURE_DATA, Titanfall::Bsp::textureData);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_ENTITY_PARTITIONS, Titanfall::Bsp::entityPartitions);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_TEXTURE_DATA_STRING_DATA, Titanfall::Bsp::textureDataData);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_TEXTURE_DATA_STRING_TABLE, Titanfall::Bsp::textureDataTable);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_ENTITY_PARTITIONS, Titanfall::Bsp::entityPartitions);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_TRICOLL_TRIS, Titanfall::Bsp::tricollTriangles);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_TRICOLL_HEADERS, Titanfall::Bsp::tricollHeaders);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_VERTEX_UNLIT, Titanfall::Bsp::vertexUnlitVertices);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_VERTEX_LIT_FLAT, Titanfall::Bsp::vertexLitFlatVertices);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_VERTEX_LIT_BUMP, Titanfall::Bsp::vertexLitBumpVertices);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_VERTEX_UNLIT_TS, Titanfall::Bsp::vertexUnlitTSVertices);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_CM_GRID, Titanfall::Bsp::cmGrid);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_CM_GRID_CELLS, Titanfall::Bsp::cmGridCells);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_CM_GEO_SETS, Titanfall::Bsp::cmGeoSets);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_CM_PRIMITIVES, Titanfall::Bsp::cmPrimitives);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_CM_BRUSHES, Titanfall::Bsp::cmBrushes);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_ENTITIES,                    Titanfall::Bsp::entities);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_PLANES,                      Titanfall::Bsp::planes);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_VERTEX_NORMALS,              Titanfall::Bsp::vertexNormals);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_VERTICES,                    Titanfall::Bsp::vertices);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_TEXTURE_DATA,                Titanfall::Bsp::textureData);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_ENTITY_PARTITIONS,           Titanfall::Bsp::entityPartitions);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_TEXTURE_DATA_STRING_DATA,    Titanfall::Bsp::textureDataData);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_TEXTURE_DATA_STRING_TABLE,   Titanfall::Bsp::textureDataTable);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_ENTITY_PARTITIONS,           Titanfall::Bsp::entityPartitions);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_TRICOLL_TRIS,                Titanfall::Bsp::tricollTriangles);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_TRICOLL_HEADERS,             Titanfall::Bsp::tricollHeaders);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_VERTEX_UNLIT,                Titanfall::Bsp::vertexUnlitVertices);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_VERTEX_LIT_FLAT,             Titanfall::Bsp::vertexLitFlatVertices);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_VERTEX_LIT_BUMP,             Titanfall::Bsp::vertexLitBumpVertices);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_VERTEX_UNLIT_TS,             Titanfall::Bsp::vertexUnlitTSVertices);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_CM_GRID,                     Titanfall::Bsp::cmGrid);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_CM_GRID_CELLS,               Titanfall::Bsp::cmGridCells);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_CM_GEO_SETS,                 Titanfall::Bsp::cmGeoSets);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_CM_PRIMITIVES,               Titanfall::Bsp::cmPrimitives);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_CM_BRUSHES,                  Titanfall::Bsp::cmBrushes);
     CopyLump((rbspHeader_t*)header, R1_LUMP_CM_BRUSH_SIDE_PLANE_OFFSETS, Titanfall::Bsp::cmBrushSidePlaneOffsets);
-    CopyLump((rbspHeader_t*)header, R1_LUMP_CM_BRUSH_SIDE_PROPS, Titanfall::Bsp::cmBrushSideProperties);
+    CopyLump((rbspHeader_t*)header, R1_LUMP_CM_BRUSH_SIDE_PROPS,         Titanfall::Bsp::cmBrushSideProperties);
 
     // Load ent files
     {
@@ -334,46 +334,26 @@ void Titanfall::ParsePatch( entity_t &entity, std::size_t index ) {
         
     // Build mesh
     mesh_t mesh;
-    mesh.width = width;
-    mesh.height = height;
+    mesh.width = width;  mesh.height = height;
     bspDrawVert_t *drawVerts = new bspDrawVert_t[header.numVerts];
     for( int v = 0; v < header.numVerts; v++ ) {
         Vector3 vec = Titanfall::Bsp::vertices.at( header.firstVert + v );
 
         // Try to find vertex in VERTEX_RESERVED to get it's st and normal
-        // TODO: Bunch of duplicate code, do something about it
-        for( Titanfall::VertexLitBump_t &lb : Titanfall::Bsp::vertexLitBumpVertices ) {
-            if( lb.vertexIndex == header.firstVert + v ) {
-                drawVerts[v].st = lb.uv0;
-                drawVerts[v].normal = Titanfall::Bsp::vertexNormals.at( lb.normalIndex );
-                break;
+        // TODO: match the correct normal & textureUV, not just the first position that matches
+        #define SEARCH_VERTICES(lump) \
+            for (Titanfall::Vertex##lump##_t &vx : Titanfall::Bsp::vertex##lump##Vertices) { \
+                if (vx.vertexIndex == header.firstVert + v) { \
+                    drawVerts[v].normal = Titanfall::Bsp::vertexNormals.at(vx.normalIndex); \
+                    drawVerts[v].st = vx.textureUV; \
+                    break; \
+                } \
             }
-        }
-
-        for( Titanfall::VertexLitFlat_t &lf : Titanfall::Bsp::vertexLitFlatVertices ) {
-            if( lf.vertexIndex == header.firstVert + v ) {
-                drawVerts[v].st = lf.uv0;
-                drawVerts[v].normal = Titanfall::Bsp::vertexNormals.at( lf.normalIndex );
-                break;
-            }
-        }
-
-        for( Titanfall::VertexUnlit_t &ul : Titanfall::Bsp::vertexUnlitVertices ) {
-            if( ul.vertexIndex == header.firstVert + v ) {
-                drawVerts[v].st = ul.uv0;
-                drawVerts[v].normal = Titanfall::Bsp::vertexNormals.at( ul.normalIndex );
-                break;
-            }
-        }
-
-        for( Titanfall::VertexUnlitTS_t &ut : Titanfall::Bsp::vertexUnlitTSVertices ) {
-            if( ut.vertexIndex == header.firstVert + v ) {
-                drawVerts[v].st = ut.uv0;
-                drawVerts[v].normal = Titanfall::Bsp::vertexNormals.at( ut.normalIndex );
-                break;
-            }
-        }
-        
+        SEARCH_VERTICES(LitBump)
+        SEARCH_VERTICES(LitFlat)
+        SEARCH_VERTICES(Unlit)
+        SEARCH_VERTICES(UnlitTS)
+        #undef SEARCH_VERTICES
 
         drawVerts[v].xyz = vec;
     }

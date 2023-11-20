@@ -24,6 +24,7 @@
 #pragma once
 
 #include "remap.h"
+#include <set>
 
 
 /*
@@ -38,14 +39,24 @@ namespace Shared {
     struct Vertex_t {
         Vector3  xyz;
         Vector3  normal;
-        Vector2  st;
+        Vector2  textureUV;
+        Color4b  colour;
+        Vector2  lightmapUV;
+        Vector2  lightmapStep;
+        // TODO: tangentIndices / Quaternion
     };
 
     struct Mesh_t {
         MinMax                 minmax;
         shaderInfo_t          *shaderInfo;
+        int                    lightmapPage;
         std::vector<Vertex_t>  vertices;
         std::vector<uint16_t>  triangles;
+    };
+
+    struct Island_t {
+        MinMax2D  bounds;
+        int       mesh;
     };
 
     struct visRef_t {
@@ -63,9 +74,11 @@ namespace Shared {
     inline std::vector<Mesh_t>    meshes;
     inline std::vector<visRef_t>  visRefs;
     inline visNode_t              visRoot;
+    inline std::vector<Island_t>  islands;
     /* Functions */
     void MakeMeshes(const entity_t &e);
     void MakeVisReferences();
     visNode_t MakeVisTree(std::vector<Shared::visRef_t> refs, float parentCost);
     void MergeVisTree(Shared::visNode_t &node);
+    void MakeLightmapUVs();
 }
