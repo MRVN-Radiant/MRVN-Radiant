@@ -222,7 +222,7 @@ void Titanfall::EmitBrush(brush_t &brush) {
     for( side_t &side : brush.sides ) {
         if( !side.bevel )
             brush.contentFlags |= side.shaderInfo->contentFlags;
-            // TODO: 
+            // TODO: collect shader contentClearFlags & mask at the end
     }
 
 
