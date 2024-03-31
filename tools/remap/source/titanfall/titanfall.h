@@ -313,6 +313,14 @@ namespace Titanfall {
         uint32_t  sidePlaneIndex;
     };
 
+    // 0x5F
+    struct CMBrushSideTexVec_t {
+        Vector3  s_axis;
+        float    s_offset;
+        Vector3  t_axis;
+        float    t_offset;
+    };
+
     // 0x77
     struct CellAABBNode_t {
         Vector3   mins;
@@ -388,6 +396,7 @@ namespace Titanfall {
         inline std::vector<int32_t>               cmUniqueContents;
         inline std::vector<CMBrush_t>             cmBrushes;
         inline std::vector<uint16_t>              cmBrushSidePlaneOffsets;
+        inline std::vector<CMBrushSideTexVec_t>   cmBrushSideTexVecs;
         inline std::vector<Vector3>               occlusionMeshVertices;
         inline std::vector<uint16_t>              occlusionMeshIndices;
         inline std::vector<CellAABBNode_t>        cellAABBNodes;

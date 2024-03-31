@@ -222,6 +222,7 @@ void Titanfall::EmitBrush(brush_t &brush) {
     for( side_t &side : brush.sides ) {
         if( !side.bevel )
             brush.contentFlags |= side.shaderInfo->contentFlags;
+            // TODO: 
     }
 
 
@@ -235,18 +236,12 @@ void Titanfall::EmitBrush(brush_t &brush) {
 
     std::vector<side_t>  axialSides;
     std::vector<side_t>  cuttingSides;
-    // +X -X +Y -Y +Z -Z
-    shaderInfo_t *axials[6];
-    // The bsp brushes are AABBs + cutting planes
-    // Surface flags are indexed first for AABB ( first 6 planes ) then for the rest
-    // Radiant brushes are made purely of planes so we dont have a guarantee that we'll get the
-    // Axial ones which define the AABB, that's why we first sort them
     for (const side_t &side : brush.sides) {
         Vector3 normal = side.plane.normal();
         SnapNormal(normal);
         if ((normal[0] == -1.0f || normal[0] == 1.0f || (normal[0] == 0.0f && normal[1] == 0.0f)
-            || normal[1] == -1.0f || normal[1] == 1.0f || (normal[1] == 0.0f && normal[2] == 0.0f)
-            || normal[2] == -1.0f || normal[2] == 1.0f || (normal[2] == 0.0f && normal[0] == 0.0f)) && !side.bevel) {
+          || normal[1] == -1.0f || normal[1] == 1.0f || (normal[1] == 0.0f && normal[2] == 0.0f)
+          || normal[2] == -1.0f || normal[2] == 1.0f || (normal[2] == 0.0f && normal[0] == 0.0f)) && !side.bevel) {
             // Axial
             axialSides.emplace_back(side);
         }
@@ -254,38 +249,59 @@ void Titanfall::EmitBrush(brush_t &brush) {
         cuttingSides.emplace_back(side);
     }
 
+    // +X -X +Y -Y +Z -Z
+    side_t sortedAxialSides[6];
+    sortedAxialSides[0] = {.plane=Plane3(+1, 0, 0, 0)};
+    sortedAxialSides[1] = {.plane=Plane3(-1, 0, 0, 0)};
+    sortedAxialSides[2] = {.plane=Plane3(0, +1, 0, 0)};
+    sortedAxialSides[3] = {.plane=Plane3(0, -1, 0, 0)};
+    sortedAxialSides[4] = {.plane=Plane3(0, 0, +1, 0)};
+    sortedAxialSides[5] = {.plane=Plane3(0, 0, -1, 0)};
+    // The bsp brushes are AABBs + cutting planes
+    // Surface flags are indexed first for AABB ( first 6 planes ) then for the rest
+    // Radiant brushes are made purely of planes so we dont have a guarantee that we'll get the
+    // Axial ones which define the AABB, that's why we first sort them
     for (const side_t &side : axialSides) {
         Vector3 normal = side.plane.normal();
         SnapNormal(normal);
 
         if (normal[0] == 1.0f) {
-            axials[1] = side.shaderInfo;
+            sortedAxialSides[1] = const_cast<side_t&>(side);
         } else if (normal[0] == -1.0f) {
-            axials[0] = side.shaderInfo;
+            sortedAxialSides[0] = const_cast<side_t&>(side);
         }
 
         if (normal[1] == 1.0f) {
-            axials[3] = side.shaderInfo;
+            sortedAxialSides[3] = const_cast<side_t&>(side);
         } else if (normal[1] == -1.0f) {
-            axials[2] = side.shaderInfo;
+            sortedAxialSides[2] = const_cast<side_t&>(side);
         }
 
         if (normal[2] == 1.0f) {
-            axials[5] = side.shaderInfo;
+            sortedAxialSides[5] = const_cast<side_t&>(side);
         } else if (normal[2] == -1.0f) {
-            axials[4] = side.shaderInfo;
+            sortedAxialSides[4] = const_cast<side_t&>(side);
         }
     }
 
     int test = 0;
     for (int i = 0; i < 6; i++) {
-        if (axials[i] != nullptr) {
-            //Titanfall::Bsp::cmBrushSideProperties.emplace_back(Titanfall::EmitTextureData(*axials[i]));
+        side_t side = sortedAxialSides[i];
+        if (side.shaderInfo != nullptr) {
+            // Titanfall::Bsp::cmBrushSideProperties.emplace_back(Titanfall::EmitTextureData(*side.shaderInfo));
             Titanfall::Bsp::cmBrushSideProperties.emplace_back(0);
         } else {
             test++;
             Titanfall::Bsp::cmBrushSideProperties.emplace_back(MASK_DISCARD);
+            // TODO: ensure BrushSideProperty indexes tools/toolsnodraw
+            // -- either always emit nodraw as the first TextureData, or EmitTextureData here & now
         }
+
+        Vector3  s_axis, t_axis;
+        ComputeAxisBase(side.plane.normal(), s_axis, t_axis);
+        auto &tv = Titanfall::Bsp::cmBrushSideTexVecs.emplace_back();
+        tv.s_axis = s_axis;  tv.s_offset = side.texMat[0][2];
+        tv.t_axis = t_axis;  tv.t_offset = side.texMat[1][2];
     }
 
 #if 1
@@ -301,8 +317,15 @@ void Titanfall::EmitBrush(brush_t &brush) {
         Titanfall::EmitPlane(side.plane);
         b.planeCount++;
         Titanfall::Bsp::cmBrushSideProperties.emplace_back(Titanfall::EmitTextureData(*side.shaderInfo));
+
         uint16_t &so = Titanfall::Bsp::cmBrushSidePlaneOffsets.emplace_back();
         so = 0;
+
+        Vector3  s_axis, t_axis;
+        ComputeAxisBase(normal, s_axis, t_axis);
+        auto &tv = Titanfall::Bsp::cmBrushSideTexVecs.emplace_back();
+        tv.s_axis = s_axis;  tv.s_offset = side.texMat[0][2];
+        tv.t_axis = t_axis;  tv.t_offset = side.texMat[1][2];
     }
 
     if (b.planeCount) {
