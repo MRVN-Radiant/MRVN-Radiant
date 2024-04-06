@@ -63,11 +63,8 @@ void Titanfall::EmitCollisionGrid( entity_t &e ) {
     for( brush_t *brush : gridBrushes )
         Titanfall::EmitBrush( *brush );
 
-
     // Worldspawn size
     Vector3 size = gridSize.maxs - gridSize.mins;
-
-     
 
     // Choose scale
     // The limit seems to be 128x128, try to use size of 256 or higher
@@ -251,12 +248,12 @@ void Titanfall::EmitBrush(brush_t &brush) {
 
     // +X -X +Y -Y +Z -Z
     side_t sortedAxialSides[6];
-    sortedAxialSides[0] = {.plane=Plane3(+1, 0, 0, 0)};
-    sortedAxialSides[1] = {.plane=Plane3(-1, 0, 0, 0)};
-    sortedAxialSides[2] = {.plane=Plane3(0, +1, 0, 0)};
-    sortedAxialSides[3] = {.plane=Plane3(0, -1, 0, 0)};
-    sortedAxialSides[4] = {.plane=Plane3(0, 0, +1, 0)};
-    sortedAxialSides[5] = {.plane=Plane3(0, 0, -1, 0)};
+    sortedAxialSides[0].plane=Plane3(+1, 0, 0, 0);
+    sortedAxialSides[1].plane=Plane3(-1, 0, 0, 0);
+    sortedAxialSides[2].plane=Plane3(0, +1, 0, 0);
+    sortedAxialSides[3].plane=Plane3(0, -1, 0, 0);
+    sortedAxialSides[4].plane=Plane3(0, 0, +1, 0);
+    sortedAxialSides[5].plane=Plane3(0, 0, -1, 0);
     // The bsp brushes are AABBs + cutting planes
     // Surface flags are indexed first for AABB ( first 6 planes ) then for the rest
     // Radiant brushes are made purely of planes so we dont have a guarantee that we'll get the
