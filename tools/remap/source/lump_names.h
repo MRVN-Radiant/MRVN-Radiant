@@ -43,7 +43,7 @@
 #define R1_LUMP_CM_BRUSHES                      0x5C
 #define R1_LUMP_CM_BRUSH_SIDE_PLANE_OFFSETS     0x5D
 #define R1_LUMP_CM_BRUSH_SIDE_PROPS             0x5E
-#define R1_LUMP_CM_BRUSH_TEX_VECS               0x5F
+#define R1_LUMP_CM_BRUSH_SIDE_TEX_VECS          0x5F
 #define R1_LUMP_TRICOLL_BEVEL_STARTS            0x60
 #define R1_LUMP_TRICOLL_BEVEL_INDICES           0x61
 #define R1_LUMP_LIGHTMAP_DATA_SKY               0x62
@@ -125,7 +125,7 @@
 #define R2_LUMP_CM_BRUSHES                      0x5C
 #define R2_LUMP_CM_BRUSH_SIDE_PLANES            0x5D
 #define R2_LUMP_CM_BRUSH_SIDE_PROPS             0x5E
-#define R2_LUMP_CM_BRUSH_TEX_VECS               0x5F
+#define R2_LUMP_CM_BRUSH_SIDE_TEX_VECS          0x5F
 #define R2_LUMP_TRICOLL_BEVEL_STARTS            0x60
 #define R2_LUMP_TRICOLL_BEVEL_INDICES           0x61
 #define R2_LUMP_LIGHTMAP_DATA_SKY               0x62

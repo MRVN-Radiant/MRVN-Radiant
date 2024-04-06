@@ -132,6 +132,7 @@ void WriteR1BSPFile(const char *filename) {
     AddLump(file, header.lumps[R1_LUMP_CM_BRUSHES],                  Titanfall::Bsp::cmBrushes);
     AddLump(file, header.lumps[R1_LUMP_CM_BRUSH_SIDE_PROPS],         Titanfall::Bsp::cmBrushSideProperties);
     AddLump(file, header.lumps[R1_LUMP_CM_BRUSH_SIDE_PLANE_OFFSETS], Titanfall::Bsp::cmBrushSidePlaneOffsets);
+    AddLump(file, header.lumps[R1_LUMP_CM_BRUSH_SIDE_TEX_VECS],      Titanfall::Bsp::cmBrushSideTexVecs);
     AddLump(file, header.lumps[R1_LUMP_LIGHTMAP_DATA_SKY],           Titanfall::Bsp::lightMapDataSky_stub);  // stub
     AddLump(file, header.lumps[R1_LUMP_CSM_AABB_NODES],              Titanfall::Bsp::csmAABBNodes_stub);  // stub
     AddLump(file, header.lumps[R1_LUMP_CELL_BSP_NODES],              Titanfall::Bsp::cellBSPNodes_stub);  // stub
