@@ -1958,16 +1958,6 @@ inline std::vector<int>             bspDrawIndexes;
 #define CHECK_FLAG(value, flag) (value & flag) == flag
 #define REMOVE_FLAG(value, flag) value &= ~flag
 
-#define AUTOEXPAND_BY_REALLOC(ptr, reqitem, allocated, def)\
-    do {\
-        if (reqitem >= allocated) {\
-            if (allocated == 0)                       { allocated = def; }\
-            while (reqitem >= allocated && allocated) { allocated *= 2; }\
-            if (!allocated || allocated > 2147483647 / (int)sizeof(*ptr)) { Error(#ptr " over 2 GB"); }\
-            ptr = void_ptr(realloc(ptr, sizeof(*ptr) * allocated));\
-            if (!ptr) { Error(#ptr " out of memory"); }\
-        }\
-    } while (0)
 
 #define AUTOEXPAND_BY_REALLOC_ADD(ptr, used, allocated, add) \
     do {\
