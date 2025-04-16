@@ -1495,16 +1495,12 @@ public:
 	SelectableEdge( Faces& faces, FaceVertexId faceVertex )
 		: m_faces( faces ), m_faceVertex( faceVertex ){
 	}
-	SelectableEdge& operator=( const SelectableEdge& other ){
-		m_faceVertex = other.m_faceVertex;
-		return *this;
-	}
 
 	Face& getFace() const {
 		return *m_faces[m_faceVertex.getFace()];
 	}
 
-	void testSelect( SelectionTest& test, SelectionIntersection& best ){
+	void testSelect( SelectionTest& test, SelectionIntersection& best ) const {
 		test.TestPoint( getEdge(), best );
 	}
 };
@@ -1521,10 +1517,6 @@ public:
 
 	SelectableVertex( Faces& faces, FaceVertexId faceVertex )
 		: m_faces( faces ), m_faceVertex( faceVertex ){
-	}
-	SelectableVertex& operator=( const SelectableVertex& other ){
-		m_faceVertex = other.m_faceVertex;
-		return *this;
 	}
 
 	Face& getFace() const {
@@ -3136,7 +3128,7 @@ inline void Face_addLight( const FaceInstance& face, const Matrix4& localToWorld
 typedef std::vector<FaceInstance> FaceInstances;
 typedef std::vector<FaceInstance*> FaceInstances_ptrs;
 
-class EdgeInstance : public Selectable
+class EdgeInstance final : public Selectable
 {
 	FaceInstances& m_faceInstances;
 	SelectableEdge* m_edge;
@@ -3164,15 +3156,11 @@ public:
 	EdgeInstance( FaceInstances& faceInstances, SelectableEdge& edge )
 		: m_faceInstances( faceInstances ), m_edge( &edge ){
 	}
-	EdgeInstance& operator=( const EdgeInstance& other ){
-		m_edge = other.m_edge;
-		return *this;
-	}
 
-	void setSelected( bool select ){
+	void setSelected( bool select ) override {
 		select_edge( select );
 	}
-	bool isSelected() const {
+	bool isSelected() const override {
 		return selected_edge();
 	}
 
@@ -3232,7 +3220,7 @@ public:
 	}
 };
 
-class VertexInstance : public Selectable
+class VertexInstance final : public Selectable
 {
 	FaceInstances& m_faceInstances;
 	SelectableVertex* m_vertex;
@@ -3263,15 +3251,11 @@ public:
 	VertexInstance( FaceInstances& faceInstances, SelectableVertex& vertex )
 		: m_faceInstances( faceInstances ), m_vertex( &vertex ){
 	}
-	VertexInstance& operator=( const VertexInstance& other ){
-		m_vertex = other.m_vertex;
-		return *this;
-	}
 
-	void setSelected( bool select ){
+	void setSelected( bool select ) override {
 		select_vertex( select );
 	}
-	bool isSelected() const {
+	bool isSelected() const override {
 		return selected_vertex();
 	}
 

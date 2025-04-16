@@ -101,7 +101,7 @@ public:
 
 /// \brief A TextOutputStream which writes to a StringBuffer.
 /// Similar to std::stringstream.
-class StringOutputStream : public TextOutputStream
+class StringOutputStream final : public TextOutputStream
 {
 	StringBuffer m_string;
 public:
@@ -111,7 +111,7 @@ public:
 	StringOutputStream() = default;
 	explicit StringOutputStream( std::size_t capacity ) : m_string( capacity ){
 	}
-	std::size_t write( const char* buffer, std::size_t length ){
+	std::size_t write( const char* buffer, std::size_t length ) override {
 		m_string.push_range( buffer, buffer + length );
 		return length;
 	}
