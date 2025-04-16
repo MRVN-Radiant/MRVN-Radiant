@@ -1312,7 +1312,7 @@ QWidget* EntityInspector_constructWindow( QWidget* toplevel ){
 			{
 				auto b = g_focusToggleButton = new QToolButton;
 				hbox->addWidget( b );
-				b->setText( u8"👀" );
+				b->setText( "👀" );
 				b->setToolTip( "AutoFocus on Selection" );
 				b->setCheckable( true );
 				QObject::connect( b, &QAbstractButton::clicked, []( bool checked ){ if( checked ) FocusAllViews(); } );
