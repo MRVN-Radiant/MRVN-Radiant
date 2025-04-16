@@ -37,8 +37,10 @@ public:
 	StringFixedSize() {
 		clear();
 	}
-	explicit StringFixedSize( const char* string ){
-		operator()( string );
+	template<typename Arg, typename ... Args, typename = std::enable_if_t<sizeof...( Args ) != 0 || //prevent override of copy constructor
+		!std::is_same_v<StringFixedSize, std::decay_t<Arg>>>>
+	explicit StringFixedSize( Arg &&arg, Args&& ... args ) {
+		operator()( std::forward<Arg>( arg ), std::forward<Args>( args ) ... );
 	}
 	std::size_t write( const char* buffer, std::size_t length ) override {
 		if( m_length + length < SIZE ){
@@ -53,15 +55,14 @@ public:
 		return length;
 	}
 
-	StringFixedSize& operator=( const char* string ){
-		return operator()( string );
+	void operator=( const char* string ){
+		 operator()( string );
 	}
 
 	template<typename ... Args>
-	StringFixedSize& operator()( Args&& ... args ){
+	void operator()( Args&& ... args ){
 		clear();
 		( *this << ... << std::forward<Args>( args ) );
-		return *this;
 	}
 
 	operator const char*() const {
@@ -85,4 +86,4 @@ inline StringFixedSize<SIZE>& operator<<( StringFixedSize<SIZE>& ostream, const 
 	return ostream_write( ostream, t );
 }
 
-using String512 = StringFixedSize<512>;
+using String64 = StringFixedSize<64>;

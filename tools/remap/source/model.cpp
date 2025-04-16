@@ -1119,14 +1119,7 @@ void InsertModel( const char *name, const char *skin, int frame, const Matrix4& 
 
 		/* shader renaming for sof2 */
 		if ( renameModelShaders ) {
-			auto shaderName = String512()( PathExtensionless( picoShaderName ) );
-			if ( spawnFlags & eRMG_BSP ) {
-				shaderName << "_RMG_BSP";
-			}
-			else{
-				shaderName << "_BSP";
-			}
-			si = ShaderInfoForShader( shaderName );
+			si = ShaderInfoForShader( String64( PathExtensionless( picoShaderName ), ( spawnFlags & eRMG_BSP ) ? "_RMG_BSP" : "_BSP" ) );
 		}
 		else{
 			si = ShaderInfoForShader( picoShaderName );
@@ -1374,7 +1367,7 @@ void AddTriangleModels( entity_t& eparent ){
 		shaderInfo_t *celShader;
 		if( const char *value; e.read_keyvalue( value, "_celshader" ) ||
 		    entities[ 0 ].read_keyvalue( value, "_celshader" ) ){
-			celShader = ShaderInfoForShader( String512()( "textures/", value ) );
+			celShader = ShaderInfoForShader( String64( "textures/", value ) );
 		}
 		else{
 			celShader = globalCelShader.empty() ? NULL : ShaderInfoForShader( globalCelShader );

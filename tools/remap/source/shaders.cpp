@@ -756,7 +756,7 @@ shaderInfo_t *ShaderInfoForShader(const char *shaderName) {
     }
 
     /* strip off extension */
-    auto shader = String512()(PathExtensionless(shaderName));
+    String64 shader( PathExtensionless( shaderName ) );
 
     /* search for it */
     deprecationDepth = 0;

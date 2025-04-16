@@ -368,8 +368,7 @@ static void ProcessWorldModel( entity_t& e ){
 
 	/* ydnar: fog hull */
 	if ( e.read_keyvalue( value, "_foghull" ) ) {
-		const auto shader = String512()( "textures/", value );
-		MakeFogHullSurfs( shader );
+		MakeFogHullSurfs( String64( "textures/", value ) );
 	}
 
 	/* ydnar: bug 645: do flares for lights */

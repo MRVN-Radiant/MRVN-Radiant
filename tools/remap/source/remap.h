@@ -419,7 +419,7 @@ enum class EImplicitMap {
 
 
 struct shaderInfo_t {
-    String512                  shader;
+    String64                  shader;
     int                        surfaceFlags;
     int                        contentFlags;
     int                        compileFlags;
@@ -489,16 +489,16 @@ struct shaderInfo_t {
 
     float                      vertexScale;           /* vertex light scale */
 
-    String512                  skyParmsImageBase;     /* ydnar: for skies */
+    String64                  skyParmsImageBase;     /* ydnar: for skies */
 
-    String512                  editorImagePath;       /* use this image to generate texture coordinates */
-    String512                  lightImagePath;        /* use this image to generate color / averageColor */
-    String512                  normalImagePath;       /* ydnar: normalmap image for bumpmapping */
+    String64                  editorImagePath;       /* use this image to generate texture coordinates */
+    String64                  lightImagePath;        /* use this image to generate color / averageColor */
+    String64                  normalImagePath;       /* ydnar: normalmap image for bumpmapping */
 
-    String512                  baseTexture2Path;
+    String64                  baseTexture2Path;
 
     EImplicitMap               implicitMap;           /* ydnar: enemy territory implicit shaders */
-    String512                  implicitImagePath;
+    String64                  implicitImagePath;
 
     const image_t             *shaderImage;
     const image_t             *lightImage;
@@ -600,7 +600,7 @@ struct indexMap_t {
     int        w;
     int        h;
     int        numLayers;
-    String512  shader;
+    String64  shader;
     float      offsets[256];
     byte      *pixels;
 };
@@ -1578,7 +1578,7 @@ void InjectCommandLine(const char *stage, const std::vector<const char*> &args);
 inline shaderInfo_t *shaderInfo;
 inline int           numShaderInfo;
 
-inline String512     mapName;  /* ydnar: per-map custom shaders for larger lightmaps */
+inline String64     mapName;  /* ydnar: per-map custom shaders for larger lightmaps */
 inline CopiedString  mapShaderFile;
 
 /* can't code */
@@ -1629,7 +1629,7 @@ inline float      clipDepthGlobal = 2.0f;
 inline int        metaAdequateScore = -1;
 inline int        metaGoodScore = -1;
 inline bool       g_noob;
-inline String512  globalCelShader;
+inline String64  globalCelShader;
 inline bool       keepLights;
 
 inline bool  g_bExternalModels;
