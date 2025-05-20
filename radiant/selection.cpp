@@ -6992,11 +6992,11 @@ public:
 		m_lazy_bounds.setInvalid();
 		SceneChangeNotify();
 	}
-	typedef ConstMemberCaller<RadiantSelectionSystem, &RadiantSelectionSystem::pivotChanged> PivotChangedCaller;
+	typedef ConstMemberCaller<RadiantSelectionSystem, void(), &RadiantSelectionSystem::pivotChanged> PivotChangedCaller;
 	void pivotChangedSelection( const Selectable& selectable ){
 		pivotChanged();
 	}
-	typedef MemberCaller1<RadiantSelectionSystem, const Selectable&, &RadiantSelectionSystem::pivotChangedSelection> PivotChangedSelectionCaller;
+	typedef MemberCaller<RadiantSelectionSystem, void(const Selectable&), &RadiantSelectionSystem::pivotChangedSelection> PivotChangedSelectionCaller;
 
 	const AABB& getBoundsSelected() const override {
 		return m_lazy_bounds.getBounds();
@@ -7049,11 +7049,11 @@ public:
 
 	SelectionChangeCallback getObserver( EMode mode ) override {
 		if ( mode == ePrimitive ) {
-			return makeCallback1( m_count_primitive );
+			return makeCallback( m_count_primitive );
 		}
 		else
 		{
-			return makeCallback1( m_count_component );
+			return makeCallback( m_count_component );
 		}
 	}
 	std::size_t countSelected() const override {
@@ -7135,7 +7135,7 @@ public:
 	void selectionChanged( const Selectable& selectable ){
 		m_selectionChanged_callbacks( selectable );
 	}
-	typedef MemberCaller1<RadiantSelectionSystem, const Selectable&, &RadiantSelectionSystem::selectionChanged> SelectionChangedCaller;
+	typedef MemberCaller<RadiantSelectionSystem, void(const Selectable&), &RadiantSelectionSystem::selectionChanged> SelectionChangedCaller;
 
 
 	void startMove(){
@@ -7609,7 +7609,7 @@ public:
 
 	Transforms m_repeatableTransforms;
 
-	void repeatTransforms( const Callback& clone ) override {
+	void repeatTransforms( const Callback<void()>& clone ) override {
 		if ( !nothingSelected() && !m_repeatableTransforms.isIdentity() ) {
 			startMove();
 			UndoableCommand undo( "repeatTransforms" );
@@ -8218,7 +8218,7 @@ void SelectionSystem_constructPage( PreferenceGroup& group ){
 	SelectionSystem_constructPreferences( page );
 }
 void SelectionSystem_registerPreferencesPage(){
-	PreferencesDialog_addSettingsPage( FreeCaller1<PreferenceGroup&, SelectionSystem_constructPage>() );
+	PreferencesDialog_addSettingsPage( FreeCaller<void(PreferenceGroup&), SelectionSystem_constructPage>() );
 }
 
 
@@ -8234,7 +8234,7 @@ void SelectionSystem_Construct(){
 
 	g_RadiantSelectionSystem = new RadiantSelectionSystem;
 
-	SelectionSystem_boundsChanged = GlobalSceneGraph().addBoundsChangedCallback( FreeCaller<SelectionSystem_OnBoundsChanged>() );
+	SelectionSystem_boundsChanged = GlobalSceneGraph().addBoundsChangedCallback( FreeCaller<void(), SelectionSystem_OnBoundsChanged>() );
 
 	GlobalShaderCache().attachRenderable( getSelectionSystem() );
 
@@ -8282,7 +8282,7 @@ inline WindowVector window_constrained( WindowVector window, std::size_t x, std:
 	return WindowVector( window_constrained( window.x(), x, width ), window_constrained( window.y(), y, height ) );
 }
 
-typedef Callback1<DeviceVector> MouseEventCallback;
+typedef Callback<void(DeviceVector)> MouseEventCallback;
 
 Single<MouseEventCallback> g_mouseMovedCallback;
 Single<MouseEventCallback> g_mouseUpCallback;
@@ -8358,7 +8358,7 @@ public:
 			                                   bitfield_enabled( m_state, c_modifierAlt ) );
 		}
 	}
-	typedef MemberCaller1<TexManipulator_, DeviceVector, &TexManipulator_::mouseMoved> MouseMovedCaller;
+	typedef MemberCaller<TexManipulator_, void(DeviceVector), &TexManipulator_::mouseMoved> MouseMovedCaller;
 
 	void mouseUp( DeviceVector position ){
 		if( m_undo_begun ){
@@ -8370,7 +8370,7 @@ public:
 		g_mouseMovedCallback.clear();
 		g_mouseUpCallback.clear();
 	}
-	typedef MemberCaller1<TexManipulator_, DeviceVector, &TexManipulator_::mouseUp> MouseUpCaller;
+	typedef MemberCaller<TexManipulator_, void(DeviceVector), &TexManipulator_::mouseUp> MouseUpCaller;
 };
 
 
@@ -8472,7 +8472,7 @@ public:
 			                                  ( m_state & c_modifier_face ) != c_modifierNone );
 		}
 	}
-	typedef MemberCaller1<Selector_, DeviceVector, &Selector_::mouseMoved> MouseMovedCaller;
+	typedef MemberCaller<Selector_, void(DeviceVector), &Selector_::mouseMoved> MouseMovedCaller;
 
 	void mouseUp( DeviceVector position ){
 		if( m_mouse2 ){
@@ -8485,7 +8485,7 @@ public:
 		g_mouseMovedCallback.clear();
 		g_mouseUpCallback.clear();
 	}
-	typedef MemberCaller1<Selector_, DeviceVector, &Selector_::mouseUp> MouseUpCaller;
+	typedef MemberCaller<Selector_, void(DeviceVector), &Selector_::mouseUp> MouseUpCaller;
 };
 
 
@@ -8531,14 +8531,14 @@ public:
 			                                                      bitfield_enabled( m_state, c_modifierControl ),
 			                                                      bitfield_enabled( m_state, c_modifierAlt ) );
 	}
-	typedef MemberCaller1<Manipulator_, DeviceVector, &Manipulator_::mouseMoved> MouseMovedCaller;
+	typedef MemberCaller<Manipulator_, void(DeviceVector), &Manipulator_::mouseMoved> MouseMovedCaller;
 
 	void mouseUp( DeviceVector position ){
 		m_moving_transformOrigin = getSelectionSystem().endMove();
 		g_mouseMovedCallback.clear();
 		g_mouseUpCallback.clear();
 	}
-	typedef MemberCaller1<Manipulator_, DeviceVector, &Manipulator_::mouseUp> MouseUpCaller;
+	typedef MemberCaller<Manipulator_, void(DeviceVector), &Manipulator_::mouseUp> MouseUpCaller;
 
 	void highlight( DeviceVector position ){
 		getSelectionSystem().HighlightManipulator( *m_view, position, getEpsilon() );

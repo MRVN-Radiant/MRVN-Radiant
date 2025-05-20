@@ -179,22 +179,22 @@ static GameCombo s_gameCombo;
 void GameModeImport( int value ){
 	gamemode_set( value == 0? "sp" : "mp" );
 }
-typedef FreeCaller1<int, GameModeImport> GameModeImportCaller;
+typedef FreeCaller<void(int), GameModeImport> GameModeImportCaller;
 
 void GameModeExport( const IntImportCallback& importer ){
 	const char *gamemode = gamemode_get();
 	importer( ( string_empty( gamemode ) || string_equal( gamemode, "sp" ) )? 0 : 1 );
 }
-typedef FreeCaller1<const IntImportCallback&, GameModeExport> GameModeExportCaller;
+typedef FreeCaller<void(const IntImportCallback&), GameModeExport> GameModeExportCaller;
 
 
 void FSGameImport( int value ){
 }
-typedef FreeCaller1<int, FSGameImport> FSGameImportCaller;
+typedef FreeCaller<void(int), FSGameImport> FSGameImportCaller;
 
 void FSGameExport( const IntImportCallback& importer ){
 }
-typedef FreeCaller1<const IntImportCallback&, FSGameExport> FSGameExportCaller;
+typedef FreeCaller<void(const IntImportCallback&), FSGameExport> FSGameExportCaller;
 
 
 void GameImport( int value ){
@@ -216,7 +216,7 @@ void GameImport( int value ){
 		}
 	}
 }
-typedef FreeCaller1<int, GameImport> GameImportCaller;
+typedef FreeCaller<void(int), GameImport> GameImportCaller;
 
 void GameExport( const IntImportCallback& importer ){
 	const gamecombo_t gamecombo = gamecombo_for_dir( gamename_get() );
@@ -225,7 +225,7 @@ void GameExport( const IntImportCallback& importer ){
 	s_gameCombo.fsgame_entry->setEditText( gamecombo.fs_game );
 	s_gameCombo.fsgame_entry->setEnabled( gamecombo.sensitive );
 }
-typedef FreeCaller1<const IntImportCallback&, GameExport> GameExportCaller;
+typedef FreeCaller<void(const IntImportCallback&), GameExport> GameExportCaller;
 
 
 void Game_constructPreferences( PreferencesPage& page ){

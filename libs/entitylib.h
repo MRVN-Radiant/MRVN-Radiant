@@ -376,7 +376,7 @@ public:
 
 		notify();
 	}
-	typedef MemberCaller1<KeyValue, const CopiedString&, &KeyValue::importState> UndoImportCaller;
+	typedef MemberCaller<KeyValue, void(const CopiedString&), &KeyValue::importState> UndoImportCaller;
 };
 
 /// \brief An unsorted list of key/value pairs.
@@ -534,7 +534,7 @@ public:
 
 		m_entityKeyValueChanged();
 	}
-	typedef MemberCaller1<EntityKeyValues, const KeyValues&, &EntityKeyValues::importState> UndoImportCaller;
+	typedef MemberCaller<EntityKeyValues, void(const KeyValues&), &EntityKeyValues::importState> UndoImportCaller;
 
 	void attach( Observer& observer ) override {
 		ASSERT_MESSAGE( !m_observerMutex, "observer cannot be attached during iteration" );
