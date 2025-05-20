@@ -3465,7 +3465,7 @@ public:
 class SelectionCounter
 {
 public:
-	typedef const Selectable& first_argument_type;
+	using func = void(const Selectable &);
 
 	SelectionCounter( const SelectionChangeCallback& onchanged )
 		: m_count( 0 ), m_onchanged( onchanged ){
