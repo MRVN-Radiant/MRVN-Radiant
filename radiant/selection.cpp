@@ -8218,7 +8218,7 @@ void SelectionSystem_constructPage( PreferenceGroup& group ){
 	SelectionSystem_constructPreferences( page );
 }
 void SelectionSystem_registerPreferencesPage(){
-	PreferencesDialog_addSettingsPage( FreeCaller<void(PreferenceGroup&), SelectionSystem_constructPage>() );
+	PreferencesDialog_addSettingsPage( makeCallbackF( SelectionSystem_constructPage ) );
 }
 
 

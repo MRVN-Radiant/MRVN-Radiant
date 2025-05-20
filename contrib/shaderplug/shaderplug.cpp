@@ -92,8 +92,6 @@ void loadArchiveFile( const char* filename ){
 	archives.push_back( filename );
 }
 
-typedef FreeCaller<void(const char*), loadArchiveFile> LoadArchiveFileCaller;
-
 void LoadTextureFile( const char* filename ){
 	std::string s_filename = filename;
 
@@ -109,10 +107,8 @@ void LoadTextureFile( const char* filename ){
 	}
 }
 
-typedef FreeCaller<void(const char*), LoadTextureFile> LoadTextureFileCaller;
-
 void GetTextures( const char* extension ){
-	GlobalFileSystem().forEachFile( "textures/", extension, LoadTextureFileCaller(), 0 );
+	GlobalFileSystem().forEachFile( "textures/", extension, makeCallbackF( LoadTextureFile ), 0 );
 }
 
 void LoadShaderList( const char* filename ){
@@ -121,14 +117,12 @@ void LoadShaderList( const char* filename ){
 	}
 }
 
-typedef FreeCaller<void(const char*), LoadShaderList> LoadShaderListCaller;
-
 void GetAllShaders(){
-	GlobalShaderSystem().foreachShaderName( LoadShaderListCaller() );
+	GlobalShaderSystem().foreachShaderName( makeCallbackF( LoadShaderList ) );
 }
 
 void GetArchiveList(){
-	GlobalFileSystem().forEachArchive( LoadArchiveFileCaller() );
+	GlobalFileSystem().forEachArchive( makeCallbackF( loadArchiveFile ) );
 	globalOutputStream() << "Shaderplug: " << Shaderplug::archives.size() << " archives found.\n";
 }
 

@@ -77,19 +77,12 @@ const char* BrushType_getName( EBrushType type ){
 void Face_importSnapPlanes( bool value ){
 	Face::m_quantise = value ? quantiseInteger : quantiseFloating;
 }
-typedef FreeCaller<void(bool), Face_importSnapPlanes> FaceImportSnapPlanesCaller;
 
 void Face_exportSnapPlanes( const BoolImportCallback& importer ){
 	importer( Face::m_quantise == quantiseInteger );
 }
-typedef FreeCaller<void(const BoolImportCallback&), Face_exportSnapPlanes> FaceExportSnapPlanesCaller;
 
 void Brush_constructPreferences( PreferencesPage& page ){
-	page.appendCheckBox(
-	    "", "Snap planes to integer grid",
-	    FaceImportSnapPlanesCaller(),
-	    FaceExportSnapPlanesCaller()
-	);
 	page.appendSpinner(
 		"Default texture scale",
 		g_texdef_default_scale,
@@ -110,13 +103,18 @@ void Brush_constructPreferences( PreferencesPage& page ){
 	                     "Always use caulk for new brushes",
 	                     g_brush_always_caulk
 	                   );
+	page.appendCheckBox(
+		"Dangerous!", "Snap planes to integer grid (may break brushes)",
+		makeCallbackF( Face_importSnapPlanes ),
+		makeCallbackF( Face_exportSnapPlanes )
+	);
 }
 void Brush_constructPage( PreferenceGroup& group ){
 	PreferencesPage page( group.createPage( "Brush", "Brush Settings" ) );
 	Brush_constructPreferences( page );
 }
 void Brush_registerPreferencesPage(){
-	PreferencesDialog_addSettingsPage( FreeCaller<void(PreferenceGroup&), Brush_constructPage>() );
+	PreferencesDialog_addSettingsPage( makeCallbackF( Brush_constructPage ) );
 }
 
 void Brush_toggleFormat( EBrushType type ){
@@ -180,12 +178,12 @@ void Brush_Construct( EBrushType type ){
 
 	GlobalPreferenceSystem().registerPreference( "TextureLock", BoolImportStringCaller( g_brush_texturelock_enabled ), BoolExportStringCaller( g_brush_texturelock_enabled ) );
 	GlobalPreferenceSystem().registerPreference( "TextureVertexLock", BoolImportStringCaller( g_brush_textureVertexlock_enabled ), BoolExportStringCaller( g_brush_textureVertexlock_enabled ) );
-	GlobalPreferenceSystem().registerPreference( "BrushSnapPlanes", makeBoolStringImportCallback( FaceImportSnapPlanesCaller() ), makeBoolStringExportCallback( FaceExportSnapPlanesCaller() ) );
+	GlobalPreferenceSystem().registerPreference( "BrushSnapPlanes", makeBoolStringImportCallback( FreeCaller<void(bool), Face_importSnapPlanes>() ), makeBoolStringExportCallback( FreeCaller<void(const BoolImportCallback&), Face_exportSnapPlanes>() ) );
 	GlobalPreferenceSystem().registerPreference( "TexdefDefaultScale", FloatImportStringCaller( g_texdef_default_scale ), FloatExportStringCaller( g_texdef_default_scale ) );
 
 	GridStatus_getTextureLockEnabled = getTextureLockEnabled;
 	GridStatus_getTexdefTypeIdLabel = getTexdefTypeIdLabel;
-	g_texture_lock_status_changed = FreeCaller<void(), GridStatus_changed>();
+	g_texture_lock_status_changed = makeCallbackF( GridStatus_changed );
 
 	Clipper_Construct();
 }
