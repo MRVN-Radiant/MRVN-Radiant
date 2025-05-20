@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "generic/callbackfwd.h"
+#include "generic/callback.h"
 #include "signal/signalfwd.h"
 
 #define TEX_MAX_FOLDER_DEPTH 16
@@ -37,8 +37,6 @@ void TextureBrowser_Construct();
 void TextureBrowser_Destroy();
 
 typedef Callback1<const char*> StringImportCallback;
-template<typename FirstArgument, void( *func ) (FirstArgument)>
-class FreeCaller1;
 
 extern QWidget* g_page_textures;
 void TextureBrowser_exportTitle( const StringImportCallback& importer );
