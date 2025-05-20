@@ -277,6 +277,9 @@ struct bspDrawVert_t {
     Color4b  color[MAX_LIGHTMAPS];  /* RBSP */
 };
 
+using TriRef = std::array<const bspDrawVert_t *, 3>;
+using QuadRef = std::array<const bspDrawVert_t *, 4>;
+
 
 enum bspSurfaceType_t {
     MST_BAD,
@@ -1318,7 +1321,7 @@ void FilterStructuralBrushesIntoTree(const entity_t &e, tree_t &tree);
 bool WindingIsTiny(const winding_t &w);
 
 /* mesh.c */
-void LerpDrawVert(const bspDrawVert_t *a, const bspDrawVert_t *b, bspDrawVert_t *out);
+bspDrawVert_t LerpDrawVert( const bspDrawVert_t &a, const bspDrawVert_t &b );
 void LerpDrawVertAmount(bspDrawVert_t *a, bspDrawVert_t *b, float amount, bspDrawVert_t *out);
 void FreeMesh(mesh_t *m);
 mesh_t *CopyMesh(mesh_t *mesh);

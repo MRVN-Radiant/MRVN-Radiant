@@ -66,8 +66,7 @@ bool RadSampleImage( const byte *pixels, int width, int height, const Vector2& s
 
 	/* get pixel */
 	pixels += ( y * width * 4 ) + ( x * 4 );
-	VectorCopy( pixels, color.rgb() );
-	color.alpha() = pixels[ 3 ];
+	color = Color4f( pixels[0], pixels[1], pixels[2], pixels[3] );
 
 	if ( texturesRGB ) {
 		color[0] = Image_LinearFloatFromsRGBFloat( color[0] * ( 1.0 / 255.0 ) ) * 255.0;
