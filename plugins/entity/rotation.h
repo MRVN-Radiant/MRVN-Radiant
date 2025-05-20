@@ -57,7 +57,7 @@ inline void write_rotation( const Float9 rotation, Entity* entity, const char* k
 	}
 	else
 	{
-	const auto value = StringStream(
+		const auto value = StringStream(
 			rotation[0], ' ',
 			rotation[1], ' ',
 			rotation[2], ' ',
@@ -67,7 +67,7 @@ inline void write_rotation( const Float9 rotation, Entity* entity, const char* k
 			rotation[6], ' ',
 			rotation[7], ' ',
 			rotation[8] );
-		entity->setKeyValue( key, value.c_str() );
+		entity->setKeyValue( key, value );
 	}
 }
 inline void read_rotation( Float9 rotation, const char* value ){
