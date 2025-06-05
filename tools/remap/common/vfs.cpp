@@ -308,7 +308,7 @@ MemBuffer vfsLoadFile( const char *filename, int index /* = 0 */ ){
 	{
 		if ( strEqual( file.name.c_str(), fixed ) && 0 == index-- )
 		{
-			snprintf( g_strLoadedFileLocation, sizeof( g_strLoadedFileLocation ), "%s :: %s", file.pak.unzFilePath.c_str(), filename );
+			std::snprintf( g_strLoadedFileLocation, std::size( g_strLoadedFileLocation ), "%s :: %s", file.pak.unzFilePath.c_str(), filename );
 
 			unzFile zipfile = file.pak.zipfile;
 			*(unz_s*)zipfile = file.zipinfo;
