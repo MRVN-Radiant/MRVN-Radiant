@@ -3056,7 +3056,7 @@ public:
 	bool contains( const Plane3& plane ) const override {
 		return m_selectedPlanes.contains( plane );
 	}
-	typedef MemberCaller1<SelectedPlaneSet, const Plane3&, &SelectedPlaneSet::insert> InsertCaller;
+	typedef MemberCaller<SelectedPlaneSet, void( const Plane3&), &SelectedPlaneSet::insert> InsertCaller;
 };
 
 
