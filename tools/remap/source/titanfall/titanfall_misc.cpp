@@ -112,7 +112,7 @@ void Titanfall::EmitEntity(const entity_t &e) {
     }
     data << "}\n";
 
-    std::vector<char> str = { data.begin(), data.end() };
+    std::vector<char> str = { data.cbegin(), data.cend() };
 
     #define ENT_APPEND(x)  Titanfall::Ent::x.insert(Titanfall::Ent::x.end(), str.begin(), str.end()); break
     switch (dest) {
@@ -156,7 +156,7 @@ void Titanfall::EmitExtraEntity( entity_t &e ) {
     }
     data << "}\n";
 
-    std::vector<char> str = { data.begin(), data.end() };
+    std::vector<char> str = { data.cbegin(), data.cend() };
 
     Titanfall::Ent::extra.insert( Titanfall::Ent::extra.end(), str.begin(), str.end() );
 }

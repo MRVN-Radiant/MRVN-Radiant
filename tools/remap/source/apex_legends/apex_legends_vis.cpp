@@ -147,7 +147,7 @@ uint32_t ApexLegends::EmitTextureData(shaderInfo_t shader) {
     // Add to Table
     StringOutputStream data;
     data << tex.c_str();
-    std::vector<char> str = { data.begin(), data.end() + 1 };
+    std::vector<char> str = { data.cbegin(), data.cend() + 1 };
 
     ApexLegends::TextureData_t &td = ApexLegends::Bsp::textureData.emplace_back();
     td.surfaceIndex = Titanfall::Bsp::textureDataData.size();
@@ -291,7 +291,7 @@ void ApexLegends::EmitEntity(const entity_t &e) {
     }
     data << "}\n";
 
-    std::vector<char> str = { data.begin(), data.end() };
+    std::vector<char> str = { data.cbegin(), data.cend() };
 
     // env
     if (striEqualPrefix(e.valueForKey("classname"), "light")
