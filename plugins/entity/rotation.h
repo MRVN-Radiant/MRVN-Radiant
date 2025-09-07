@@ -28,7 +28,7 @@
 #include "generic/callback.h"
 #include "stringio.h"
 
-#include "angle.h"
+#include "angles.h"
 
 typedef float Float9[9]; 
 
@@ -130,16 +130,16 @@ inline void rotation_rotate( Float9 rotation, const Quaternion& rotate ){
 	                   );
 }
 
-inline void read_angle( Float9 rotation, const char* value ){
-	float angle;
-	if ( !string_parse_float( value, angle ) ) {
-		default_rotation( rotation );
-	}
-	else
-	{
-		rotation_fromMatrix( rotation,  matrix4_rotation_for_z_degrees( angle ) );
-	}
-}
+//inline void read_angle( Float9 rotation, const char* value ){
+//	float angle;
+//	if ( !string_parse_float( value, angle ) ) {
+//		default_rotation( rotation );
+//	}
+//	else
+//	{
+//		rotation_fromMatrix( rotation,  matrix4_rotation_for_z_degrees( angle ) );
+//	}
+//}
 
 class RotationKey
 {
@@ -153,11 +153,11 @@ public:
 		default_rotation( m_rotation );
 	}
 
-	void angleChanged( const char* value ){
-		read_angle( m_rotation, value );
-		m_rotationChanged();
-	}
-	typedef MemberCaller1<RotationKey, const char*, &RotationKey::angleChanged> AngleChangedCaller;
+	//void angleChanged( const char* value ){
+	//	read_angle( m_rotation, value );
+	//	m_rotationChanged();
+	//}
+	//typedef MemberCaller1<RotationKey, const char*, &RotationKey::angleChanged> AngleChangedCaller;
 
 	void rotationChanged( const char* value ){
 		read_rotation( m_rotation, value );
@@ -167,14 +167,14 @@ public:
 
 	void write( Entity* entity ) const {
 		Vector3 euler = matrix4_get_rotation_euler_xyz_degrees( rotation_toMatrix( m_rotation ) );
-		if ( euler[0] == 0 && euler[1] == 0 ) {
+		/*if ( euler[0] == 0 && euler[1] == 0 ) {
 			entity->setKeyValue( "rotation", "" );
-			write_angle( euler[2], entity );
+			write_angles( euler[2], entity );
 		}
 		else
-		{
-			entity->setKeyValue( "angle", "" );
+		{*/
+			entity->setKeyValue( "angles", "" );
 			write_rotation( m_rotation, entity );
-		}
+		//}
 	}
 };

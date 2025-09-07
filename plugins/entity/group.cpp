@@ -72,7 +72,8 @@ class Group
 	RenderableArrow m_arrow;
 	bool m_anglesDraw;
 	void updateAnglesDraw(){
-		m_anglesDraw = m_entity.getEntityClass().has_angles || m_entity.hasKeyValue( "angle" ) || m_entity.hasKeyValue( "angles" );
+		//m_anglesDraw = m_entity.getEntityClass().has_angles || m_entity.hasKeyValue( "angle" ) || m_entity.hasKeyValue( "angles" );
+		m_anglesDraw = m_entity.getEntityClass().has_angles || m_entity.hasKeyValue("angles");
 		SceneChangeNotify();
 	}
 	typedef MemberCaller<Group, &Group::updateAnglesDraw> UpdateAnglesDrawCaller;
@@ -84,7 +85,7 @@ class Group
 		m_keyObservers.insert( "classname", ClassnameFilter::ClassnameChangedCaller( m_filter ) );
 		m_keyObservers.insert( Static<KeyIsName>::instance().m_nameKey, NamedEntity::IdentifierChangedCaller( m_named ) );
 		m_keyObservers.insert( "origin", OriginKey::OriginChangedCaller( m_originKey ) );
-		m_keyObservers.insert( "angle", m_anglesKey.getGroupAngleChangedCallback() );
+		//m_keyObservers.insert( "angle", m_anglesKey.getGroupAngleChangedCallback() );
 		m_keyObservers.insert( "angles", m_anglesKey.getAnglesChangedCallback() );
 		updateAnglesDraw();
 	}
