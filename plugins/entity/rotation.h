@@ -30,7 +30,7 @@
 
 #include "angle.h"
 
-typedef float Float9[9];
+typedef float Float9[9]; 
 
 inline void default_rotation( Float9 rotation ){
 	rotation[0] = 1;
