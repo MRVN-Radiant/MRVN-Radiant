@@ -136,12 +136,10 @@ class RotationKey
 public:
 	Float9 m_rotation;
 
-
 	RotationKey( const Callback& rotationChanged )
 		: m_rotationChanged( rotationChanged ){
 		default_rotation( m_rotation );
 	}
-
 
 	void rotationChanged( const char* value ){
 		read_rotation( m_rotation, value );

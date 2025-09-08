@@ -95,6 +95,7 @@ inline Vector3 angles_rotated( const Vector3& angles, const Quaternion& rotation
 	           )
 	       );
 }
+
 #if 0
 inline Vector3 angles_rotated_for_rotated_pivot( const Vector3& angles, const Quaternion& rotation ){
 	return angles_snapped_to_zero(
@@ -107,6 +108,7 @@ inline Vector3 angles_rotated_for_rotated_pivot( const Vector3& angles, const Qu
 	       );
 }
 #endif
+
 class AnglesKey
 {
 	Callback m_anglesChanged;
