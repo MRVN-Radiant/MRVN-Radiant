@@ -1172,7 +1172,7 @@ class Light :
 		m_keyObservers.insert( "spawnflags", LightRadii::FlagsChangedCaller( m_radii ) );
 
 		if ( g_lightType == LIGHTTYPE_DOOM3 ) {
-			//m_keyObservers.insert( "angle", RotationKey::AngleChangedCaller( m_rotationKey ) ); // "angle" is not longer supported, need to be converted to "angles"
+			//m_keyObservers.insert( "angle", RotationKey::AngleChangedCaller( m_rotationKey ) ); // "angle" is no longer supported, need to be converted to "angles"
 			m_keyObservers.insert( "rotation", RotationKey::RotationChangedCaller( m_rotationKey ) );
 			m_keyObservers.insert( "light_radius", Doom3LightRadius::LightRadiusChangedCaller( m_doom3Radius ) );
 			m_keyObservers.insert( "light_center", Doom3LightRadius::LightCenterChangedCaller( m_doom3Radius ) );
