@@ -22,9 +22,9 @@
 #pragma once
 
 #include "generic/constant.h"
-#include "generic/callbackfwd.h"
+#include "generic/callback.h"
 
-typedef Callback1<const char*> NameCallback;
+typedef Callback<void(const char*)> NameCallback;
 
 class Nameable
 {

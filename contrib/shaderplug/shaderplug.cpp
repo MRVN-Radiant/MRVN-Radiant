@@ -23,7 +23,6 @@
 
 #include "debugging/debugging.h"
 
-#include <string>
 #include <vector>
 #include "string/string.h"
 #include "modulesystem/singletonmodule.h"
@@ -55,8 +54,8 @@ namespace Shaderplug
 QWidget* g_window;
 
 std::vector<const char*> archives;
-std::set<std::string> shaders;
-std::set<std::string> textures;
+std::set<CopiedString> shaders;
+std::set<CopiedString> textures;
 
 XmlTagBuilder TagBuilder;
 void CreateTagFile();
@@ -92,30 +91,20 @@ void loadArchiveFile( const char* filename ){
 	archives.push_back( filename );
 }
 
-typedef FreeCaller1<const char*, loadArchiveFile> LoadArchiveFileCaller;
-
 void LoadTextureFile( const char* filename ){
-	std::string s_filename = filename;
-
-	char buffer[256];
-	strcpy( buffer, "textures/" );
+	char buffer[256] = "textures/";
 
 	// append filename without trailing file extension (.tga or .jpg for example)
-	strncat( buffer, filename, s_filename.length() - 4 );
-
-	std::set<std::string>::iterator iter;
-	iter = shaders.find( buffer );
+	strncat( buffer, filename, strlen( filename ) - 4 );
 
 	// a shader with this name already exists
-	if ( iter == shaders.end() ) {
+	if ( !shaders.contains( buffer ) ) {
 		textures.insert( buffer );
 	}
 }
 
-typedef FreeCaller1<const char*, LoadTextureFile> LoadTextureFileCaller;
-
 void GetTextures( const char* extension ){
-	GlobalFileSystem().forEachFile( "textures/", extension, LoadTextureFileCaller(), 0 );
+	GlobalFileSystem().forEachFile( "textures/", extension, makeCallbackF( LoadTextureFile ), 0 );
 }
 
 void LoadShaderList( const char* filename ){
@@ -124,14 +113,12 @@ void LoadShaderList( const char* filename ){
 	}
 }
 
-typedef FreeCaller1<const char*, LoadShaderList> LoadShaderListCaller;
-
 void GetAllShaders(){
-	GlobalShaderSystem().foreachShaderName( LoadShaderListCaller() );
+	GlobalShaderSystem().foreachShaderName( makeCallbackF( LoadShaderList ) );
 }
 
 void GetArchiveList(){
-	GlobalFileSystem().forEachArchive( LoadArchiveFileCaller() );
+	GlobalFileSystem().forEachArchive( makeCallbackF( loadArchiveFile ) );
 	globalOutputStream() << "Shaderplug: " << Shaderplug::archives.size() << " archives found.\n";
 }
 

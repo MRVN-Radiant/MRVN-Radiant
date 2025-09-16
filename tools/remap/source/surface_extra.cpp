@@ -40,31 +40,8 @@
    ------------------------------------------------------------------------------- */
 
 
-#define GROW_SURFACE_EXTRAS 1024
-
-static int numSurfaceExtras = 0;
-static int maxSurfaceExtras = 0;
-static surfaceExtra_t              *surfaceExtras;
+static std::vector<surfaceExtra_t> surfaceExtras;
 static surfaceExtra_t seDefault;
-
-
-
-/*
-   AllocSurfaceExtra()
-   allocates a new extra storage
- */
-
-static surfaceExtra_t& AllocSurfaceExtra(){
-	/* enough space? */
-	AUTOEXPAND_BY_REALLOC_ADD( surfaceExtras, numSurfaceExtras, maxSurfaceExtras, GROW_SURFACE_EXTRAS );
-
-	/* add another */
-	surfaceExtra_t& se = surfaceExtras[ numSurfaceExtras++ ];
-	se = seDefault;
-
-	/* return it */
-	return se;
-}
 
 
 
@@ -86,7 +63,7 @@ void SetDefaultSampleSize( int sampleSize ){
 
 void SetSurfaceExtra( const mapDrawSurface_t& ds ){
 	/* get a new extra */
-	surfaceExtra_t& se = AllocSurfaceExtra();
+	surfaceExtra_t& se = surfaceExtras.emplace_back( seDefault );
 
 	/* copy out the relevant bits */
 	se.mds = &ds;
@@ -111,7 +88,7 @@ void SetSurfaceExtra( const mapDrawSurface_t& ds ){
  */
 
 const surfaceExtra_t& GetSurfaceExtra( int num ){
-	if ( num < 0 || num >= numSurfaceExtras ) {
+	if ( num < 0 || size_t( num ) >= surfaceExtras.size() ) {
 		return seDefault;
 	}
 	return surfaceExtras[ num ];
@@ -134,15 +111,15 @@ void WriteSurfaceExtraFile( const char *path ){
 	Sys_Printf( "--- WriteSurfaceExtraFile ---\n" );
 
 	/* open the file */
-	auto srfPath = StringStream( PathExtensionless( path ), ".srf" );
+	const auto srfPath = StringStream( path, ".srf" );
 	Sys_Printf( "Writing %s\n", srfPath.c_str() );
 	FILE *sf = SafeOpenWrite( srfPath, "wt" );
 
 	/* lap through the extras list */
-	for ( int i = -1; i < numSurfaceExtras; i++ )
+	for ( int i = -1, size = surfaceExtras.size(); i < size; ++i )
 	{
 		/* get extra */
-		const surfaceExtra_t *se = &GetSurfaceExtra( i );
+		const surfaceExtra_t * const se = &GetSurfaceExtra( i );
 
 		/* default or surface num? */
 		if ( i < 0 ) {
@@ -230,7 +207,7 @@ void LoadSurfaceExtraFile( const char *path ){
 	}
 
 	/* load the file */
-	auto srfPath = StringStream( PathExtensionless( path ), ".srf" );
+	const auto srfPath = StringStream( PathExtensionless( path ), ".srf" );
 
 	/* parse the file */
 	if( !LoadScriptFile( srfPath, -1 ) )
@@ -252,8 +229,11 @@ void LoadSurfaceExtraFile( const char *path ){
 			if ( surfaceNum < 0 || surfaceNum > MAX_MAP_DRAW_SURFS ) {
 				Error( "ReadSurfaceExtraFile(): %s, line %d: bogus surface num %d", srfPath.c_str(), scriptline, surfaceNum );
 			}
-			while ( surfaceNum >= numSurfaceExtras )
-				AllocSurfaceExtra();
+			if ( size_t( surfaceNum ) >= surfaceExtras.size() ) {
+				if ( size_t( surfaceNum ) >= surfaceExtras.capacity() ) // ensure that capacity grows efficiently, as it's not guaranteed for vector::resize()
+					surfaceExtras.reserve( surfaceExtras.capacity() << 1 );
+				surfaceExtras.resize( surfaceNum + 1, seDefault );
+			}
 			se = &surfaceExtras[ surfaceNum ];
 		}
 

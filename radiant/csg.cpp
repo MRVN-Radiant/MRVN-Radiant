@@ -473,11 +473,9 @@ class Dereference
 {
 	const Functor& functor;
 public:
-	typedef typename RemoveReference<typename Functor::first_argument_type>::type* first_argument_type;
-	typedef typename Functor::result_type result_type;
 	Dereference( const Functor& functor ) : functor( functor ){
 	}
-	result_type operator()( first_argument_type firstArgument ) const {
+	get_result_type<Functor> operator()( typename RemoveReference<get_argument<Functor, 0>>::type *firstArgument ) const {
 		return functor( *firstArgument );
 	}
 };
@@ -499,15 +497,13 @@ Face* Brush_findIf( const Brush& brush, const Predicate& predicate ){
 template<typename Caller>
 class BindArguments1
 {
-	typedef typename Caller::second_argument_type FirstBound;
+	typedef get_argument<Caller, 1> FirstBound;
 	FirstBound firstBound;
 public:
-	typedef typename Caller::result_type result_type;
-	typedef typename Caller::first_argument_type first_argument_type;
 	BindArguments1( FirstBound firstBound )
 		: firstBound( firstBound ){
 	}
-	result_type operator()( first_argument_type firstArgument ) const {
+	get_result_type<Caller> operator()( get_argument<Caller, 0> firstArgument ) const {
 		return Caller::call( firstArgument, firstBound );
 	}
 };
@@ -515,17 +511,15 @@ public:
 template<typename Caller>
 class BindArguments2
 {
-	typedef typename Caller::second_argument_type FirstBound;
-	typedef typename Caller::third_argument_type SecondBound;
+	typedef get_argument<Caller, 1> FirstBound;
+	typedef get_argument<Caller, 2> SecondBound;
 	FirstBound firstBound;
 	SecondBound secondBound;
 public:
-	typedef typename Caller::result_type result_type;
-	typedef typename Caller::first_argument_type first_argument_type;
 	BindArguments2( FirstBound firstBound, SecondBound secondBound )
 		: firstBound( firstBound ), secondBound( secondBound ){
 	}
-	result_type operator()( first_argument_type firstArgument ) const {
+	get_result_type<Caller> operator()( get_argument<Caller, 0> firstArgument ) const {
 		return Caller::call( firstArgument, firstBound, secondBound );
 	}
 };
@@ -538,7 +532,7 @@ BindArguments2<Caller> bindArguments( const Caller& caller, FirstBound firstBoun
 inline bool Face_testPlane( const Face& face, const Plane3& plane, bool flipped ){
 	return face.contributes() && !Winding_TestPlane( face.getWinding(), plane, flipped );
 }
-typedef Function3<const Face&, const Plane3&, bool, bool, Face_testPlane> FaceTestPlane;
+typedef Function<bool(const Face&, const Plane3&, bool), Face_testPlane> FaceTestPlane;
 
 
 
@@ -1592,10 +1586,10 @@ void CSG_Tool(){
 #include "commands.h"
 
 void CSG_registerCommands(){
-	GlobalCommands_insert( "CSGSubtract", FreeCaller<CSG_Subtract>(), QKeySequence( "Shift+U" ) );
-	GlobalCommands_insert( "CSGMerge", FreeCaller<CSG_Merge>() );
-	GlobalCommands_insert( "CSGWrapMerge", FreeCaller<CSG_WrapMerge>(), QKeySequence( "Ctrl+U" ) );
-	GlobalCommands_insert( "CSGIntersect", FreeCaller<CSG_Intersect>(), QKeySequence( "Ctrl+Shift+U" ) );
-	GlobalCommands_insert( "CSGroom", FreeCaller<CSG_MakeRoom>() );
-	GlobalCommands_insert( "CSGTool", FreeCaller<CSG_Tool>() );
+	GlobalCommands_insert( "CSGSubtract", makeCallbackF( CSG_Subtract ), QKeySequence( "Shift+U" ) );
+	GlobalCommands_insert( "CSGMerge", makeCallbackF( CSG_Merge ) );
+	GlobalCommands_insert( "CSGWrapMerge", FreeCaller<void(), CSG_WrapMerge>(), QKeySequence( "Ctrl+U" ) );
+	GlobalCommands_insert( "CSGIntersect", makeCallbackF( CSG_Intersect ), QKeySequence( "Ctrl+Shift+U" ) );
+	GlobalCommands_insert( "CSGroom", makeCallbackF( CSG_MakeRoom ) );
+	GlobalCommands_insert( "CSGTool", makeCallbackF( CSG_Tool ) );
 }

@@ -293,33 +293,33 @@ inline bool Tokeniser_nextTokenIsDigit( Tokeniser& tokeniser ){
 inline void CopiedString_importString( CopiedString& self, const char* string ){
 	self = string;
 }
-typedef ReferenceCaller1<CopiedString, const char*, CopiedString_importString> CopiedStringImportStringCaller;
+typedef ReferenceCaller<CopiedString, void(const char*), CopiedString_importString> CopiedStringImportStringCaller;
 inline void CopiedString_exportString( const CopiedString& self, const StringImportCallback& importer ){
 	importer( self.c_str() );
 }
-typedef ConstReferenceCaller1<CopiedString, const StringImportCallback&, CopiedString_exportString> CopiedStringExportStringCaller;
+typedef ConstReferenceCaller<CopiedString, void(const StringImportCallback&), CopiedString_exportString> CopiedStringExportStringCaller;
 
 inline void Bool_importString( bool& self, const char* string ){
 	self = string_equal( string, "true" );
 }
-typedef ReferenceCaller1<bool, const char*, Bool_importString> BoolImportStringCaller;
+typedef ReferenceCaller<bool, void(const char*), Bool_importString> BoolImportStringCaller;
 inline void Bool_exportString( const bool& self, const StringImportCallback& importer ){
 	importer( self ? "true" : "false" );
 }
-typedef ConstReferenceCaller1<bool, const StringImportCallback&, Bool_exportString> BoolExportStringCaller;
+typedef ConstReferenceCaller<bool, void(const StringImportCallback&), Bool_exportString> BoolExportStringCaller;
 
 inline void Int_importString( int& self, const char* string ){
 	if ( !string_parse_int( string, self ) ) {
 		self = 0;
 	}
 }
-typedef ReferenceCaller1<int, const char*, Int_importString> IntImportStringCaller;
+typedef ReferenceCaller<int, void(const char*), Int_importString> IntImportStringCaller;
 inline void Int_exportString( const int& self, const StringImportCallback& importer ){
 	char buffer[16];
 	sprintf( buffer, "%d", self );
 	importer( buffer );
 }
-typedef ConstReferenceCaller1<int, const StringImportCallback&, Int_exportString> IntExportStringCaller;
+typedef ConstReferenceCaller<int, void(const StringImportCallback&), Int_exportString> IntExportStringCaller;
 
 inline void Size_importString( std::size_t& self, const char* string ){
 	int i;
@@ -331,39 +331,39 @@ inline void Size_importString( std::size_t& self, const char* string ){
 		self = 0;
 	}
 }
-typedef ReferenceCaller1<std::size_t, const char*, Size_importString> SizeImportStringCaller;
+typedef ReferenceCaller<std::size_t, void(const char*), Size_importString> SizeImportStringCaller;
 inline void Size_exportString( const std::size_t& self, const StringImportCallback& importer ){
 	char buffer[16];
 	sprintf( buffer, "%u", Unsigned( self ) );
 	importer( buffer );
 }
-typedef ConstReferenceCaller1<std::size_t, const StringImportCallback&, Size_exportString> SizeExportStringCaller;
+typedef ConstReferenceCaller<std::size_t, void(const StringImportCallback&), Size_exportString> SizeExportStringCaller;
 
 inline void Float_importString( float& self, const char* string ){
 	if ( !string_parse_float( string, self ) ) {
 		self = 0;
 	}
 }
-typedef ReferenceCaller1<float, const char*, Float_importString> FloatImportStringCaller;
+typedef ReferenceCaller<float, void(const char*), Float_importString> FloatImportStringCaller;
 inline void Float_exportString( const float& self, const StringImportCallback& importer ){
 	char buffer[16];
 	sprintf( buffer, "%g", self );
 	importer( buffer );
 }
-typedef ConstReferenceCaller1<float, const StringImportCallback&, Float_exportString> FloatExportStringCaller;
+typedef ConstReferenceCaller<float, void(const StringImportCallback&), Float_exportString> FloatExportStringCaller;
 
 inline void Vector3_importString( Vector3& self, const char* string ){
 	if ( !string_parse_vector3( string, self ) ) {
 		self = Vector3( 0, 0, 0 );
 	}
 }
-typedef ReferenceCaller1<Vector3, const char*, Vector3_importString> Vector3ImportStringCaller;
+typedef ReferenceCaller<Vector3, void(const char*), Vector3_importString> Vector3ImportStringCaller;
 inline void Vector3_exportString( const Vector3& self, const StringImportCallback& importer ){
 	char buffer[64];
 	sprintf( buffer, "%g %g %g", self[0], self[1], self[2] );
 	importer( buffer );
 }
-typedef ConstReferenceCaller1<Vector3, const StringImportCallback&, Vector3_exportString> Vector3ExportStringCaller;
+typedef ConstReferenceCaller<Vector3, void(const StringImportCallback&), Vector3_exportString> Vector3ExportStringCaller;
 
 
 
@@ -393,17 +393,17 @@ public:
 inline void CopiedString_toString( const StringImportCallback& self, CopiedString value ){
 	CopiedString_exportString( value, self );
 }
-typedef ConstReferenceCaller1<StringImportCallback, CopiedString, CopiedString_toString> CopiedStringToString;
+typedef ConstReferenceCaller<StringImportCallback, void(CopiedString), CopiedString_toString> CopiedStringToString;
 
 
 template<typename Caller>
 inline StringImportCallback makeCopiedStringStringImportCallback( const Caller& caller ){
-	return StringImportCallback( caller.getEnvironment(), ImportConvert1<StringImportCallback::first_argument_type, Caller, CopiedStringFromString>::thunk );
+	return StringImportCallback( caller.getEnvironment(), ImportConvert1<get_argument<StringImportCallback, 0>, Caller, CopiedStringFromString>::thunk );
 }
 
 template<typename Caller>
 inline StringExportCallback makeCopiedStringStringExportCallback( const Caller& caller ){
-	return StringExportCallback( caller.getEnvironment(), ImportConvert1<StringExportCallback::first_argument_type, Caller, CopiedStringToString>::thunk );
+	return StringExportCallback( caller.getEnvironment(), ImportConvert1<get_argument<StringExportCallback, 0>, Caller, CopiedStringToString>::thunk );
 }
 
 
@@ -423,17 +423,17 @@ public:
 inline void Bool_toString( const StringImportCallback& self, bool value ){
 	Bool_exportString( value, self );
 }
-typedef ConstReferenceCaller1<StringImportCallback, bool, Bool_toString> BoolToString;
+typedef ConstReferenceCaller<StringImportCallback, void(bool), Bool_toString> BoolToString;
 
 
 template<typename Caller>
 inline StringImportCallback makeBoolStringImportCallback( const Caller& caller ){
-	return StringImportCallback( caller.getEnvironment(), ImportConvert1<StringImportCallback::first_argument_type, Caller, BoolFromString>::thunk );
+	return StringImportCallback( caller.getEnvironment(), ImportConvert1<get_argument<StringImportCallback, 0>, Caller, BoolFromString>::thunk );
 }
 
 template<typename Caller>
 inline StringExportCallback makeBoolStringExportCallback( const Caller& caller ){
-	return StringExportCallback( caller.getEnvironment(), ImportConvert1<StringExportCallback::first_argument_type, Caller, BoolToString>::thunk );
+	return StringExportCallback( caller.getEnvironment(), ImportConvert1<get_argument<StringExportCallback, 0>, Caller, BoolToString>::thunk );
 }
 
 
@@ -453,17 +453,17 @@ public:
 inline void Int_toString( const StringImportCallback& self, int value ){
 	Int_exportString( value, self );
 }
-typedef ConstReferenceCaller1<StringImportCallback, int, Int_toString> IntToString;
+typedef ConstReferenceCaller<StringImportCallback, void(int), Int_toString> IntToString;
 
 
 template<typename Caller>
 inline StringImportCallback makeIntStringImportCallback( const Caller& caller ){
-	return StringImportCallback( caller.getEnvironment(), ImportConvert1<StringImportCallback::first_argument_type, Caller, IntFromString>::thunk );
+	return StringImportCallback( caller.getEnvironment(), ImportConvert1<get_argument<StringImportCallback, 0>, Caller, IntFromString>::thunk );
 }
 
 template<typename Caller>
 inline StringExportCallback makeIntStringExportCallback( const Caller& caller ){
-	return StringExportCallback( caller.getEnvironment(), ImportConvert1<StringExportCallback::first_argument_type, Caller, IntToString>::thunk );
+	return StringExportCallback( caller.getEnvironment(), ImportConvert1<get_argument<StringExportCallback, 0>, Caller, IntToString>::thunk );
 }
 
 
@@ -484,15 +484,15 @@ public:
 inline void Size_toString( const StringImportCallback& self, std::size_t value ){
 	Size_exportString( value, self );
 }
-typedef ConstReferenceCaller1<StringImportCallback, std::size_t, Size_toString> SizeToString;
+typedef ConstReferenceCaller<StringImportCallback, void(std::size_t), Size_toString> SizeToString;
 
 
 template<typename Caller>
 inline StringImportCallback makeSizeStringImportCallback( const Caller& caller ){
-	return StringImportCallback( caller.getEnvironment(), ImportConvert1<StringImportCallback::first_argument_type, Caller, SizeFromString>::thunk );
+	return StringImportCallback( caller.getEnvironment(), ImportConvert1<get_argument<StringImportCallback, 0>, Caller, SizeFromString>::thunk );
 }
 
 template<typename Caller>
 inline StringExportCallback makeSizeStringExportCallback( const Caller& caller ){
-	return StringExportCallback( caller.getEnvironment(), ImportConvert1<StringExportCallback::first_argument_type, Caller, SizeToString>::thunk );
+	return StringExportCallback( caller.getEnvironment(), ImportConvert1<get_argument<StringExportCallback, 0>, Caller, SizeToString>::thunk );
 }

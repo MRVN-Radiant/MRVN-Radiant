@@ -273,7 +273,7 @@ void Pointfile_Parse( CPointfile& pointfile ){
 	while ( *data )
 	{
 		Vector3 v;
-		if ( sscanf( data,"%f %f %f", &v[0], &v[1], &v[2] ) != 3 ) {
+		if ( sscanf( data, "%f %f %f", &v[0], &v[1], &v[2] ) != 3 ) {
 			globalWarningStream() << "Corrupt point file, line " << line << '\n';
 			break;
 		}
@@ -287,7 +287,7 @@ void Pointfile_Parse( CPointfile& pointfile ){
 		}
 		// deal with zhlt style point files.
 		if ( *data == '-' ) {
-			if ( sscanf( data,"- %f %f %f", &v[0], &v[1], &v[2] ) != 3 ) {
+			if ( sscanf( data, "- %f %f %f", &v[0], &v[1], &v[2] ) != 3 ) {
 				globalWarningStream() << "Corrupt point file, line " << line << '\n';
 				break;
 			}
@@ -322,9 +322,9 @@ void Pointfile_Construct(){
 
 	GlobalShaderCache().attachRenderable( s_pointfile );
 
-	GlobalCommands_insert( "TogglePointfile", FreeCaller<Pointfile_Toggle>() );
-	GlobalCommands_insert( "NextLeakSpot", FreeCaller<Pointfile_Next>(), QKeySequence( "Ctrl+Shift+K" ) );
-	GlobalCommands_insert( "PrevLeakSpot", FreeCaller<Pointfile_Prev>(), QKeySequence( "Ctrl+Shift+L" ) );
+	GlobalCommands_insert( "TogglePointfile", makeCallbackF( Pointfile_Toggle ) );
+	GlobalCommands_insert( "NextLeakSpot", makeCallbackF( Pointfile_Next ), QKeySequence( "Ctrl+Shift+K" ) );
+	GlobalCommands_insert( "PrevLeakSpot", makeCallbackF( Pointfile_Prev ), QKeySequence( "Ctrl+Shift+L" ) );
 }
 
 void Pointfile_Destroy(){

@@ -536,7 +536,7 @@ void Titanfall2::EmitEntity(const entity_t &e) {
     }
     data << "}\n";
 
-    std::vector<char> str = { data.begin(), data.end() };
+    std::vector<char> str = { data.cbegin(), data.cend() };
 
     #define ENT_APPEND(x)  Titanfall::Ent::x.insert(Titanfall::Ent::x.end(), str.begin(), str.end()); break
     switch (dest) {
@@ -635,13 +635,13 @@ void Titanfall2::EmitStubs() {
             0x94, 0xEB, 0x60, 0xB9, 0xB5, 0x1A, 0xA2, 0xB7, 0x38, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x3F
         };
-        Titanfall2::Bsp::worldLights_stub = { data.begin(), data.end() };
+        Titanfall2::Bsp::worldLights_stub = { data.cbegin(), data.cend() };
     }
     {  // LightMap Headers
         constexpr std::array<uint8_t, 8> data = {
             0x01, 0x00, 0x00, 0x00, 0x00, 0x02, 0x80, 0x00
         };
-        Titanfall2::Bsp::lightMapHeaders_stub = { data.begin(), data.end() };
+        Titanfall2::Bsp::lightMapHeaders_stub = { data.cbegin(), data.cend() };
     }
     {  // LightMap Data Sky
         for (std::size_t i = 0; i < 524288; i++) {

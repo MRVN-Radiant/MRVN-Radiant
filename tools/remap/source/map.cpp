@@ -167,23 +167,23 @@ bool SnapNormal( Vector3& normal ){
 
 
 	/*
-	for ( i=0; i<30; i++ )
+	for ( i = 0; i < 30; i++ )
 	{
 		double x, y, z, length;
 		x=(double) 1.0;
 		y=(double) ( 0.00001 * i );
 		z=(double) 0.0;
 
-		Sys_Printf("(%6.18f %6.18f %6.18f)inNormal\n", x,y,z );
+		Sys_Printf( "(%6.18f %6.18f %6.18f)inNormal\n", x, y, z );
 
 		length = sqrt( ( x * x ) + ( y * y ) + ( z * z ) );
-		Sys_Printf("(%6.18f)length\n", length);
+		Sys_Printf( "(%6.18f)length\n", length );
 		x = (vec_t) ( x / length );
 		y = (vec_t) ( y / length );
 		z = (vec_t) ( z / length );
-		Sys_Printf("(%6.18f %6.18f %6.18f)outNormal\n\n", x,y,z );
+		Sys_Printf( "(%6.18f %6.18f %6.18f)outNormal\n\n", x, y, z );
 	}
-	Error("vectorNormalize test completed");
+	Error( "vectorNormalize test completed" );
 	*/
 
 	for ( i = 0; i < 3; i++ )
@@ -496,10 +496,10 @@ static void SetBrushContents( brush_t& b ){
 		else if ( s->compileFlags & C_FOG ){
 			b.contentShader = s->shaderInfo;
 		}
-		//else if ( b.contentShader->contentFlags & GetRequiredSurfaceParm( "playerclip"_Tstring ).contentFlags ){
+		//else if ( b.contentShader->contentFlags & GetRequiredSurfaceParm<"playerclip">().contentFlags ){
 		//	continue;
 		//}
-		//else if ( s->contentFlags & GetRequiredSurfaceParm( "playerclip"_Tstring ).contentFlags ){
+		//else if ( s->contentFlags & GetRequiredSurfaceParm<"playerclip">().contentFlags ){
 		//	b.contentShader = s->shaderInfo;
 		//}
 		else if (!( b.contentShader->compileFlags & C_SOLID )){
@@ -1003,7 +1003,7 @@ static void ParseRawBrush( bool onlyLights ){
 
 		/* read shader name */
 		GetToken( false );
-		const auto shader = String512()( "textures/", token );
+		const String64 shader( "textures/", token );
 
 		/* set default flags and values */
 		shaderInfo_t *si = onlyLights? &shaderInfo[ 0 ]
@@ -1441,7 +1441,7 @@ static void LoadEntityIndexMap( entity_t& e ){
 			if ( space == NULL ) {
 				space = offset + strlen( offset );
 			}
-			im->offsets[ i ] = atof( String512()( StringRange( offset, space ) ) );
+			im->offsets[ i ] = atof( String64( StringRange( offset, space ) ) );
 			if ( space == NULL ) {
 				break;
 			}
@@ -1577,7 +1577,7 @@ static bool ParseMapEntity( bool onlyLights, bool noCollapseGroups, int mapEntit
 	const char *value;
 	if( mapEnt.read_keyvalue( value, "_celshader" ) ||
 	    entities[ 0 ].read_keyvalue( value, "_celshader" ) ){
-		celShader = ShaderInfoForShader( String512()( "textures/", value ) );
+		celShader = ShaderInfoForShader( String64( "textures/", value ) );
 		Sys_Printf( "Entity %d (%s) has cel shader %s\n", mapEnt.mapEntityNum, classname, celShader->shader.c_str() );
 	}
 	else{

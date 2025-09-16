@@ -223,7 +223,7 @@ class Model :
 
 	AABB m_aabb_local;
 public:
-	Callback m_lightsChanged;
+	Callback<void()> m_lightsChanged;
 
 	~Model(){
 		for ( surfaces_t::iterator i = m_surfaces.begin(); i != m_surfaces.end(); ++i )
@@ -333,7 +333,7 @@ public:
 	void lightsChanged(){
 		m_lightList->lightsChanged();
 	}
-	typedef MemberCaller<ModelInstance, &ModelInstance::lightsChanged> LightsChangedCaller;
+	typedef MemberCaller<ModelInstance, void(), &ModelInstance::lightsChanged> LightsChangedCaller;
 
 	void constructRemaps(){
 		ModelSkin* skin = NodeTypeCast<ModelSkin>::cast( path().parent() );
@@ -384,9 +384,9 @@ public:
 	~ModelInstance(){
 		destroyRemaps();
 
-		Instance::setTransformChangedCallback( Callback() );
+		Instance::setTransformChangedCallback( Callback<void()>() );
 
-		m_model.m_lightsChanged = Callback();
+		m_model.m_lightsChanged = Callback<void()>();
 		GlobalShaderCache().detach( *this );
 	}
 
@@ -521,8 +521,7 @@ inline void Model_constructNull( Model& model ){
 
 	AABB aabb( Vector3( 0, 0, 0 ), Vector3( 8, 8, 8 ) );
 
-	Vector3 points[8];
-	aabb_corners( aabb, points );
+	const std::array<Vector3, 8> points = aabb_corners( aabb );
 
 	surface.vertices().reserve( 24 );
 

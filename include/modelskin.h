@@ -22,7 +22,7 @@
 #pragma once
 
 #include "generic/constant.h"
-#include "generic/callbackfwd.h"
+#include "generic/callback.h"
 
 class SkinRemap
 {
@@ -33,7 +33,7 @@ public:
 	}
 };
 
-typedef Callback1<SkinRemap> SkinRemapCallback;
+typedef Callback<void(SkinRemap)> SkinRemapCallback;
 class ModuleObserver;
 
 class ModelSkin

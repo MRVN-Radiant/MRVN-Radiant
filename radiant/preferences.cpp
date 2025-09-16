@@ -179,7 +179,7 @@ bool Preferences_Save( PreferenceDictionary& preferences, const char* filename )
 }
 
 bool Preferences_Save_Safe( PreferenceDictionary& preferences, const char* filename ){
-	const auto tmpName = StringOutputStream()( filename, "TMP" );
+	const auto tmpName = StringStream( filename, "TMP" );
 	return Preferences_Save( preferences, tmpName ) && file_move( tmpName, filename );
 }
 
@@ -188,7 +188,7 @@ void LogConsole_importString( const char* string ){
 	g_Console_enableLogging = string_equal( string, "true" );
 	Sys_LogFile( g_Console_enableLogging );
 }
-typedef FreeCaller1<const char*, LogConsole_importString> LogConsoleImportStringCaller;
+typedef FreeCaller<void(const char*), LogConsole_importString> LogConsoleImportStringCaller;
 
 
 void RegisterGlobalPreferences( PreferenceSystem& preferences ){
@@ -218,7 +218,7 @@ void CGameDialog::LoadPrefs(){
 void CGameDialog::SavePrefs(){
 	const auto strGlobalPref = StringStream( g_Preferences.m_global_rc_path, "global.pref" );
 
-	globalOutputStream() << "saving global preferences to " << strGlobalPref << "\n";
+	globalOutputStream() << "saving global preferences to " << strGlobalPref << '\n';
 
 	if ( !Preferences_Save_Safe( g_global_preferences, strGlobalPref ) ) {
 		globalOutputStream() << "failed to save global preferences to " << strGlobalPref << '\n';
@@ -279,9 +279,9 @@ void CGameDialog::CreateGlobalFrame( PreferencesPage& page, bool global ){
 	    "Select the game",
 	    StringArrayRange( games ),
 	    global?
-	    IntImportCallback( MemberCaller1<CGameDialog, int, &CGameDialog::GameFileAssign>( *this ) ):
-	    IntImportCallback( MemberCaller1<CGameDialog, int, &CGameDialog::GameFileImport>( *this ) ),
-	    ConstMemberCaller1<CGameDialog, const IntImportCallback&, &CGameDialog::GameFileExport>( *this )
+	    IntImportCallback( MemberCaller<CGameDialog, void(int), &CGameDialog::GameFileAssign>( *this ) ):
+	    IntImportCallback( MemberCaller<CGameDialog, void(int), &CGameDialog::GameFileImport>( *this ) ),
+	    ConstMemberCaller<CGameDialog, void(const IntImportCallback&), &CGameDialog::GameFileExport>( *this )
 	);
 	page.appendCheckBox( "Startup", "Show Global Preferences", m_bGamePrompt );
 }
@@ -312,32 +312,6 @@ void CGameDialog::BuildDialog(){
 	}
 }
 
-class LoadGameFile
-{
-	std::list<CGameDescription*>& mGames;
-	const char* mPath;
-public:
-	LoadGameFile( std::list<CGameDescription*>& games, const char* path ) : mGames( games ), mPath( path ){
-	}
-	void operator()( const char* name ) const {
-		if ( !path_extension_is( name, "game" ) ) {
-			return;
-		}
-		const auto strPath = StringStream( mPath, name );
-		globalOutputStream() << strPath << '\n';
-
-		xmlDocPtr pDoc = xmlParseFile( strPath );
-		if ( pDoc ) {
-			mGames.push_back( new CGameDescription( pDoc, name ) );
-			xmlFreeDoc( pDoc );
-		}
-		else
-		{
-			globalErrorStream() << "XML parser failed on '" << strPath << "'\n";
-		}
-	}
-};
-
 void CGameDialog::ScanForGames(){
 	const auto path = StringStream( AppPath_get(), "gamepacks/games/" );
 
@@ -352,7 +326,23 @@ void CGameDialog::ScanForGames(){
 	   (if that's really needed)
 	 */
 
-	Directory_forEach( path, LoadGameFile( mGames, path ) );
+	Directory_forEach( path, [&]( const char *name ){
+		if ( !path_extension_is( name, "game" ) ) {
+			return;
+		}
+		const auto strPath = StringStream( path, name );
+		globalOutputStream() << strPath << '\n';
+
+		xmlDocPtr pDoc = xmlParseFile( strPath );
+		if ( pDoc ) {
+			mGames.push_back( new CGameDescription( pDoc, name ) );
+			xmlFreeDoc( pDoc );
+		}
+		else
+		{
+			globalErrorStream() << "XML parser failed on '" << strPath << "'\n";
+		}
+	});
 }
 
 void CGameDialog::InitGlobalPrefPath(){
@@ -617,7 +607,7 @@ public:
 };
 
 void PrefsDlg::BuildDialog(){
-	PreferencesDialog_addInterfacePreferences( FreeCaller1<PreferencesPage&, Interface_constructPreferences>() );
+	PreferencesDialog_addInterfacePreferences( makeCallbackF( Interface_constructPreferences ) );
 
 	GetWidget()->setWindowTitle( "NetRadiant Preferences" );
 
@@ -845,20 +835,20 @@ void PreferencesDialog_showDialog(){
 void GameName_importString( const char* value ){
 	gamename_set( value );
 }
-typedef FreeCaller1<const char*, GameName_importString> GameNameImportStringCaller;
+typedef FreeCaller<void(const char*), GameName_importString> GameNameImportStringCaller;
 void GameName_exportString( const StringImportCallback& importer ){
 	importer( gamename_get() );
 }
-typedef FreeCaller1<const StringImportCallback&, GameName_exportString> GameNameExportStringCaller;
+typedef FreeCaller<void(const StringImportCallback&), GameName_exportString> GameNameExportStringCaller;
 
 void GameMode_importString( const char* value ){
 	gamemode_set( value );
 }
-typedef FreeCaller1<const char*, GameMode_importString> GameModeImportStringCaller;
+typedef FreeCaller<void(const char*), GameMode_importString> GameModeImportStringCaller;
 void GameMode_exportString( const StringImportCallback& importer ){
 	importer( gamemode_get() );
 }
-typedef FreeCaller1<const StringImportCallback&, GameMode_exportString> GameModeExportStringCaller;
+typedef FreeCaller<void(const StringImportCallback&), GameMode_exportString> GameModeExportStringCaller;
 
 
 void RegisterPreferences( PreferenceSystem& preferences ){

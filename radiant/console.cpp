@@ -28,7 +28,6 @@
 #include "gtkutil/menu.h"
 #include "gtkutil/nonmodal.h"
 #include "stream/stringstream.h"
-#include "convert.h"
 
 #include "version.h"
 #include "aboutmsg.h"
@@ -37,6 +36,11 @@
 
 #include <QPlainTextEdit>
 #include <QContextMenuEvent>
+
+
+#ifndef WIN32
+#include <unistd.h> // write()
+#endif
 
 // handle to the console log file
 namespace
@@ -173,14 +177,7 @@ std::size_t Sys_Print( int level, const char* buf, std::size_t length ){
 
 			{
 				GtkTextBufferOutputStream textBuffer( g_console );
-				if ( !globalCharacterSet().isUTF8() ) {
-					BufferedTextOutputStream<GtkTextBufferOutputStream> buffered( textBuffer );
-					buffered << StringRange( buf, length );
-				}
-				else
-				{
-					textBuffer << StringRange( buf, length );
-				}
+				textBuffer << StringRange( buf, length );
 			}
 
  			if ( contains_newline ) {

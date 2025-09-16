@@ -70,6 +70,7 @@
 #include "bitflags.h"
 #include <list>
 #include <forward_list>
+#include <algorithm>
 #include "qmath.h"
 
 #include <cstddef>
@@ -277,6 +278,9 @@ struct bspDrawVert_t {
     Color4b  color[MAX_LIGHTMAPS];  /* RBSP */
 };
 
+using TriRef = std::array<const bspDrawVert_t *, 3>;
+using QuadRef = std::array<const bspDrawVert_t *, 4>;
+
 
 enum bspSurfaceType_t {
     MST_BAD,
@@ -419,7 +423,7 @@ enum class EImplicitMap {
 
 
 struct shaderInfo_t {
-    String512                  shader;
+    String64                  shader;
     int                        surfaceFlags;
     int                        contentFlags;
     int                        compileFlags;
@@ -489,16 +493,16 @@ struct shaderInfo_t {
 
     float                      vertexScale;           /* vertex light scale */
 
-    String512                  skyParmsImageBase;     /* ydnar: for skies */
+    String64                  skyParmsImageBase;     /* ydnar: for skies */
 
-    String512                  editorImagePath;       /* use this image to generate texture coordinates */
-    String512                  lightImagePath;        /* use this image to generate color / averageColor */
-    String512                  normalImagePath;       /* ydnar: normalmap image for bumpmapping */
+    String64                  editorImagePath;       /* use this image to generate texture coordinates */
+    String64                  lightImagePath;        /* use this image to generate color / averageColor */
+    String64                  normalImagePath;       /* ydnar: normalmap image for bumpmapping */
 
-    String512                  baseTexture2Path;
+    String64                  baseTexture2Path;
 
     EImplicitMap               implicitMap;           /* ydnar: enemy territory implicit shaders */
-    String512                  implicitImagePath;
+    String64                  implicitImagePath;
 
     const image_t             *shaderImage;
     const image_t             *lightImage;
@@ -600,7 +604,7 @@ struct indexMap_t {
     int        w;
     int        h;
     int        numLayers;
-    String512  shader;
+    String64  shader;
     float      offsets[256];
     byte      *pixels;
 };
@@ -1318,7 +1322,7 @@ void FilterStructuralBrushesIntoTree(const entity_t &e, tree_t &tree);
 bool WindingIsTiny(const winding_t &w);
 
 /* mesh.c */
-void LerpDrawVert(const bspDrawVert_t *a, const bspDrawVert_t *b, bspDrawVert_t *out);
+bspDrawVert_t LerpDrawVert( const bspDrawVert_t &a, const bspDrawVert_t &b );
 void LerpDrawVertAmount(bspDrawVert_t *a, bspDrawVert_t *b, float amount, bspDrawVert_t *out);
 void FreeMesh(mesh_t *m);
 mesh_t *CopyMesh(mesh_t *mesh);
@@ -1419,26 +1423,24 @@ void InsertModel(const char *name, const char *skin, int frame, const Matrix4 &t
 void AddTriangleModels(entity_t &eparent);
 
 /* surface.c */
-mapDrawSurface_t *AllocDrawSurface(ESurfaceType type);
-void StripFaceSurface(mapDrawSurface_t *ds);
-void MaxAreaFaceSurface(mapDrawSurface_t *ds);
-Vector3 CalcLightmapAxis(const Vector3 &normal);
-void ClassifySurfaces(int numSurfs, mapDrawSurface_t *ds);
-void ClassifyEntitySurfaces(const entity_t &e);
-void TidyEntitySurfaces(const entity_t &e);
-mapDrawSurface_t *CloneSurface(mapDrawSurface_t *src, shaderInfo_t *si);
-bool IsTriangleDegenerate(bspDrawVert_t *points, int a, int b, int c);
-void ClearSurface(mapDrawSurface_t *ds);
-mapDrawSurface_t *DrawSurfaceForSide(const entity_t &e, const brush_t &b, const side_t &s, const winding_t &w);
-mapDrawSurface_t *DrawSurfaceForMesh(const entity_t &e, parseMesh_t *p, mesh_t *mesh);
-mapDrawSurface_t *DrawSurfaceForFlare(int entNum, const Vector3 &origin, const Vector3 &normal,
-                                      const Vector3 &color, const char *flareShader, int lightStyle);
-void ClipSidesIntoTree(entity_t &e, const tree_t &tree);
-void MakeDebugPortalSurfs(const tree_t &tree);
-void MakeFogHullSurfs(const char *shader);
-void SubdivideFaceSurfaces(const entity_t &e);
-void AddEntitySurfaceModels(entity_t &e);
-void FilterDrawsurfsIntoTree(entity_t &e, tree_t &tree);
+mapDrawSurface_t            *AllocDrawSurface( ESurfaceType type );
+void                        StripFaceSurface( mapDrawSurface_t *ds );
+void                        MaxAreaFaceSurface( mapDrawSurface_t *ds );
+Vector3                     CalcLightmapAxis( const Vector3& normal );
+void                        ClassifySurfaces( int numSurfs, mapDrawSurface_t *ds );
+void                        ClassifyEntitySurfaces( const entity_t& e );
+void                        TidyEntitySurfaces( const entity_t& e );
+mapDrawSurface_t            *CloneSurface( mapDrawSurface_t *src, shaderInfo_t *si );
+void                        ClearSurface( mapDrawSurface_t *ds );
+mapDrawSurface_t            *DrawSurfaceForSide( const entity_t& e, const brush_t& b, const side_t& s, const winding_t& w );
+mapDrawSurface_t            *DrawSurfaceForMesh( const entity_t& e, parseMesh_t *p, mesh_t *mesh );
+mapDrawSurface_t            *DrawSurfaceForFlare( int entNum, const Vector3& origin, const Vector3& normal, const Vector3& color, const char *flareShader, int lightStyle );
+void                        ClipSidesIntoTree( entity_t& e, const tree_t& tree );
+void                        MakeDebugPortalSurfs( const tree_t& tree );
+void                        MakeFogHullSurfs( const char *shader );
+void                        SubdivideFaceSurfaces( const entity_t& e );
+void                        AddEntitySurfaceModels( entity_t& e );
+void                        FilterDrawsurfsIntoTree( entity_t& e, tree_t& tree );
 
 /* surface_fur.c */
 void Fur(mapDrawSurface_t *src);
@@ -1528,20 +1530,24 @@ void TCMod(const tcMod_t &mod, Vector2 &st);
 bool ApplyShaderType( const char *name, int *surfaceFlags, int *contentFlags, int *compileFlags );
 bool ApplyShaderFlag( const char *name, int *surfaceFlags, int *contentFlags, int *compileFlags );
 
-// Encode the string as a type
-//template <char... chars>
-//using TemplateString = std::integer_sequence<char, chars...>;
-// Create a user defined literal operator
-//template <typename T, T... chars>
-//constexpr TemplateString<chars...> operator""_Tstring() { return { }; }
+// Encode the string as a structural literal class type
+/*template <std::size_t N>
+struct TemplateString
+{
+    consteval TemplateString( const char( &string )[N] ) {
+        std::copy_n( string, N, m_data );
+        ENSURE( string[N - 1] == '\0' && "TemplateString must be null-terminated" ); // consteval ensures this is evaluated at compile time, despite not being a static_assert
+    }
+    char m_data[N];
+};
 /// \brief returns statically evaluated \c surfaceParm_t for the given name or emits \c Error
-//template<char... chars>
-//const surfaceParm_t &GetRequiredSurfaceParm(const TemplateString<chars...>) {
-//    static constexpr char  str[sizeof...(chars) + 1] = { chars..., '\0' };  // Recover the character data
-//        static const  surfaceParm_t *const sp = GetSurfaceParm(str);
-//        ENSURE(sp != nullptr);
-//    return *sp;
-//}
+
+template<TemplateString string>
+const surfaceParm_t &GetRequiredSurfaceParm() {
+    static const surfaceParm_t *const sp = GetSurfaceParm( string.m_data ); // null-termination ensured in constructor
+    ENSURE( sp != nullptr );
+    return *sp;
+}*/
 
 void BeginMapShaderFile(const char *mapFile);
 void WriteMapShaderFile();
@@ -1580,7 +1586,7 @@ void InjectCommandLine(const char *stage, const std::vector<const char*> &args);
 inline shaderInfo_t *shaderInfo;
 inline int           numShaderInfo;
 
-inline String512     mapName;  /* ydnar: per-map custom shaders for larger lightmaps */
+inline String64     mapName;  /* ydnar: per-map custom shaders for larger lightmaps */
 inline CopiedString  mapShaderFile;
 
 /* can't code */
@@ -1618,6 +1624,7 @@ inline int        maxSurfaceVerts = 999;     /* ydnar */
 inline int        maxSurfaceIndexes = 6000;  /* ydnar */
 inline float      npDegrees;                 /* ydnar: nonplanar degrees */
 inline int        bevelSnap;                 /* ydnar: bevel plane snap */
+inline bool       g_brushSnap = true;
 inline bool       flat;
 inline bool       meta;
 inline bool       patchMeta;
@@ -1630,7 +1637,7 @@ inline float      clipDepthGlobal = 2.0f;
 inline int        metaAdequateScore = -1;
 inline int        metaGoodScore = -1;
 inline bool       g_noob;
-inline String512  globalCelShader;
+inline String64  globalCelShader;
 inline bool       keepLights;
 
 inline bool  g_bExternalModels;
@@ -1959,16 +1966,6 @@ inline std::vector<int>             bspDrawIndexes;
 #define CHECK_FLAG(value, flag) (value & flag) == flag
 #define REMOVE_FLAG(value, flag) value &= ~flag
 
-#define AUTOEXPAND_BY_REALLOC(ptr, reqitem, allocated, def)\
-    do {\
-        if (reqitem >= allocated) {\
-            if (allocated == 0)                       { allocated = def; }\
-            while (reqitem >= allocated && allocated) { allocated *= 2; }\
-            if (!allocated || allocated > 2147483647 / (int)sizeof(*ptr)) { Error(#ptr " over 2 GB"); }\
-            ptr = void_ptr(realloc(ptr, sizeof(*ptr) * allocated));\
-            if (!ptr) { Error(#ptr " out of memory"); }\
-        }\
-    } while (0)
 
 #define AUTOEXPAND_BY_REALLOC_ADD(ptr, used, allocated, add) \
     do {\

@@ -117,7 +117,7 @@ public:
 		m_name = name;
 		construct();
 	}
-	typedef MemberCaller1<NameObserver, const char*, &NameObserver::nameChanged> NameChangedCaller;
+	typedef MemberCaller<NameObserver, void(const char*), &NameObserver::nameChanged> NameChangedCaller;
 };
 
 class BasicNamespace : public Namespace
@@ -1539,11 +1539,11 @@ tryDecompile:
 	if ( path_extension_is( filename, "bsp" ) || path_extension_is( filename, "map" ) ) {
 		StringOutputStream str( 256 );
 		str << AppPath_get() << "q3map2." << RADIANT_EXECUTABLE
-			<< " -v -game " << ((type && *type) ? type : "quake3")
-			<< " -fs_basepath " << makeQuoted(EnginePath_get())
-			<< " -fs_homepath " << makeQuoted(g_qeglobals.m_userEnginePath)
-			<< " -fs_game " << gamename_get()
-			<< " -convert -format " << (BrushType_getTexdefType(GlobalBrushCreator().getFormat()) == TEXDEFTYPEID_QUAKE ? "map" : "map_bp");
+		<< " -v -game " << ((type && *type) ? type : "quake3")
+		<< " -fs_basepath " << makeQuoted(EnginePath_get())
+		<< " -fs_homepath " << makeQuoted(g_qeglobals.m_userEnginePath)
+		<< " -fs_game " << gamename_get()
+		<< " -convert -format " << (BrushType_getTexdefType(GlobalBrushCreator().getFormat()) == TEXDEFTYPEID_QUAKE ? "map" : "map_bp");
 		if ( path_extension_is( filename, "map" ) ) {
 			str << " -readmap ";
 		}
@@ -1929,7 +1929,7 @@ void Scene_FindEntityBrush( std::size_t entity, std::size_t brush, scene::Path& 
 	path.push( makeReference( GlobalSceneGraph().root() ) );
 
 	Node_getTraversable( path.top() )->traverse( EntityFindByIndexWalker( entity, path ) );
-	
+
 	if ( path.size() == 2 ) {
 		scene::Traversable* traversable = Node_getTraversable( path.top() );
 		if ( traversable != 0 ) {
@@ -2166,8 +2166,8 @@ void map_autocaulk_selected(){
 		file << "\n}\n";
 		// spawn
 		file << "{\n"
-		        "\"classname\" \"info_player_start\'\n'
-		        "\"origin\" \"" << spawn[0] << ' ' << spawn[1] << ' ' << spawn[2] << "\'\n'
+		        "\"classname\" \"info_player_start\"\n"
+		        "\"origin\" \"" << spawn[0] << ' ' << spawn[1] << ' ' << spawn[2] << "\"\n"
 		        "}\n";
 		// point entities
 		const MapFormat& format = MapFormat_forFile( filename );
@@ -2378,31 +2378,31 @@ MapModuleObserver g_MapModuleObserver;
 #include "preferencesystem.h"
 
 CopiedString g_strLastMap;
-bool g_bLoadLastMap = false;
+bool g_bLoadLastMap = true;
 
 void Map_Construct(){
-	GlobalCommands_insert( "NewMap", FreeCaller<NewMap>() );
-	GlobalCommands_insert( "OpenMap", FreeCaller<OpenMap>(), QKeySequence( "Ctrl+O" ) );
-	GlobalCommands_insert( "ImportMap", FreeCaller<ImportMap>() );
-	GlobalCommands_insert( "SaveMap", FreeCaller<SaveMap>(), QKeySequence( "Ctrl+S" ) );
-	GlobalCommands_insert( "SaveMapAs", FreeCaller<SaveMapAs>() );
-	GlobalCommands_insert( "SaveSelected", FreeCaller<ExportMap>() );
-	GlobalCommands_insert( "SaveRegion", FreeCaller<SaveRegion>() );
+	GlobalCommands_insert( "NewMap", makeCallbackF( NewMap ) );
+	GlobalCommands_insert( "OpenMap", makeCallbackF( OpenMap ), QKeySequence( "Ctrl+O" ) );
+	GlobalCommands_insert( "ImportMap", makeCallbackF( ImportMap ) );
+	GlobalCommands_insert( "SaveMap", makeCallbackF( SaveMap ), QKeySequence( "Ctrl+S" ) );
+	GlobalCommands_insert( "SaveMapAs", makeCallbackF( SaveMapAs ) );
+	GlobalCommands_insert( "SaveSelected", makeCallbackF( ExportMap ) );
+	GlobalCommands_insert( "SaveRegion", makeCallbackF( SaveRegion ) );
 
-	GlobalCommands_insert( "RegionOff", FreeCaller<RegionOff>() );
-	GlobalCommands_insert( "RegionSetXY", FreeCaller<RegionXY>() );
-	GlobalCommands_insert( "RegionSetBrush", FreeCaller<RegionBrush>() );
-	//GlobalCommands_insert( "RegionSetSelection", FreeCaller<RegionSelected>(), QKeySequence( "Ctrl+Shift+R" ) );
-	GlobalToggles_insert( "RegionSetSelection", FreeCaller<RegionSelected>(), ToggleItem::AddCallbackCaller( g_region_item ), QKeySequence( "Ctrl+Shift+R" ) );
-	GlobalCommands_insert( "AutoCaulkSelected", FreeCaller<map_autocaulk_selected>(), QKeySequence( "F4" ) );
+	GlobalCommands_insert( "RegionOff", makeCallbackF( RegionOff ) );
+	GlobalCommands_insert( "RegionSetXY", makeCallbackF( RegionXY ) );
+	GlobalCommands_insert( "RegionSetBrush", makeCallbackF( RegionBrush ) );
+	//GlobalCommands_insert( "RegionSetSelection", makeCallbackF( RegionSelected ), QKeySequence( "Ctrl+Shift+R" ) );
+	GlobalToggles_insert( "RegionSetSelection", makeCallbackF( RegionSelected ), ToggleItem::AddCallbackCaller( g_region_item ), QKeySequence( "Ctrl+Shift+R" ) );
+	GlobalCommands_insert( "AutoCaulkSelected", makeCallbackF( map_autocaulk_selected ), QKeySequence( "F4" ) );
 
-	GlobalCommands_insert( "FindBrush", FreeCaller<DoFind>() );
-	GlobalCommands_insert( "MapInfo", FreeCaller<DoMapInfo>(), QKeySequence( "M" ) );
+	GlobalCommands_insert( "FindBrush", makeCallbackF( DoFind ) );
+	GlobalCommands_insert( "MapInfo", makeCallbackF( DoMapInfo ), QKeySequence( "M" ) );
 
 	GlobalPreferenceSystem().registerPreference( "LastMap", CopiedStringImportStringCaller( g_strLastMap ), CopiedStringExportStringCaller( g_strLastMap ) );
 	GlobalPreferenceSystem().registerPreference( "LoadLastMap", BoolImportStringCaller( g_bLoadLastMap ), BoolExportStringCaller( g_bLoadLastMap ) );
 
-	PreferencesDialog_addSettingsPreferences( FreeCaller1<PreferencesPage&, Map_constructPreferences>() );
+	PreferencesDialog_addSettingsPreferences( makeCallbackF( Map_constructPreferences ) );
 
 	GlobalEntityClassManager().attach( g_MapEntityClasses );
 	Radiant_attachHomePathsObserver( g_MapModuleObserver );

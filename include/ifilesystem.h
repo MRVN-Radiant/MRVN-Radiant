@@ -23,10 +23,10 @@
 
 #include <cstddef>
 #include "generic/constant.h"
-#include "generic/callbackfwd.h"
+#include "generic/callback.h"
 
-typedef Callback1<const char*> ArchiveNameCallback;
-typedef Callback1<const char*> FileNameCallback;
+typedef Callback<void(const char*)> ArchiveNameCallback;
+typedef Callback<void(const char*)> FileNameCallback;
 
 class ArchiveFile;
 class ArchiveTextFile;

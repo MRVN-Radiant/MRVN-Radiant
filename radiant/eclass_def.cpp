@@ -70,7 +70,6 @@ StaticRegisterModule staticRegisterEclassDef( StaticEclassDefModule::instance() 
 
 
 char com_token[1024];
-bool com_eof;
 
 /*
    ==============
@@ -95,7 +94,6 @@ skipwhite:
 	while ( ( c = *data ) <= ' ' )
 	{
 		if ( c == 0 ) {
-			com_eof = true;
 			return 0;           // end of file;
 		}
 		data++;
@@ -162,7 +160,7 @@ void setSpecialLoad( EntityClass *e, const char* pWhat, CopiedString& p ){
 	const char *pText = 0;
 	const char *where = 0;
 
-	where = strstr( e->comments(),pWhat );
+	where = strstr( e->comments(), pWhat );
 	if ( !where ) {
 		return;
 	}
@@ -172,7 +170,7 @@ void setSpecialLoad( EntityClass *e, const char* pWhat, CopiedString& p ){
 		pText++;
 	}
 
-	where = strchr( pText,'\"' );
+	where = strchr( pText, '\"' );
 	if ( where ) {
 		p = StringRange( pText, where );
 	}
@@ -209,7 +207,7 @@ EntityClass *Eclass_InitFromText( const char *text ){
 
 	{
 		// grab the color, reformat as texture name
-		int r = sscanf( text," (%f %f %f)", &e->color[0], &e->color[1], &e->color[2] );
+		int r = sscanf( text, " (%f %f %f)", &e->color[0], &e->color[1], &e->color[2] );
 		if ( r != 3 ) {
 			return e;
 		}
@@ -229,8 +227,8 @@ EntityClass *Eclass_InitFromText( const char *text ){
 	text = COM_Parse( text );
 	if ( Get_COM_Token()[0] == '(' ) { // parse the size as two vectors
 		e->fixedsize = true;
-		int r = sscanf( text,"%f %f %f) (%f %f %f)", &e->mins[0], &e->mins[1], &e->mins[2],
-		                                             &e->maxs[0], &e->maxs[1], &e->maxs[2] );
+		int r = sscanf( text, "%f %f %f) (%f %f %f)", &e->mins[0], &e->mins[1], &e->mins[2],
+		                                              &e->maxs[0], &e->maxs[1], &e->maxs[2] );
 		if ( r != 6 ) {
 			return 0;
 		}
@@ -248,25 +246,20 @@ EntityClass *Eclass_InitFromText( const char *text ){
 		}
 	}
 
-	char parms[256];
-	// get the flags
-	{
-		// copy to the first /n
-		char* p = parms;
-		while ( *text && *text != '\n' )
-			*p++ = *text++;
-		*p = 0;
-		text++;
-	}
-
-	{
-		// any remaining words are parm flags
-		const char* p = parms;
+	{ // any remaining words on the line are parm flags
+		const char *p = text;
+		// get the flags: advance past the first \n
+		while ( *text && *text++ != '\n' ) {};
 		for ( std::size_t i = 0; i < MAX_FLAGS; i++ )
 		{
 			p = COM_Parse( p );
-			if ( !p ) {
+			if ( p == nullptr || p > text ) {
 				break;
+			}
+			if( string_equal( Get_COM_Token(), "-" )
+			 || string_equal( Get_COM_Token(), "x" )
+			 || string_equal_prefix_nocase( Get_COM_Token(), "unused" ) ){
+				continue;
 			}
 			strncpy( e->flagnames[i], Get_COM_Token(), std::size( e->flagnames[i] ) - 1 );
 		}
@@ -334,6 +327,9 @@ void Eclass_ScanFile( EntityClassCollector& collector, const char *filename ){
 			else if ( c == '*' ) {
 				p = quakeEd;
 				state = eParseQuakeED;
+			}
+			else{
+				state = eParseDefault;
 			}
 			break;
 		case eParseComment:

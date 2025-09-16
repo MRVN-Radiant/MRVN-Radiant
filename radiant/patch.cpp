@@ -2603,7 +2603,7 @@ void Patch::BuildVertexArray(){
 }
 
 
-Vector3 getAverageNormal(const Vector3& normal1, const Vector3& normal2)
+Vector3 getAverageNormal( const Vector3& normal1, const Vector3& normal2 )
 {
 	// Beware of normals with 0 length
 	if ( vector3_length_squared( normal1 ) == 0 ) return normal2;
@@ -2616,12 +2616,12 @@ Vector3 getAverageNormal(const Vector3& normal1, const Vector3& normal2)
 	// Get the angle bisector
 	if( vector3_length_squared( normal1 + normal2 ) == 0 ) return normal1;
 
-	Vector3 normal = vector3_normalised (normal1 + normal2);
+	Vector3 normal = vector3_normalised( normal1 + normal2 );
 
 	// Now calculate the length correction out of the angle
 	// of the two normals
 	/* float factor = cos(n1.angle(n2) * 0.5); */
-	float factor = (float) vector3_dot( normal1, normal2 );
+	float factor = vector3_dot( normal1, normal2 );
 	if ( factor > 1.0 ) factor = 1;
 	if ( factor < -1.0 ) factor = -1;
 	factor = acos( factor );
@@ -2630,7 +2630,7 @@ Vector3 getAverageNormal(const Vector3& normal1, const Vector3& normal2)
 
 	// Check for div by zero (if the normals are antiparallel)
 	// and stretch the resulting normal, if necessary
-	if (factor != 0)
+	if ( factor != 0 )
 	{
 		normal /= factor;
 	}
@@ -2638,33 +2638,33 @@ Vector3 getAverageNormal(const Vector3& normal1, const Vector3& normal2)
 	return normal;
 }
 
-void Patch::createThickenedOpposite(const Patch& sourcePatch,
-                                    const float thickness,
-                                    const int axis,
-                                    bool& no12,
-                                    bool& no34)
+void Patch::createThickenedOpposite( const Patch& sourcePatch,
+                                     const float thickness,
+                                     const int axis,
+                                     bool& no12,
+                                     bool& no34 )
 {
 	// Clone the dimensions from the other patch
-	setDims(sourcePatch.getWidth(), sourcePatch.getHeight());
+	setDims( sourcePatch.getWidth(), sourcePatch.getHeight() );
 
 	// Also inherit the tesselation from the source patch
 	//setFixedSubdivisions(sourcePatch.subdivionsFixed(), sourcePatch.getSubdivisions());
 
 	// Copy the shader from the source patch
-	SetShader(sourcePatch.GetShader());
+	SetShader( sourcePatch.GetShader() );
 
 	// if extrudeAxis == 0,0,0 the patch is extruded along its vertex normals
-	Vector3 extrudeAxis(0,0,0);
+	Vector3 extrudeAxis( 0 );
 
 	switch (axis) {
 	case 0: // X-Axis
-		extrudeAxis = Vector3(1,0,0);
+		extrudeAxis = Vector3( 1, 0, 0 );
 		break;
 	case 1: // Y-Axis
-		extrudeAxis = Vector3(0,1,0);
+		extrudeAxis = Vector3( 0, 1, 0 );
 		break;
 	case 2: // Z-Axis
-		extrudeAxis = Vector3(0,0,1);
+		extrudeAxis = Vector3( 0, 0, 1 );
 		break;
 	default:
 		// Default value already set during initialisation
@@ -2673,14 +2673,14 @@ void Patch::createThickenedOpposite(const Patch& sourcePatch,
 
 	//check if certain seams are required + cycling in normals calculation is needed
 	//( endpoints != startpoints ) - not a cylinder or something
-	for (std::size_t col = 0; col < m_width; col++){
+	for ( std::size_t col = 0; col < m_width; col++ ){
 		if( vector3_length_squared( sourcePatch.ctrlAt( 0, col ).m_vertex - sourcePatch.ctrlAt( m_height - 1, col ).m_vertex ) > 0.1f ){
 			//globalOutputStream() << "yes12.\n";
 			no12 = false;
 			break;
 		}
 	}
-	for (std::size_t row = 0; row < m_height; row++){
+	for ( std::size_t row = 0; row < m_height; row++ ){
 		if( vector3_length_squared( sourcePatch.ctrlAt( row, 0 ).m_vertex - sourcePatch.ctrlAt( row, m_width - 1 ).m_vertex ) > 0.1f ){
 			no34 = false;
 			//globalOutputStream() << "yes34.\n";
@@ -2688,33 +2688,33 @@ void Patch::createThickenedOpposite(const Patch& sourcePatch,
 		}
 	}
 
-	for (std::size_t col = 0; col < m_width; col++)
+	for ( std::size_t col = 0; col < m_width; col++ )
 	{
-		for (std::size_t row = 0; row < m_height; row++)
+		for ( std::size_t row = 0; row < m_height; row++ )
 		{
 			// The current control vertex on the other patch
-			const PatchControl& curCtrl = sourcePatch.ctrlAt(row, col);
+			const PatchControl& curCtrl = sourcePatch.ctrlAt( row, col );
 
 			Vector3 normal;
 
 			// Are we extruding along vertex normals (i.e. extrudeAxis == 0,0,0)?
-			if (extrudeAxis == Vector3(0,0,0))
+			if ( extrudeAxis == Vector3( 0 ) )
 			{
 				// The col tangents (empty if 0,0,0)
-				Vector3 colTangent[2] = { Vector3(0,0,0), Vector3(0,0,0) };
+				Vector3 colTangent[2] = { Vector3( 0 ), Vector3( 0 ) };
 
 				// Are we at the beginning/end of the row? + not cylinder
-				if ( (col == 0 || col == m_width - 1) && !no34 )
+				if ( ( col == 0 || col == m_width - 1 ) && !no34 )
 				{
 					// Get the next col index
-					std::size_t nextCol = (col == m_width - 1) ? (col - 1) : (col + 1);
+					std::size_t nextCol = ( col == m_width - 1 ) ? ( col - 1 ) : ( col + 1 );
 
-					const PatchControl& colNeighbour = sourcePatch.ctrlAt(row, nextCol);
+					const PatchControl& colNeighbour = sourcePatch.ctrlAt( row, nextCol );
 
 					// One available tangent
 					colTangent[0] = colNeighbour.m_vertex - curCtrl.m_vertex;
 					// Reverse it if we're at the end of the column
-					colTangent[0] *= (col == m_width - 1) ? -1 : +1;
+					colTangent[0] *= ( col == m_width - 1 ) ? -1 : +1;
 					//normalize
 					if ( vector3_length_squared( colTangent[0] ) != 0 ) vector3_normalise( colTangent[0] );
 				}
@@ -2735,8 +2735,8 @@ void Patch::createThickenedOpposite(const Patch& sourcePatch,
 						nextCol = col+1;
 						prevCol = col-1;
 					}
-					const PatchControl& neighbour1 = sourcePatch.ctrlAt(row, nextCol);
-					const PatchControl& neighbour2 = sourcePatch.ctrlAt(row, prevCol);
+					const PatchControl& neighbour1 = sourcePatch.ctrlAt( row, nextCol );
+					const PatchControl& neighbour2 = sourcePatch.ctrlAt( row, prevCol );
 
 
 					// Calculate both available tangents
@@ -2753,26 +2753,26 @@ void Patch::createThickenedOpposite(const Patch& sourcePatch,
 					// Cull redundant tangents (parallel)
 					if ( vector3_length_squared( colTangent[1] + colTangent[0] ) == 0 ||
 					     vector3_length_squared( colTangent[1] - colTangent[0] ) == 0 ){
-						colTangent[1] = Vector3(0,0,0);
+						colTangent[1] = Vector3( 0 );
 					}
 				}
 
 				// Calculate the tangent vectors to the next row
-				Vector3 rowTangent[2] = { Vector3(0,0,0), Vector3(0,0,0) };
+				Vector3 rowTangent[2] = { Vector3( 0 ), Vector3( 0 ) };
 
 				// Are we at the beginning or the end?
-				if ( (row == 0 || row == m_height - 1) && !no12 )
+				if ( ( row == 0 || row == m_height - 1 ) && !no12 )
 				{
 					// Yes, only calculate one row tangent
 					// Get the next row index
-					std::size_t nextRow = (row == m_height - 1) ? (row - 1) : (row + 1);
+					std::size_t nextRow = ( row == m_height - 1 ) ? ( row - 1 ) : ( row + 1 );
 
-					const PatchControl& rowNeighbour = sourcePatch.ctrlAt(nextRow, col);
+					const PatchControl& rowNeighbour = sourcePatch.ctrlAt( nextRow, col );
 
 					// First tangent
 					rowTangent[0] = rowNeighbour.m_vertex - curCtrl.m_vertex;
 					// Reverse it accordingly
-					rowTangent[0] *= (row == m_height - 1) ? -1 : +1;
+					rowTangent[0] *= ( row == m_height - 1 ) ? -1 : +1;
 					//normalize
 					if ( vector3_length_squared( rowTangent[0] ) != 0 ) vector3_normalise( rowTangent[0] );
 				}
@@ -2781,19 +2781,19 @@ void Patch::createThickenedOpposite(const Patch& sourcePatch,
 					// Two tangents to calculate
 					std::size_t nextRow, prevRow;
 					if( row == 0 ){
-						nextRow = row+1;
-						prevRow = m_height-2;
+						nextRow = row + 1;
+						prevRow = m_height - 2;
 					}
 					else if( row == m_height - 1 ){
 						nextRow = 1;
-						prevRow = row-1;
+						prevRow = row - 1;
 					}
 					else{
-						nextRow = row+1;
-						prevRow = row-1;
+						nextRow = row + 1;
+						prevRow = row - 1;
 					}
-					const PatchControl& rowNeighbour1 = sourcePatch.ctrlAt(nextRow, col);
-					const PatchControl& rowNeighbour2 = sourcePatch.ctrlAt(prevRow, col);
+					const PatchControl& rowNeighbour1 = sourcePatch.ctrlAt( nextRow, col );
+					const PatchControl& rowNeighbour2 = sourcePatch.ctrlAt( prevRow, col );
 
 					// First tangent
 					rowTangent[0] = rowNeighbour1.m_vertex - curCtrl.m_vertex;
@@ -2809,7 +2809,7 @@ void Patch::createThickenedOpposite(const Patch& sourcePatch,
 					// Cull redundant tangents (parallel)
 					if ( vector3_length_squared( rowTangent[1] + rowTangent[0] ) == 0 ||
 					     vector3_length_squared( rowTangent[1] - rowTangent[0] ) == 0 ){
-						rowTangent[1] = Vector3(0,0,0);
+						rowTangent[1] = Vector3( 0 );
 					}
 				}
 
@@ -2817,29 +2817,29 @@ void Patch::createThickenedOpposite(const Patch& sourcePatch,
 				//clean parallel pairs...
 				if ( vector3_length_squared( rowTangent[0] + colTangent[0] ) == 0 ||
 				     vector3_length_squared( rowTangent[0] - colTangent[0] ) == 0 ){
-					rowTangent[0] = Vector3(0,0,0);
+					rowTangent[0] = Vector3( 0 );
 				}
 				if ( vector3_length_squared( rowTangent[1] + colTangent[1] ) == 0 ||
 				     vector3_length_squared( rowTangent[1] - colTangent[1] ) == 0 ){
-					rowTangent[1] = Vector3(0,0,0);
+					rowTangent[1] = Vector3( 0 );
 				}
 				if ( vector3_length_squared( rowTangent[0] + colTangent[1] ) == 0 ||
 				     vector3_length_squared( rowTangent[0] - colTangent[1] ) == 0 ){
-					colTangent[1] = Vector3(0,0,0);
+					colTangent[1] = Vector3( 0 );
 				}
 				if ( vector3_length_squared( rowTangent[1] + colTangent[0] ) == 0 ||
 				     vector3_length_squared( rowTangent[1] - colTangent[0] ) == 0 ){
-					rowTangent[1] = Vector3(0,0,0);
+					rowTangent[1] = Vector3( 0 );
 				}
 
 				//clean dummies
 				if ( vector3_length_squared( colTangent[0] ) == 0 ){
 					colTangent[0] = colTangent[1];
-					colTangent[1] = Vector3(0,0,0);
+					colTangent[1] = Vector3( 0 );
 				}
 				if ( vector3_length_squared( rowTangent[0] ) == 0 ){
 					rowTangent[0] = rowTangent[1];
-					rowTangent[1] = Vector3(0,0,0);
+					rowTangent[1] = Vector3( 0 );
 				}
 				if( vector3_length_squared( rowTangent[0] ) == 0 || vector3_length_squared( colTangent[0] ) == 0 ){
 					normal = extrudeAxis;
@@ -2854,7 +2854,7 @@ void Patch::createThickenedOpposite(const Patch& sourcePatch,
 						Vector3 normal1 = vector3_normalised( vector3_cross( rowTangent[0], colTangent[0] ) );
 						Vector3 normal2 = vector3_normalised( vector3_cross( rowTangent[1], colTangent[1] ) );
 
-						normal = getAverageNormal(normal1, normal2);
+						normal = getAverageNormal( normal1, normal2 );
 						/*globalOutputStream() << "0\n";
 						globalOutputStream() << normal1 << '\n';
 						globalOutputStream() << normal2 << '\n';
@@ -2868,7 +2868,7 @@ void Patch::createThickenedOpposite(const Patch& sourcePatch,
 						Vector3 normal1 = vector3_normalised( vector3_cross( rowTangent[0], colTangent[0] ) );
 						Vector3 normal2 = vector3_normalised( vector3_cross( rowTangent[0], colTangent[1] ) );
 
-						normal = getAverageNormal(normal1, normal2);
+						normal = getAverageNormal( normal1, normal2 );
 						/*globalOutputStream() << "1\n";
 						globalOutputStream() << normal1 << '\n';
 						globalOutputStream() << normal2 << '\n';
@@ -2884,7 +2884,7 @@ void Patch::createThickenedOpposite(const Patch& sourcePatch,
 							Vector3 normal1 = vector3_normalised( vector3_cross( rowTangent[0], colTangent[0] ) );
 							Vector3 normal2 = vector3_normalised( vector3_cross( rowTangent[1], colTangent[0] ) );
 
-							normal = getAverageNormal(normal1, normal2);
+							normal = getAverageNormal( normal1, normal2 );
 							/*globalOutputStream() << "2\n";
 							globalOutputStream() << rowTangent[0] << '\n';
 							globalOutputStream() << colTangent[0] << '\n';
@@ -2916,10 +2916,10 @@ void Patch::createThickenedOpposite(const Patch& sourcePatch,
 			}
 
 			// Store the new coordinates into this patch at the current coords
-			ctrlAt(row, col).m_vertex = curCtrl.m_vertex + normal*thickness;
+			ctrlAt( row, col ).m_vertex = curCtrl.m_vertex + normal * thickness;
 
 			// Clone the texture cooordinates of the source patch
-			ctrlAt(row, col).m_texcoord = curCtrl.m_texcoord;
+			ctrlAt( row, col ).m_texcoord = curCtrl.m_texcoord;
 		}
 	}
 
@@ -2927,12 +2927,12 @@ void Patch::createThickenedOpposite(const Patch& sourcePatch,
 	controlPointsChanged();
 }
 
-void Patch::createThickenedWall(const Patch& sourcePatch,
-                                const Patch& targetPatch,
-                                const int wallIndex)
+void Patch::createThickenedWall( const Patch& sourcePatch,
+                                 const Patch& targetPatch,
+                                 const int wallIndex )
 {
 	// Copy the shader from the source patch
-	SetShader(sourcePatch.GetShader());
+	SetShader( sourcePatch.GetShader() );
 
 	// The start and end control vertex indices
 	int start = 0;
@@ -2945,65 +2945,65 @@ void Patch::createThickenedWall(const Patch& sourcePatch,
 	int cols = 0;
 	int rows = 3;
 
-	int sourceWidth = static_cast<int>(sourcePatch.getWidth());
-	int sourceHeight = static_cast<int>(sourcePatch.getHeight());
+	int sourceWidth = static_cast<int>( sourcePatch.getWidth() );
+	int sourceHeight = static_cast<int>( sourcePatch.getHeight() );
 /*
 	bool sourceTesselationFixed = sourcePatch.subdivionsFixed();
-	Subdivisions sourceTesselationX(sourcePatch.getSubdivisions().x(), 1);
-	Subdivisions sourceTesselationY(sourcePatch.getSubdivisions().y(), 1);
+	Subdivisions sourceTesselationX( sourcePatch.getSubdivisions().x(), 1 );
+	Subdivisions sourceTesselationY( sourcePatch.getSubdivisions().y(), 1 );
 */
 	// Determine which of the four edges have to be connected
 	// and calculate the start, end & stepsize for the following loop
-	switch (wallIndex) {
+	switch ( wallIndex ) {
 	case 0:
 		cols = sourceWidth;
 		start = 0;
 		end = sourceWidth - 1;
 		incr = 1;
-		//setFixedSubdivisions(sourceTesselationFixed, sourceTesselationX);
+		//setFixedSubdivisions( sourceTesselationFixed, sourceTesselationX );
 		break;
 	case 1:
 		cols = sourceWidth;
 		start = sourceWidth * (sourceHeight-1);
 		end = sourceWidth*sourceHeight - 1;
 		incr = 1;
-		//setFixedSubdivisions(sourceTesselationFixed, sourceTesselationX);
+		//setFixedSubdivisions( sourceTesselationFixed, sourceTesselationX );
 		break;
 	case 2:
 		cols = sourceHeight;
 		start = 0;
 		end = sourceWidth*(sourceHeight-1);
 		incr = sourceWidth;
-		//setFixedSubdivisions(sourceTesselationFixed, sourceTesselationY);
+		//setFixedSubdivisions( sourceTesselationFixed, sourceTesselationY );
 		break;
 	case 3:
 		cols = sourceHeight;
 		start = sourceWidth - 1;
 		end = sourceWidth*sourceHeight - 1;
 		incr = sourceWidth;
-		//setFixedSubdivisions(sourceTesselationFixed, sourceTesselationY);
+		//setFixedSubdivisions( sourceTesselationFixed, sourceTesselationY );
 		break;
 	}
 
-	setDims(cols, rows);
+	setDims( cols, rows );
 
 	const PatchControlArray& sourceCtrl = sourcePatch.getControlPoints();
 	const PatchControlArray& targetCtrl = targetPatch.getControlPoints();
 
 	int col = 0;
 	// Now go through the control vertices with these calculated stepsize
-	for (int idx = start; idx <= end; idx += incr, col++) {
+	for ( int idx = start; idx <= end; idx += incr, col++ ) {
 		Vector3 sourceCoord = sourceCtrl[idx].m_vertex;
 		Vector3 targetCoord = targetCtrl[idx].m_vertex;
-		Vector3 middleCoord = (sourceCoord + targetCoord) / 2;
+		Vector3 middleCoord = ( sourceCoord + targetCoord ) / 2;
 
 		// Now assign the vertex coordinates
-		ctrlAt(0, col).m_vertex = sourceCoord;
-		ctrlAt(1, col).m_vertex = middleCoord;
-		ctrlAt(2, col).m_vertex = targetCoord;
+		ctrlAt( 0, col ).m_vertex = sourceCoord;
+		ctrlAt( 1, col ).m_vertex = middleCoord;
+		ctrlAt( 2, col ).m_vertex = targetCoord;
 	}
 
-	if (wallIndex == 0 || wallIndex == 3) {
+	if ( wallIndex == 0 || wallIndex == 3 ) {
 		InvertMatrix();
 	}
 
@@ -3015,15 +3015,18 @@ void Patch::createThickenedWall(const Patch& sourcePatch,
 }
 
 
-class PatchFilterWrapper : public Filter
+class PatchFilterWrapper final : public Filter
 {
 	bool m_active;
 	bool m_invert;
 	PatchFilter& m_filter;
 public:
-	PatchFilterWrapper( PatchFilter& filter, bool invert ) : m_invert( invert ), m_filter( filter ){
+	PatchFilterWrapper( PatchFilter& filter, bool invert ) :
+		m_active( false ), // suppress uninitialized warning
+		m_invert( invert ),
+		m_filter( filter ){
 	}
-	void setActive( bool active ){
+	void setActive( bool active ) override {
 		m_active = active;
 	}
 	bool active(){

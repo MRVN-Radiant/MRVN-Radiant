@@ -127,7 +127,7 @@ void TextureGroups_addWad( TextureGroups& groups, const char* archive ){
 #endif
 	}
 }
-typedef ReferenceCaller1<TextureGroups, const char*, TextureGroups_addWad> TextureGroupsAddWadCaller;
+typedef ReferenceCaller<TextureGroups, void(const char*), TextureGroups_addWad> TextureGroupsAddWadCaller;
 
 void TextureGroups_addShader( TextureGroups& groups, const char* shaderName ){
 	const char* texture = path_make_relative( shaderName, "textures/" );
@@ -138,12 +138,12 @@ void TextureGroups_addShader( TextureGroups& groups, const char* shaderName ){
 		}
 	}
 }
-typedef ReferenceCaller1<TextureGroups, const char*, TextureGroups_addShader> TextureGroupsAddShaderCaller;
+typedef ReferenceCaller<TextureGroups, void(const char*), TextureGroups_addShader> TextureGroupsAddShaderCaller;
 
 void TextureGroups_addDirectory( TextureGroups& groups, const char* directory ){
 	groups.insert( directory );
 }
-typedef ReferenceCaller1<TextureGroups, const char*, TextureGroups_addDirectory> TextureGroupsAddDirectoryCaller;
+typedef ReferenceCaller<TextureGroups, void(const char*), TextureGroups_addDirectory> TextureGroupsAddDirectoryCaller;
 
 namespace
 {
@@ -509,7 +509,7 @@ bool Texture_IsShown( IShader* shader, const TextureBrowser& textureBrowser ){
 	}
 
 	if ( textureBrowser.m_searchedTags ) {
-		return textureBrowser.m_found_shaders.find( shader->getName() ) != textureBrowser.m_found_shaders.cend();
+		return textureBrowser.m_found_shaders.contains( shader->getName() );
 	}
 	else {
 		if ( !shader_equal_prefix( shader_get_textureName( shader->getName() ), g_TextureBrowser_currentDirectory.c_str() ) ) {
@@ -588,7 +588,7 @@ void TextureBrowser_importShowScrollbar( TextureBrowser& textureBrowser, bool va
 		textureBrowser.updateScroll();
 	}
 }
-typedef ReferenceCaller1<TextureBrowser, bool, TextureBrowser_importShowScrollbar> TextureBrowserImportShowScrollbarCaller;
+typedef ReferenceCaller<TextureBrowser, void(bool), TextureBrowser_importShowScrollbar> TextureBrowserImportShowScrollbarCaller;
 
 
 /*
@@ -656,7 +656,7 @@ class TextureCategoryLoadShader
 	const char* m_directory;
 	std::size_t& m_count;
 public:
-	typedef const char* first_argument_type;
+	using func = void(const char *);
 
 	TextureCategoryLoadShader( const char* directory, std::size_t& count )
 		: m_directory( directory ), m_count( count ){
@@ -691,7 +691,7 @@ void TexturePath_loadTexture( const char* name ){
 void TextureDirectory_loadTexture( const char* directory, const char* texture ){
 	TexturePath_loadTexture( StringStream<64>( directory, PathExtensionless( texture ) ) );
 }
-typedef ConstPointerCaller1<char, const char*, TextureDirectory_loadTexture> TextureDirectoryLoadTextureCaller;
+typedef ConstPointerCaller<char, void(const char*), TextureDirectory_loadTexture> TextureDirectoryLoadTextureCaller;
 
 class LoadTexturesByTypeVisitor : public ImageModules::Visitor
 {
@@ -724,7 +724,7 @@ void TextureBrowser_ShowDirectory( const char* directory ){
 		g_TextureBrowser_currentDirectory = directory;
 
 		std::size_t shaders_count;
-		GlobalShaderSystem().foreachShaderName( makeCallback1( TextureCategoryLoadShader( directory, shaders_count ) ) );
+		GlobalShaderSystem().foreachShaderName( makeCallback( TextureCategoryLoadShader( directory, shaders_count ) ) );
 		globalOutputStream() << "Showing " << shaders_count << " shaders.\n";
 
 		if ( g_pGameDescription->mGameType != "doom3" ) {
@@ -1404,11 +1404,8 @@ protected:
 		if ( newName.isEmpty() ){
 			qt_MessageBox( g_TexBro.m_parent, "New tag name is empty :0", ":o", EMessageBoxType::Error );
 		}
-		else{
-			const auto oldName = index.data( Qt::ItemDataRole::DisplayRole ).toByteArray();
-
-			if( oldName != newName	// is changed
-			 && g_TexBro.m_all_tags.find( newName.constData() ) != g_TexBro.m_all_tags.cend() ){	// & found in existing names
+		else if( const auto oldName = index.data( Qt::ItemDataRole::DisplayRole ).toByteArray(); oldName != newName ){ // is changed
+			if( g_TexBro.m_all_tags.contains( newName.constData() ) ){	// found in existing names
 				qt_MessageBox( g_TexBro.m_parent, "New tag name is already taken :0", newName.constData(), EMessageBoxType::Error );
 			}
 			else{
@@ -1532,7 +1529,7 @@ void TextureBrowser_checkTagFile(){
 void TextureBrowser_addTag(){
 	auto tag = StringStream<64>( "NewTag" );
 	int index = 0;
-	while( g_TexBro.m_all_tags.find( tag.c_str() ) != g_TexBro.m_all_tags.cend() )
+	while( g_TexBro.m_all_tags.contains( tag.c_str() ) )
 		tag( "NewTag", ++index );
 
 	auto item = new QListWidgetItem( tag.c_str() );
@@ -1739,7 +1736,7 @@ QWidget* TextureBrowser_constructWindow( QWidget* toplevel ){
 	TextureBrowser_checkTagFile();
 	TextureBrowser_SetNotex();
 
-	GlobalShaderSystem().setActiveShadersChangedNotify( ReferenceCaller<TextureBrowser, TextureBrowser_activeShadersChanged>( g_TexBro ) );
+	GlobalShaderSystem().setActiveShadersChangedNotify( ReferenceCaller<TextureBrowser, void(), TextureBrowser_activeShadersChanged>( g_TexBro ) );
 
 	g_TexBro.m_parent = toplevel;
 
@@ -1767,7 +1764,7 @@ QWidget* TextureBrowser_constructWindow( QWidget* toplevel ){
 		menu_view->setParent( toolbar, menu_view->windowFlags() ); //don't reset windowFlags
 
 		//view menu button
-		toolbar_append_button( toolbar, "View", "texbro_view.png", PointerCaller<QMenu, Popup_View_Menu>( menu_view ) );
+		toolbar_append_button( toolbar, "View", "texbro_view.png", PointerCaller<QMenu, void(), Popup_View_Menu>( menu_view ) );
 
 		toolbar_append_button( toolbar, "Find / Replace...", "texbro_gtk-find-and-replace.png", "FindReplaceTextures" );
 
@@ -1859,7 +1856,7 @@ QWidget* TextureBrowser_constructWindow( QWidget* toplevel ){
 }
 
 void TextureBrowser_destroyWindow(){
-	GlobalShaderSystem().setActiveShadersChangedNotify( Callback() );
+	GlobalShaderSystem().setActiveShadersChangedNotify( Callback<void()>() );
 }
 
 const Vector3& TextureBrowser_getBackgroundColour(){
@@ -1988,7 +1985,7 @@ void TextureScaleImport( TextureBrowser& textureBrowser, int value ){
 		break;
 	}
 }
-typedef ReferenceCaller1<TextureBrowser, int, TextureScaleImport> TextureScaleImportCaller;
+typedef ReferenceCaller<TextureBrowser, void(int), TextureScaleImport> TextureScaleImportCaller;
 
 void TextureScaleExport( TextureBrowser& textureBrowser, const IntImportCallback& importer ){
 	switch ( textureBrowser.m_textureScale )
@@ -2010,19 +2007,19 @@ void TextureScaleExport( TextureBrowser& textureBrowser, const IntImportCallback
 		break;
 	}
 }
-typedef ReferenceCaller1<TextureBrowser, const IntImportCallback&, TextureScaleExport> TextureScaleExportCaller;
+typedef ReferenceCaller<TextureBrowser, void(const IntImportCallback&), TextureScaleExport> TextureScaleExportCaller;
 
 void UniformTextureSizeImport( TextureBrowser& textureBrowser, int value ){
 	if ( value >= 16 )
 		TextureBrowser_setUniformSize( textureBrowser, value );
 }
-typedef ReferenceCaller1<TextureBrowser, int, UniformTextureSizeImport> UniformTextureSizeImportCaller;
+typedef ReferenceCaller<TextureBrowser, void(int), UniformTextureSizeImport> UniformTextureSizeImportCaller;
 
 void UniformTextureMinSizeImport( TextureBrowser& textureBrowser, int value ){
 	if ( value >= 16 )
 		TextureBrowser_setUniformMinSize( textureBrowser, value );
 }
-typedef ReferenceCaller1<TextureBrowser, int, UniformTextureMinSizeImport> UniformTextureMinSizeImportCaller;
+typedef ReferenceCaller<TextureBrowser, void(int), UniformTextureMinSizeImport> UniformTextureMinSizeImportCaller;
 
 void TextureBrowser_constructPreferences( PreferencesPage& page ){
 	page.appendCheckBox(
@@ -2059,40 +2056,40 @@ void TextureBrowser_constructPage( PreferenceGroup& group ){
 	TextureBrowser_constructPreferences( page );
 }
 void TextureBrowser_registerPreferencesPage(){
-	PreferencesDialog_addSettingsPage( FreeCaller1<PreferenceGroup&, TextureBrowser_constructPage>() );
+	PreferencesDialog_addSettingsPage( makeCallbackF( TextureBrowser_constructPage ) );
 }
 
 
 #include "preferencesystem.h"
 #include "stringio.h"
 
-typedef ReferenceCaller1<TextureBrowser, std::size_t, TextureBrowser_setScale> TextureBrowserSetScaleCaller;
+typedef ReferenceCaller<TextureBrowser, void(std::size_t), TextureBrowser_setScale> TextureBrowserSetScaleCaller;
 
 
 
 void TextureClipboard_textureSelected( const char* shader );
 
 void TextureBrowser_Construct(){
-	GlobalCommands_insert( "ShaderInfo", FreeCaller<TextureBrowser_shaderInfo>() );
-	GlobalCommands_insert( "TagSearchUntagged", FreeCaller<TextureBrowser_showUntagged>() );
-	GlobalCommands_insert( "TagSearch", FreeCaller<TextureBrowser_searchTags>() );
-	GlobalCommands_insert( "TagAdd", FreeCaller<TextureBrowser_addTag>() );
-	GlobalCommands_insert( "TagRename", FreeCaller<TextureBrowser_renameTag>() );
-	GlobalCommands_insert( "TagDelete", FreeCaller<TextureBrowser_deleteTag>() );
-	GlobalCommands_insert( "TagCopy", FreeCaller<TextureBrowser_copyTag>() );
-	GlobalCommands_insert( "TagPaste", FreeCaller<TextureBrowser_pasteTag>() );
-	GlobalCommands_insert( "RefreshShaders", FreeCaller<RefreshShaders>() );
-	GlobalToggles_insert( "ShowInUse", FreeCaller<TextureBrowser_ToggleHideUnused>(), ToggleItem::AddCallbackCaller( g_TexBro.m_hideunused_item ), QKeySequence( "U" ) );
-	GlobalCommands_insert( "ShowAllTextures", FreeCaller<TextureBrowser_showAll>(), QKeySequence( "Ctrl+A" ) );
-	GlobalCommands_insert( "ToggleTextures", FreeCaller<TextureBrowser_toggleShow>(), QKeySequence( "T" ) );
-	GlobalToggles_insert( "ToggleShowShaders", FreeCaller<TextureBrowser_ToggleShowShaders>(), ToggleItem::AddCallbackCaller( g_TexBro.m_showshaders_item ) );
-	GlobalToggles_insert( "ToggleShowTextures", FreeCaller<TextureBrowser_ToggleShowTextures>(), ToggleItem::AddCallbackCaller( g_TexBro.m_showtextures_item ) );
-	GlobalToggles_insert( "ToggleShowShaderlistOnly", FreeCaller<TextureBrowser_ToggleShowShaderListOnly>(), ToggleItem::AddCallbackCaller( g_TexBro.m_showshaderlistonly_item ) );
-	GlobalToggles_insert( "FixedSize", FreeCaller<TextureBrowser_FixedSize>(), ToggleItem::AddCallbackCaller( g_TexBro.m_fixedsize_item ) );
-	GlobalToggles_insert( "FilterNotex", FreeCaller<TextureBrowser_FilterNotex>(), ToggleItem::AddCallbackCaller( g_TexBro.m_filternotex_item ) );
-	GlobalToggles_insert( "EnableAlpha", FreeCaller<TextureBrowser_EnableAlpha>(), ToggleItem::AddCallbackCaller( g_TexBro.m_enablealpha_item ) );
-	GlobalToggles_insert( "TagsToggleGui", FreeCaller<TextureBrowser_tagsToggleGui>(), ToggleItem::AddCallbackCaller( g_TexBro.m_tags_item ) );
-	GlobalToggles_insert( "SearchFromStart", FreeCaller<TextureBrowser_filter_searchFromStart>(), ToggleItem::AddCallbackCaller( g_TexBro.m_filter_searchFromStart_item ) );
+	GlobalCommands_insert( "ShaderInfo", makeCallbackF( TextureBrowser_shaderInfo ) );
+	GlobalCommands_insert( "TagSearchUntagged", makeCallbackF( TextureBrowser_showUntagged ) );
+	GlobalCommands_insert( "TagSearch", makeCallbackF( TextureBrowser_searchTags ) );
+	GlobalCommands_insert( "TagAdd", makeCallbackF( TextureBrowser_addTag ) );
+	GlobalCommands_insert( "TagRename", makeCallbackF( TextureBrowser_renameTag ) );
+	GlobalCommands_insert( "TagDelete", makeCallbackF( TextureBrowser_deleteTag ) );
+	GlobalCommands_insert( "TagCopy", makeCallbackF( TextureBrowser_copyTag ) );
+	GlobalCommands_insert( "TagPaste", makeCallbackF( TextureBrowser_pasteTag ) );
+	GlobalCommands_insert( "RefreshShaders", makeCallbackF( RefreshShaders ) );
+	GlobalToggles_insert( "ShowInUse", makeCallbackF( TextureBrowser_ToggleHideUnused ), ToggleItem::AddCallbackCaller( g_TexBro.m_hideunused_item ), QKeySequence( "U" ) );
+	GlobalCommands_insert( "ShowAllTextures", makeCallbackF( TextureBrowser_showAll ), QKeySequence( "Ctrl+A" ) );
+	GlobalCommands_insert( "ToggleTextures", makeCallbackF( TextureBrowser_toggleShow ), QKeySequence( "T" ) );
+	GlobalToggles_insert( "ToggleShowShaders", makeCallbackF( TextureBrowser_ToggleShowShaders ), ToggleItem::AddCallbackCaller( g_TexBro.m_showshaders_item ) );
+	GlobalToggles_insert( "ToggleShowTextures", makeCallbackF( TextureBrowser_ToggleShowTextures ), ToggleItem::AddCallbackCaller( g_TexBro.m_showtextures_item ) );
+	GlobalToggles_insert( "ToggleShowShaderlistOnly", makeCallbackF( TextureBrowser_ToggleShowShaderListOnly ), ToggleItem::AddCallbackCaller( g_TexBro.m_showshaderlistonly_item ) );
+	GlobalToggles_insert( "FixedSize", makeCallbackF( TextureBrowser_FixedSize ), ToggleItem::AddCallbackCaller( g_TexBro.m_fixedsize_item ) );
+	GlobalToggles_insert( "FilterNotex", makeCallbackF( TextureBrowser_FilterNotex ), ToggleItem::AddCallbackCaller( g_TexBro.m_filternotex_item ) );
+	GlobalToggles_insert( "EnableAlpha", makeCallbackF( TextureBrowser_EnableAlpha ), ToggleItem::AddCallbackCaller( g_TexBro.m_enablealpha_item ) );
+	GlobalToggles_insert( "TagsToggleGui", makeCallbackF( TextureBrowser_tagsToggleGui ), ToggleItem::AddCallbackCaller( g_TexBro.m_tags_item ) );
+	GlobalToggles_insert( "SearchFromStart", makeCallbackF( TextureBrowser_filter_searchFromStart ), ToggleItem::AddCallbackCaller( g_TexBro.m_filter_searchFromStart_item ) );
 
 	GlobalPreferenceSystem().registerPreference( "TextureScale",
 	                                             makeSizeStringImportCallback( TextureBrowserSetScaleCaller( g_TexBro ) ),
@@ -2125,7 +2122,7 @@ void TextureBrowser_Construct(){
 
 	TextureBrowser::wads = !string_empty( g_pGameDescription->getKeyValue( "show_wads" ) );
 
-	Textures_setModeChangedNotify( ConstMemberCaller<TextureBrowser, &TextureBrowser::queueDraw>( g_TexBro ) );
+	Textures_setModeChangedNotify( ConstMemberCaller<TextureBrowser, void(), &TextureBrowser::queueDraw>( g_TexBro ) );
 
 	TextureBrowser_registerPreferencesPage();
 
@@ -2138,5 +2135,5 @@ void TextureBrowser_Destroy(){
 
 	GlobalShaderSystem().detach( g_ShadersObserver );
 
-	Textures_setModeChangedNotify( Callback() );
+	Textures_setModeChangedNotify( Callback<void()>() );
 }

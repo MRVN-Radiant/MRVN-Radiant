@@ -238,7 +238,7 @@ public:
 	typedef ModelLoader Type;
 
 	ModelPicoAPI( const char* extension ){
-		GlobalFiletypesModule::getTable().addType( Type::Name, extension, filetype_t(  StringStream<32>( extension, " model" ),  StringStream<16>( "*.", extension ) ) );
+		GlobalFiletypesModule::getTable().addType( Type::Name, extension, filetype_t( StringStream<32>( extension, " model" ), StringStream<16>( "*.", extension ) ) );
 	}
 	ModelLoader* getTable(){
 		return &m_modelLoader;

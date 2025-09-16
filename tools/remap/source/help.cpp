@@ -39,47 +39,47 @@ struct HelpOption
 	const char* description;
 };
 
-static void HelpOptions(const char* group_name, int indentation, int width, const std::vector<HelpOption>& options)
+static void HelpOptions( const char* group_name, int indentation, int width, const std::vector<HelpOption>& options )
 {
 	indentation *= 2;
-	char* indent = safe_malloc(indentation+1);
-	memset(indent, ' ', indentation);
+	char* indent = safe_malloc( indentation + 1 );
+	memset( indent, ' ', indentation );
 	indent[indentation] = 0;
-	printf("%s%s:\n", indent, group_name);
+	printf( "%s%s:\n", indent, group_name );
 	indentation += 2;
-	indent = void_ptr( realloc(indent, indentation+1) );
-	memset(indent, ' ', indentation);
+	indent = void_ptr( realloc( indent, indentation + 1 ) );
+	memset( indent, ' ', indentation );
 	indent[indentation] = 0;
 
 	for ( auto&& option : options )
 	{
-		int printed = printf("%s%-24s  ", indent, option.name);
-		int descsz = strlen(option.description);
+		int printed = printf( "%s%-24s  ", indent, option.name );
+		int descsz = strlen( option.description );
 		int j = 0;
 		while ( j < descsz && descsz-j > width - printed )
 		{
 			if ( j != 0 )
-				printf("%s%26c",indent,' ');
+				printf( "%s%26c", indent, ' ' );
 			int fragment = width - printed;
-			while ( fragment > 0 && option.description[j+fragment-1] != ' ')
+			while ( fragment > 0 && option.description[j + fragment - 1] != ' ' )
 				fragment--;
-			j += fwrite(option.description+j, sizeof(char), fragment, stdout);
-			putchar('\n');
-			printed = indentation+26;
+			j += fwrite( option.description + j, sizeof(char), fragment, stdout );
+			putchar( '\n' );
+			printed = indentation + 26;
 		}
 		if ( j == 0 )
 		{
-			printf("%s\n",option.description+j);
+			printf( "%s\n", option.description + j );
 		}
 		else if ( j < descsz )
 		{
-			printf("%s%26c%s\n",indent,' ',option.description+j);
+			printf( "%s%26c%s\n", indent, ' ', option.description + j );
 		}
 	}
 
-	putchar('\n');
+	putchar( '\n' );
 
-	free(indent);
+	free( indent );
 }
 
 static void HelpBsp()
@@ -111,6 +111,7 @@ static void HelpBsp()
 		{"-mi <N>", "Sets the maximum number of indexes per surface"},
 		{"-mv <N>", "Sets the maximum number of vertices of a lightmapped surface"},
 		{"-ne <F>", "Normal epsilon for plane snapping etc."},
+		{"-nobrushsnap", "Disable brush vertices snapping"},
 		{"-nocurves", "Turn off support for patches"},
 		{"-nodetail", "Leave out detail brushes"},
 		{"-noflares", "Turn off support for flares"},
@@ -135,24 +136,24 @@ static void HelpBsp()
 		{"-tempname <filename.map>", "Read the MAP file from the given file name"},
 		{"-verboseentities", "Enable `-v` only for map entities, not for the world"},
 	};
-	HelpOptions("BSP Stage", 0, 80, options);
+	HelpOptions( "BSP Stage", 0, 80, options );
 }
 
 static void HelpVis()
 {
 	const std::vector<HelpOption> options = {
-		{"-vis [options] <filename.map>", "Switch that enters this stage"},
-		{"-fast", "Very fast and crude vis calculation"},
-		{"-hint", "Merge all but hint portals"},
-		{"-mergeportals", "The less crude half of `-merge`, makes vis sometimes much faster but doesn't hurt fps usually"},
-		{"-merge", "Faster but still okay vis calculation"},
-		{"-nopassage", "Just use PortalFlow vis (usually less fps)"},
-		{"-nosort", "Do not sort the portals before calculating vis (usually slower)"},
-		{"-passageOnly", "Just use PassageFlow vis (usually less fps)"},
-		{"-saveprt", "Keep the Portal file after running vis (so you can run vis again)"},
-		{"-v -v", "Extra verbose mode for cluster debug"}, // q3map2 common takes first -v
+		{ "-vis [options] <filename.map>", "Switch that enters this stage" },
+		{ "-fast", "Very fast and crude vis calculation" },
+		{ "-hint", "Merge all but hint portals" },
+		{ "-mergeportals", "The less crude half of `-merge`, makes vis sometimes much faster but doesn't hurt fps usually" },
+		{ "-merge", "Faster but still okay vis calculation" },
+		{ "-nopassage", "Just use PortalFlow vis (usually less fps)" },
+		{ "-nosort", "Do not sort the portals before calculating vis (usually slower)" },
+		{ "-passageOnly", "Just use PassageFlow vis (usually less fps)" },
+		{ "-saveprt", "Keep the Portal file after running vis (so you can run vis again)" },
+		{ "-v -v", "Extra verbose mode for cluster debug" }, // q3map2 common takes first -v
 	};
-	HelpOptions("VIS Stage", 0, 80, options);
+	HelpOptions( "VIS Stage", 0, 80, options );
 }
 
 static void HelpLight()
@@ -269,176 +270,176 @@ static void HelpLight()
 		{"-wolf", "Use linear falloff curve by default (like W:ET)"},
 	};
 
-	HelpOptions("Light Stage", 0, 80, options);
+	HelpOptions( "Light Stage", 0, 80, options );
 }
 
 static void HelpAnalyze()
 {
 	const std::vector<HelpOption> options = {
-		{"-analyze [options] <filename.bsp>", "Switch that enters this mode"},
-		{"-lumpswap", "Swap byte order in the lumps"},
+		{ "-analyze [options] <filename.bsp>", "Switch that enters this mode" },
+		{ "-lumpswap", "Swap byte order in the lumps" },
 	};
 
-	HelpOptions("Analyzing BSP-like file structure", 0, 80, options);
+	HelpOptions( "Analyzing BSP-like file structure", 0, 80, options );
 }
 
 static void HelpScale()
 {
 	const std::vector<HelpOption> options = {
-		{"-scale [options] <S filename.bsp>", "Scale uniformly"},
-		{"-scale [options] <SX SY SZ filename.bsp>", "Scale non-uniformly"},
-		{"-tex", "Option to scale without texture lock"},
-		{"-spawn_ref <F>", "Option to vertically offset info_player_* entities (adds spawn_ref, scales, subtracts spawn_ref)"},
+		{ "-scale [options] <S filename.bsp>", "Scale uniformly" },
+		{ "-scale [options] <SX SY SZ filename.bsp>", "Scale non-uniformly" },
+		{ "-tex", "Option to scale without texture lock" },
+		{ "-spawn_ref <F>", "Option to vertically offset info_player_* entities (adds spawn_ref, scales, subtracts spawn_ref)" },
 	};
-	HelpOptions("BSP Scaling", 0, 80, options);
+	HelpOptions( "BSP Scaling", 0, 80, options );
 }
 
 static void HelpShift()
 {
 	const std::vector<HelpOption> options = {
-		{"-shift <S filename.bsp>", "Shift uniformly"},
-		{"-shift <SX SY SZ filename.bsp>", "Shift non-uniformly"},
+		{ "-shift <S filename.bsp>", "Shift uniformly" },
+		{ "-shift <SX SY SZ filename.bsp>", "Shift non-uniformly" },
 	};
-	HelpOptions("BSP Shift", 0, 80, options);
+	HelpOptions( "BSP Shift", 0, 80, options );
 }
 
 static void HelpConvert()
 {
 	const std::vector<HelpOption> options = {
-		{"-convert [options] <filename.bsp>", "Switch that enters this mode"},
-		{"-deluxemapsastexcoord", "Save deluxemap names and texcoords instead of textures (only when writing ase and obj)"},
-		{"-de <F>", "Distance epsilon for the conversion (only when reading map)"},
-		{"-fast", "fast bsp to map conversion mode (without texture alignments)"},
-		{"-format <converter>", "Select the converter, default ase (available: map, map_bp, ase, obj, or game names)"},
-		{"-lightmapsastexcoord", "Save lightmap names and texcoords instead of textures (only when writing ase and obj)"},
-		{"-meta", "Combine adjacent triangles of the same texture to surfaces (only when reading map)"},
-		{"-ne <F>", "Normal epsilon for the conversion (only when reading map)"},
-		{"-patchmeta", "Turn patches into triangle meshes for display (only when reading map)"},
-		{"-readbsp", "Force converting bsp to selected format"},
-		{"-readmap", "Force converting map to selected format"},
-		{"-shadersasbitmap", "Save shader names as bitmap names in the model so it works as a prefab (only when writing ase and obj)"},
+		{ "-convert [options] <filename.bsp>", "Switch that enters this mode" },
+		{ "-deluxemapsastexcoord", "Save deluxemap names and texcoords instead of textures (only when writing ase and obj)" },
+		{ "-de <F>", "Distance epsilon for the conversion (only when reading map)" },
+		{ "-fast", "fast bsp to map conversion mode (without texture alignments)" },
+		{ "-format <converter>", "Select the converter, default ase (available: map, map_bp, ase, obj, or game names)" },
+		{ "-lightmapsastexcoord", "Save lightmap names and texcoords instead of textures (only when writing ase and obj)" },
+		{ "-meta", "Combine adjacent triangles of the same texture to surfaces (only when reading map)" },
+		{ "-ne <F>", "Normal epsilon for the conversion (only when reading map)" },
+		{ "-patchmeta", "Turn patches into triangle meshes for display (only when reading map)" },
+		{ "-readbsp", "Force converting bsp to selected format" },
+		{ "-readmap", "Force converting map to selected format" },
+		{ "-shadersasbitmap", "Save shader names as bitmap names in the model so it works as a prefab (only when writing ase and obj)" },
 	};
 
-	HelpOptions("Converting & Decompiling", 0, 80, options);
+	HelpOptions( "Converting & Decompiling", 0, 80, options );
 }
 
 static void HelpExport()
 {
 	const std::vector<HelpOption> options = {
-		{"-export <filename.bsp>", "Copies lightmaps from the BSP to `filename/lightmap_NNNN.tga`"}
+		{ "-export <filename.bsp>", "Copies lightmaps from the BSP to `filename/lightmap_NNNN.tga`" },
 	};
 
-	HelpOptions("Exporting lightmaps", 0, 80, options);
+	HelpOptions( "Exporting lightmaps", 0, 80, options );
 }
 
 static void HelpImport()
 {
 	const std::vector<HelpOption> options = {
-		{"-import <filename.bsp>", "Copies lightmaps from `filename/lightmap_NNNN.tga` into the BSP"},
+		{ "-import <filename.bsp>", "Copies lightmaps from `filename/lightmap_NNNN.tga` into the BSP" },
 	};
 
-	HelpOptions("Importing lightmaps", 0, 80, options);
+	HelpOptions( "Importing lightmaps", 0, 80, options );
 }
 
 static void HelpExportEnts()
 {
 	const std::vector<HelpOption> options = {
-		{"-exportents <filename.bsp>", "Exports the entities to a text file (.ent)"},
+		{ "-exportents <filename.bsp>", "Exports the entities to a text file (.ent)" },
 	};
-	HelpOptions("ExportEnts Stage", 0, 80, options);
+	HelpOptions( "ExportEnts Stage", 0, 80, options );
 }
 
 static void HelpFixaas()
 {
 	const std::vector<HelpOption> options = {
-		{"-fixaas <filename.bsp>", "Writes BSP checksum to AAS file, so that it's accepted as valid by engine"},
+		{ "-fixaas <filename.bsp>", "Writes BSP checksum to AAS file, so that it's accepted as valid by engine" },
 	};
 
-	HelpOptions("Fixing AAS checksum", 0, 80, options);
+	HelpOptions( "Fixing AAS checksum", 0, 80, options );
 }
 
 static void HelpInfo()
 {
 	const std::vector<HelpOption> options = {
-		{"-info <filename.bsp .. filenameN.bsp>", "Switch that enters this mode"},
+		{ "-info <filename.bsp .. filenameN.bsp>", "Switch that enters this mode" },
 	};
 
-	HelpOptions("Get info about BSP file", 0, 80, options);
+	HelpOptions( "Get info about BSP file", 0, 80, options );
 }
 
 static void HelpMinimap()
 {
 	const std::vector<HelpOption> options = {
-		{"-minimap [options] <filename.bsp>", "Creates a minimap of the BSP, by default writes to `../gfx/filename_mini.tga`"},
-		{"-autolevel", "Automatically level brightness and contrast"},
-		{"-black", "Write the minimap as a black-on-transparency RGBA32 image"},
-		{"-boost <F>", "Sets the contrast boost value (higher values make a brighter image); contrast boost is somewhat similar to gamma, but continuous even at zero"},
-		{"-border <F>", "Sets the amount of border pixels relative to the total image size"},
-		{"-brightness <F>", "Sets brightness value to add to minimap values"},
-		{"-contrast <F>", "Sets contrast value to scale minimap values (doesn't affect brightness)"},
-		{"-gray", "Write the minimap as a white-on-black GRAY8 image"},
-		{"-keepaspect", "Ensure the aspect ratio is kept (the minimap is then letterboxed to keep aspect)"},
-		{"-minmax <xmin ymin zmin xmax ymax zmax>", "Forces specific map dimensions (note: the minimap actually uses these dimensions, scaled to the target size while keeping aspect with centering, and 1/64 of border appended to all sides)"},
-		{"-noautolevel", "Do not automatically level brightness and contrast"},
-		{"-nokeepaspect", "Do not ensure the aspect ratio is kept (makes it easier to use the image in your code, but looks bad together with sharpening)"},
-		{"-o <filename.tga>", "Sets the output file name"},
-		{"-random <N>", "Sets the randomized supersampling count (cannot be combined with `-samples`)"},
-		{"-samples <N>", "Sets the ordered supersampling count (cannot be combined with `-random`)"},
-		{"-sharpen <F>", "Sets the sharpening coefficient"},
-		{"-size <N>", "Sets the width and height of the output image"},
-		{"-white", "Write the minimap as a white-on-transparency RGBA32 image"},
+		{ "-minimap [options] <filename.bsp>", "Creates a minimap of the BSP, by default writes to `../gfx/filename_mini.tga`" },
+		{ "-autolevel", "Automatically level brightness and contrast" },
+		{ "-black", "Write the minimap as a black-on-transparency RGBA32 image" },
+		{ "-boost <F>", "Sets the contrast boost value (higher values make a brighter image); contrast boost is somewhat similar to gamma, but continuous even at zero" },
+		{ "-border <F>", "Sets the amount of border pixels relative to the total image size" },
+		{ "-brightness <F>", "Sets brightness value to add to minimap values" },
+		{ "-contrast <F>", "Sets contrast value to scale minimap values (doesn't affect brightness)" },
+		{ "-gray", "Write the minimap as a white-on-black GRAY8 image" },
+		{ "-keepaspect", "Ensure the aspect ratio is kept (the minimap is then letterboxed to keep aspect)" },
+		{ "-minmax <xmin ymin zmin xmax ymax zmax>", "Forces specific map dimensions (note: the minimap actually uses these dimensions, scaled to the target size while keeping aspect with centering, and 1/64 of border appended to all sides)" },
+		{ "-noautolevel", "Do not automatically level brightness and contrast" },
+		{ "-nokeepaspect", "Do not ensure the aspect ratio is kept (makes it easier to use the image in your code, but looks bad together with sharpening)" },
+		{ "-o <filename.tga>", "Sets the output file name" },
+		{ "-random <N>", "Sets the randomized supersampling count (cannot be combined with `-samples`)" },
+		{ "-samples <N>", "Sets the ordered supersampling count (cannot be combined with `-random`)" },
+		{ "-sharpen <F>", "Sets the sharpening coefficient" },
+		{ "-size <N>", "Sets the width and height of the output image" },
+		{ "-white", "Write the minimap as a white-on-transparency RGBA32 image" },
 	};
 
-	HelpOptions("MiniMap", 0, 80, options);
+	HelpOptions( "MiniMap", 0, 80, options );
 }
 
 static void HelpPk3()
 {
 	const std::vector<HelpOption> options = {
-		{"-pk3 [options] <filename.bsp .. filenameN.bsp>", "Creates a pk3 for the BSP(s) (complete Q3 support). Using file 'gamename.exclude' to exclude vanilla game resources."},
-		{"-complevel <N>", "Set compression level (-1 .. 10); 0 = uncompressed, -1 = 6, 10 = ultra zlib incompatible preset"},
-		{"-dbg", "Print wall of debug text, useful for .exclude file creation"},
-		{"-png", "include png textures, at highest priority; taking tga, jpg by default"},
+		{ "-pk3 [options] <filename.bsp .. filenameN.bsp>", "Creates a pk3 for the BSP(s) (complete Q3 support). Using file 'gamename.exclude' to exclude vanilla game resources." },
+		{ "-complevel <N>", "Set compression level (-1 .. 10); 0 = uncompressed, -1 = 6, 10 = ultra zlib incompatible preset" },
+		{ "-dbg", "Print wall of debug text, useful for .exclude file creation" },
+		{ "-png", "include png textures, at highest priority; taking tga, jpg by default" },
 	};
 
-	HelpOptions("PK3 creation", 0, 80, options);
+	HelpOptions( "PK3 creation", 0, 80, options );
 }
 
 static void HelpRepack()
 {
 	const std::vector<HelpOption> options = {
-		{"-repack [options] <filename.bsp .. filenameN.bsp|filenames.txt>", "Creates repack of BSP(s) (complete Q3 support). Rips off only used shaders to new shader file. Using file 'gamename.exclude' to exclude vanilla game resources and 'repack.exclude' to exclude resources of existing repack."},
-		{"-analyze", "Only print bsp resource references and exit"},
-		{"-complevel <N>", "Set compression level (-1 .. 10); 0 = uncompressed, -1 = 6, 10 = ultra zlib incompatible preset"},
-		{"-dbg", "Print wall of debug text"},
-		{"-png", "include png textures, at highest priority; taking tga, jpg by default"},
+		{ "-repack [options] <filename.bsp .. filenameN.bsp|filenames.txt>", "Creates repack of BSP(s) (complete Q3 support). Rips off only used shaders to new shader file. Using file 'gamename.exclude' to exclude vanilla game resources and 'repack.exclude' to exclude resources of existing repack." },
+		{ "-analyze", "Only print bsp resource references and exit" },
+		{ "-complevel <N>", "Set compression level (-1 .. 10); 0 = uncompressed, -1 = 6, 10 = ultra zlib incompatible preset" },
+		{ "-dbg", "Print wall of debug text" },
+		{ "-png", "include png textures, at highest priority; taking tga, jpg by default" },
 	};
 
-	HelpOptions("Maps repack creation", 0, 80, options);
+	HelpOptions( "Maps repack creation", 0, 80, options );
 }
 
 static void HelpJson()
 {
 	const std::vector<HelpOption> options = {
-		{"-json [options] <filename.bsp>", "Export/import BSP to/from json text files for debugging and editing purposes"},
-		{"-unpack", "Unpack BSP to json"},
-		{"-pack", "Pack json to BSP"},
-		{"-useflagnames", "While packing, deduce surface/content flag values from their names in shaders.json (useful for conversion to a game with different flag values)"},
-		{"-skipflags", "While -useflagnames, skip unknown flag names"},
+		{ "-json [options] <filename.bsp>", "Export/import BSP to/from json text files for debugging and editing purposes" },
+		{ "-unpack", "Unpack BSP to json" },
+		{ "-pack", "Pack json to BSP" },
+		{ "-useflagnames", "While packing, deduce surface/content flag values from their names in shaders.json (useful for conversion to a game with different flag values)" },
+		{ "-skipflags", "While -useflagnames, skip unknown flag names" },
 	};
 
-	HelpOptions("BSP json export/import", 0, 80, options);
+	HelpOptions( "BSP json export/import", 0, 80, options );
 }
 
 static void HelpMergeBsp()
 {
 	const std::vector<HelpOption> options = {
-		{"-mergebsp [options] <mainBsp.bsp> <bspToinject.bsp>", "Inject latter BSP to former. Tree and vis data of the main one are preserved."},
-		{"-fixnames", "Make incoming BSP target/targetname names unique to not collide with existing names"},
-		{"-world", "Also merge worldspawn model (brushes as if they were detail, no BSP tree is affected) (only merges entities by default)"},
+		{ "-mergebsp [options] <mainBsp.bsp> <bspToinject.bsp>", "Inject latter BSP to former. Tree and vis data of the main one are preserved." },
+		{ "-fixnames", "Make incoming BSP target/targetname names unique to not collide with existing names" },
+		{ "-world", "Also merge worldspawn model (brushes as if they were detail, no BSP tree is affected) (only merges entities by default)" },
 	};
 
-	HelpOptions("BSP merge", 0, 80, options);
+	HelpOptions( "BSP merge", 0, 80, options );
 }
 
 static void HelpCommon()
@@ -460,7 +461,7 @@ static void HelpCommon()
 		{"-v", "Verbose mode"}
 	};
 
-	HelpOptions("Common Options", 0, 80, options);
+	HelpOptions( "Common Options", 0, 80, options );
 
 }
 
@@ -472,31 +473,31 @@ void HelpGames(){
 
 void HelpMain(const char* arg)
 {
-	printf("Usage: q3map2 [stage] [common options...] [stage options...] [stage source file]\n");
-	printf("       q3map2 -help [stage]\n\n");
+	printf( "Usage: q3map2 [stage] [common options...] [stage options...] [stage source file]\n" );
+	printf( "       q3map2 -help [stage]\n\n" );
 
 	HelpCommon();
 
 	const std::vector<HelpOption> stages = {
-		{"-bsp", "BSP Stage"},
-		{"-vis", "VIS Stage"},
-		{"-light", "Light Stage"},
-		{"-analyze", "Analyzing BSP-like file structure"},
-		{"-scale", "Scaling"},
-		{"-shift", "Shift"},
-		{"-convert", "Converting & Decompiling"},
-		{"-export", "Exporting lightmaps"},
-		{"-import", "Importing lightmaps"},
-		{"-exportents", "Exporting entities"},
-		{"-fixaas", "Fixing AAS checksum"},
-		{"-info", "Get info about BSP file"},
-		{"-minimap", "MiniMap"},
-		{"-pk3", "PK3 creation"},
-		{"-repack", "Maps repack creation"},
-		{"-json", "BSP json export/import"},
-		{"-mergebsp", "BSP merge"},
+		{ "-bsp", "BSP Stage" },
+		{ "-vis", "VIS Stage" },
+		{ "-light", "Light Stage" },
+		{ "-analyze", "Analyzing BSP-like file structure" },
+		{ "-scale", "Scaling" },
+		{ "-shift", "Shift" },
+		{ "-convert", "Converting & Decompiling" },
+		{ "-export", "Exporting lightmaps" },
+		{ "-import", "Importing lightmaps" },
+		{ "-exportents", "Exporting entities" },
+		{ "-fixaas", "Fixing AAS checksum" },
+		{ "-info", "Get info about BSP file" },
+		{ "-minimap", "MiniMap" },
+		{ "-pk3", "PK3 creation" },
+		{ "-repack", "Maps repack creation" },
+		{ "-json", "BSP json export/import" },
+		{ "-mergebsp", "BSP merge" },
 	};
-	void(*help_funcs[])() = {
+	void( *help_funcs[] )() = {
 		HelpBsp,
 		HelpVis,
 		HelpLight,
@@ -522,16 +523,12 @@ void HelpMain(const char* arg)
 			arg++;
 
 		for ( size_t i = 0; i < stages.size(); ++i )
-			if ( striEqual(arg, stages[i].name+1) )
-			{
-				help_funcs[i]();
-				return;
-			}
-		if( striEqual( arg, "game" ) ){
-			HelpGames();
-			return;
-		}
+			if ( striEqual( arg, stages[i].name + 1 ) )
+				return help_funcs[i]();
+
+		if( striEqual( arg, "game" ) )
+			return HelpGames();
 	}
 
-	HelpOptions("Stages", 0, 80, stages);
+	HelpOptions( "Stages", 0, 80, stages );
 }

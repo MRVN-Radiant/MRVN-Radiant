@@ -24,12 +24,13 @@
 #include "stream/textstream.h"
 #include "string/string.h"
 #include "inout.h"
+#include <type_traits>
 
 
 /// \brief A TextOutputStream which writes to a null terminated fixed length char array.
 /// Similar to std::stringstream.
 template<std::size_t SIZE>
-class StringFixedSize : public TextOutputStream
+class StringFixedSize final : public TextOutputStream
 {
 	char m_string[SIZE];
 	std::size_t m_length;
@@ -37,8 +38,11 @@ public:
 	StringFixedSize() {
 		clear();
 	}
-	explicit StringFixedSize( const char* string ){
-		operator()( string );
+	template<typename ... Args>
+	// prevent override of copy constructor
+		requires ( !std::is_same_v<std::tuple<std::decay_t<Args>...>, std::tuple<StringFixedSize>> )
+	explicit StringFixedSize( Args&& ... args ) {
+		operator()( std::forward<Args>( args ) ... );
 	}
 	std::size_t write( const char* buffer, std::size_t length ) override {
 		if( m_length + length < SIZE ){
@@ -53,15 +57,14 @@ public:
 		return length;
 	}
 
-	StringFixedSize& operator=( const char* string ){
-		return operator()( string );
+	void operator=( const char* string ){
+		 operator()( string );
 	}
 
 	template<typename ... Args>
-	StringFixedSize& operator()( Args&& ... args ){
+	void operator()( Args&& ... args ){
 		clear();
 		( *this << ... << std::forward<Args>( args ) );
-		return *this;
 	}
 
 	operator const char*() const {
@@ -85,4 +88,4 @@ inline StringFixedSize<SIZE>& operator<<( StringFixedSize<SIZE>& ostream, const 
 	return ostream_write( ostream, t );
 }
 
-using String512 = StringFixedSize<512>;
+using String64 = StringFixedSize<64>;

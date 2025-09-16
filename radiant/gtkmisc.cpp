@@ -20,7 +20,7 @@
    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
    DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
-   DIRECT,INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
    ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
@@ -94,7 +94,7 @@ void command_disconnect_accelerator( const char* name ){
 static void action_set_checked_callback( QAction& action, bool enabled ){
 	action.setChecked( enabled );
 }
-typedef ReferenceCaller1<QAction, bool, action_set_checked_callback> ActionSetCheckedCaller;
+typedef ReferenceCaller<QAction, void(bool), action_set_checked_callback> ActionSetCheckedCaller;
 
 inline QAction* toggle_add_accelerator_( const char* name ){
 	GlobalShortcuts_register( name, 2 );

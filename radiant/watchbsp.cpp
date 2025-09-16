@@ -20,7 +20,7 @@
    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
    DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
-   DIRECT,INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
    ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
@@ -186,13 +186,13 @@ public:
 		importer( m_string.c_str() );
 	}
 	auto getImportCaller(){
-		return MemberCaller1<DefaultableString, const char*, &DefaultableString::Import>( *this );
+		return MemberCaller<DefaultableString, void(const char*), &DefaultableString::Import>( *this );
 	}
 	auto getExportWithDefaultCaller(){
-		return ConstMemberCaller1<DefaultableString, const StringImportCallback&, &DefaultableString::ExportWithDefault>( *this );
+		return ConstMemberCaller<DefaultableString, void(const StringImportCallback&), &DefaultableString::ExportWithDefault>( *this );
 	}
 	auto getExportCaller(){
-		return ConstMemberCaller1<DefaultableString, const StringImportCallback&, &DefaultableString::Export>( *this );
+		return ConstMemberCaller<DefaultableString, void(const StringImportCallback&), &DefaultableString::Export>( *this );
 	}
 	CopiedString string() const {
 		return m_string.empty()? m_getDefault() : m_string;
@@ -273,7 +273,7 @@ void Build_constructPage( PreferenceGroup& group ){
 	Build_constructPreferences( page );
 }
 void Build_registerPreferencesPage(){
-	PreferencesDialog_addSettingsPage( FreeCaller1<PreferenceGroup&, Build_constructPage>() );
+	PreferencesDialog_addSettingsPage( makeCallbackF( Build_constructPage ) );
 }
 
 #include "preferencesystem.h"
@@ -606,7 +606,7 @@ void CWatchBSP::DoEBeginStep(){
 
 	if ( !m_bBSPPlugin ) {
 		globalOutputStream() << "=== running build command ===\n"
-			                 << m_commands[m_iCurrentStep] << '\n';
+		                     << m_commands[m_iCurrentStep] << '\n';
 
 		if ( !Q_Exec( NULL, const_cast<char*>( m_commands[m_iCurrentStep].c_str() ), NULL, true, false ) ) {
 			const auto msg = StringStream( "Failed to execute the following command: ", m_commands[m_iCurrentStep],

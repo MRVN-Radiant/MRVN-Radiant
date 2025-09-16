@@ -696,7 +696,7 @@ public:
 				}
 
 				for( const auto& [ name, path ] : name_path ){
-					EntityClassFGD_loadFile( StringStream()( path, name ) );
+					EntityClassFGD_loadFile( StringStream( path, name ) );
 				}
 			}
 

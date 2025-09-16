@@ -30,8 +30,7 @@ void OnExportClicked( bool choose_path ){
 
 			if ( !file_readable( buffer ) ) {
 				// just go to fsmain
-				buffer.clear();
-				buffer << GlobalRadiant().getEnginePath() << GlobalRadiant().getGameName();
+				buffer( GlobalRadiant().getEnginePath(), GlobalRadiant().getGameName() );
 			}
 		}
 

@@ -20,7 +20,7 @@
    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
    DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
-   DIRECT,INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
    ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
@@ -79,7 +79,7 @@ void ActiveShaders_IteratorBegin();
 bool ActiveShaders_IteratorAtEnd();
 IShader *ActiveShaders_IteratorCurrent();
 void ActiveShaders_IteratorIncrement();
-Callback g_ActiveShadersChangedNotify;
+Callback<void()> g_ActiveShadersChangedNotify;
 
 void FreeShaders();
 void LoadShaderFile( const char *filename );
@@ -980,11 +980,8 @@ public:
 		if ( m_pTexture2->texture_number == 0 ) {
 			m_notfound2 = m_pTexture2;
 
-			{
-				StringOutputStream name( 256 );
-				name << GlobalRadiant().getAppPath() << "bitmaps/" << ( IsDefault() ? "notex.png" : "shadernotex.png" );
-				m_pTexture2 = GlobalTexturesCache().capture( LoadImageCallback( 0, loadBitmap ), name.c_str() );
-			}
+			const auto name = StringStream( GlobalRadiant().getAppPath(), "bitmaps/", ( IsDefault() ? "notex.png" : "shadernotex.png" ) );
+			m_pTexture2 = GlobalTexturesCache().capture( LoadImageCallback( 0, loadBitmap ), name );
 		}
 
 		realiseLighting();
@@ -1079,7 +1076,7 @@ public:
 		m_Name = name;
 	}
 
-	class MapLayer : public ShaderLayer
+	class MapLayer final : public ShaderLayer
 	{
 		qtexture_t* m_texture;
 		BlendFunc m_blendFunc;
@@ -1092,16 +1089,16 @@ public:
 			m_clampToBorder( false ),
 			m_alphaTest( alphaTest ){
 		}
-		qtexture_t* texture() const {
+		qtexture_t* texture() const override {
 			return m_texture;
 		}
-		BlendFunc blendFunc() const {
+		BlendFunc blendFunc() const override {
 			return m_blendFunc;
 		}
-		bool clampToBorder() const {
+		bool clampToBorder() const override {
 			return m_clampToBorder;
 		}
-		float alphaTest() const {
+		float alphaTest() const override {
 			return m_alphaTest;
 		}
 	};
@@ -1539,9 +1536,6 @@ void LoadShaderFile( const char* filename ){
 	}
 }
 
-typedef FreeCaller1<const char*, LoadShaderFile> LoadShaderFileCaller;
-
-
 void loadGuideFile( const char* filename ){
 	const auto fullname = StringStream( "guides/", filename );
 	ArchiveTextFile* file = GlobalFileSystem().openTextFile( fullname );
@@ -1561,9 +1555,6 @@ void loadGuideFile( const char* filename ){
 		globalWarningStream() << "Unable to read guide file " << fullname << '\n';
 	}
 }
-
-typedef FreeCaller1<const char*, loadGuideFile> LoadGuideFileCaller;
-
 
 CShader* Try_Shader_ForName( const char* name ){
 	{
@@ -1635,7 +1626,7 @@ void IfFound_dumpUnreferencedShader( bool& bFound, const char* filename ){
 		globalOutputStream() << '\t' << filename << '\n';
 	}
 }
-typedef ReferenceCaller1<bool, const char*, IfFound_dumpUnreferencedShader> IfFoundDumpUnreferencedShaderCaller;
+typedef ReferenceCaller<bool, void(const char*), IfFound_dumpUnreferencedShader> IfFoundDumpUnreferencedShaderCaller;
 
 void DumpUnreferencedShaders(){
 	bool bFound = false;
@@ -1659,9 +1650,6 @@ void ShaderList_addShaderFile( const char* dirstring ){
 	}
 }
 
-typedef FreeCaller1<const char*, ShaderList_addShaderFile> AddShaderFileCaller;
-
-
 /*
    ==================
    BuildShaderList
@@ -1674,7 +1662,7 @@ void BuildShaderList( TextInputStream& shaderlist ){
 	for( const char* token; tokeniser.nextLine(), token = tokeniser.getToken(); )
 	{
 		// each token should be a shader filename
-		shaderFile ( token );
+		shaderFile( token );
 		if( !path_extension_is( token, g_shadersExtension ) )
 			shaderFile << '.' << g_shadersExtension;
 
@@ -1700,8 +1688,6 @@ void ShaderList_addFromArchive( const char *archivename ){
 	}
 }
 
-typedef FreeCaller1<const char *, ShaderList_addFromArchive> AddShaderListFromArchiveCaller;
-
 #include "stream/filestream.h"
 
 bool shaderlist_findOrInstall( const char* enginePath, const char* toolsPath, const char* shaderPath, const char* gamename ){
@@ -1726,7 +1712,7 @@ bool shaderlist_findOrInstall( const char* enginePath, const char* toolsPath, co
 
 void Shaders_Load(){
 	if ( g_shaderLanguage == SHADERLANGUAGE_QUAKE4 ) {
-		GlobalFileSystem().forEachFile( "guides/", "guide", LoadGuideFileCaller(), 0 );
+		GlobalFileSystem().forEachFile( "guides/", "guide", makeCallbackF( loadGuideFile ), 0 );
 	}
 
 	const char* shaderPath = GlobalRadiant().getGameDescriptionKeyValue( "shaderpath" );
@@ -1747,18 +1733,18 @@ void Shaders_Load(){
 				shaderlist_findOrInstall( enginePath, toolsPath, path, gamename );
 			}
 
-			GlobalFileSystem().forEachArchive( AddShaderListFromArchiveCaller(), false, true );
+			GlobalFileSystem().forEachArchive( makeCallbackF( ShaderList_addFromArchive ), false, true );
 			if( !l_shaderfiles.empty() ){
 				DumpUnreferencedShaders();
 			}
 			else{
 				globalOutputStream() << "No shaderlist.txt found: loading all shaders\n";
-				GlobalFileSystem().forEachFile( path, g_shadersExtension, AddShaderFileCaller(), 1 );
+				GlobalFileSystem().forEachFile( path, g_shadersExtension, makeCallbackF( ShaderList_addShaderFile ), 1 );
 			}
 		}
 		else
 		{
-			GlobalFileSystem().forEachFile( path, g_shadersExtension, AddShaderFileCaller(), 0 );
+			GlobalFileSystem().forEachFile( path, g_shadersExtension, makeCallbackF( ShaderList_addShaderFile ), 0 );
 		}
 
 		StringOutputStream shadername( 256 );
@@ -1837,7 +1823,7 @@ public:
 	void incrementActiveShadersIterator(){
 		ActiveShaders_IteratorIncrement();
 	}
-	void setActiveShadersChangedNotify( const Callback& notify ){
+	void setActiveShadersChangedNotify( const Callback<void()>& notify ){
 		g_ActiveShadersChangedNotify = notify;
 	}
 

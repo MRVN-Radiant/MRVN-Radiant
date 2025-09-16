@@ -339,7 +339,7 @@ static bool EntityClass_parse( EntityClass& entityClass, Tokeniser& tokeniser ){
 
 		if ( currentString != 0 && string_equal( key, "\\" ) ) {
 			tokeniser.nextLine();
-			*currentString <<' ';
+			*currentString << ' ';
 			PARSE_RETURN_FALSE_IF_FAIL( EntityClassDoom3_parseString( tokeniser, *currentString ) );
 			continue;
 		}
@@ -690,7 +690,7 @@ public:
 	void realise(){
 		if ( --m_unrealised == 0 ) {
 			globalOutputStream() << "searching vfs directory " << makeQuoted( "def" ) << " for *.def\n";
-			GlobalFileSystem().forEachFile( "def/", "def", FreeCaller1<const char*, EntityClassDoom3_loadFile>() );
+			GlobalFileSystem().forEachFile( "def/", "def", makeCallbackF( EntityClassDoom3_loadFile ) );
 
 			{
 				for ( Models::iterator i = g_models.begin(); i != g_models.end(); ++i )

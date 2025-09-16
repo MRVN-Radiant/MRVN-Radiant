@@ -28,7 +28,7 @@
 #pragma once
 
 #include "generic/constant.h"
-#include "generic/callbackfwd.h"
+#include "generic/callback.h"
 
 class Matrix4;
 
@@ -43,7 +43,7 @@ class CameraModel
 {
 public:
 	STRING_CONSTANT( Name, "CameraModel" );
-	virtual void setCameraView( CameraView* view, const Callback& disconnect ) = 0;
+	virtual void setCameraView( CameraView* view, const Callback<void()>& disconnect ) = 0;
 };
 
 template<typename Element> class BasicVector3;

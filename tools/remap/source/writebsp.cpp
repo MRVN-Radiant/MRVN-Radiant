@@ -327,8 +327,6 @@ void EndBSPFile( bool do_write ){
 		//WriteSurfaceExtraFile( source );
 
 		/* write the bsp */
-		auto path = StringStream( source, ".bsp" );
-		WriteBSPFile( path );
-		WriteEntFiles( source );
+		WriteBSPFile( StringStream( source, ".bsp" ) );
 	}
 }

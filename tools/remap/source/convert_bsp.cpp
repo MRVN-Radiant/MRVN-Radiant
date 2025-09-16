@@ -394,7 +394,6 @@ int ConvertBSPMain( Args& args ){
 	// 	//g_game = convertGame;
 	// 	/* write bsp */
 	// 	path_set_extension( source, "_c.bsp" );
-	// 	Sys_Printf( "Writing %s\n", source );
 	// 	WriteBSPFile( source );
 
 	// 	/* return to sender */

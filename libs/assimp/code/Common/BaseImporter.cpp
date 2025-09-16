@@ -384,7 +384,7 @@ void BaseImporter::ConvertToUTF8(std::vector<char> &data) {
         ASSIMP_LOG_DEBUG("Found UTF-16 BOM ...");
 
         std::vector<unsigned char> output;
-        utf8::utf16to8(data.begin(), data.end(), back_inserter(output));
+        utf8::utf16to8(data.cbegin(), data.cend(), back_inserter(output));
         return;
     }
 }

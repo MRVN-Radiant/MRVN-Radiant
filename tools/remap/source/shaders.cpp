@@ -756,7 +756,7 @@ shaderInfo_t *ShaderInfoForShader(const char *shaderName) {
     }
 
     /* strip off extension */
-    auto shader = String512()(PathExtensionless(shaderName));
+    String64 shader( PathExtensionless( shaderName ) );
 
     /* search for it */
     deprecationDepth = 0;
@@ -980,7 +980,7 @@ void LoadShaderInfo() {
     }
 
     /* we can pile up several shader files, the one in baseq3 and ones in the mod dir or other spots */
-    const auto  filename = StringStream<64>(g_game->shaderPath, "/shaderlist.txt");
+    const auto filename = StringStream<64>( g_game->shaderPath, "/shaderlist.txt" );
     const int   count = vfsGetFileCount(filename);
 
     /* load them all */

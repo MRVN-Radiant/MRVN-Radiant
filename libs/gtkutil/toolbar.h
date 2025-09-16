@@ -21,8 +21,8 @@
 
 #pragma once
 
-#include "generic/callbackfwd.h"
+#include "generic/callback.h"
 #include <QToolBar>
 
-QAction* toolbar_append_button( QToolBar* toolbar, const char* description, const char* icon, const Callback& callback );
-QAction* toolbar_append_toggle_button( QToolBar* toolbar, const char* description, const char* icon, const Callback& callback );
+QAction* toolbar_append_button( QToolBar* toolbar, const char* description, const char* icon, const Callback<void()>& callback );
+QAction* toolbar_append_toggle_button( QToolBar* toolbar, const char* description, const char* icon, const Callback<void()>& callback );

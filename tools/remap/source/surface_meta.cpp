@@ -30,6 +30,7 @@
 
 /* dependencies */
 #include "remap.h"
+#include "tjunction.h"
 #include "timer.h"
 #include <map>
 #include <set>
@@ -342,10 +343,6 @@ static void SurfaceToMetaTriangles( mapDrawSurface_t *ds ){
  */
 
 static void TriangulatePatchSurface( const entity_t& e, mapDrawSurface_t *ds ){
-	int x, y, pw[ 5 ], r;
-	mapDrawSurface_t    *dsNew;
-	mesh_t src, *subdivided, *mesh;
-
 	/* vortex: _patchMeta, _patchQuality, _patchSubdivide support */
 	const bool forcePatchMeta = e.boolForKey( "_patchMeta", "patchMeta" );
 
@@ -354,14 +351,14 @@ static void TriangulatePatchSurface( const entity_t& e, mapDrawSurface_t *ds ){
 		return;
 	}
 	/* make a mesh from the drawsurf */
+	mesh_t src;
 	src.width = ds->patchWidth;
 	src.height = ds->patchHeight;
 	src.verts = ds->verts;
-	//%	subdivided = SubdivideMesh( src, 8, 999 );
+	//%	mesh_t *subdivided = SubdivideMesh( src, 8, 999 );
 
 	int iterations;
-	int patchSubdivision;
-	if ( e.read_keyvalue( patchSubdivision, "_patchSubdivide", "patchSubdivide" ) ) {
+	if ( int patchSubdivision; e.read_keyvalue( patchSubdivision, "_patchSubdivide", "patchSubdivide" ) ) {
 		iterations = IterationsForCurve( ds->longestCurve, patchSubdivision );
 	}
 	else{
@@ -369,20 +366,20 @@ static void TriangulatePatchSurface( const entity_t& e, mapDrawSurface_t *ds ){
 		iterations = IterationsForCurve( ds->longestCurve, patchSubdivisions / ( patchQuality == 0? 1 : patchQuality ) );
 	}
 
-	subdivided = SubdivideMesh2( src, iterations ); //%	ds->maxIterations
+	mesh_t *subdivided = SubdivideMesh2( src, iterations ); //%	ds->maxIterations
 
 	/* fit it to the curve and remove colinear verts on rows/columns */
 	PutMeshOnCurve( *subdivided );
-	mesh = RemoveLinearMeshColumnsRows( subdivided );
+	mesh_t *mesh = RemoveLinearMeshColumnsRows( subdivided );
 	FreeMesh( subdivided );
 	//% MakeMeshNormals( mesh );
 
 	/* make a copy of the drawsurface */
-	dsNew = AllocDrawSurface( ESurfaceType::Meta );
+	mapDrawSurface_t *dsNew = AllocDrawSurface( ESurfaceType::Meta );
 	memcpy( dsNew, ds, sizeof( *ds ) );
 
 	/* if the patch is nonsolid, then discard it */
-	//if ( !( ds->shaderInfo->compileFlags & C_SOLID ) && !( ds->shaderInfo->contentFlags & GetRequiredSurfaceParm( "playerclip"_Tstring ).contentFlags ) ) {
+	//if ( !( ds->shaderInfo->compileFlags & C_SOLID ) && !( ds->shaderInfo->contentFlags & GetRequiredSurfaceParm<"playerclip">().contentFlags ) ) {
 	//	ClearSurface( ds );
 	//}
 
@@ -399,19 +396,20 @@ static void TriangulatePatchSurface( const entity_t& e, mapDrawSurface_t *ds ){
 	ds->verts = mesh->verts;
 
 	/* iterate through the mesh quads */
-	for ( y = 0; y < ( mesh->height - 1 ); y++ )
+	for ( int y = 0; y < ( mesh->height - 1 ); y++ )
 	{
-		for ( x = 0; x < ( mesh->width - 1 ); x++ )
+		for ( int x = 0; x < ( mesh->width - 1 ); x++ )
 		{
 			/* set indexes */
-			pw[ 0 ] = x + ( y * mesh->width );
-			pw[ 1 ] = x + ( ( y + 1 ) * mesh->width );
-			pw[ 2 ] = x + 1 + ( ( y + 1 ) * mesh->width );
-			pw[ 3 ] = x + 1 + ( y * mesh->width );
-			pw[ 4 ] = x + ( y * mesh->width );    /* same as pw[ 0 ] */
-
+			const int pw[ 5 ] = {
+				x + ( y * mesh->width ),
+				x + ( ( y + 1 ) * mesh->width ),
+				x + 1 + ( ( y + 1 ) * mesh->width ),
+				x + 1 + ( y * mesh->width ),
+				x + ( y * mesh->width )    /* same as pw[ 0 ] */
+			};
 			/* set radix */
-			r = ( x + y ) & 1;
+			const int r = ( x + y ) & 1;
 
 			/* make first triangle */
 			ds->indexes[ ds->numIndexes++ ] = pw[ r + 0 ];
@@ -435,7 +433,7 @@ static void TriangulatePatchSurface( const entity_t& e, mapDrawSurface_t *ds ){
 	ClassifySurfaces( 1, ds );
 }
 
-#define TINY_AREA 1.0f
+#define TINY_AREA   1.0
 #define MAXAREA_MAXTRIES 8
 static int MaxAreaIndexes( bspDrawVert_t *vert, int cnt, int *indexes ){
 	int r, s, t, bestR = 0, bestS = 1, bestT = 2;
@@ -452,7 +450,7 @@ static int MaxAreaIndexes( bspDrawVert_t *vert, int cnt, int *indexes ){
 	A = 0;
 	for ( i = 1; i + 1 < cnt; ++i )
 	{
-		A += vector3_length( vector3_cross( vert[i].xyz - vert[0].xyz, vert[i + 1].xyz - vert[0].xyz ) );
+		A += triangle_area2x( vert[0].xyz, vert[i].xyz, vert[i + 1].xyz );
 	}
 	V = 0;
 	for ( i = 0; i < cnt; ++i )
@@ -533,7 +531,7 @@ static int MaxAreaIndexes( bspDrawVert_t *vert, int cnt, int *indexes ){
 			}
 			// abc abc abc abc abc abc
 
-			bestA = vector3_length( vector3_cross( vert[bestS].xyz - vert[bestR].xyz, vert[bestT].xyz - vert[bestR].xyz ) );
+			bestA = triangle_area2x( vert[bestR].xyz, vert[bestS].xyz, vert[bestT].xyz );
 		}
 
 		if ( bestA < TINY_AREA ) {
@@ -727,8 +725,7 @@ static void FanFaceSurface( mapDrawSurface_t *ds ){
 #define MAX_INDEXES     1024
 
 void StripFaceSurface( mapDrawSurface_t *ds ){
-	int i, r, least, rotate, numIndexes, ni, a, b, c, indexes[ MAX_INDEXES ];
-
+	int numIndexes, indexes[ MAX_INDEXES ];
 
 	/* try to early out  */
 	if ( !ds->numVerts || ( ds->type != ESurfaceType::Face && ds->type != ESurfaceType::Decal ) ) {
@@ -745,9 +742,9 @@ void StripFaceSurface( mapDrawSurface_t *ds ){
 	else
 	{
 		/* ydnar: find smallest coordinate */
-		least = 0;
+		int least = 0;
 		if ( ds->shaderInfo != NULL && !ds->shaderInfo->autosprite ) {
-			for ( i = 0; i < ds->numVerts; i++ )
+			for ( int i = 0; i < ds->numVerts; i++ )
 			{
 				/* get points */
 				const Vector3& v1 = ds->verts[ i ].xyz;
@@ -768,59 +765,55 @@ void StripFaceSurface( mapDrawSurface_t *ds ){
 			Error( "MAX_INDEXES exceeded for surface (%d > %d) (%d verts)", numIndexes, MAX_INDEXES, ds->numVerts );
 		}
 
-		/* try all possible orderings of the points looking for a non-degenerate strip order */
-		ni = 0;
-		for ( r = 0; r < ds->numVerts; r++ )
+		class TriEval
 		{
-			/* set rotation */
-			rotate = ( r + least ) % ds->numVerts;
+			const bspDrawVert_t *m_verts;
+			double m_area = std::numeric_limits<double>::max(); // 2x area
+			double m_angle = std::numeric_limits<double>::max(); // squared sin of the angle
+		public:
+			TriEval( const bspDrawVert_t *verts ) : m_verts( verts ){
+			}
+			void push( int a, int b, int c ){
+				value_minimize( m_angle, triangle_min_angle_squared_sin( m_verts[a].xyz, m_verts[b].xyz, m_verts[c].xyz ) );
+				value_minimize( m_area, triangle_area2x( m_verts[a].xyz, m_verts[b].xyz, m_verts[c].xyz ) );
+			}
+			bool decent() const {
+				return m_angle > 1e-5 && m_area > TINY_AREA;
+			}
+			void reset(){
+				*this = TriEval( m_verts );
+			}
+		} triEval( ds->verts );
 
+		const auto idx = [n = ds->numVerts]( int i ){ return i < 0? i + n : i < n? i : i - n; };
+
+		/* try all possible orderings of the points looking for a non-degenerate strip order */
+		for ( int r = 0; r < ds->numVerts; ++r )
+		{
+			triEval.reset();
 			/* walk the winding in both directions */
-			for ( ni = 0, i = 0; i < ds->numVerts - 2 - i; i++ )
+			for( int i = idx( r + least ), j = idx( i - 1 ), k, swap = 0, out = 0;
+			    ( swap ^= bspDrawVert_is_tjunc( ds->verts[idx( swap? i + 1 : j - 1 )] )
+			           >= bspDrawVert_is_tjunc( ds->verts[idx( swap? j - 1 : i + 1 )] ) )
+			    ? ( k = j, j = idx( --j ) ) : ( k = i, i = idx( ++i ) ), i != j; )
 			{
-				/* make indexes */
-				a = ( ds->numVerts - 1 - i + rotate ) % ds->numVerts;
-				b = ( i + rotate ) % ds->numVerts;
-				c = ( ds->numVerts - 2 - i + rotate ) % ds->numVerts;
-
 				/* test this triangle */
-				if ( ds->numVerts > 4 && IsTriangleDegenerate( ds->verts, a, b, c ) ) {
+				if ( triEval.push( i, j, k ), !triEval.decent() ) {
 					break;
 				}
-				indexes[ ni++ ] = a;
-				indexes[ ni++ ] = b;
-				indexes[ ni++ ] = c;
-
-				/* handle end case */
-				if ( i + 1 != ds->numVerts - 1 - i ) {
-					/* make indexes */
-					a = ( ds->numVerts - 2 - i + rotate ) % ds->numVerts;
-					b = ( i + rotate ) % ds->numVerts;
-					c = ( i + 1 + rotate ) % ds->numVerts;
-
-					/* test triangle */
-					if ( ds->numVerts > 4 && IsTriangleDegenerate( ds->verts, a, b, c ) ) {
-						break;
-					}
-					indexes[ ni++ ] = a;
-					indexes[ ni++ ] = b;
-					indexes[ ni++ ] = c;
-				}
+				indexes[ out++ ] = i;
+				indexes[ out++ ] = j;
+				indexes[ out++ ] = k;
 			}
 
-			/* valid strip? */
-			if ( ni == numIndexes ) {
-				break;
-			}
+			if( triEval.decent() )
+				goto okej;
 		}
 
 		/* if any triangle in the strip is degenerate, render from a centered fan point instead */
-		if ( ni < numIndexes ) {
-			FanFaceSurface( ds );
-			return;
-		}
+		return FanFaceSurface( ds );
 	}
-
+okej:
 	/* copy strip triangle indexes */
 	ds->numIndexes = numIndexes;
 	ds->indexes = safe_malloc( ds->numIndexes * sizeof( int ) );
@@ -1431,7 +1424,7 @@ static int AddMetaTriangleToSurface( mapDrawSurface_t *ds, const metaTriangle_t&
 		newTexMinMax.extend( Vector3( tri.m_vertices[ 0 ]->st ) );
 		newTexMinMax.extend( Vector3( tri.m_vertices[ 1 ]->st ) );
 		newTexMinMax.extend( Vector3( tri.m_vertices[ 2 ]->st ) );
-		if( texMinMax.surrounds( newTexMinMax ) ){
+		if( numVerts_original == 0 || texMinMax.surrounds( newTexMinMax ) ){
 			score += 4 * ST_SCORE;
 		}
 		else{

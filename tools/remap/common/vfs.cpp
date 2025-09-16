@@ -20,7 +20,7 @@
    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
    DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
-   DIRECT,INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   DIRECT INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
    ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
@@ -206,7 +206,7 @@ std::vector<CopiedString> vfsListShaderFiles( const char *shaderPath ){
 	};
 	/* search in dirs */
 	for ( const auto& strdir : g_strDirs ){
-		GDir* dir = g_dir_open(StringStream(strdir, shaderPath, '/' ), 0, NULL );
+		GDir *dir = g_dir_open( StringStream( strdir, shaderPath, '/' ), 0, NULL );
 
 		if ( dir != NULL ) {
 			const char* name;
@@ -308,7 +308,7 @@ MemBuffer vfsLoadFile( const char *filename, int index /* = 0 */ ){
 	{
 		if ( strEqual( file.name.c_str(), fixed ) && 0 == index-- )
 		{
-			snprintf( g_strLoadedFileLocation, sizeof( g_strLoadedFileLocation ), "%s :: %s", file.pak.unzFilePath.c_str(), filename );
+			std::snprintf( g_strLoadedFileLocation, std::size( g_strLoadedFileLocation ), "%s :: %s", file.pak.unzFilePath.c_str(), filename );
 
 			unzFile zipfile = file.pak.zipfile;
 			*(unz_s*)zipfile = file.zipinfo;

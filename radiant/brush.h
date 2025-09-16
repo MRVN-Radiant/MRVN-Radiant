@@ -176,12 +176,12 @@ inline void planepts_quantise( PlanePoints planepts, double snap ){
 	vector3_snap( planepts[2], snap );
 }
 
-inline float vector3_max_component( const Vector3& vec3 ){
+inline float vector3_max_abs_component( const Vector3& vec3 ){
 	return std::max( fabsf( vec3[0] ), std::max( fabsf( vec3[1] ), fabsf( vec3[2] ) ) );
 }
 
 inline void edge_snap( Vector3& edge, double snap ){
-	float scale = static_cast<float>( ceil( fabs( snap / vector3_max_component( edge ) ) ) );
+	float scale = static_cast<float>( ceil( fabs( snap / vector3_max_abs_component( edge ) ) ) );
 	if ( scale > 0.0f ) {
 		vector3_scale( edge, scale );
 	}
@@ -1113,14 +1113,7 @@ public:
 		else if( g_bp_globals.m_texdefTypeId == TEXDEFTYPEID_VALVE ){
 			const DoubleVector3 from = vector3_normalised( vector3_cross( m_texdefTransformed.m_basis_s, m_texdefTransformed.m_basis_t ) );
 			const DoubleVector3 to = matrix4_transformed_normal( matrix, from );
-			Quaternion quat = quaternion_for_unit_vectors( from, to );
-			if( quat.w() != quat.w() ){ //handle 180` cases
-				if( vector3_max_abs_component_index( from ) == 2 )
-					quat = Quaternion( g_vector3_axis_y, 0 );
-				else
-					quat = Quaternion( g_vector3_axis_z, 0 );
-			}
-			const Matrix4 mat = matrix4_rotation_for_quaternion( quat );
+			const Matrix4 mat = matrix4_rotation_for_quaternion( quaternion_for_unit_vectors_safe( from, to ) );
 			m_texdefTransformed.m_basis_s = vector3_normalised( matrix4_transformed_direction( mat, m_texdefTransformed.m_basis_s ) );
 			m_texdefTransformed.m_basis_t = vector3_normalised( matrix4_transformed_direction( mat, m_texdefTransformed.m_basis_t ) );
 		}
@@ -1502,16 +1495,12 @@ public:
 	SelectableEdge( Faces& faces, FaceVertexId faceVertex )
 		: m_faces( faces ), m_faceVertex( faceVertex ){
 	}
-	SelectableEdge& operator=( const SelectableEdge& other ){
-		m_faceVertex = other.m_faceVertex;
-		return *this;
-	}
 
 	Face& getFace() const {
 		return *m_faces[m_faceVertex.getFace()];
 	}
 
-	void testSelect( SelectionTest& test, SelectionIntersection& best ){
+	void testSelect( SelectionTest& test, SelectionIntersection& best ) const {
 		test.TestPoint( getEdge(), best );
 	}
 };
@@ -1528,10 +1517,6 @@ public:
 
 	SelectableVertex( Faces& faces, FaceVertexId faceVertex )
 		: m_faces( faces ), m_faceVertex( faceVertex ){
-	}
-	SelectableVertex& operator=( const SelectableVertex& other ){
-		m_faceVertex = other.m_faceVertex;
-		return *this;
 	}
 
 	Face& getFace() const {
@@ -1614,8 +1599,8 @@ private:
 	AABB m_aabb_local;
 // ----
 
-	Callback m_evaluateTransform;
-	Callback m_boundsChanged;
+	Callback<void()> m_evaluateTransform;
+	Callback<void()> m_boundsChanged;
 
 	mutable bool m_planeChanged;   // b-rep evaluation required
 	mutable bool m_transformChanged;   // transform evaluation required
@@ -1625,7 +1610,7 @@ private:
 public:
 	STRING_CONSTANT( Name, "Brush" );
 
-	Callback m_lightsChanged;
+	Callback<void()> m_lightsChanged;
 
 // static data
 	static Shader* m_state_point;
@@ -1635,7 +1620,7 @@ public:
 	static EBrushType m_type;
 	static double m_maxWorldCoord;
 
-	Brush( scene::Node& node, const Callback& evaluateTransform, const Callback& boundsChanged ) :
+	Brush( scene::Node& node, const Callback<void()>& evaluateTransform, const Callback<void()>& boundsChanged ) :
 		m_node( &node ),
 		m_undoable_observer( 0 ),
 		m_map( 0 ),
@@ -1649,7 +1634,7 @@ public:
 		m_transformChanged( false ){
 		planeChanged();
 	}
-	Brush( const Brush& other, scene::Node& node, const Callback& evaluateTransform, const Callback& boundsChanged ) :
+	Brush( const Brush& other, scene::Node& node, const Callback<void()>& evaluateTransform, const Callback<void()>& boundsChanged ) :
 		m_node( &node ),
 		m_undoable_observer( 0 ),
 		m_map( 0 ),
@@ -1817,7 +1802,7 @@ public:
 		planeChanged();
 		m_transformChanged = true;
 	}
-	typedef MemberCaller<Brush, &Brush::transformChanged> TransformChangedCaller;
+	typedef MemberCaller<Brush, void(), &Brush::transformChanged> TransformChangedCaller;
 
 	void evaluateTransform(){
 		if ( m_transformChanged ) {
@@ -2699,7 +2684,7 @@ public:
 		}
 		m_selectionChanged( selectable );
 	}
-	typedef MemberCaller1<FaceInstance, const Selectable&, &FaceInstance::selectedChanged> SelectedChangedCaller;
+	typedef MemberCaller<FaceInstance, void(const Selectable&), &FaceInstance::selectedChanged> SelectedChangedCaller;
 
 	bool selectedVertices() const {
 		return !m_vertexSelection.empty();
@@ -2787,7 +2772,7 @@ public:
 	}
 
 	void iterate_selected( AABB& aabb ) const {
-		SelectedComponents_foreach( AABBExtendByPoint( aabb ) );
+		SelectedComponents_foreach( [&]( const Vector3& point ){ aabb_extend_by_point_safe( aabb, point ); } );
 	}
 
 	void gatherSelectedComponents( const Vector3Callback& callback ) const {
@@ -2811,19 +2796,10 @@ public:
 		}
 	}
 
-	class RenderablePointVectorPushBack
-	{
-		RenderablePointVector& m_points;
-	public:
-		RenderablePointVectorPushBack( RenderablePointVector& points ) : m_points( points ){
-		}
-		void operator()( const Vector3& point ) const {
-			m_points.push_back( pointvertex_for_windingpoint( point, colour_selected ) );
-		}
-	};
-
 	void iterate_selected( RenderablePointVector& points ) const {
-		SelectedComponents_foreach( RenderablePointVectorPushBack( points ) );
+		SelectedComponents_foreach( [&]( const Vector3& point ){
+			points.push_back( pointvertex_for_windingpoint( point, colour_selected ) );
+		} );
 	}
 
 	bool intersectVolume( const VolumeTest& volume, const Matrix4& localToWorld ) const {
@@ -3152,7 +3128,7 @@ inline void Face_addLight( const FaceInstance& face, const Matrix4& localToWorld
 typedef std::vector<FaceInstance> FaceInstances;
 typedef std::vector<FaceInstance*> FaceInstances_ptrs;
 
-class EdgeInstance : public Selectable
+class EdgeInstance final : public Selectable
 {
 	FaceInstances& m_faceInstances;
 	SelectableEdge* m_edge;
@@ -3180,15 +3156,11 @@ public:
 	EdgeInstance( FaceInstances& faceInstances, SelectableEdge& edge )
 		: m_faceInstances( faceInstances ), m_edge( &edge ){
 	}
-	EdgeInstance& operator=( const EdgeInstance& other ){
-		m_edge = other.m_edge;
-		return *this;
-	}
 
-	void setSelected( bool select ){
+	void setSelected( bool select ) override {
 		select_edge( select );
 	}
-	bool isSelected() const {
+	bool isSelected() const override {
 		return selected_edge();
 	}
 
@@ -3248,7 +3220,7 @@ public:
 	}
 };
 
-class VertexInstance : public Selectable
+class VertexInstance final : public Selectable
 {
 	FaceInstances& m_faceInstances;
 	SelectableVertex* m_vertex;
@@ -3279,15 +3251,11 @@ public:
 	VertexInstance( FaceInstances& faceInstances, SelectableVertex& vertex )
 		: m_faceInstances( faceInstances ), m_vertex( &vertex ){
 	}
-	VertexInstance& operator=( const VertexInstance& other ){
-		m_vertex = other.m_vertex;
-		return *this;
-	}
 
-	void setSelected( bool select ){
+	void setSelected( bool select ) override {
 		select_vertex( select );
 	}
-	bool isSelected() const {
+	bool isSelected() const override {
 		return selected_vertex();
 	}
 
@@ -3413,7 +3381,7 @@ public:
 	void lightsChanged(){
 		m_lightList->lightsChanged();
 	}
-	typedef MemberCaller<BrushInstance, &BrushInstance::lightsChanged> LightsChangedCaller;
+	typedef MemberCaller<BrushInstance, void(), &BrushInstance::lightsChanged> LightsChangedCaller;
 
 	STRING_CONSTANT( Name, "BrushInstance" );
 
@@ -3438,9 +3406,9 @@ public:
 		Instance::setTransformChangedCallback( LightsChangedCaller( *this ) );
 	}
 	~BrushInstance(){
-		Instance::setTransformChangedCallback( Callback() );
+		Instance::setTransformChangedCallback( Callback<void()>() );
 
-		m_brush.m_lightsChanged = Callback();
+		m_brush.m_lightsChanged = Callback<void()>();
 		GlobalShaderCache().detach( *this );
 
 		m_counter->decrement();
@@ -3471,13 +3439,13 @@ public:
 
 		Instance::selectedChanged();
 	}
-	typedef MemberCaller1<BrushInstance, const Selectable&, &BrushInstance::selectedChanged> SelectedChangedCaller;
+	typedef MemberCaller<BrushInstance, void(const Selectable&), &BrushInstance::selectedChanged> SelectedChangedCaller;
 
 	void selectedChangedComponent( const Selectable& selectable ){
 		GlobalSelectionSystem().getObserver ( SelectionSystem::eComponent )( selectable );
 		GlobalSelectionSystem().onComponentSelection( *this, selectable );
 	}
-	typedef MemberCaller1<BrushInstance, const Selectable&, &BrushInstance::selectedChangedComponent> SelectedChangedComponentCaller;
+	typedef MemberCaller<BrushInstance, void(const Selectable&), &BrushInstance::selectedChangedComponent> SelectedChangedComponentCaller;
 
 	const BrushInstanceVisitor& forEachFaceInstance( const BrushInstanceVisitor& visitor ){
 		for ( FaceInstances::iterator i = m_faceInstances.begin(); i != m_faceInstances.end(); ++i )
@@ -3774,6 +3742,7 @@ public:
 		}
 	}
 	void gatherComponentsHighlight( std::vector<std::vector<Vector3>>& polygons, SelectionIntersection& intersection, SelectionTest& test, SelectionSystem::EComponentMode mode ) const {
+		m_brush.evaluateBRep(); // highlight() may happen right next to undo(), hence care to evaluate; normally render() triggers this beforehand
 		test.BeginMesh( localToWorld() );
 
 		switch ( mode )
@@ -4092,7 +4061,7 @@ public:
 		}
 		m_brush.vertexModeFree();
 	}
-	typedef MemberCaller<BrushInstance, &BrushInstance::applyTransform> ApplyTransformCaller;
+	typedef MemberCaller<BrushInstance, void(), &BrushInstance::applyTransform> ApplyTransformCaller;
 
 	void setClipPlane( const Plane3& plane ){
 		m_clipPlane.setPlane( m_brush, plane );

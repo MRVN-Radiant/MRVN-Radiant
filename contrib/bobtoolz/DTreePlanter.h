@@ -41,12 +41,12 @@ class DTreePlanter {
 	SignalHandlerId m_destroyed;
 public:
 	SignalHandlerResult mouseDown( const WindowVector& position, ButtonIdentifier button, ModifierFlags modifiers );
-	typedef Member3<DTreePlanter, const WindowVector&, ButtonIdentifier, ModifierFlags, SignalHandlerResult, &DTreePlanter::mouseDown> MouseDownCaller;
+	typedef Member<DTreePlanter, SignalHandlerResult(const WindowVector&, ButtonIdentifier, ModifierFlags), &DTreePlanter::mouseDown> MouseDownCaller;
 	void destroyed(){
 		m_mouseDown = MouseEventHandlerId();
 		m_destroyed = SignalHandlerId();
 	}
-	typedef Member<DTreePlanter, void, &DTreePlanter::destroyed> DestroyedCaller;
+	typedef Member<DTreePlanter, void(), &DTreePlanter::destroyed> DestroyedCaller;
 
 	DTreePlanter() {
 		m_numModels =   0;
@@ -122,15 +122,15 @@ public:
 				GT;
 				CT;
 
-				strncpy( m_trees[m_numModels++].name, pToken, sizeof( m_trees[m_numModels].name ) - 1 );
-				m_trees[m_numModels].name[ sizeof( m_trees[m_numModels].name ) - 1 ] = '\0';
+				strncpy( m_trees[m_numModels++].name, pToken, std::size( m_trees[m_numModels].name ) - 1 );
+				m_trees[m_numModels].name[ std::size( m_trees[m_numModels].name ) - 1 ] = '\0';
 			}
 			else if ( MT( "link" ) ) {
 				GT;
 				CT;
 
-				strncpy( m_linkName, pToken, sizeof( m_linkName ) - 1 );
-				m_linkName[ sizeof( m_linkName ) - 1 ] = '\0';
+				strncpy( m_linkName, pToken, std::size( m_linkName ) - 1 );
+				m_linkName[ std::size( m_linkName ) - 1 ] = '\0';
 
 				m_autoLink = true;
 			}
@@ -138,8 +138,8 @@ public:
 				GT;
 				CT;
 
-				strncpy( m_entType, pToken, sizeof( m_entType ) - 1 );
-				m_entType[ sizeof( m_entType ) - 1 ] = '\0';
+				strncpy( m_entType, pToken, std::size( m_entType ) - 1 );
+				m_entType[ std::size( m_entType ) - 1 ] = '\0';
 			}
 			else if ( MT( "offset" ) ) {
 				GT;

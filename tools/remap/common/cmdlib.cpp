@@ -219,7 +219,7 @@ void    SaveFile( const char *filename, const void *buffer, int count ){
 #ifdef __BIG_ENDIAN__
 
 short   LittleShort( short l ){
-	byte b1,b2;
+	byte b1, b2;
 
 	b1 = l & 255;
 	b2 = ( l >> 8 ) & 255;
@@ -233,7 +233,7 @@ short   BigShort( short l ){
 
 
 int    LittleLong( int l ){
-	byte b1,b2,b3,b4;
+	byte b1, b2, b3, b4;
 
 	b1 = l & 255;
 	b2 = ( l >> 8 ) & 255;
@@ -269,7 +269,7 @@ float   BigFloat( float l ){
 
 
 short   BigShort( short l ){
-	byte b1,b2;
+	byte b1, b2;
 
 	b1 = l & 255;
 	b2 = ( l >> 8 ) & 255;
@@ -283,7 +283,7 @@ short   LittleShort( short l ){
 
 
 int    BigLong( int l ){
-	byte b1,b2,b3,b4;
+	byte b1, b2, b3, b4;
 
 	b1 = l & 255;
 	b2 = ( l >> 8 ) & 255;

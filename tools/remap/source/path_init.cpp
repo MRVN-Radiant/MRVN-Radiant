@@ -274,7 +274,7 @@ static void AddHomeBasePath( std::vector<CopiedString>& basePaths, const char *h
 	}
 
 	/* add it to the beginning of the list */
-	const auto clean = StringOutputStream( 256 )( DirectoryCleaned( str ) );
+	const auto clean = StringStream( DirectoryCleaned( str ) );
 	if( is_unique( basePaths, clean ) )
 		basePaths.emplace( basePaths.cbegin(), clean );
 }

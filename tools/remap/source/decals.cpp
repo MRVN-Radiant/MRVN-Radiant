@@ -63,7 +63,7 @@ static Vector3 entityOrigin;
    returns false if a texture matrix cannot be created
  */
 
-static bool MakeTextureMatrix( decalProjector_t *dp, const Plane3f& projection, bspDrawVert_t *a, bspDrawVert_t *b, bspDrawVert_t *c ){
+static bool MakeTextureMatrix( decalProjector_t *dp, const Plane3f &projection, const bspDrawVert_t *a, const bspDrawVert_t *b, const bspDrawVert_t *c ) {
 	int i, j;
 	double bb, s, t;
 	DoubleVector3 pa, pb, pc;
@@ -286,7 +286,8 @@ static void TransformDecalProjector( decalProjector_t *in, const Vector3 (&axis)
    creates a new decal projector from a triangle
  */
 
-static int MakeDecalProjector( shaderInfo_t *si, const Plane3f& projection, float distance, int numVerts, bspDrawVert_t **dv ){
+
+static int MakeDecalProjector( shaderInfo_t *si, const Plane3f &projection, float distance, int numVerts, const bspDrawVert_t **dv ) {
 	int i, j;
 	decalProjector_t    *dp;
 
@@ -360,13 +361,9 @@ static int MakeDecalProjector( shaderInfo_t *si, const Plane3f& projection, floa
 #define PLANAR_EPSILON  0.5f
 
 void ProcessDecals(){
-	int x, y, pw[ 5 ], r, iterations;
 	float distance;
 	Plane3f projection, plane;
 	entity_t            *e2;
-	parseMesh_t         *p;
-	mesh_t              *mesh, *subdivided;
-	bspDrawVert_t       *dv[ 4 ];
 
 
 	/* note it */
@@ -396,7 +393,7 @@ void ProcessDecals(){
 		}
 
 		/* walk entity patches */
-		for ( p = e.patches; p != NULL; p = e.patches )
+		for ( parseMesh_t *p = e.patches; p != NULL; p = e.patches )
 		{
 			/* setup projector */
 			Vector3 origin;
@@ -415,12 +412,12 @@ void ProcessDecals(){
 			/* create projectors */
 			if ( distance > 0.125f ) {
 				/* tesselate the patch */
-				iterations = IterationsForCurve( p->longestCurve, patchSubdivisions );
-				subdivided = SubdivideMesh2( p->mesh, iterations );
+				const int iterations = IterationsForCurve( p->longestCurve, patchSubdivisions );
+				mesh_t *subdivided = SubdivideMesh2( p->mesh, iterations );
 
 				/* fit it to the curve and remove colinear verts on rows/columns */
 				PutMeshOnCurve( *subdivided );
-				mesh = RemoveLinearMeshColumnsRows( subdivided );
+				mesh_t *mesh = RemoveLinearMeshColumnsRows( subdivided );
 				FreeMesh( subdivided );
 
 				/* offset by projector origin */
@@ -428,25 +425,29 @@ void ProcessDecals(){
 					vert.xyz += e.origin;
 
 				/* iterate through the mesh quads */
-				for ( y = 0; y < ( mesh->height - 1 ); y++ )
+				for ( int y = 0; y < ( mesh->height - 1 ); y++ )
 				{
-					for ( x = 0; x < ( mesh->width - 1 ); x++ )
+					for ( int x = 0; x < ( mesh->width - 1 ); x++ )
 					{
 						/* set indexes */
-						pw[ 0 ] = x + ( y * mesh->width );
-						pw[ 1 ] = x + ( ( y + 1 ) * mesh->width );
-						pw[ 2 ] = x + 1 + ( ( y + 1 ) * mesh->width );
-						pw[ 3 ] = x + 1 + ( y * mesh->width );
-						pw[ 4 ] = x + ( y * mesh->width );    /* same as pw[ 0 ] */
+						const int pw[5] = {
+							x + ( y * mesh->width ),
+							x + ( ( y + 1 ) * mesh->width ),
+							x + 1 + ( ( y + 1 ) * mesh->width ),
+							x + 1 + ( y * mesh->width ),
+							x + ( y * mesh->width )    /* same as pw[ 0 ] */
+						};
 
 						/* set radix */
-						r = ( x + y ) & 1;
+						const int r = ( x + y ) & 1;
 
 						/* get drawverts */
-						dv[ 0 ] = &mesh->verts[ pw[ r + 0 ] ];
-						dv[ 1 ] = &mesh->verts[ pw[ r + 1 ] ];
-						dv[ 2 ] = &mesh->verts[ pw[ r + 2 ] ];
-						dv[ 3 ] = &mesh->verts[ pw[ r + 3 ] ];
+						const bspDrawVert_t *dv[4] = {
+							&mesh->verts[pw[r + 0]],
+							&mesh->verts[pw[r + 1]],
+							&mesh->verts[pw[r + 2]],
+							&mesh->verts[pw[r + 3]]
+						};
 
 						/* planar? (nuking this optimization as it doesn't work on non-rectangular quads) */
 						if ( 0 && PlaneFromPoints( plane, dv[ 0 ]->xyz, dv[ 1 ]->xyz, dv[ 2 ]->xyz ) &&
@@ -615,43 +616,39 @@ static void ProjectDecalOntoFace( decalProjector_t *dp, mapDrawSurface_t *ds ){
  */
 
 static void ProjectDecalOntoPatch( decalProjector_t *dp, mapDrawSurface_t *ds ){
-	int x, y, pw[ 5 ], r, iterations;
-	mesh_t src, *mesh, *subdivided;
-
-
 	/* backface check */
-	if ( ds->planar ) {
-		if ( vector3_dot( dp->planes[ 0 ].normal(), mapplanes[ ds->planeNum ].normal() ) < -0.0001f ) {
+	if ( ds->planar )
+		if ( vector3_dot( dp->planes[ 0 ].normal(), mapplanes[ ds->planeNum ].normal() ) < -0.0001f )
 			return;
-		}
-	}
 
 	/* tesselate the patch */
+	mesh_t src;
 	src.width = ds->patchWidth;
 	src.height = ds->patchHeight;
 	src.verts = ds->verts;
-	iterations = IterationsForCurve( ds->longestCurve, patchSubdivisions );
-	subdivided = SubdivideMesh2( src, iterations );
+	const int iterations = IterationsForCurve( ds->longestCurve, patchSubdivisions );
+	mesh_t *subdivided = SubdivideMesh2( src, iterations );
 
 	/* fit it to the curve and remove colinear verts on rows/columns */
 	PutMeshOnCurve( *subdivided );
-	mesh = RemoveLinearMeshColumnsRows( subdivided );
+	mesh_t *mesh = RemoveLinearMeshColumnsRows( subdivided );
 	FreeMesh( subdivided );
 
 	/* iterate through the mesh quads */
-	for ( y = 0; y < ( mesh->height - 1 ); y++ )
+	for ( int y = 0; y < ( mesh->height - 1 ); y++ )
 	{
-		for ( x = 0; x < ( mesh->width - 1 ); x++ )
+		for ( int x = 0; x < ( mesh->width - 1 ); x++ )
 		{
 			/* set indexes */
-			pw[ 0 ] = x + ( y * mesh->width );
-			pw[ 1 ] = x + ( ( y + 1 ) * mesh->width );
-			pw[ 2 ] = x + 1 + ( ( y + 1 ) * mesh->width );
-			pw[ 3 ] = x + 1 + ( y * mesh->width );
-			pw[ 4 ] = x + ( y * mesh->width );    /* same as pw[ 0 ] */
-
+			const int pw[ 5 ] = {
+				x + ( y * mesh->width ),
+				x + ( ( y + 1 ) * mesh->width ),
+				x + 1 + ( ( y + 1 ) * mesh->width ),
+				x + 1 + ( y * mesh->width ),
+				x + ( y * mesh->width )    /* same as pw[ 0 ] */
+			};
 			/* set radix */
-			r = ( x + y ) & 1;
+			const int r = ( x + y ) & 1;
 
 			/* generate decal for first triangle */
 			winding_t w{

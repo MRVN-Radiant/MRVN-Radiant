@@ -70,13 +70,13 @@ public: // public types
     * Type for info/warning/error callbacks. The callback takes a const
     * char* argument (the message string); it has no return value.
     */
-   typedef Callback1<const char *, void> MessageCallback;
+   typedef Callback<void(const char *)> MessageCallback;
 
    /**
     * Type for texture scale info callbacks. The callback takes two float
     * arguments (scale and tiles); it has no return value.
     */
-   typedef Callback2<float, float, void> TexInfoCallback;
+   typedef Callback<void(float, float)> TexInfoCallback;
 
    /**
     * Type for defining how to manipulate control point or surface values
@@ -119,7 +119,7 @@ public: // public types
     */
    template<typename ObjectClass, void (ObjectClass::*member)(float, float)>
    class TexInfoCallbackMethod :
-      public BindFirstOpaque2<Member2<ObjectClass, float, float, void, member> >
+      public BindFirstOpaque<Member<ObjectClass, void(float, float), member> >
    {
    public:
       /**
@@ -128,7 +128,7 @@ public: // public types
        * @param object The object on which to invoke the callback method.
        */
       TexInfoCallbackMethod(ObjectClass& object) :
-         BindFirstOpaque2<Member2<ObjectClass, float, float, void, member> >(object) {}
+         BindFirstOpaque<Member<ObjectClass, void(float, float), member> >(object) {}
    };
 
 public: // public methods
