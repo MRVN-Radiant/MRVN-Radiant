@@ -100,7 +100,9 @@ class EclassModel :
 		}
 		else
 		{
-			m_keyObservers.insert( "angles", m_anglesKey.getAnglesChangedCallback() );
+			if (m_entity.getEntityClass().has_angles_key) {
+				m_keyObservers.insert("angles", m_anglesKey.getAnglesChangedCallback());
+			}
 		}
 		m_keyObservers.insert( "origin", OriginKey::OriginChangedCaller( m_originKey ) );
 	}
