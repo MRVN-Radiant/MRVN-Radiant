@@ -50,7 +50,7 @@ jobs:
       run: echo "ARTIFACT_NAME=$(echo MRVN-Radiant_`date -u -Idate`_`git rev-parse --short HEAD`_Windows_${{ matrix.arch }})" >> $GITHUB_ENV
       shell: bash
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: ${{ env.ARTIFACT_NAME }}
         path: install/
@@ -68,7 +68,7 @@ jobs:
     - name: Install tools
       run: |
           sudo apt-get -qq update
-          sudo apt-get -y install mesa-common-dev qtbase5-dev
+          sudo apt-get -y install mesa-common-dev qtbase5-dev glib-2.0 libpng-dev libjpeg-dev
     - uses: actions/checkout@v3
       with:
         submodules: recursive
@@ -84,7 +84,7 @@ jobs:
       run: |
         echo "ARTIFACT_NAME=$(echo MRVN-Radiant_`date -u -Idate`_`git rev-parse --short HEAD`_Linux_${{ matrix.arch }})" >> $GITHUB_ENV
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: ${{ env.ARTIFACT_NAME }}
         path: install/
