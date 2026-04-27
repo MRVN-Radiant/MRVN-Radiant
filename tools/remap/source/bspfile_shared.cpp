@@ -163,7 +163,7 @@ void Shared::MakeMeshes(const entity_t &e) {
     }
 
     // Recalculate lightmapUVs for all vertices
-    Shared::MakeLightmapUVs();
+    // Shared::MakeLightmapUVs();  /* causes heap corruption */
 
     // Combine all meshes based on shaderInfo and AABB tests
     std::size_t index = 0;
