@@ -95,17 +95,14 @@ class EclassModel :
 		m_keyObservers.insert( "classname", ClassnameFilter::ClassnameChangedCaller( m_filter ) );
 		m_keyObservers.insert( Static<KeyIsName>::instance().m_nameKey, NamedEntity::IdentifierChangedCaller( m_named ) );
 		if ( g_gameType == eGameTypeDoom3 ) {
-			m_keyObservers.insert( "angle", RotationKey::AngleChangedCaller( m_rotationKey ) );
+			//m_keyObservers.insert( "angle", RotationKey::AngleChangedCaller( m_rotationKey ) );  // "angle" is not longer supported, need to be converted to "angles"
 			m_keyObservers.insert( "rotation", RotationKey::RotationChangedCaller( m_rotationKey ) );
 		}
 		else
 		{
-			if( m_entity.getEntityClass().has_direction_key )
-				m_keyObservers.insert( "angle", m_anglesKey.getGroupAngleChangedCallback() );
-			else
-				m_keyObservers.insert( "angle", m_anglesKey.getAngleChangedCallback() );
-			if( m_entity.getEntityClass().has_angles_key )
-				m_keyObservers.insert( "angles", m_anglesKey.getAnglesChangedCallback() );
+			if (m_entity.getEntityClass().has_angles_key) {
+				m_keyObservers.insert("angles", m_anglesKey.getAnglesChangedCallback());
+			}
 		}
 		m_keyObservers.insert( "origin", OriginKey::OriginChangedCaller( m_originKey ) );
 	}
@@ -274,8 +271,6 @@ public:
 		else
 		{
 			m_angles = angles_rotated( m_angles, rotation );
-			if( !m_entity.getEntityClass().has_angles_key ) // yaw angle only
-				m_angles[0] = m_angles[1] = 0;
 		}
 	}
 	void snapto( float snap ){

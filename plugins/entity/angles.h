@@ -27,8 +27,6 @@
 #include "generic/callback.h"
 #include "stringio.h"
 
-#include "angle.h"
-
 #include "entity.h"
 
 const Vector3 ANGLESKEY_IDENTITY = Vector3( 0, 0, 0 );
@@ -36,30 +34,13 @@ const Vector3 ANGLESKEY_IDENTITY = Vector3( 0, 0, 0 );
 inline void default_angles( Vector3& angles ){
 	angles = ANGLESKEY_IDENTITY;
 }
+
 inline void normalise_angles( Vector3& angles ){
 	angles[0] = static_cast<float>( float_mod( angles[0], 360 ) );
 	angles[1] = static_cast<float>( float_mod( angles[1], 360 ) );
 	angles[2] = static_cast<float>( float_mod( angles[2], 360 ) );
 }
-inline void read_angle( Vector3& angles, const char* value ){
-	if ( !string_parse_float( value, angles[2] ) ) {
-		default_angles( angles );
-	}
-	else
-	{
-		angles[0] = 0;
-		angles[1] = 0;
-		normalise_angles( angles );
-	}
-}
-inline void read_group_angle( Vector3& angles, const char* value ){
-	if( string_equal( value, "-1" ) )
-		angles = Vector3( 0, -90, 0 );
-	else if( string_equal( value, "-2" ) )
-		angles = Vector3( 0, 90, 0 );
-	else
-		read_angle( angles, value );
-}
+
 inline void read_angles( Vector3& angles, const char* value ){
 	if ( !string_parse_vector3( value, angles ) ) {
 		default_angles( angles );
@@ -70,25 +51,16 @@ inline void read_angles( Vector3& angles, const char* value ){
 		normalise_angles( angles );
 	}
 }
+
 inline void write_angles( const Vector3& angles, Entity* entity ){
 	if ( angles == ANGLESKEY_IDENTITY ) {
-		entity->setKeyValue( "angle", "" );
 		entity->setKeyValue( "angles", "" );
 	}
 	else
 	{
-		if ( angles[0] == 0 && angles[1] == 0 ) {
-			const float yaw = angles[2];
-			entity->setKeyValue( "angles", "" );
-			write_angle( yaw, entity );
-		}
-		else
-		{
-			char value[64];
-			sprintf( value, "%g %g %g", g_stupidQuakeBug? -angles[1] : angles[1], angles[2], angles[0] );
-			entity->setKeyValue( "angle", "" );
-			entity->setKeyValue( "angles", value );
-		}
+		char value[64];
+		sprintf( value, "%g %g %g", g_stupidQuakeBug? -angles[1] : angles[1], angles[2], angles[0] );
+		entity->setKeyValue( "angles", value );
 	}
 }
 
@@ -123,6 +95,7 @@ inline Vector3 angles_rotated( const Vector3& angles, const Quaternion& rotation
 	           )
 	       );
 }
+
 #if 0
 inline Vector3 angles_rotated_for_rotated_pivot( const Vector3& angles, const Quaternion& rotation ){
 	return angles_snapped_to_zero(
@@ -135,47 +108,28 @@ inline Vector3 angles_rotated_for_rotated_pivot( const Vector3& angles, const Qu
 	       );
 }
 #endif
+
 class AnglesKey
 {
 	Callback m_anglesChanged;
-	KeyObserver m_angleCB;
 	KeyObserver m_anglesCB;
 	const Entity& m_entity;
 public:
 	Vector3 m_angles;
 
-
 	AnglesKey( const Callback& anglesChanged, const Entity& entity )
-		: m_anglesChanged( anglesChanged ), m_angleCB(), m_anglesCB(), m_entity( entity ), m_angles( ANGLESKEY_IDENTITY ){
-	}
-
-	void angleChanged( const char* value ){
-		if( !m_entity.hasKeyValue( "angles" ) || m_anglesCB == KeyObserver() ){ // no "angles" set or supported
-			read_angle( m_angles, value );
-			m_anglesChanged();
-		}
-	}
-	KeyObserver getAngleChangedCallback(){
-		return m_angleCB = MemberCaller1<AnglesKey, const char*, &AnglesKey::angleChanged>( *this );
-	}
-
-	void groupAngleChanged( const char* value ){
-		if( !m_entity.hasKeyValue( "angles" ) || m_anglesCB == KeyObserver() ){ // no "angles" set or supported
-			read_group_angle( m_angles, value );
-			m_anglesChanged();
-		}
-	}
-	KeyObserver getGroupAngleChangedCallback(){
-		return m_angleCB = MemberCaller1<AnglesKey, const char*, &AnglesKey::groupAngleChanged>( *this );
+		: m_anglesChanged( anglesChanged ), m_anglesCB(), m_entity( entity ), m_angles( ANGLESKEY_IDENTITY ){
 	}
 
 	void anglesChanged( const char* value ){
-		if( m_entity.hasKeyValue( "angles" ) ){ // check actual key presence, as this may be notified by default value on key removal
-			read_angles( m_angles, value );
-			m_anglesChanged();
+		if (m_entity.hasKeyValue("angles")) {
+			read_angles(m_angles, value);
 		}
-		else // "angles" key removed // improvable: also do this on invalid "angles" key
-			m_angleCB( m_entity.getKeyValue( "angle" ) );
+		else {
+			// If "angles" key removed or missing, reset to identity
+			m_angles = ANGLESKEY_IDENTITY;
+		}
+		m_anglesChanged();
 	}
 	KeyObserver getAnglesChangedCallback(){
 		return m_anglesCB = MemberCaller1<AnglesKey, const char*, &AnglesKey::anglesChanged>( *this );

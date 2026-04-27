@@ -1,6 +1,6 @@
 add_library(entity MODULE
-            angle.cpp
-            angle.h
+            
+            
             angles.cpp
             angles.h
             colour.cpp
