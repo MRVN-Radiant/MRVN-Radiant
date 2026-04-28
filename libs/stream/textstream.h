@@ -213,7 +213,12 @@ inline TextOutputStreamType& ostream_write( TextOutputStreamType& ostream, const
 /// \brief Writes a null-terminated \p string to \p ostream.
 template<typename TextOutputStreamType>
 inline TextOutputStreamType& ostream_write( TextOutputStreamType& ostream, const char* string ){
-	ostream.write( string, strlen( string ) );
+	if (! string) {
+		ostream.write("nullptr", 8);
+	}
+	else {
+		ostream.write( string, strlen( string ) );
+	}
 	return ostream;
 }
 
