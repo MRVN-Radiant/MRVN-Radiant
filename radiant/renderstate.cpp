@@ -52,7 +52,7 @@
 
 #include "xywindow.h"
 #include "camwindow.h"
-
+#include "gfx/gl_helpers.h"
 
 
 #define DEBUG_RENDER 0
@@ -125,92 +125,6 @@ const char* Renderer_GetStats( int frame2frame ){
 	);
 }
 
-
-void printShaderLog( GLuint shader ){
-	GLint log_length = 0;
-	gl().glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &log_length );
-
-	Array<char> log( log_length );
-	gl().glGetShaderInfoLog( shader, log_length, &log_length, log.data() );
-
-	globalErrorStream() << StringRange( log.begin(), log_length ) << '\n';
-}
-
-void printProgramLog( GLuint program ){
-	GLint log_length = 0;
-	gl().glGetProgramiv( program, GL_INFO_LOG_LENGTH, &log_length );
-
-	Array<char> log( log_length );
-	gl().glGetProgramInfoLog( program, log_length, &log_length, log.data() );
-
-	globalErrorStream() << StringRange( log.begin(), log_length ) << '\n';
-}
-
-void createShader( GLuint program, const char* filename, GLenum type ){
-	GLuint shader = gl().glCreateShader( type );
-	GlobalOpenGL_debugAssertNoErrors();
-
-	// load shader
-	{
-		std::size_t size = file_size( filename );
-		FileInputStream file( filename );
-		ASSERT_MESSAGE( !file.failed(), "failed to open " << makeQuoted( filename ) );
-		Array<GLchar> buffer( size );
-		size = file.read( reinterpret_cast<StreamBase::byte_type*>( buffer.data() ), size );
-
-		const GLchar* string = buffer.data();
-		GLint length = GLint( size );
-		gl().glShaderSource( shader, 1, &string, &length );
-	}
-
-	// compile shader
-	{
-		gl().glCompileShader( shader );
-
-		GLint compiled = 0;
-		gl().glGetShaderiv( shader, GL_COMPILE_STATUS, &compiled );
-
-		if ( !compiled ) {
-			printShaderLog( shader );
-		}
-
-		ASSERT_MESSAGE( compiled, "shader compile failed: " << makeQuoted( filename ) );
-	}
-
-	// attach shader
-	gl().glAttachShader( program, shader );
-
-	gl().glDeleteShader( shader );
-
-	GlobalOpenGL_debugAssertNoErrors();
-}
-
-void GLSLProgram_link( GLuint program ){
-	gl().glLinkProgram( program );
-
-	GLint linked = false;
-	gl().glGetProgramiv( program, GL_LINK_STATUS, &linked );
-
-	if ( !linked ) {
-		printProgramLog( program );
-	}
-
-	ASSERT_MESSAGE( linked, "program link failed" );
-}
-
-void GLSLProgram_validate( GLuint program ){
-	gl().glValidateProgram( program );
-
-	GLint validated = false;
-	gl().glGetProgramiv( program, GL_VALIDATE_STATUS, &validated );
-
-	if ( !validated ) {
-		printProgramLog( program );
-	}
-
-	ASSERT_MESSAGE( validated, "program validation failed" );
-}
-
 bool g_bumpGLSLPass_enabled = false;
 bool g_depthfillPass_enabled = false;
 
@@ -236,12 +150,12 @@ public:
 		// create shader
 		{
 			StringOutputStream filename( 256 );
-			createShader( m_program, filename( GlobalRadiant().getAppPath(), "gl/lighting_DBS_omni_vp.glsl" ), GL_VERTEX_SHADER );
-			createShader( m_program, filename( GlobalRadiant().getAppPath(), "gl/lighting_DBS_omni_fp.glsl" ), GL_FRAGMENT_SHADER );
+			gl_shader_create( m_program, filename( GlobalRadiant().getAppPath(), "gl/lighting_DBS_omni_vp.glsl" ), GL_VERTEX_SHADER );
+			gl_shader_create( m_program, filename( GlobalRadiant().getAppPath(), "gl/lighting_DBS_omni_fp.glsl" ), GL_FRAGMENT_SHADER );
 		}
 
-		GLSLProgram_link( m_program );
-		GLSLProgram_validate( m_program );
+		gl_program_link( m_program );
+		gl_program_validate( m_program );
 
 		gl().glUseProgram( m_program );
 
@@ -342,12 +256,12 @@ public:
 		// create shader
 		{
 			StringOutputStream filename( 256 );
-			createShader( m_program, filename( GlobalRadiant().getAppPath(), "gl/zfill_vp.glsl" ), GL_VERTEX_SHADER );
-			createShader( m_program, filename( GlobalRadiant().getAppPath(), "gl/zfill_fp.glsl" ), GL_FRAGMENT_SHADER );
+			gl_shader_create( m_program, filename( GlobalRadiant().getAppPath(), "gl/zfill_vp.glsl" ), GL_VERTEX_SHADER );
+			gl_shader_create( m_program, filename( GlobalRadiant().getAppPath(), "gl/zfill_fp.glsl" ), GL_FRAGMENT_SHADER );
 		}
 
-		GLSLProgram_link( m_program );
-		GLSLProgram_validate( m_program );
+		gl_program_link( m_program );
+		gl_program_validate( m_program );
 
 		GlobalOpenGL_debugAssertNoErrors();
 	}
@@ -391,12 +305,12 @@ public:
 		// create shader
 		{
 			StringOutputStream filename( 256 );
-			createShader( m_program, filename( GlobalRadiant().getAppPath(), "gl/skybox_vp.glsl" ), GL_VERTEX_SHADER );
-			createShader( m_program, filename( GlobalRadiant().getAppPath(), "gl/skybox_fp.glsl" ), GL_FRAGMENT_SHADER );
+			gl_shader_create( m_program, filename( GlobalRadiant().getAppPath(), "gl/skybox_vp.glsl" ), GL_VERTEX_SHADER );
+			gl_shader_create( m_program, filename( GlobalRadiant().getAppPath(), "gl/skybox_fp.glsl" ), GL_FRAGMENT_SHADER );
 		}
 
-		GLSLProgram_link( m_program );
-		GLSLProgram_validate( m_program );
+		gl_program_link( m_program );
+		gl_program_validate( m_program );
 
 		gl().glUseProgram( m_program );
 
@@ -879,6 +793,7 @@ public:
 		m_shaders.release( name );
 	}
 	void render( RenderStateFlags globalstate, const Matrix4& modelview, const Matrix4& projection, const Vector3& viewer ){
+		return; // FIXME:
 		gl().glMatrixMode( GL_PROJECTION );
 		gl().glLoadMatrixf( reinterpret_cast<const float*>( &projection ) );
 #if 0
