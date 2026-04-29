@@ -137,6 +137,15 @@ void WriteR1BSPFile(const char *filename) {
     AddLump(file, header.lumps[R1_LUMP_CSM_AABB_NODES],              Titanfall::Bsp::csmAABBNodes_stub);  // stub
     AddLump(file, header.lumps[R1_LUMP_CELL_BSP_NODES],              Titanfall::Bsp::cellBSPNodes_stub);  // stub
     AddLump(file, header.lumps[R1_LUMP_CELLS],                       Titanfall::Bsp::cells_stub);  // stub
+    AddLump(file, header.lumps[R1_LUMP_PORTALS],                     Titanfall::Bsp::portals_stub);  // stub
+    AddLump(file, header.lumps[R1_LUMP_PORTAL_VERTICES],             Titanfall::Bsp::portalVertices_stub);  // stub
+    AddLump(file, header.lumps[R1_LUMP_PORTAL_EDGES],                Titanfall::Bsp::portalEdges_stub);  // stub
+    AddLump(file, header.lumps[R1_LUMP_PORTAL_VERTEX_EDGES],         Titanfall::Bsp::portalVertexEdges_stub);  // stub
+    AddLump(file, header.lumps[R1_LUMP_PORTAL_VERTEX_REFERENCES],    Titanfall::Bsp::portalVertexReferences_stub);  // stub
+    AddLump(file, header.lumps[R1_LUMP_PORTAL_EDGE_REFERENCES],      Titanfall::Bsp::portalEdgeReferences_stub);  // stub
+    AddLump(file, header.lumps[R1_LUMP_PORTAL_INTERSECT_EDGE],       Titanfall::Bsp::portalIntersectEdges_stub);  // stub
+    AddLump(file, header.lumps[R1_LUMP_PORTAL_INTERSECT_VERTEX],     Titanfall::Bsp::portalIntersectVertices_stub);  // stub
+    AddLump(file, header.lumps[R1_LUMP_PORTAL_INTERSECT_HEADER],     Titanfall::Bsp::portalIntersectHeaders_stub);  // stub
     AddLump(file, header.lumps[R1_LUMP_OCCLUSION_MESH_VERTICES],     Titanfall::Bsp::occlusionMeshVertices);
     AddLump(file, header.lumps[R1_LUMP_OCCLUSION_MESH_INDICES],      Titanfall::Bsp::occlusionMeshIndices);
     AddLump(file, header.lumps[R1_LUMP_CELL_AABB_NODES],             Titanfall::Bsp::cellAABBNodes);
@@ -164,6 +173,10 @@ void WriteR1BSPFile(const char *filename) {
 void CompileR1BSPFile() {
     Titanfall::SetupGameLump();
 
+    // TODO: inject plane for portals stub
+    // -- Titanfall::Bsp::planes[0] = {.distance=-8192, .normal={0, 0, -1}};
+    // -- Titanfall::Bsp::cmGrid[0].first_brush_plane = 1;
+
     for (entity_t &entity : entities) {
         const char *pszClassname = entity.classname();
 
@@ -184,7 +197,6 @@ void CompileR1BSPFile() {
 
             Titanfall::EndModel();
         } else if (ENT_IS("prop_static")) { // Compile as static props into gamelump
-            // TODO: use prop_static instead
             Titanfall::EmitStaticProp(entity);
             continue; // Don't emit as entity
         } else if (ENT_IS("func_occluder")) {
@@ -429,10 +441,98 @@ void Titanfall::EmitStubs() {
         Titanfall::Bsp::cellBSPNodes_stub = { data.begin(), data.end() };
     }
     {  // Cells
+        // {.num_portals=1, .first_portal=0, .flags=5, .leaf_water_data=-1};
         constexpr std::array<uint8_t, 8> data = {
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF
+            0x01, 0x00, 0x00, 0x00, 0x05, 0x00, 0xFF, 0xFF
         };
         Titanfall::Bsp::cells_stub = { data.begin(), data.end() };
     }
+    {  // Portals
+        // {.is_reversed=0, .type=1, .num_refs=4, .padding=0, .first_ref=0, .cell=2, .plane=0};
+        constexpr std::array<uint8_t, 8> data = {
+            0x00, 0x01, 0x04, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00
+        };
+        Titanfall::Bsp::portals_stub = { data.begin(), data.end() };
+    }
+    {  // PortalVertices
+        constexpr std::array<uint8_t, 8> data = {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //     0     0     0
+            0x00, 0x00, 0x00, 0xC6, 0x00, 0x00, 0x00, 0xC6, 0x00, 0x00, 0x00, 0x46,  // -8192 -8192 +8192
+            0x00, 0x00, 0x00, 0x46, 0x00, 0x00, 0x00, 0xC6, 0x00, 0x00, 0x00, 0x46,  // +8192 -8192 +8192
+            0x00, 0x00, 0x00, 0xC6, 0x00, 0x00, 0x00, 0x46, 0x00, 0x00, 0x00, 0x46,  // -8192 +8192 +8192
+            0x00, 0x00, 0x00, 0x46, 0x00, 0x00, 0x00, 0x46, 0x00, 0x00, 0x00, 0x46   // +8192 +8192 +8192
+        };
+        Titanfall::Bsp::portalVertices_stub = { data.begin(), data.end() };
+    }
+    {  // PortalVertexReferences
+       // [1, 2, 3, 4];
+        constexpr std::array<uint8_t, 8> data = {
+            0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0x04, 0x00
+        };
+        Titanfall::Bsp::portalVertexReferences_stub = { data.begin(), data.end() };
+    }
+    {  // PortalEdges
+        // [1, 2,  2, 3,  3, 4,  4, 1];
+        constexpr std::array<uint8_t, 8> data = {
+            0x01, 0x00, 0x02, 0x00, 0x02, 0x00, 0x03, 0x00, 0x03, 0x00, 0x04, 0x00, 0x04, 0x00, 0x01, 0x00
+        };
+        Titanfall::Bsp::portalEdges_stub = { data.begin(), data.end() };
+    }
+    {  // PortalEdgeReferences
+       // [0, 1, 2, 3];
+        constexpr std::array<uint8_t, 8> data = {
+            0x00, 0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00
+        };
+        Titanfall::Bsp::portalEdgeReferences_stub = { data.begin(), data.end() };
+    }
+    {  // PortalVertexEdges
+        // {-1, -1, -1, -1, -1, -1, -1, -1},
+        // { 0,  3, -1, -1, -1, -1, -1, -1},
+        // { 0,  1, -1, -1, -1, -1, -1, -1},
+        // { 1,  2, -1, -1, -1, -1, -1, -1},
+        // { 2,  3, -1, -1, -1, -1, -1, -1};
+        constexpr std::array<uint8_t, 8> data = {
+            0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0x00, 0x00, 0x03, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0x00, 0x00, 0x01, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0x01, 0x00, 0x02, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0x02, 0x00, 0x03, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+        };
+        Titanfall::Bsp::portalVertexEdges_stub = { data.begin(), data.end() };
+    }
+    {  // PortalEdgeIntersectHeaders
+        constexpr std::array<uint8_t, 8> data = {
+            0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,  // {.first_set=0, .num_sets=1},
+            0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,  // {.first_set=1, .num_sets=1},
+            0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,  // {.first_set=2, .num_sets=1},
+            0x03, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00   // {.first_set=3, .num_sets=1};
+        };
+        Titanfall::Bsp::portalIntersectHeaders_stub = { data.begin(), data.end() };
+    }
+    {  // PortalEdgeIntersectEdges
+        // { 3,  1, -1, -1, -1, -1, -1, -1},
+        // { 0,  2, -1, -1, -1, -1, -1, -1},
+        // { 1,  3, -1, -1, -1, -1, -1, -1},
+        // { 2,  0, -1, -1, -1, -1, -1, -1};
+        constexpr std::array<uint8_t, 8> data = {
+            0x03, 0x00, 0x01, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0x00, 0x00, 0x02, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0x01, 0x00, 0x03, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0x02, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+        };
+        Titanfall::Bsp::portalIntersectEdges_stub = { data.begin(), data.end() };
+    }
+    {  // PortalEdgeIntersectVertices
+        // { 1,  2, -1, -1, -1, -1, -1, -1},
+        // { 2,  3, -1, -1, -1, -1, -1, -1},
+        // { 3,  4, -1, -1, -1, -1, -1, -1},
+        // { 4,  1, -1, -1, -1, -1, -1, -1};
+        constexpr std::array<uint8_t, 8> data = {
+            0x01, 0x00, 0x02, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0x02, 0x00, 0x03, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0x03, 0x00, 0x04, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0x04, 0x00, 0x01, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+        };
+        Titanfall::Bsp::portalIntersectVertices_stub = { data.begin(), data.end() };
+    }
 }
-
