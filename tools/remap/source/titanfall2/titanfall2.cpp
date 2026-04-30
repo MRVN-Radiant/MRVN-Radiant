@@ -185,6 +185,10 @@ void WriteR2BSPFile(const char *filename) {
 void CompileR2BSPFile() {
     Titanfall2::SetUpGameLump();
 
+    // Cell/Portal planes
+    Titanfall::Bsp::planes.emplace_back(Plane3f(0, 1, 0, 0));
+    // TODO: set cmGrid.brushSidePlaneOffset here
+
     for (entity_t &entity : entities) {
         const char *pszClassname = entity.classname();
 

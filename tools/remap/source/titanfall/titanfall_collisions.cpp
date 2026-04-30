@@ -86,7 +86,7 @@ void Titanfall::EmitCollisionGrid( entity_t &e ) {
     grid.xCount = ceil(size.x() / grid.scale) + 2;
     grid.yCount = ceil(size.y() / grid.scale) + 2;
     grid.straddleGroupCount = 0;
-    grid.brushSidePlaneOffset = 0;
+    grid.brushSidePlaneOffset = 1;  // 1 plane for Cells/Portals
 
     // Make GridCells
     for (int32_t y = 0; y < grid.yCount; y++) {
