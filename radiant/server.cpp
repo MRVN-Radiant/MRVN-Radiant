@@ -88,8 +88,15 @@ public:
 			}
 		}
 	}
+	virtual void foreachModule(const std::function<void(const char*, int, Module*)>& visitor) const override;
 };
 
+void RadiantModuleServer::foreachModule(const std::function<void(const char*, int, Module*)>& visitor) const
+{
+	for (auto& module : m_modules) {
+		visitor(module.first.first.first.c_str(), module.first.first.second, module.second);
+	}
+}
 
 #if defined( WIN32 )
 
