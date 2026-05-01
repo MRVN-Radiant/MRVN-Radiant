@@ -1,8 +1,13 @@
 *.[oda]
 .settings
 out
+
+# Editors
 .vscode
 .vs
+.idea
+
+# CMake
 libs/assimp/out
 CMakeFiles
 cmake_install.cmake
