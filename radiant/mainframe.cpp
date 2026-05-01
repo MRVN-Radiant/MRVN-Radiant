@@ -124,6 +124,7 @@
 #include "theme.h"
 #include "tools.h"
 #include "filterbar.h"
+#include "dialogs/module_server_dialog.h"
 
 
 // VFS
@@ -1212,6 +1213,14 @@ void create_help_menu( QMenuBar *menubar ){
 	create_menu_item_with_mnemonic( menu, "&About", FreeCaller<DoAbout>() );
 }
 
+void create_debug_menu( QMenuBar* const menubar)
+{
+#if 1
+	QMenu* const debug_menu = menubar->addMenu("&Debug");
+	create_menu_item_with_mnemonic( debug_menu, "Module dialog", FreeCaller<ModuleServerDialog_showDialog>() );
+#endif
+}
+
 void create_main_menu( QMenuBar *menubar, MainFrame::EViewStyle style ){
 	create_file_menu( menubar );
  	create_edit_menu( menubar );
@@ -1225,6 +1234,7 @@ void create_main_menu( QMenuBar *menubar, MainFrame::EViewStyle style ){
 	create_patch_menu( menubar );
 	create_plugins_menu( menubar );
 	create_help_menu( menubar );
+	create_debug_menu( menubar );
 }
 
 
@@ -1835,6 +1845,8 @@ void MainFrame::Create(){
 	PreferencesDialog_constructWindow( window );
 	FindTextureDialog_constructWindow( window );
 	SurfaceInspector_constructWindow( window );
+	ModuleServerDialog_constructWindow( window );
+
 	theme_contruct();
 
 	SetActiveXY( m_pXYWnd );
@@ -1885,6 +1897,7 @@ void MainFrame::Shutdown(){
 	PreferencesDialog_destroyWindow();
 	SurfaceInspector_destroyWindow();
 	FindTextureDialog_destroyWindow();
+	ModuleServerDialog_destructWindow();
 
 	g_DbgDlg.destroyWindow();
 

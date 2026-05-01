@@ -1,4 +1,5 @@
 add_executable(radiant
+               dialogs/module_server_dialog.cpp
                autosave.cpp
                brushmanip.cpp
                brushmodule.cpp
