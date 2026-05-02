@@ -483,6 +483,7 @@ void Map_StartPosition(){
 
 	Vector3 origin;
 	if ( entity != nullptr && string_parse_vector3( entity->getKeyValue( "origin" ), origin ) ) {
+		origin[2] += 64
 		FocusViews( origin, string_read_float( entity->getKeyValue( "angle" ) ) );
 	}
 	else
