@@ -527,6 +527,6 @@ void Shared::MakeLightmapUVs() {
     }
 
     // TODO: leftovers
-    Sys_Printf("%9zu lightmap pages used\n", current_page + 1);
+    Sys_Printf("%d lightmap pages used\n", current_page + 1);
     Sys_Printf("%9zu lightmap islands leftover\n", Shared::islands.size() - island_index);
 }
