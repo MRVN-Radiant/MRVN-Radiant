@@ -35,11 +35,18 @@ void Broadcast_Shutdown();
 
 #define SYS_VRB SYS_STD | SYS_VRBflag // verbose support (on/off) //a shortcut, not for sending!
 
+#if not defined(WIN32)
+#define PRINTF_LIKE(format_idx, varg_idx) __attribute__ ((format (printf, format_idx, varg_idx)));
+#else
+#define PRINTF_LIKE(format_idx, varg_idx)
+#endif
+
+
 extern bool verbose;
-void Sys_Printf( const char *text, ... );
-void Sys_FPrintf( int flag, const char *text, ... );
-void Sys_Warning( const char *format, ... );
-[[ noreturn ]] void Error( const char *error, ... );
+void Sys_Printf( const char *text, ... ) PRINTF_LIKE(1, 2);
+void Sys_FPrintf( int flag, const char *text, ... ) PRINTF_LIKE(2, 3);
+void Sys_Warning( const char *format, ... ) PRINTF_LIKE(1, 2);;
+[[ noreturn ]] void Error( const char *error, ... ) PRINTF_LIKE(1, 2);;
 #define ENSURE( condition ) \
 	(void) \
 	( (!!( condition )) || \
