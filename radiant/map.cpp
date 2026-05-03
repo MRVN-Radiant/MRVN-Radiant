@@ -441,11 +441,10 @@ Entity *Scene_FindPlayerStart(){
 	typedef const char* StaticString;
 	StaticString strings[] = {
 		"info_player_start",
-		"info_player_deathmatch",
-		"team_CTF_redplayer",
-		"team_CTF_blueplayer",
-		"team_CTF_redspawn",
-		"team_CTF_bluespawn",
+		"info_spawnpoint_human_start",
+		"info_spawnpoint_dropship_start",
+		"info_spawnpoint_titan_start",
+		"info_spawnpoint_droppod_start",
 	};
 	typedef const StaticString* StaticStringIterator;
 	for ( StaticStringIterator i = strings, end = strings + ( sizeof( strings ) / sizeof( StaticString ) ); i != end; ++i )
