@@ -481,9 +481,11 @@ void Map_StartPosition(){
 	Entity* entity = Scene_FindPlayerStart();
 
 	Vector3 origin;
+	Vector3 angles;
 	if ( entity != nullptr && string_parse_vector3( entity->getKeyValue( "origin" ), origin ) ) {
 		origin[2] += 64;
-		FocusViews( origin, string_read_float( entity->getKeyValue( "angles" ) ) );
+		angles = string_parse_vector3( entity->getKeyValue( "angles" ), angles );
+		FocusViews( origin, angles[1] );
 	}
 	else
 	{
