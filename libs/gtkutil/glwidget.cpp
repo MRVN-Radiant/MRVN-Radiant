@@ -49,7 +49,7 @@ void glwidget_context_created( QOpenGLWidget& widget ){
 	ASSERT_MESSAGE( widget.isValid(), "failed to create OpenGL widget" );
 
 	if ( ++g_context_count == 1 ) {
-		GlobalOpenGL().funcs = widget.context()->versionFunctions<QOpenGLFunctions_2_0>();
+		GlobalOpenGL().funcs = widget.context()->versionFunctions<QOpenGLFunctions_3_0>();
 		ASSERT_MESSAGE( GlobalOpenGL().funcs, "failed to initializeOpenGLFunctions" );
 		GlobalOpenGL().contextValid = true;
 
@@ -67,9 +67,12 @@ void glwidget_context_destroyed(){
 }
 
 void glwidget_setDefaultFormat(){
+	const int MAJOR = 3;
+	const int MINOR = 0;
+	globalOutputStream() << "Setting OpenGL version to: " << MAJOR << "." << MINOR << "\n";
 	QCoreApplication::setAttribute( Qt::ApplicationAttribute::AA_ShareOpenGLContexts );
 	QSurfaceFormat format;
-	format.setVersion( 2, 0 );
+	format.setVersion( MAJOR, MINOR );
 	format.setSwapInterval( 0 );
 //	format.setSamples( 8 );
 	QSurfaceFormat::setDefaultFormat( format );

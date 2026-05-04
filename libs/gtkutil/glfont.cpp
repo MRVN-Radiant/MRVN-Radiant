@@ -701,6 +701,9 @@ GLFont *glfont_create( const char* font_string ){
 #elif 1
 
 GLFont *glfont_create( const char* family, int fontSize, const char* appPath ){
+	// FIXME:
+	return new GLFontStub;
+
 	GLuint font_list_base = gl().glGenLists( 128 );
 
 	QFont font;

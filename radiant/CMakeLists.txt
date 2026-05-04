@@ -1,4 +1,6 @@
 add_executable(radiant
+               gfx/gl_helpers.cpp
+               gfx/rendergraph.cpp
                autosave.cpp
                brushmanip.cpp
                brushmodule.cpp

@@ -793,15 +793,15 @@ public:
 		m_shaders.release( name );
 	}
 	void render( RenderStateFlags globalstate, const Matrix4& modelview, const Matrix4& projection, const Vector3& viewer ){
-		return; // FIXME:
-		gl().glMatrixMode( GL_PROJECTION );
-		gl().glLoadMatrixf( reinterpret_cast<const float*>( &projection ) );
+
+		// gl().glMatrixMode( GL_PROJECTION );
+		// gl().glLoadMatrixf( reinterpret_cast<const float*>( &projection ) );
 #if 0
 		//qglGetFloatv(GL_PROJECTION_MATRIX, reinterpret_cast<float*>(&projection));
 #endif
 
-		gl().glMatrixMode( GL_MODELVIEW );
-		gl().glLoadMatrixf( reinterpret_cast<const float*>( &modelview ) );
+		// gl().glMatrixMode( GL_MODELVIEW );
+		// gl().glLoadMatrixf( reinterpret_cast<const float*>( &modelview ) );
 #if 0
 		//qglGetFloatv(GL_MODELVIEW_MATRIX, reinterpret_cast<float*>(&modelview));
 #endif
@@ -809,83 +809,83 @@ public:
 		ASSERT_MESSAGE( realised(), "render states are not realised" );
 
 		// global settings that are not set in renderstates
-		gl().glFrontFace( GL_CW );
-		gl().glCullFace( GL_BACK );
-		gl().glPolygonOffset( -1, 1 );
-		{
-			const GLubyte pattern[132] = {
-				0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
-				0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
-				0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
-				0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
-				0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
-				0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
-				0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
-				0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
-				0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
-				0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
-				0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
-				0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
-				0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
-				0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
-				0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
-				0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55
-			};
-			gl().glPolygonStipple( pattern );
-		}
-		gl().glEnableClientState( GL_VERTEX_ARRAY );
-		g_vertexArray_enabled = true;
-		gl().glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE );
-
-		gl().glActiveTexture( GL_TEXTURE0 );
-		gl().glClientActiveTexture( GL_TEXTURE0 );
-
-		gl().glUseProgram( 0 );
-		gl().glDisableVertexAttribArray( c_attr_TexCoord0 );
-		gl().glDisableVertexAttribArray( c_attr_Tangent );
-		gl().glDisableVertexAttribArray( c_attr_Binormal );
-
-		if ( globalstate & RENDER_TEXTURE ) {
-			gl().glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-			gl().glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-		}
+		// gl().glFrontFace( GL_CW );
+		// gl().glCullFace( GL_BACK );
+		// gl().glPolygonOffset( -1, 1 );
+		// {
+		// 	const GLubyte pattern[132] = {
+		// 		0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
+		// 		0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
+		// 		0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
+		// 		0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
+		// 		0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
+		// 		0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
+		// 		0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
+		// 		0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
+		// 		0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
+		// 		0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
+		// 		0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
+		// 		0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
+		// 		0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
+		// 		0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
+		// 		0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55,
+		// 		0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55
+		// 	};
+		// 	gl().glPolygonStipple( pattern );
+		// }
+		// gl().glEnableClientState( GL_VERTEX_ARRAY );
+		// g_vertexArray_enabled = true;
+		// gl().glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE );
+		//
+		// gl().glActiveTexture( GL_TEXTURE0 );
+		// gl().glClientActiveTexture( GL_TEXTURE0 );
+		//
+		// gl().glUseProgram( 0 );
+		// gl().glDisableVertexAttribArray( c_attr_TexCoord0 );
+		// gl().glDisableVertexAttribArray( c_attr_Tangent );
+		// gl().glDisableVertexAttribArray( c_attr_Binormal );
+		//
+		// if ( globalstate & RENDER_TEXTURE ) {
+		// 	gl().glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+		// 	gl().glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+		// }
 
 		OpenGLState current;
 		OpenGLState_constructDefault( current );
 		current.m_sort = OpenGLState::eSortFirst;
 
 		// default renderstate settings
-		gl().glLineStipple( current.m_linestipple_factor, current.m_linestipple_pattern );
-		gl().glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-		gl().glDisable( GL_LIGHTING );
-		gl().glDisable( GL_TEXTURE_2D );
-		gl().glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-		g_texcoordArray_enabled = false;
-		gl().glDisableClientState( GL_COLOR_ARRAY );
-		g_colorArray_enabled = false;
-		gl().glDisableClientState( GL_NORMAL_ARRAY );
-		g_normalArray_enabled = false;
-		gl().glDisable( GL_BLEND );
-		gl().glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-		gl().glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-		gl().glDisable( GL_CULL_FACE );
-		gl().glShadeModel( GL_FLAT );
-		gl().glDisable( GL_DEPTH_TEST );
-		gl().glDepthMask( GL_FALSE );
-		gl().glDisable( GL_ALPHA_TEST );
-		gl().glDisable( GL_LINE_STIPPLE );
-		gl().glDisable( GL_POLYGON_STIPPLE );
-		gl().glDisable( GL_POLYGON_OFFSET_LINE );
-
-		gl().glBindTexture( GL_TEXTURE_2D, 0 );
-		gl().glColor4f( 1,1,1,1 );
-		gl().glDepthFunc( GL_LESS );
-		gl().glAlphaFunc( GL_ALWAYS, 0 );
-		gl().glLineWidth( 1 );
-		gl().glPointSize( 1 );
-
-		gl().glHint( GL_FOG_HINT, GL_NICEST );
-		gl().glDisable( GL_FOG );
+		// gl().glLineStipple( current.m_linestipple_factor, current.m_linestipple_pattern );
+		// gl().glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+		// gl().glDisable( GL_LIGHTING );
+		// gl().glDisable( GL_TEXTURE_2D );
+		// gl().glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+		// g_texcoordArray_enabled = false;
+		// gl().glDisableClientState( GL_COLOR_ARRAY );
+		// g_colorArray_enabled = false;
+		// gl().glDisableClientState( GL_NORMAL_ARRAY );
+		// g_normalArray_enabled = false;
+		// gl().glDisable( GL_BLEND );
+		// gl().glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+		// gl().glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		// gl().glDisable( GL_CULL_FACE );
+		// gl().glShadeModel( GL_FLAT );
+		// gl().glDisable( GL_DEPTH_TEST );
+		// gl().glDepthMask( GL_FALSE );
+		// gl().glDisable( GL_ALPHA_TEST );
+		// gl().glDisable( GL_LINE_STIPPLE );
+		// gl().glDisable( GL_POLYGON_STIPPLE );
+		// gl().glDisable( GL_POLYGON_OFFSET_LINE );
+		//
+		// gl().glBindTexture( GL_TEXTURE_2D, 0 );
+		// gl().glColor4f( 1,1,1,1 );
+		// gl().glDepthFunc( GL_LESS );
+		// gl().glAlphaFunc( GL_ALWAYS, 0 );
+		// gl().glLineWidth( 1 );
+		// gl().glPointSize( 1 );
+		//
+		// gl().glHint( GL_FOG_HINT, GL_NICEST );
+		// gl().glDisable( GL_FOG );
 		setFogState( OpenGLFogState() );
 
 		GlobalOpenGL_debugAssertNoErrors();
@@ -900,7 +900,9 @@ public:
 		OpenGLState reset = current; /* reset some states */
 		reset.m_state = current.m_state & ~RENDER_TEXT; /* popmatrix after RENDER_TEXT */
 		reset.m_program = nullptr; /* disable shader */
-		OpenGLState_apply( reset, current, globalstate );
+		// OpenGLState_apply( reset, current, globalstate );
+
+		GlobalOpenGL_debugAssertNoErrors();
 	}
 	void realise(){
 		if ( --m_unrealised == 0 ) {
@@ -1564,7 +1566,7 @@ void OpenGLStateBucket::render( OpenGLState& current, unsigned int globalstate, 
 		gl().glPopMatrix();
 	}
 	else if ( !m_renderables.empty() ) {
-		OpenGLState_apply( m_state, current, globalstate );
+		//OpenGLState_apply( m_state, current, globalstate );
 		Renderables_flush( m_renderables, current, globalstate, viewer );
 	}
 }
