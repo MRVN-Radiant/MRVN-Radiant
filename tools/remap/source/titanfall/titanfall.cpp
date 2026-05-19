@@ -436,15 +436,18 @@ void Titanfall::EmitStubs() {
     }
     // Cell BSP Nodes
     Titanfall::Bsp::cellBSPNodes_stub = {
-        {.plane=-1, .child=0}
+        // plane, child
+        {-1, 0}
     };
     // Cells
     Titanfall::Bsp::cells_stub = {
-        {.portalCount=1, .firstPortal=0, .flags=5, .leafWaterData=-1}
+        // portalCount, firstPortal, flags, leafWaterData
+        {1, 0, 5, -1}
     };
     // Portals
     Titanfall::Bsp::portals_stub = {
-        {.isReversed=0, .type=1, .refCount=4, .padding=0, .firstRef=0, .cell=2, .plane=0}
+        // isReversed, type, refCount, padding, firstRef, cell, plane
+        {0, 1, 4, 0, 0, 2, 0}
     };
     // PortalVertices
     Titanfall::Bsp::portalVertices_stub = {
@@ -482,10 +485,11 @@ void Titanfall::EmitStubs() {
     };
     // PortalEdgeIntersectHeaders
     Titanfall::Bsp::portalIntersectHeaders_stub = {
-        {.firstSet=0, .setCount=1},
-        {.firstSet=1, .setCount=1},
-        {.firstSet=2, .setCount=1},
-        {.firstSet=3, .setCount=1}
+        // firstSet, setCount
+        {0, 1},
+        {1, 1},
+        {2, 1},
+        {3, 1}
     };
     // PortalEdgeIntersectEdges
     Titanfall::Bsp::portalIntersectEdges_stub = {
