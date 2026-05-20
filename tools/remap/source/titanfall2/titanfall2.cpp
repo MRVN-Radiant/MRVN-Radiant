@@ -135,7 +135,7 @@ void WriteR2BSPFile(const char *filename) {
     AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_HEADERS],          Titanfall2::Bsp::lightMapHeaders_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_CM_GRID],                   Titanfall::Bsp::cmGrid);
     AddLump(file, header.lumps[R2_LUMP_CM_GRID_CELLS],             Titanfall::Bsp::cmGridCells);
-    AddLump(file, header.lumps[R2_LUMP_CM_GEO_SETS],              Titanfall::Bsp::cmGeoSets);
+    AddLump(file, header.lumps[R2_LUMP_CM_GEO_SETS],               Titanfall::Bsp::cmGeoSets);
     AddLump(file, header.lumps[R2_LUMP_CM_GEO_SET_BOUNDS],         Titanfall::Bsp::cmGeoSetBounds);
     // AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVES],             Titanfall::Bsp::cmPrimitives_stub);  // stub
     // AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVE_BOUNDS],       Titanfall::Bsp::cmPrimitiveBounds_stub);  // stub
@@ -149,6 +149,15 @@ void WriteR2BSPFile(const char *filename) {
     AddLump(file, header.lumps[R2_LUMP_CSM_AABB_NODES],            Titanfall::Bsp::csmAABBNodes_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_CELL_BSP_NODES],            Titanfall::Bsp::cellBSPNodes_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_CELLS],                     Titanfall::Bsp::cells_stub);  // stub
+    AddLump(file, header.lumps[R2_LUMP_PORTALS],                   Titanfall::Bsp::portals_stub);  // stub
+    AddLump(file, header.lumps[R2_LUMP_PORTAL_VERTICES],           Titanfall::Bsp::portalVertices_stub);  // stub
+    AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGES],              Titanfall::Bsp::portalEdges_stub);  // stub
+    AddLump(file, header.lumps[R2_LUMP_PORTAL_VERTEX_EDGES],       Titanfall::Bsp::portalVertexEdges_stub);  // stub
+    AddLump(file, header.lumps[R2_LUMP_PORTAL_VERTEX_REFERENCES],  Titanfall::Bsp::portalVertexReferences_stub);  // stub
+    AddLump(file, header.lumps[R2_LUMP_PORTAL_EDGE_REFERENCES],    Titanfall::Bsp::portalEdgeReferences_stub);  // stub
+    AddLump(file, header.lumps[R2_LUMP_PORTAL_INTERSECT_EDGE],     Titanfall::Bsp::portalIntersectEdges_stub);  // stub
+    AddLump(file, header.lumps[R2_LUMP_PORTAL_INTERSECT_VERTEX],   Titanfall::Bsp::portalIntersectVertices_stub);  // stub
+    AddLump(file, header.lumps[R2_LUMP_PORTAL_INTERSECT_HEADER],   Titanfall::Bsp::portalIntersectHeaders_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_OCCLUSION_MESH_VERTICES],   Titanfall::Bsp::occlusionMeshVertices);
     AddLump(file, header.lumps[R2_LUMP_OCCLUSION_MESH_INDICES],    Titanfall::Bsp::occlusionMeshIndices);
     AddLump(file, header.lumps[R2_LUMP_CELL_AABB_NODES],           Titanfall::Bsp::cellAABBNodes);
@@ -175,6 +184,10 @@ void WriteR2BSPFile(const char *filename) {
 */
 void CompileR2BSPFile() {
     Titanfall2::SetUpGameLump();
+
+    // Cell/Portal planes
+    Titanfall::Bsp::planes.emplace_back(Plane3f(0, 1, 0, 0));
+    // TODO: set cmGrid.brushSidePlaneOffset here
 
     for (entity_t &entity : entities) {
         const char *pszClassname = entity.classname();

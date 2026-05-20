@@ -321,6 +321,42 @@ namespace Titanfall {
         float    t_offset;
     };
 
+    // 0x6A
+    struct CellBspNode_t {
+        int32_t   plane;  // -1 if child is a Cell
+        uint32_t  child;
+    };
+
+    // 0x6B
+    struct Cell_t {
+        uint16_t  portalCount;
+        uint16_t  firstPortal;
+        uint16_t  flags;  // TODO: CellFlags enum
+        int16_t   leafWaterData;  // -1 for none
+    };
+
+    // 0x6C
+    struct Portal_t {
+        uint8_t   isReversed;
+        uint8_t   type;  // TODO: PortalType enum
+        uint8_t   refCount;
+        uint8_t   padding;
+        uint16_t  firstRef;
+        uint16_t  cell;
+        uint32_t  plane;
+    };
+
+    // 0x6F, 0x72 & 0x73
+    struct IndexSet_t {  // typedef int16_t[8]?
+        int16_t a, b, c, d, e, f, g, h;
+    };
+
+    // 0x74
+    struct IntersectHeader_t {
+        uint32_t  firstSet;
+        uint32_t  setCount;
+    };
+
     // 0x77
     struct CellAABBNode_t {
         Vector3   mins;
@@ -411,7 +447,16 @@ namespace Titanfall {
         inline std::vector<uint8_t>  lightmapHeaders_stub;
         inline std::vector<uint8_t>  lightMapDataSky_stub;
         inline std::vector<uint8_t>  csmAABBNodes_stub;
-        inline std::vector<uint8_t>  cellBSPNodes_stub;
-        inline std::vector<uint8_t>  cells_stub;
+        inline std::vector<CellBspNode_t>      cellBSPNodes_stub;
+        inline std::vector<Cell_t>             cells_stub;
+        inline std::vector<Portal_t>           portals_stub;
+        inline std::vector<Vector3>            portalVertices_stub;
+        inline std::vector<uint16_t>           portalVertexReferences_stub;
+        inline std::vector<uint16_t>           portalEdges_stub;
+        inline std::vector<uint16_t>           portalEdgeReferences_stub;
+        inline std::vector<IndexSet_t>         portalVertexEdges_stub;
+        inline std::vector<IntersectHeader_t>  portalIntersectHeaders_stub;
+        inline std::vector<IndexSet_t>         portalIntersectVertices_stub;
+        inline std::vector<IndexSet_t>         portalIntersectEdges_stub;
     }
 }

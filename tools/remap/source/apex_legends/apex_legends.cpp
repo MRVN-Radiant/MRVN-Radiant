@@ -74,6 +74,7 @@ void WriteR5BSPFile(const char *filename) {
 
     /* Write lumps */
     AddLump(file, header.lumps[R5_LUMP_ENTITIES],                 Titanfall::Bsp::entities);
+    AddLump(file, header.lumps[R5_LUMP_PLANES],                   Titanfall::Bsp::planes);
     AddLump(file, header.lumps[R5_LUMP_TEXTURE_DATA],             ApexLegends::Bsp::textureData);
     AddLump(file, header.lumps[R5_LUMP_VERTICES],                 Titanfall::Bsp::vertices);
     AddLump(file, header.lumps[R5_LUMP_LIGHTPROBE_PARENT_INFOS],  ApexLegends::Bsp::lightprobeParentInfos_stub);  // stub
@@ -112,32 +113,41 @@ void WriteR5BSPFile(const char *filename) {
         SafeWrite(file, &Titanfall2::Bsp::gameLumpUnknownHeader, sizeof(Titanfall2::GameLumpUnknownHeader_t));
     }
 
-    AddLump(file, header.lumps[R5_LUMP_UNKNOWN_37],              ApexLegends::Bsp::unknown25_stub);            // stub
-    AddLump(file, header.lumps[R5_LUMP_UNKNOWN_38],              ApexLegends::Bsp::unknown26_stub);            // stub
-    AddLump(file, header.lumps[R5_LUMP_UNKNOWN_39],              ApexLegends::Bsp::unknown27_stub);            // stub
-    AddLump(file, header.lumps[R5_LUMP_CUBEMAPS],                ApexLegends::Bsp::cubemaps_stub);             // stub
-    AddLump(file, header.lumps[R5_LUMP_WORLD_LIGHTS],            ApexLegends::Bsp::worldLights_stub);          // stub
-    AddLump(file, header.lumps[R5_LUMP_VERTEX_UNLIT],            ApexLegends::Bsp::vertexUnlitVertices);
-    AddLump(file, header.lumps[R5_LUMP_VERTEX_LIT_FLAT],         ApexLegends::Bsp::vertexLitFlatVertices);
-    AddLump(file, header.lumps[R5_LUMP_VERTEX_LIT_BUMP],         ApexLegends::Bsp::vertexLitBumpVertices);
-    AddLump(file, header.lumps[R5_LUMP_VERTEX_UNLIT_TS],         ApexLegends::Bsp::vertexUnlitTSVertices);
-    AddLump(file, header.lumps[R5_LUMP_MESH_INDICES],            Titanfall::Bsp::meshIndices);
-    AddLump(file, header.lumps[R5_LUMP_MESHES],                  ApexLegends::Bsp::meshes);
-    AddLump(file, header.lumps[R5_LUMP_MESH_BOUNDS],             Titanfall::Bsp::meshBounds);
-    AddLump(file, header.lumps[R5_LUMP_MATERIAL_SORT],           ApexLegends::Bsp::materialSorts);
-    AddLump(file, header.lumps[R5_LUMP_LIGHTMAP_HEADERS],        ApexLegends::Bsp::lightmapHeaders_stub);      // stub
-    AddLump(file, header.lumps[R5_LUMP_TWEAK_LIGHTS],            ApexLegends::Bsp::tweakLights_stub);          // stub
-    AddLump(file, header.lumps[R5_LUMP_LIGHTMAP_DATA_SKY],       ApexLegends::Bsp::lightmapDataSky_stub);      // stub
-    AddLump(file, header.lumps[R5_LUMP_CSM_AABB_NODES],          ApexLegends::Bsp::csmAABBNodes_stub);         // stub
-    AddLump(file, header.lumps[R5_LUMP_CELL_BSP_NODES],          Titanfall::Bsp::cellBSPNodes_stub);           // stub
-    AddLump(file, header.lumps[R5_LUMP_CELLS],                   Titanfall::Bsp::cells_stub);                  // stub
-    AddLump(file, header.lumps[R5_LUMP_OCCLUSION_MESH_VERTICES], Titanfall::Bsp::occlusionMeshVertices);
-    AddLump(file, header.lumps[R5_LUMP_OCCLUSION_MESH_INDICES],  Titanfall::Bsp::occlusionMeshIndices);
-    AddLump(file, header.lumps[R5_LUMP_CELL_AABB_NODES],         ApexLegends::Bsp::cellAABBNodes);
-    AddLump(file, header.lumps[R5_LUMP_OBJ_REFERENCES],          ApexLegends::Bsp::objReferences);
-    AddLump(file, header.lumps[R5_LUMP_OBJ_REFERENCE_BOUNDS],    Titanfall::Bsp::objReferenceBounds);
-    AddLump(file, header.lumps[R5_LUMP_LIGHTMAP_DATA_RTL_PAGE],  ApexLegends::Bsp::lightmapDataRTLPage_stub);  // stub
-    AddLump(file, header.lumps[R5_LUMP_LEVEL_INFO],              ApexLegends::Bsp::levelInfo);
+    AddLump(file, header.lumps[R5_LUMP_UNKNOWN_37],                ApexLegends::Bsp::unknown25_stub);              // stub
+    AddLump(file, header.lumps[R5_LUMP_UNKNOWN_38],                ApexLegends::Bsp::unknown26_stub);              // stub
+    AddLump(file, header.lumps[R5_LUMP_UNKNOWN_39],                ApexLegends::Bsp::unknown27_stub);              // stub
+    AddLump(file, header.lumps[R5_LUMP_CUBEMAPS],                  ApexLegends::Bsp::cubemaps_stub);               // stub
+    AddLump(file, header.lumps[R5_LUMP_WORLD_LIGHTS],              ApexLegends::Bsp::worldLights_stub);            // stub
+    AddLump(file, header.lumps[R5_LUMP_VERTEX_UNLIT],              ApexLegends::Bsp::vertexUnlitVertices);
+    AddLump(file, header.lumps[R5_LUMP_VERTEX_LIT_FLAT],           ApexLegends::Bsp::vertexLitFlatVertices);
+    AddLump(file, header.lumps[R5_LUMP_VERTEX_LIT_BUMP],           ApexLegends::Bsp::vertexLitBumpVertices);
+    AddLump(file, header.lumps[R5_LUMP_VERTEX_UNLIT_TS],           ApexLegends::Bsp::vertexUnlitTSVertices);
+    AddLump(file, header.lumps[R5_LUMP_MESH_INDICES],              Titanfall::Bsp::meshIndices);
+    AddLump(file, header.lumps[R5_LUMP_MESHES],                    ApexLegends::Bsp::meshes);
+    AddLump(file, header.lumps[R5_LUMP_MESH_BOUNDS],               Titanfall::Bsp::meshBounds);
+    AddLump(file, header.lumps[R5_LUMP_MATERIAL_SORT],             ApexLegends::Bsp::materialSorts);
+    AddLump(file, header.lumps[R5_LUMP_LIGHTMAP_HEADERS],          ApexLegends::Bsp::lightmapHeaders_stub);        // stub
+    AddLump(file, header.lumps[R5_LUMP_TWEAK_LIGHTS],              ApexLegends::Bsp::tweakLights_stub);            // stub
+    AddLump(file, header.lumps[R5_LUMP_LIGHTMAP_DATA_SKY],         ApexLegends::Bsp::lightmapDataSky_stub);        // stub
+    AddLump(file, header.lumps[R5_LUMP_CSM_AABB_NODES],            ApexLegends::Bsp::csmAABBNodes_stub);           // stub
+    AddLump(file, header.lumps[R5_LUMP_CELL_BSP_NODES],            Titanfall::Bsp::cellBSPNodes_stub);             // stub
+    AddLump(file, header.lumps[R5_LUMP_CELLS],                     Titanfall::Bsp::cells_stub);                    // stub
+    AddLump(file, header.lumps[R5_LUMP_PORTALS],                   Titanfall::Bsp::portals_stub);                  // stub
+    AddLump(file, header.lumps[R5_LUMP_PORTAL_VERTICES],           Titanfall::Bsp::portalVertices_stub);           // stub
+    AddLump(file, header.lumps[R5_LUMP_PORTAL_EDGES],              Titanfall::Bsp::portalEdges_stub);              // stub
+    AddLump(file, header.lumps[R5_LUMP_PORTAL_VERTEX_EDGES],       Titanfall::Bsp::portalVertexEdges_stub);        // stub
+    AddLump(file, header.lumps[R5_LUMP_PORTAL_VERTEX_REFERENCES],  Titanfall::Bsp::portalVertexReferences_stub);   // stub
+    AddLump(file, header.lumps[R5_LUMP_PORTAL_EDGE_REFERENCES],    Titanfall::Bsp::portalEdgeReferences_stub);     // stub
+    AddLump(file, header.lumps[R5_LUMP_PORTAL_INTERSECT_EDGE],     Titanfall::Bsp::portalIntersectEdges_stub);     // stub
+    AddLump(file, header.lumps[R5_LUMP_PORTAL_INTERSECT_VERTEX],   Titanfall::Bsp::portalIntersectVertices_stub);  // stub
+    AddLump(file, header.lumps[R5_LUMP_PORTAL_INTERSECT_HEADER],   Titanfall::Bsp::portalIntersectHeaders_stub);   // stub
+    AddLump(file, header.lumps[R5_LUMP_OCCLUSION_MESH_VERTICES],   Titanfall::Bsp::occlusionMeshVertices);
+    AddLump(file, header.lumps[R5_LUMP_OCCLUSION_MESH_INDICES],    Titanfall::Bsp::occlusionMeshIndices);
+    AddLump(file, header.lumps[R5_LUMP_CELL_AABB_NODES],           ApexLegends::Bsp::cellAABBNodes);
+    AddLump(file, header.lumps[R5_LUMP_OBJ_REFERENCES],            ApexLegends::Bsp::objReferences);
+    AddLump(file, header.lumps[R5_LUMP_OBJ_REFERENCE_BOUNDS],      Titanfall::Bsp::objReferenceBounds);
+    AddLump(file, header.lumps[R5_LUMP_LIGHTMAP_DATA_RTL_PAGE],    ApexLegends::Bsp::lightmapDataRTLPage_stub);    // stub
+    AddLump(file, header.lumps[R5_LUMP_LEVEL_INFO],                ApexLegends::Bsp::levelInfo);
 
     /* emit bsp size */
     const int size = ftell(file);
@@ -158,6 +168,10 @@ void WriteR5BSPFile(const char *filename) {
 */
 void CompileR5BSPFile() {
     ApexLegends::SetupGameLump();
+
+    // Cell/Portal planes
+    Titanfall::Bsp::planes.emplace_back(Plane3f(0, 1, 0, 0));
+    // NOTE: no cmGrid, no cmGrid.brushSidePlaneOffset to set
     
     for (entity_t &entity : entities) {
         const char *pszClassname = entity.classname();
