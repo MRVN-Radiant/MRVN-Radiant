@@ -120,9 +120,6 @@ void WriteR2BSPFile(const char *filename) {
     AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_DATA],  Titanfall::Bsp::textureDataData);
     AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_TABLE], Titanfall::Bsp::textureDataTable);
     AddLump(file, header.lumps[R2_LUMP_WORLD_LIGHTS],              Titanfall2::Bsp::worldLights_stub);  // stub
-    // AddLump(file, header.lumps[R2_LUMP_TRICOLL_TRIS],              Titanfall2::bspTricollTris_stub);  // stub
-    // AddLump(file, header.lumps[R2_LUMP_TRICOLL_NODES],             Titanfall2::bspTricollNodes_stub);  // stub
-    // AddLump(file, header.lumps[R2_LUMP_TRICOLL_HEADERS],           Titanfall2::bspTricollHeaders_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_VERTEX_UNLIT],              Titanfall::Bsp::vertexUnlitVertices);
     AddLump(file, header.lumps[R2_LUMP_VERTEX_LIT_FLAT],           Titanfall::Bsp::vertexLitFlatVertices);
     AddLump(file, header.lumps[R2_LUMP_VERTEX_LIT_BUMP],           Titanfall::Bsp::vertexLitBumpVertices);
@@ -137,14 +134,11 @@ void WriteR2BSPFile(const char *filename) {
     AddLump(file, header.lumps[R2_LUMP_CM_GRID_CELLS],             Titanfall::Bsp::cmGridCells);
     AddLump(file, header.lumps[R2_LUMP_CM_GEO_SETS],               Titanfall::Bsp::cmGeoSets);
     AddLump(file, header.lumps[R2_LUMP_CM_GEO_SET_BOUNDS],         Titanfall::Bsp::cmGeoSetBounds);
-    // AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVES],             Titanfall::Bsp::cmPrimitives_stub);  // stub
-    // AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVE_BOUNDS],       Titanfall::Bsp::cmPrimitiveBounds_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_CM_UNIQUE_CONTENTS],        Titanfall::Bsp::cmUniqueContents);
     AddLump(file, header.lumps[R2_LUMP_CM_BRUSHES],                Titanfall::Bsp::cmBrushes);
     AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PROPS],       Titanfall::Bsp::cmBrushSideProperties);
     AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PLANES],      Titanfall::Bsp::cmBrushSidePlaneOffsets);
     AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_TEX_VECS],    Titanfall::Bsp::cmBrushSideTexVecs);
-    // AddLump(file, header.lumps[R2_LUMP_TRICOLL_BEVEL_STARTS],      Titanfall2::bspTricollBevelStarts_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_DATA_SKY],         Titanfall2::Bsp::lightMapDataSky_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_CSM_AABB_NODES],            Titanfall::Bsp::csmAABBNodes_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_CELL_BSP_NODES],            Titanfall::Bsp::cellBSPNodes_stub);  // stub
