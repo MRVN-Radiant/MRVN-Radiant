@@ -57,7 +57,7 @@ void WriteR1BSPFile(const char *filename) {
     header.lumps[R1_LUMP_LEAF_WATER_DATA].lumpVer = 1;
     header.lumps[R1_LUMP_WORLD_LIGHTS].lumpVer = 1;
     header.lumps[R1_LUMP_PHYSICS_LEVEL].lumpVer = 16;
-    header.lumps[R1_LUMP_TRICOLL_TRIANGLES].lumpVer = 2;
+    header.lumps[R1_LUMP_TRICOLL_TRIS].lumpVer = 2;
     header.lumps[R1_LUMP_TRICOLL_NODES].lumpVer = 1;
     header.lumps[R1_LUMP_TRICOLL_HEADERS].lumpVer = 1;
     header.lumps[R1_LUMP_VERTEX_LIT_FLAT].lumpVer = 1;
