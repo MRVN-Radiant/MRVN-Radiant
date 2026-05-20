@@ -51,11 +51,18 @@ void WriteR1BSPFile(const char *filename) {
     header.mapVersion = 6;
     header.maxLump = 127;
 
-    // This should be automated maybe
-    header.lumps[0x02].lumpVer = 1;
-    header.lumps[0x36].lumpVer = 1;
-    header.lumps[0x49].lumpVer = 1;
-    header.lumps[0x53].lumpVer = 1;
+    // Set lump versions (this should be automated maybe)
+    header.lumps[R1_LUMP_PLANES].lumpVer = 1;
+    header.lumps[R1_LUMP_TEXTURE_DATA].lumpVer = 1;
+    header.lumps[R1_LUMP_LEAF_WATER_DATA].lumpVer = 1;
+    header.lumps[R1_LUMP_WORLD_LIGHTS].lumpVer = 1;
+    header.lumps[R1_LUMP_PHYSICS_LEVEL].lumpVer = 16;
+    header.lumps[R1_LUMP_TRICOLL_TRIANGLES].lumpVer = 2;
+    header.lumps[R1_LUMP_TRICOLL_NODES].lumpVer = 1;
+    header.lumps[R1_LUMP_TRICOLL_HEADERS].lumpVer = 1;
+    header.lumps[R1_LUMP_VERTEX_LIT_FLAT].lumpVer = 1;
+    header.lumps[R1_LUMP_VERTEX_LIT_BUMP].lumpVer = 1;
+    header.lumps[R1_LUMP_LIGHTMAP_HEADERS].lumpVer = 1;
 
     // write initial header
     FILE *file = SafeOpenWrite(filename);

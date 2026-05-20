@@ -52,15 +52,18 @@ void WriteR2BSPFile(const char *filename) {
     header.mapVersion = 30;
     header.maxLump = 127;
 
-    /* This should be automated maybe */
-    header.lumps[0x01].lumpVer = 1;
-    header.lumps[0x02].lumpVer = 1;
-    header.lumps[0x36].lumpVer = 3;
-    header.lumps[0x42].lumpVer = 2;
-    header.lumps[0x44].lumpVer = 1;
-    header.lumps[0x45].lumpVer = 1;
-    header.lumps[0x49].lumpVer = 1;
-    header.lumps[0x53].lumpVer = 1;
+    /* set lump versions (this should be automated maybe) */
+    header.lumps[R2_LUMP_PLANES].lumpVer = 1;
+    header.lumps[R2_LUMP_TEXTURE_DATA].lumpVer = 1;
+    header.lumps[R2_LUMP_LEAF_WATER_DATA].lumpVer = 1;
+    header.lumps[R2_LUMP_WORLD_LIGHTS].lumpVer = 3;
+    header.lumps[R2_LUMP_WORLD_LIGHT_PARENT_INFOS].lumpVer = 3;
+    header.lumps[R2_LUMP_TRICOLL_TRIANGLES].lumpVer = 2;
+    header.lumps[R2_LUMP_TRICOLL_NODES].lumpVer = 1;
+    header.lumps[R2_LUMP_TRICOLL_HEADERS].lumpVer = 1;
+    header.lumps[R2_LUMP_VERTEX_LIT_FLAT].lumpVer = 1;
+    header.lumps[R2_LUMP_VERTEX_LIT_BUMP].lumpVer = 1;
+    header.lumps[R2_LUMP_LIGHTMAP_HEADERS].lumpVer = 1;
 
     /* write initial header */
     FILE *file = SafeOpenWrite(filename);
