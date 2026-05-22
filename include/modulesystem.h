@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include "generic/static.h"
 #include "debugging/debugging.h"
 
@@ -73,6 +75,7 @@ public:
 	virtual void registerModule( const char* type, int version, const char* name, Module& module ) = 0;
 	virtual Module* findModule( const char* type, int version, const char* name ) const = 0;
 	virtual void foreachModule( const char* type, int version, const Visitor& visitor ) = 0;
+	virtual void foreachModule(const std::function<void(const char*, int, Module*)>& visitor) const = 0;
 };
 
 class ModuleServerHolder
