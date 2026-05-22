@@ -136,8 +136,11 @@ static void InitPakFile( ArchiveModules& archiveModules, const char *filename ){
 	const _QERArchiveTable* table = GetArchiveTable( archiveModules, path_get_extension( filename ) );
 
 	if ( table != 0 ) {
-		g_archives.push_back( archive_entry_t{ filename, table->m_pfnOpenArchive( filename ), true } );
-		globalOutputStream() << "  pak file: " << filename << '\n';
+		Archive* const archive = table->m_pfnOpenArchive( filename );
+		if (archive) {
+			g_archives.push_back( archive_entry_t{ filename, archive, true } );
+			globalOutputStream() << "  pak file: " << filename << '\n';
+		}
 	}
 }
 
