@@ -52,15 +52,18 @@ void WriteR2BSPFile(const char *filename) {
     header.mapVersion = 30;
     header.maxLump = 127;
 
-    /* This should be automated maybe */
-    header.lumps[0x01].lumpVer = 1;
-    header.lumps[0x02].lumpVer = 1;
-    header.lumps[0x36].lumpVer = 3;
-    header.lumps[0x42].lumpVer = 2;
-    header.lumps[0x44].lumpVer = 1;
-    header.lumps[0x45].lumpVer = 1;
-    header.lumps[0x49].lumpVer = 1;
-    header.lumps[0x53].lumpVer = 1;
+    /* set lump versions (this should be automated maybe) */
+    header.lumps[R2_LUMP_PLANES].lumpVer = 1;
+    header.lumps[R2_LUMP_TEXTURE_DATA].lumpVer = 1;
+    header.lumps[R2_LUMP_LEAF_WATER_DATA].lumpVer = 1;
+    header.lumps[R2_LUMP_WORLD_LIGHTS].lumpVer = 3;
+    header.lumps[R2_LUMP_WORLD_LIGHT_PARENT_INFOS].lumpVer = 3;
+    header.lumps[R2_LUMP_TRICOLL_TRIS].lumpVer = 2;
+    header.lumps[R2_LUMP_TRICOLL_NODES].lumpVer = 1;
+    header.lumps[R2_LUMP_TRICOLL_HEADERS].lumpVer = 1;
+    header.lumps[R2_LUMP_VERTEX_LIT_FLAT].lumpVer = 1;
+    header.lumps[R2_LUMP_VERTEX_LIT_BUMP].lumpVer = 1;
+    header.lumps[R2_LUMP_LIGHTMAP_HEADERS].lumpVer = 1;
 
     /* write initial header */
     FILE *file = SafeOpenWrite(filename);
@@ -120,9 +123,6 @@ void WriteR2BSPFile(const char *filename) {
     AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_DATA],  Titanfall::Bsp::textureDataData);
     AddLump(file, header.lumps[R2_LUMP_TEXTURE_DATA_STRING_TABLE], Titanfall::Bsp::textureDataTable);
     AddLump(file, header.lumps[R2_LUMP_WORLD_LIGHTS],              Titanfall2::Bsp::worldLights_stub);  // stub
-    // AddLump(file, header.lumps[R2_LUMP_TRICOLL_TRIS],              Titanfall2::bspTricollTris_stub);  // stub
-    // AddLump(file, header.lumps[R2_LUMP_TRICOLL_NODES],             Titanfall2::bspTricollNodes_stub);  // stub
-    // AddLump(file, header.lumps[R2_LUMP_TRICOLL_HEADERS],           Titanfall2::bspTricollHeaders_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_VERTEX_UNLIT],              Titanfall::Bsp::vertexUnlitVertices);
     AddLump(file, header.lumps[R2_LUMP_VERTEX_LIT_FLAT],           Titanfall::Bsp::vertexLitFlatVertices);
     AddLump(file, header.lumps[R2_LUMP_VERTEX_LIT_BUMP],           Titanfall::Bsp::vertexLitBumpVertices);
@@ -137,14 +137,11 @@ void WriteR2BSPFile(const char *filename) {
     AddLump(file, header.lumps[R2_LUMP_CM_GRID_CELLS],             Titanfall::Bsp::cmGridCells);
     AddLump(file, header.lumps[R2_LUMP_CM_GEO_SETS],               Titanfall::Bsp::cmGeoSets);
     AddLump(file, header.lumps[R2_LUMP_CM_GEO_SET_BOUNDS],         Titanfall::Bsp::cmGeoSetBounds);
-    // AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVES],             Titanfall::Bsp::cmPrimitives_stub);  // stub
-    // AddLump(file, header.lumps[R2_LUMP_CM_PRIMITIVE_BOUNDS],       Titanfall::Bsp::cmPrimitiveBounds_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_CM_UNIQUE_CONTENTS],        Titanfall::Bsp::cmUniqueContents);
     AddLump(file, header.lumps[R2_LUMP_CM_BRUSHES],                Titanfall::Bsp::cmBrushes);
     AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PROPS],       Titanfall::Bsp::cmBrushSideProperties);
     AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_PLANES],      Titanfall::Bsp::cmBrushSidePlaneOffsets);
     AddLump(file, header.lumps[R2_LUMP_CM_BRUSH_SIDE_TEX_VECS],    Titanfall::Bsp::cmBrushSideTexVecs);
-    // AddLump(file, header.lumps[R2_LUMP_TRICOLL_BEVEL_STARTS],      Titanfall2::bspTricollBevelStarts_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_LIGHTMAP_DATA_SKY],         Titanfall2::Bsp::lightMapDataSky_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_CSM_AABB_NODES],            Titanfall::Bsp::csmAABBNodes_stub);  // stub
     AddLump(file, header.lumps[R2_LUMP_CELL_BSP_NODES],            Titanfall::Bsp::cellBSPNodes_stub);  // stub

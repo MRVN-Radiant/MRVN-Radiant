@@ -442,7 +442,6 @@ namespace Titanfall {
 
         // Stubs
         inline std::vector<uint8_t>  physicsCollide_stub;
-        inline std::vector<uint8_t>  gameLump_stub;
         inline std::vector<uint8_t>  worldLights_stub;
         inline std::vector<uint8_t>  lightmapHeaders_stub;
         inline std::vector<uint8_t>  lightMapDataSky_stub;
