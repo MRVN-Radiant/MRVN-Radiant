@@ -31,6 +31,7 @@
 
 #include "qerplugin.h"
 
+class RGBuilder;
 extern bool g_bCamEntityMenu;
 
 class Shader;
@@ -81,7 +82,9 @@ class XYWnd
 
 	DeferredDraw m_deferredDraw;
 
+
 public:
+	GLuint	m_shader_program;
 
 	QWidget* m_parent;
 	XYWnd();
@@ -109,13 +112,15 @@ public:
 	void SetOrigin( const Vector3& origin );
 	void Scroll( int x, int y );
 
+	void create_program();
+
 	bool m_drawRequired{}; // whether complete redraw is required, or just overlay update is enough
-	void XY_Draw();
+	void XY_Draw(RGBuilder& rg_builder);
 	void overlayDraw();
 	void DrawCameraIcon( const Vector3& origin, const Vector3& angles );
-	void XY_DrawBlockGrid();
-	void XY_DrawAxis();
-	void XY_DrawGrid();
+	void XY_DrawBlockGrid(RGBuilder& rg_builder);
+	void XY_DrawAxis(RGBuilder& rg_builder);
+	void XY_DrawGrid(RGBuilder& rg_builder);
 
 	void XY_MouseUp( int x, int y, unsigned int buttons );
 	void XY_MouseDown( int x, int y, unsigned int buttons );

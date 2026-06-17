@@ -906,6 +906,8 @@ void TextureBrowser_ViewShader( TextureBrowser& textureBrowser, Qt::KeyboardModi
    ============
  */
 void TextureBrowser::draw(){
+	// FIXME:
+	return;
 	evaluateHeight();
 	const int fontHeight = TextureBrowser_fontHeight();
 	const int fontDescent = GlobalOpenGL().m_font->getPixelDescent();

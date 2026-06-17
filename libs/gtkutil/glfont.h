@@ -35,5 +35,14 @@ public:
 	}
 };
 
+class GLFontStub : public GLFont
+{
+	virtual int getPixelHeight() const { return 10; }
+	virtual int getPixelAscent() const { return 10; }
+	virtual int getPixelDescent() const { return 10; }
+	virtual void printString( const char *s ) {}
+	virtual void renderString( const char *s, const GLuint& tex, const unsigned char colour[3], unsigned int& out_wid, unsigned int& out_hei ) {}
+};
+
 GLFont *glfont_create( const char* family, int fontSize, const char* appPath );
 // release with delete

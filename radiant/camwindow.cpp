@@ -1936,6 +1936,7 @@ void ShowSize3dToggle(){
 }
 
 void CamWnd::Cam_Draw(){
+	return; // FIXME:
 //		globalOutputStream() << "Cam_Draw()\n";
 
 	gl().glViewport( 0, 0, m_Camera.width, m_Camera.height );

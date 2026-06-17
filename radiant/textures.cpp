@@ -197,7 +197,8 @@ void LoadTextureRGBA( qtexture_t* q, unsigned char* pPixels, int nWidth, int nHe
 	SetTexParameters( g_texture_mode );
 	SetTexAnisotropy( g_TextureAnisotropy );
 #if 1
-	gl().glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE );
+	//gl().glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE );
+	gl().glGenerateMipmap(GL_TEXTURE_2D);
 	gl().glTexImage2D( GL_TEXTURE_2D, 0, g_texture_globals.texture_components, nWidth, nHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pPixels );
 
 	gl().glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, std::min( g_Textures_mipLevel, static_cast<int>( log2( static_cast<float>( std::max( nWidth, nHeight ) ) ) ) ) );

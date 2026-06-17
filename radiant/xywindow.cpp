@@ -71,6 +71,8 @@
 #include "windowobservers.h"
 
 #include "render.h"
+#include "gfx/gl_helpers.h"
+#include "gfx/rendergraph.h"
 
 bool g_bCamEntityMenu = false;
 
@@ -356,6 +358,7 @@ Shader* XYWnd::m_state_selected = 0;
 
 //outline camera crosshair rectangle
 void XYWnd::overlayDraw(){
+	return; // FIXME:
 	gl().glViewport( 0, 0, m_nWidth, m_nHeight );
 
 	gl().glDisable( GL_LINE_STIPPLE );
@@ -479,21 +482,27 @@ protected:
 	}
 	void paintGL() override
 	{
-		if( m_fbo->m_samples != g_xywindow_globals_private.m_MSAA ){
+		//if( m_fbo->m_samples != g_xywindow_globals_private.m_MSAA ){
 			delete m_fbo;
 			m_fbo = new FBO( m_xywnd.Width(), m_xywnd.Height(), false, g_xywindow_globals_private.m_MSAA );
-		}
+		//}
+
+		m_xywnd.create_program();
 
 		if ( Map_Valid( g_map ) && ScreenUpdates_Enabled() && m_fbo->bind() ) {
+			RGBuilder rg_builder;
+
+			m_xywnd.m_drawRequired = true;
+
 			GlobalOpenGL_debugAssertNoErrors();
 			if( m_xywnd.m_drawRequired ){
 				m_xywnd.m_drawRequired = false;
-				m_xywnd.XY_Draw();
+				m_xywnd.XY_Draw(rg_builder);
 				GlobalOpenGL_debugAssertNoErrors();
 			}
 			m_fbo->blit();
 			m_fbo->release();
-			m_xywnd.overlayDraw();
+			//m_xywnd.overlayDraw();
 			GlobalOpenGL_debugAssertNoErrors();
 		}
 	}
@@ -545,11 +554,12 @@ protected:
 	}
 };
 
-XYWnd::XYWnd() :
-	m_gl_widget( new XYGLWidget( *this ) ),
-	m_deferredDraw( WidgetQueueDrawCaller( *m_gl_widget ) ),
-	m_parent( 0 ),
-	m_window_observer( NewWindowObserver() )
+XYWnd::XYWnd()
+	: m_gl_widget( new XYGLWidget( *this ) )
+	, m_deferredDraw( WidgetQueueDrawCaller( *m_gl_widget ) )
+	, m_shader_program(0)
+	, m_parent( 0 )
+	, m_window_observer( NewWindowObserver() )
 {
 	m_bActive = false;
 	m_buttonstate = 0;
@@ -1241,7 +1251,8 @@ void WXY_SetBackgroundImage(){
    ==============
  */
 
-void XYWnd::XY_DrawAxis(){
+void XYWnd::XY_DrawAxis(RGBuilder& rg_builder)
+{
 	const char g_AxisName[3] = { 'X', 'Y', 'Z' };
 	NDIM1NDIM2( m_viewType )
 	const float w = ( m_nWidth / 2 / m_fScale );
@@ -1259,20 +1270,51 @@ void XYWnd::XY_DrawAxis(){
 #endif
 	// draw two lines with corresponding axis colors to highlight current view
 	// horizontal line: nDim1 color
-	gl().glLineWidth( 2 );
-	gl().glBegin( GL_LINES );
-	gl().glColor3fv( vector3_to_array( colourX ) );
-	gl().glVertex2f( m_vOrigin[nDim1] - w + 40 / m_fScale, m_vOrigin[nDim2] + h - 45 / m_fScale );
-	gl().glVertex2f( m_vOrigin[nDim1] - w + 65 / m_fScale, m_vOrigin[nDim2] + h - 45 / m_fScale );
-	gl().glVertex2f( 0, 0 );
-	gl().glVertex2f( 32 / m_fScale, 0 );
-	gl().glColor3fv( vector3_to_array( colourY ) );
-	gl().glVertex2f( m_vOrigin[nDim1] - w + 40 / m_fScale, m_vOrigin[nDim2] + h - 45 / m_fScale );
-	gl().glVertex2f( m_vOrigin[nDim1] - w + 40 / m_fScale, m_vOrigin[nDim2] + h - 20 / m_fScale );
-	gl().glVertex2f( 0, 0 );
-	gl().glVertex2f( 0, 32 / m_fScale );
-	gl().glEnd();
-	gl().glLineWidth( 1 );
+
+	std::vector<vertex_p2_t> axis1;
+	axis1.push_back({m_vOrigin[nDim1] - w + 40 / m_fScale, m_vOrigin[nDim2] + h - 45 / m_fScale});
+	axis1.push_back({m_vOrigin[nDim1] - w + 65 / m_fScale, m_vOrigin[nDim2] + h - 45 / m_fScale});
+	axis1.push_back({0, 0});
+	axis1.push_back({32 / m_fScale, 0});
+
+	std::vector<vertex_p2_t> axis2;
+	axis2.push_back({m_vOrigin[nDim1] - w + 40 / m_fScale, m_vOrigin[nDim2] + h - 45 / m_fScale});
+	axis2.push_back({m_vOrigin[nDim1] - w + 40 / m_fScale, m_vOrigin[nDim2] + h - 20 / m_fScale});
+	axis2.push_back({0, 0});
+	axis2.push_back({0, 32 / m_fScale});
+
+	const GLuint axis1_buffer = rg_builder.CreateBuffer("axis1", axis1.data(), axis1.size() * sizeof(vertex_p2_t));
+	const GLuint axis2_buffer = rg_builder.CreateBuffer("axis2", axis2.data(), axis2.size() * sizeof(vertex_p2_t));
+
+	const GLuint axis1_vertex_array = rg_builder.CreateVertexArray_p2(axis1_buffer);
+	const GLuint axis2_vertex_array = rg_builder.CreateVertexArray_p2(axis2_buffer);
+
+	rg_builder.AddGraphicsTask("XY_DrawAxis")
+	.Execute([&](RGGraphicsContext& context) {
+		Matrix4 model_matrix = g_matrix4_identity;
+		matrix4_scale_by_vec3(model_matrix, Vector3(m_fScale, m_fScale, 1.0f));
+		matrix4_translate_by_vec3(model_matrix, Vector3(-m_vOrigin[nDim1], -m_vOrigin[nDim2], 0.0f));
+
+		const Matrix4 mvp = matrix4_multiplied_by_matrix4( m_projection, model_matrix);
+
+		context.SetLineWidth(2.0f);
+
+		context.UseProgram(m_shader_program);
+		context.SetUniformMatrix4("transform", mvp);
+
+		context.SetUniformVector4("color", Vector4(colourX, 1.0f));
+		context.BindBuffer(axis1_buffer);
+		context.BindVertexArray(axis1_vertex_array);
+		context.Draw(GL_LINES, 0, 4);
+
+		context.SetUniformVector4("color", Vector4(colourY, 1.0f));
+		context.BindBuffer(axis2_buffer);
+		context.BindVertexArray(axis2_vertex_array);
+		context.Draw(GL_LINES, 0, 4);
+	});
+
+	return; // FIXME
+
 	// now print axis symbols
 	const int fontHeight = GlobalOpenGL().m_font->getPixelHeight();
 	const float fontWidth = fontHeight * .55f;
@@ -1288,7 +1330,8 @@ void XYWnd::XY_DrawAxis(){
 	GlobalOpenGL().drawChar( g_AxisName[nDim2] );
 }
 
-void XYWnd::XY_DrawGrid() {
+void XYWnd::XY_DrawGrid(RGBuilder& rg_builder)
+{
 	float x, y;
 	char text[32];
 	float step, minor_step, stepx, stepy;
@@ -1315,12 +1358,6 @@ void XYWnd::XY_DrawGrid() {
 
 	const float a = ( ( GetSnapGridSize() > 0.0f ) ? 1.0f : 0.3f );
 
-	gl().glDisable( GL_TEXTURE_2D );
-	gl().glDisable( GL_TEXTURE_1D );
-	gl().glDisable( GL_DEPTH_TEST );
-	gl().glDisable( GL_BLEND );
-	gl().glLineWidth( 1 );
-
 	const float w = ( m_nWidth / 2 / m_fScale );
 	const float h = ( m_nHeight / 2 / m_fScale );
 
@@ -1340,50 +1377,45 @@ void XYWnd::XY_DrawGrid() {
 	// draw minor blocks
 	if ( g_xywindow_globals_private.d_showgrid /*|| a < 1.0f*/ ) {
 		if ( a < 1.0f ) {
-			gl().glEnable( GL_BLEND );
+			//gl().glEnable( GL_BLEND );
 		}
 
+		std::vector<vertex_p2_t> main_minor_grid;
 		if ( COLORS_DIFFER( g_xywindow_globals.color_gridminor, g_xywindow_globals.color_gridback ) ) {
-			gl().glColor4fv( vector4_to_array( Vector4( g_xywindow_globals.color_gridminor, a ) ) );
-
-			gl().glBegin( GL_LINES );
 			int i = 0;
 			for ( x = xb; x < xe; x += minor_step, ++i ) {
 				if ( ( i & mask ) != 0 ) {
-					gl().glVertex2f( x, yb );
-					gl().glVertex2f( x, ye );
+					main_minor_grid.push_back({x, yb});
+					main_minor_grid.push_back({x, ye});
 				}
 			}
 			i = 0;
 			for ( y = yb; y < ye; y += minor_step, ++i ) {
 				if ( ( i & mask ) != 0 ) {
-					gl().glVertex2f( xb, y );
-					gl().glVertex2f( xe, y );
+					main_minor_grid.push_back({xb, y});
+					main_minor_grid.push_back({xe, y});
 				}
 			}
-			gl().glEnd();
 		}
 
-		// draw major blocks
+		std::vector<vertex_p2_t> main_major_grid;
 		if ( COLORS_DIFFER( g_xywindow_globals.color_gridmajor, g_xywindow_globals.color_gridminor ) ) {
-			gl().glColor4fv( vector4_to_array( Vector4( g_xywindow_globals.color_gridmajor, a ) ) );
-
-			gl().glBegin( GL_LINES );
 			for ( x = xb; x <= xe; x += step ) {
-				gl().glVertex2f( x, yb );
-				gl().glVertex2f( x, ye );
+				main_major_grid.push_back({x, yb});
+				main_major_grid.push_back({x, ye});
 			}
 			for ( y = yb; y <= ye; y += step ) {
-				gl().glVertex2f( xb, y );
-				gl().glVertex2f( xe, y );
+				main_major_grid.push_back({xb, y});
+				main_major_grid.push_back({xe, y});
 			}
-			gl().glEnd();
 		}
 
 		if ( a < 1.0f ) {
 			gl().glDisable( GL_BLEND );
 		}
 
+		std::vector<vertex_p2_t> region_minor_grid;
+		std::vector<vertex_p2_t> region_major_grid;
 		if( g_region_active ){
 			const float xb_ = step * floor( std::max( m_vOrigin[nDim1] - w, -GetMaxGridCoord() ) / step );
 			const float xe_ = step * ceil( std::min( m_vOrigin[nDim1] + w, GetMaxGridCoord() ) / step );
@@ -1393,47 +1425,90 @@ void XYWnd::XY_DrawGrid() {
 			gl().glEnable( GL_BLEND );
 			// draw minor blocks
 			if ( COLORS_DIFFER( g_xywindow_globals.color_gridminor, g_xywindow_globals.color_gridback ) ) {
-				gl().glColor4fv( vector4_to_array( Vector4( g_xywindow_globals.color_gridminor, .5f ) ) );
-
-				gl().glBegin( GL_LINES );
 				int i = 0;
 				for ( x = xb_; x < xe_; x += minor_step, ++i ) {
 					if ( ( i & mask ) != 0 ) {
-						gl().glVertex2f( x, yb_ );
-						gl().glVertex2f( x, ye_ );
+						region_minor_grid.push_back({x, yb_});
+						region_minor_grid.push_back({x, ye_});
 					}
 				}
 				i = 0;
 				for ( y = yb_; y < ye_; y += minor_step, ++i ) {
 					if ( ( i & mask ) != 0 ) {
-						gl().glVertex2f( xb_, y );
-						gl().glVertex2f( xe_, y );
+						region_minor_grid.push_back({xb_, y});
+						region_minor_grid.push_back({xe_, y});
 					}
 				}
-				gl().glEnd();
 			}
 
 			// draw major blocks
 			if ( COLORS_DIFFER( g_xywindow_globals.color_gridmajor, g_xywindow_globals.color_gridminor ) ) {
-				gl().glColor4fv( vector4_to_array( Vector4( g_xywindow_globals.color_gridmajor, .5f ) ) );
-
-				gl().glBegin( GL_LINES );
 				for ( x = xb_; x <= xe_; x += step ) {
-					gl().glVertex2f( x, yb_ );
-					gl().glVertex2f( x, ye_ );
+					region_major_grid.push_back({x, yb_});
+					region_major_grid.push_back({x, ye_});
 				}
 				for ( y = yb_; y <= ye_; y += step ) {
-					gl().glVertex2f( xb_, y );
-					gl().glVertex2f( xe_, y );
+					region_major_grid.push_back({xb_, y});
+					region_major_grid.push_back({xe_, y});
 				}
-				gl().glEnd();
 			}
-			gl().glDisable( GL_BLEND );
 		}
+
+		const GLuint main_minor_buffer = rg_builder.CreateBuffer("main_minor_buffer", main_minor_grid.data(), main_minor_grid.size() * sizeof(vertex_p2_t));
+		const GLuint main_major_buffer = rg_builder.CreateBuffer("main_major_buffer", main_major_grid.data(), main_major_grid.size() * sizeof(vertex_p2_t));
+
+		const GLuint main_minor_vertex_array = rg_builder.CreateVertexArray_p2(main_minor_buffer);
+		const GLuint main_major_vertex_array = rg_builder.CreateVertexArray_p2(main_major_buffer);
+
+		const GLuint region_minor_buffer = rg_builder.CreateBuffer("region_minor_buffer", region_minor_grid.data(), region_minor_grid.size() * sizeof(vertex_p2_t));
+		const GLuint region_major_buffer = rg_builder.CreateBuffer("region_major_buffer", region_major_grid.data(), region_major_grid.size() * sizeof(vertex_p2_t));
+
+		const GLuint region_minor_vertex_array = rg_builder.CreateVertexArray_p2(region_minor_buffer);
+		const GLuint region_major_vertex_array = rg_builder.CreateVertexArray_p2(region_major_buffer);
+
+		rg_builder.AddGraphicsTask("XY_DrawGrid - grid")
+		.Execute([&](RGGraphicsContext& context) {
+				Matrix4 model_matrix = g_matrix4_identity;
+				matrix4_scale_by_vec3(model_matrix, Vector3(m_fScale, m_fScale, 1.0f));
+				matrix4_translate_by_vec3(model_matrix, Vector3(-m_vOrigin[nDim1], -m_vOrigin[nDim2], 0.0f));
+
+				const Matrix4 mvp = matrix4_multiplied_by_matrix4( m_projection, model_matrix);
+
+				context.SetLineWidth(1.0f);
+
+				context.UseProgram(m_shader_program);
+				context.SetUniformMatrix4("transform", mvp);
+
+				// Main grid
+				context.SetUniformVector4("color", Vector4(g_xywindow_globals.color_gridminor, 1.0f));
+
+				context.BindBuffer(main_minor_buffer);
+				context.BindVertexArray(main_minor_vertex_array);
+				context.Draw(GL_LINES, 0, main_minor_grid.size());
+
+				context.SetUniformVector4("color", Vector4(g_xywindow_globals.color_gridmajor, 1.0f));
+
+				context.BindBuffer(main_major_buffer);
+				context.BindVertexArray(main_major_vertex_array);
+				context.Draw(GL_LINES, 0, main_major_grid.size());
+
+				// Region grid
+				context.SetUniformVector4("color", Vector4(g_xywindow_globals.color_gridminor, 0.5f));
+
+				context.BindBuffer(region_minor_buffer);
+				context.BindVertexArray(region_minor_vertex_array);
+				context.Draw(GL_LINES, 0, region_minor_grid.size());
+
+				context.SetUniformVector4("color", Vector4(g_xywindow_globals.color_gridmajor, 0.5f));
+
+				context.BindBuffer(region_major_buffer);
+				context.BindVertexArray(region_major_vertex_array);
+				context.Draw(GL_LINES, 0, region_major_grid.size());
+		});
 	}
 
 	// draw coordinate text if needed
-	if ( g_xywindow_globals_private.show_coordinates ) {
+	if ( g_xywindow_globals_private.show_coordinates && false) { // FIXME
 		gl().glColor4fv( vector4_to_array( Vector4( g_xywindow_globals.color_gridtext, 1.0f ) ) );
 		const float offx = m_vOrigin[nDim2] + h - ( 1 + GlobalOpenGL().m_font->getPixelHeight() ) / m_fScale;
 		const float offy = m_vOrigin[nDim1] - w +  4                                            / m_fScale;
@@ -1451,14 +1526,15 @@ void XYWnd::XY_DrawGrid() {
 
 	}
 
-	if ( g_xywindow_globals_private.show_axis ){
-		XY_DrawAxis();
+	if ( g_xywindow_globals_private.show_axis || true ) { // FIXME
+		XY_DrawAxis(rg_builder);
 	}
 	else{
 		gl().glColor3fv( vector3_to_array( Active()? g_xywindow_globals.color_viewname : g_xywindow_globals.color_gridtext ) );
 		gl().glRasterPos2f( m_vOrigin[nDim1] - w + 35 / m_fScale, m_vOrigin[nDim2] + h - ( GlobalOpenGL().m_font->getPixelHeight() * 2 ) / m_fScale );
 		GlobalOpenGL().drawString( ViewType_getTitle( m_viewType ) );
 	}
+	return; // FIXME
 
 	// show current work zone?
 	// the work zone is used to place dropped points and brushes
@@ -1482,7 +1558,9 @@ void XYWnd::XY_DrawGrid() {
    XY_DrawBlockGrid
    ==============
  */
-void XYWnd::XY_DrawBlockGrid(){
+void XYWnd::XY_DrawBlockGrid(RGBuilder& rg_builder)
+{
+	return; // FIXME:
 	int bs[3] = { 1024, 1024, 1024 }; // compiler's default
 
 	if ( Map_FindWorldspawn( g_map ) == 0 ) {
@@ -1799,6 +1877,24 @@ void XYWnd::updateModelview(){
 	m_view.Construct( m_projection, m_modelview, m_nWidth, m_nHeight );
 }
 
+void XYWnd::create_program()
+{
+	if (m_shader_program != 0) {
+		return;
+	}
+
+	globalOutputStream() << "Creating xy window program";
+
+	m_shader_program = gl().glCreateProgram();
+	{
+		StringOutputStream filename( 256 );
+		gl_shader_create( m_shader_program, filename( GlobalRadiant().getAppPath(), "gl/xywindow.vert.glsl" ), GL_VERTEX_SHADER );
+		gl_shader_create( m_shader_program, filename( GlobalRadiant().getAppPath(), "gl/xywindow.frag.glsl" ), GL_FRAGMENT_SHADER );
+	}
+	gl_program_link( m_shader_program );
+	gl_program_validate( m_shader_program );
+}
+
 /*
    ==============
    XY_Draw
@@ -1807,7 +1903,8 @@ void XYWnd::updateModelview(){
 
 //#define DBG_SCENEDUMP
 
-void XYWnd::XY_Draw(){
+void XYWnd::XY_Draw(RGBuilder& rg_builder)
+{
 //		globalOutputStream() << "XY_Draw()\n";
 	//
 	// clear
@@ -1822,38 +1919,19 @@ void XYWnd::XY_Draw(){
 	extern void Renderer_ResetStats();
 	Renderer_ResetStats();
 
-	//
-	// set up viewpoint
-	//
-
-	gl().glMatrixMode( GL_PROJECTION );
-	gl().glLoadMatrixf( reinterpret_cast<const float*>( &m_projection ) );
-
-	gl().glMatrixMode( GL_MODELVIEW );
-	gl().glLoadIdentity();
-	gl().glScalef( m_fScale, m_fScale, 1 );
 	NDIM1NDIM2( m_viewType )
-	gl().glTranslatef( -m_vOrigin[nDim1], -m_vOrigin[nDim2], 0 );
-
-	gl().glDisable( GL_LINE_STIPPLE );
-	gl().glLineWidth( 1 );
-	gl().glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-	gl().glDisableClientState( GL_NORMAL_ARRAY );
-	gl().glDisableClientState( GL_COLOR_ARRAY );
-	gl().glDisable( GL_TEXTURE_2D );
-	gl().glDisable( GL_LIGHTING );
-	gl().glDisable( GL_COLOR_MATERIAL );
-	gl().glDisable( GL_DEPTH_TEST );
 
 	m_backgroundImage.render( m_viewType );
 
-	XY_DrawGrid();
+	XY_DrawGrid(rg_builder);
 
 	if ( g_xywindow_globals_private.show_blocks ) {
-		XY_DrawBlockGrid();
+		XY_DrawBlockGrid(rg_builder);
 	}
+	return; // FIXME
 
-	gl().glLoadMatrixf( reinterpret_cast<const float*>( &m_modelview ) );
+
+	//gl().glLoadMatrixf( reinterpret_cast<const float*>( &m_modelview ) );
 
 	unsigned int globalstate = RENDER_COLOURARRAY | RENDER_COLOURWRITE;
 	if ( !g_xywindow_globals.m_bNoStipple ) {

@@ -25,7 +25,7 @@
 #include <cstring>
 #include "generic/constant.h"
 
-#include <QOpenGLFunctions_2_0>
+#include <QOpenGLFunctions_3_0>
 #include "gtkutil/glfont.h"
 
 /// \brief A module which wraps a runtime-binding of the standard OpenGL functions.
@@ -41,7 +41,7 @@ struct OpenGLBinding
 	/// \brief Is true if the global shared OpenGL context is valid.
 	bool contextValid;
 
-	QOpenGLFunctions_2_0 *funcs;
+	QOpenGLFunctions_3_0 *funcs;
 
 	OpenGLBinding() : contextValid( false ), funcs( nullptr ){
 	}
@@ -91,7 +91,7 @@ inline OpenGLBinding& GlobalOpenGL(){
 	return GlobalOpenGLModule::getTable();
 }
 
-inline QOpenGLFunctions_2_0& gl(){
+inline QOpenGLFunctions_3_0& gl(){
 	return *GlobalOpenGL().funcs;
 }
 
