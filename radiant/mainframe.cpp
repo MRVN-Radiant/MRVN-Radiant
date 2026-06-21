@@ -1439,7 +1439,7 @@ void create_main_statusbar( QStatusBar *statusbar, QLabel *pStatusLabel[c_status
 		if( i == c_status_brushcount ){
 			QWidget *widget = new QWidget;
 			QHBoxLayout *hbox = new QHBoxLayout( widget );
-			hbox->setMargin( 0 );
+			hbox->setContentsMargins( 0, 0, 0, 0 );
 			statusbar->addPermanentWidget( widget, 0 );
 			const char* imgs[3] = { "status_brush.png", "patch_wireframe.png", "status_entity.png" };
 			for( ; i < c_status_brushcount + 3; ++i ){

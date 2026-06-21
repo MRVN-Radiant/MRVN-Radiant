@@ -25,6 +25,7 @@
 #include <vector>
 #include <algorithm>
 
+#include <QActionGroup>
 #include "preferencesystem.h"
 
 #include "gtkutil/widget.h"

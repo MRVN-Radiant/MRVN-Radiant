@@ -10,11 +10,11 @@ add_library(assmodel MODULE
 
 target_include_directories(assmodel PRIVATE
                            assimp
-                           ${QT5_INCLUDE_DIRS}
+                           ${QT6_INCLUDE_DIRS}
                           )
 target_link_libraries(assmodel PRIVATE
                       assimp
-                      Qt5::Gui
+                      Qt6::Gui
                      )
 
 if(NOT ${MSVC})

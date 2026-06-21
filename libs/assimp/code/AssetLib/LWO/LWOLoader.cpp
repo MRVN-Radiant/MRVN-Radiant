@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #ifndef ASSIMP_BUILD_NO_LWO_IMPORTER
-
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 // internal headers
 #include "AssetLib/LWO/LWOLoader.h"
 #include "PostProcessing/ConvertToLHProcess.h"

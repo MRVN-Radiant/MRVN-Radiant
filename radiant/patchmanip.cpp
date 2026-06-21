@@ -699,14 +699,14 @@ void Patch_registerCommands(){
 	GlobalCommands_insert( "PatchCone", FreeCaller<Patch_Cone>() );
 	GlobalCommands_insert( "PatchSphere", FreeCaller<Patch_Sphere>() );
 	GlobalCommands_insert( "SimplePatchMesh", FreeCaller<Patch_Plane>(), QKeySequence( "Shift+P" ) );
-	GlobalCommands_insert( "PatchInsertFirstColumn", FreeCaller<Patch_InsertFirstColumn>(), QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_Plus + Qt::KeypadModifier ) );
+	GlobalCommands_insert( "PatchInsertFirstColumn", FreeCaller<Patch_InsertFirstColumn>(), QKeySequence( QKeyCombination( Qt::ControlModifier | Qt::ShiftModifier | Qt:: KeypadModifier, Qt::Key_Plus ) ) );
 	GlobalCommands_insert( "PatchInsertLastColumn", FreeCaller<Patch_InsertLastColumn>() );
-	GlobalCommands_insert( "PatchInsertFirstRow", FreeCaller<Patch_InsertFirstRow>(), QKeySequence( Qt::CTRL + Qt::Key_Plus + Qt::KeypadModifier ) );
+	GlobalCommands_insert( "PatchInsertFirstRow", FreeCaller<Patch_InsertFirstRow>(), QKeySequence( QKeyCombination( Qt::ControlModifier | Qt:: KeypadModifier, Qt::Key_Plus ) ) );
 	GlobalCommands_insert( "PatchInsertLastRow", FreeCaller<Patch_InsertLastRow>() );
 	GlobalCommands_insert( "PatchDeleteFirstColumn", FreeCaller<Patch_DeleteFirstColumn>() );
-	GlobalCommands_insert( "PatchDeleteLastColumn", FreeCaller<Patch_DeleteLastColumn>(), QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_Minus + Qt::KeypadModifier ) );
+	GlobalCommands_insert( "PatchDeleteLastColumn", FreeCaller<Patch_DeleteLastColumn>(), QKeySequence( QKeyCombination( Qt::ControlModifier | Qt::ShiftModifier | Qt:: KeypadModifier, Qt::Key_Minus ) ) );
 	GlobalCommands_insert( "PatchDeleteFirstRow", FreeCaller<Patch_DeleteFirstRow>() );
-	GlobalCommands_insert( "PatchDeleteLastRow", FreeCaller<Patch_DeleteLastRow>(), QKeySequence( Qt::CTRL + Qt::Key_Minus + Qt::KeypadModifier ) );
+	GlobalCommands_insert( "PatchDeleteLastRow", FreeCaller<Patch_DeleteLastRow>(), QKeySequence( QKeyCombination( Qt::ControlModifier | Qt:: KeypadModifier, Qt::Key_Minus ) ) );
 	GlobalCommands_insert( "InvertCurve", FreeCaller<Patch_Invert>(), QKeySequence( "Ctrl+I" ) );
 	//GlobalCommands_insert( "RedisperseRows", FreeCaller<Patch_RedisperseRows>(), QKeySequence( "Ctrl+E" ) );
 	GlobalCommands_insert( "RedisperseRows", FreeCaller<Patch_RedisperseRows>() );

@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
 #ifndef ASSIMP_BUILD_NO_OBJ_IMPORTER
-
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #include "ObjFileParser.h"
 #include "ObjFileData.h"
 #include "ObjFileMtlImporter.h"
