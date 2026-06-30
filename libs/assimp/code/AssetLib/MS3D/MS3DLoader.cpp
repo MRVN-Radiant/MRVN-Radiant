@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #ifndef ASSIMP_BUILD_NO_MS3D_IMPORTER
-
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 // internal headers
 #include "MS3DLoader.h"
 #include <assimp/StreamReader.h>

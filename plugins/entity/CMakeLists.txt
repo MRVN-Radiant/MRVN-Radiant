@@ -49,8 +49,8 @@ add_library(entity MODULE
            )
 
 target_include_directories(entity PRIVATE
-                           ${QT5_INCLUDE_DIRS}
+                           ${QT6_INCLUDE_DIRS}
                           )
 target_link_libraries(entity PRIVATE
-                      Qt5::Gui
+                      Qt6::Gui
                      )

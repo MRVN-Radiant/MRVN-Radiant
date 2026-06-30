@@ -56,7 +56,7 @@
 #include <QHeaderView>
 #include <QStandardItemModel>
 #include <QScrollBar>
-#include <QOpenGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include "mainframe.h"
 #include "camwindow.h"

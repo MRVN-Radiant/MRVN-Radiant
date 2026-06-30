@@ -91,7 +91,7 @@ if (${MSVC}) # Visual studio
     find_package(LibXml2 REQUIRED)
     find_package(ZLib REQUIRED)
     find_package(LibJpeg REQUIRED)
-    find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
+    find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGL OpenGLWidgets)
     find_package(Threads REQUIRED)
 else() # Msys / Linux
     include(FindPkgConfig)
@@ -101,7 +101,7 @@ else() # Msys / Linux
     pkg_check_modules(ZLIB zlib REQUIRED)
     pkg_check_modules(JPEG libjpeg REQUIRED)
 
-    find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
+    find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGL OpenGLWidgets)
     find_package(Threads REQUIRED)
 endif()
 

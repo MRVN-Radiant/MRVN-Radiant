@@ -25,7 +25,7 @@
 #include <cstring>
 #include "generic/constant.h"
 
-#include <QOpenGLFunctions_2_0>
+#include <QtOpenGL/QOpenGLFunctions_2_0>
 #include "gtkutil/glfont.h"
 
 /// \brief A module which wraps a runtime-binding of the standard OpenGL functions.

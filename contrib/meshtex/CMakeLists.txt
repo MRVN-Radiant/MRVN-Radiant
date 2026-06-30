@@ -29,12 +29,12 @@ add_library(meshtex MODULE
 
 target_include_directories(meshtex PRIVATE .
                            ${GLIB_INCLUDE_DIRS}
-                           ${QT5_INCLUDE_DIRS}
+                           ${QT6_INCLUDE_DIRS}
                           )
 
 target_link_libraries(meshtex
-                      Qt5::Gui
-                      Qt5::Widgets
-                      Qt5::Core
+                      Qt6::Gui
+                      Qt6::Widgets
+                      Qt6::Core
                       ${GLIB_LIBRARIES}
                      )

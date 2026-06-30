@@ -60,7 +60,7 @@
 
 #include "timer.h"
 
-#include <QOpenGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include <QApplication>
 
@@ -185,14 +185,16 @@ const Matrix4 g_radiant2opengl(
 	);
 
 struct camera_t;
-void Camera_mouseMove( camera_t& camera, int x, int y, const QMouseEvent& event );
+void Camera_mouseMove( camera_t& camera, int x, int y, Qt::KeyboardModifiers modifiers );
 
 struct MotionDeltaValues {
 	int x;
 	int y;
-	QMouseEvent mouseMoveEvent;
-	MotionDeltaValues( int x_, int y_, QMouseEvent mouseMoveEvent_ ) :
-		x( x_ ), y( y_ ), mouseMoveEvent( mouseMoveEvent_ ) {
+	//QMouseEvent mouseMoveEvent;
+	ModifierFlags modifier_flags;
+	Qt::KeyboardModifiers modifiers;
+	MotionDeltaValues( int x_, int y_, Qt::KeyboardModifiers modifiers_ ) :
+		x( x_ ), y( y_ ), modifiers(modifiers_) {
 	}
 };
 
@@ -256,7 +258,7 @@ struct camera_t
 		color( 0, 0, 0 ),
 		movementflags( 0 ),
 		m_keymove_speed_current( 0.f ),
-		m_mouseMove( [this]( int x, int y, const QMouseEvent& event ){ Camera_mouseMove( *this, x, y, event ); } ),
+		m_mouseMove( [this]( int x, int y, Qt::KeyboardModifiers modifiers ){ Camera_mouseMove( *this, x, y, modifiers ); } ),
 		m_view( view ),
 		m_update( update ),
 		m_idleDraw( update ),
@@ -433,10 +435,10 @@ void Camera_FreeMove( camera_t& camera, int dx, int dy ){
 }
 
 
-void Camera_mouseMove( camera_t& camera, int x, int y, const QMouseEvent& event ){
+void Camera_mouseMove( camera_t& camera, int x, int y, Qt::KeyboardModifiers modifiers ){
 	//globalOutputStream() << "mousemove... ";
 	Camera_FreeMove( camera, -x, -y );
-	camera.m_update_motion_freemove( MotionDeltaValues( x, y, event ) );
+	camera.m_update_motion_freemove( MotionDeltaValues( x, y, modifiers ) );
 	CameraMovedNotify();
 }
 
@@ -1199,9 +1201,9 @@ static void selection_button_release( const QMouseEvent& event, WindowObserver* 
 	observer->onMouseUp( WindowVector( event.x(), event.y() ), button_for_button( event.button() ), modifiers_for_state( event.modifiers() ) );
 }
 
-void selection_motion( const QMouseEvent& event, WindowObserver* observer ){
+void selection_motion( QPointF pos, Qt::KeyboardModifiers modifiers, WindowObserver* observer ){
 	//globalOutputStream() << "motion... ";
-	observer->onMouseMotion( WindowVector( event.x(), event.y() ), modifiers_for_state( event.modifiers() ) );
+	observer->onMouseMotion( WindowVector( pos.x(), pos.y() ), modifiers_for_state( modifiers ) );
 }
 
 inline WindowVector windowvector_for_widget_centre( const QWidget* widget ){
@@ -1221,7 +1223,7 @@ static void selection_button_release_freemove( QWidget* widget, const QMouseEven
 void CamWnd::selection_motion_freemove( const MotionDeltaValues& delta ){
 	m_rightClickMove += sqrt( static_cast<double>( delta.x * delta.x + delta.y * delta.y ) );
 	m_window_observer->incMouseMove( WindowVector( delta.x, delta.y ) );
-	m_window_observer->onMouseMotion( windowvector_for_widget_centre( m_gl_widget ), modifiers_for_state( delta.mouseMoveEvent.modifiers() ) );
+	m_window_observer->onMouseMotion( windowvector_for_widget_centre( m_gl_widget ), modifiers_for_state( delta.modifiers ) );
 }
 typedef MemberCaller1<CamWnd, const MotionDeltaValues&, &CamWnd::selection_motion_freemove> CamWnd_selection_motion_freemove;
 
@@ -1682,7 +1684,7 @@ CamWnd::CamWnd() :
 	m_gl_widget( new CamGLWidget( *this ) ),
 	m_window_observer( NewWindowObserver() ),
 	m_deferredDraw( WidgetQueueDrawCaller( *m_gl_widget ) ),
-	m_deferred_motion( [this]( const QMouseEvent& event ){ selection_motion( event, m_window_observer ); } ),
+m_deferred_motion( [this]( QPointF pos, Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers ){ selection_motion(pos, modifiers, m_window_observer ); } ),
 	m_drawing( false )
 {
 	m_bFreeMove = false;
@@ -2506,8 +2508,8 @@ void CamWnd_Construct(){
 	GlobalCommands_insert( "CameraModeNext", FreeCaller<CameraModeNext>(), QKeySequence( "Shift+]" ) );
 	GlobalCommands_insert( "CameraModePrev", FreeCaller<CameraModePrev>(), QKeySequence( "Shift+[" ) );
 
-	GlobalCommands_insert( "CameraSpeedInc", FreeCaller<CameraSpeed_increase>(), QKeySequence( Qt::SHIFT + Qt::Key_Plus + Qt::KeypadModifier ) );
-	GlobalCommands_insert( "CameraSpeedDec", FreeCaller<CameraSpeed_decrease>(), QKeySequence( Qt::SHIFT + Qt::Key_Minus + Qt::KeypadModifier ) );
+	GlobalCommands_insert( "CameraSpeedInc", FreeCaller<CameraSpeed_increase>(), QKeySequence( QKeyCombination(Qt::ShiftModifier, Qt::Key_Plus ) ) );
+	GlobalCommands_insert( "CameraSpeedDec", FreeCaller<CameraSpeed_decrease>(), QKeySequence( QKeyCombination(Qt::ShiftModifier, Qt::Key_Minus )  ) );
 
 	GlobalShortcuts_insert( "CameraForward", QKeySequence( "Up" ) );
 	GlobalShortcuts_insert( "CameraBack", QKeySequence( "Down" ) );

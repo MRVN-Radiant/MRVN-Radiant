@@ -31,18 +31,25 @@
 
 class DeferredMotion
 {
-	QMouseEvent m_mouseMoveEvent;
+	//QMouseEvent m_mouseMoveEvent;
+	QPointF m_position;
+	Qt::MouseButtons m_buttons;
+	Qt::KeyboardModifiers m_modifiers;
 	QTimer m_timer;
 public:
 	template<class Functor>
 	DeferredMotion( Functor func ) :
-		m_mouseMoveEvent( QEvent::MouseMove, QPointF(), Qt::MouseButton::NoButton, Qt::MouseButtons(), Qt::KeyboardModifiers() )
+		m_position(),
+		m_buttons(),
+		m_modifiers()
 	{
 		m_timer.setSingleShot( true );
-		m_timer.callOnTimeout( [this, func](){ func( m_mouseMoveEvent ); } );
+		m_timer.callOnTimeout( [this, func](){ func( m_position, m_buttons, m_modifiers ); } );
 	}
 	void motion( const QMouseEvent *event ){
-		m_mouseMoveEvent = *event;
+		m_position = event->position();
+		m_buttons = event->buttons();
+		m_modifiers = event->modifiers();
 		if( !m_timer.isActive() )
 			m_timer.start();
 	}
@@ -50,75 +57,80 @@ public:
 
 class DeferredMotion2
 {
-	QMouseEvent m_mouseMoveEvent;
-	const std::function<void( const QMouseEvent& )> m_func;
+	QPointF m_position;
+	Qt::MouseButtons m_buttons;
+	Qt::KeyboardModifiers m_modifiers;
+	const std::function<void(QPointF pos,Qt::MouseButtons buttons,Qt::KeyboardModifiers modifiers )> m_func;
 public:
 	template<class Functor>
 	DeferredMotion2( Functor func ) :
-		m_mouseMoveEvent( QEvent::MouseMove, QPointF(), Qt::MouseButton::NoButton, Qt::MouseButtons(), Qt::KeyboardModifiers() ),
-		m_func( func )
+	m_position(),
+	m_buttons(),
+	m_modifiers(),
+	m_func( func )
 	{
 	}
 	void motion( const QMouseEvent& event ){
-		m_mouseMoveEvent = event;
+		m_position = event.position();
+		m_buttons = event.buttons();
+		m_modifiers = event.modifiers();
 	}
 	void invoke(){
-		m_func( m_mouseMoveEvent );
+		m_func( m_position, m_buttons, m_modifiers );
 	}
 	typedef MemberCaller<DeferredMotion2, &DeferredMotion2::invoke> InvokeCaller;
 };
 
-class DeferredMotionDelta
-{
-	QMouseEvent m_mouseMoveEvent;
-	QTimer m_timer;
-	int m_delta_x = 0;
-	int m_delta_y = 0;
-public:
-	template<class Functor>
-	DeferredMotionDelta( Functor func ) :
-		m_mouseMoveEvent( QEvent::MouseMove, QPointF(), Qt::MouseButton::NoButton, Qt::MouseButtons(), Qt::KeyboardModifiers() )
-	{
-		m_timer.setSingleShot( true );
-		m_timer.callOnTimeout( [this, func](){
-			func( m_delta_x, m_delta_y, m_mouseMoveEvent );
-			m_delta_x = 0;
-			m_delta_y = 0;
-		} );
-	}
-	void flush(){
-		m_timer.stop();
-//.	?	deferred_motion( this );
-	}
-	void motion_delta( int x, int y, const QMouseEvent *event ){
-		m_delta_x += x;
-		m_delta_y += y;
-		m_mouseMoveEvent = *event;
-		if( !m_timer.isActive() )
-			m_timer.start();
-	}
-};
+// class DeferredMotionDelta
+// {
+// 	QMouseEvent m_mouseMoveEvent;
+// 	QTimer m_timer;
+// 	int m_delta_x = 0;
+// 	int m_delta_y = 0;
+// public:
+// 	template<class Functor>
+// 	DeferredMotionDelta( Functor func ) :
+// 		m_mouseMoveEvent( QEvent::MouseMove, QPointF(), Qt::MouseButton::NoButton, Qt::MouseButtons(), Qt::KeyboardModifiers() )
+// 	{
+// 		m_timer.setSingleShot( true );
+// 		m_timer.callOnTimeout( [this, func](){
+// 			func( m_delta_x, m_delta_y, m_mouseMoveEvent );
+// 			m_delta_x = 0;
+// 			m_delta_y = 0;
+// 		} );
+// 	}
+// 	void flush(){
+// 		m_timer.stop();
+// //.	?	deferred_motion( this );
+// 	}
+// 	void motion_delta( int x, int y, const QMouseEvent *event ){
+// 		m_delta_x += x;
+// 		m_delta_y += y;
+// 		m_mouseMoveEvent = *event;
+// 		if( !m_timer.isActive() )
+// 			m_timer.start();
+// 	}
+// };
 
 class DeferredMotionDelta2
 {
-	QMouseEvent m_mouseMoveEvent;
-	std::function<void( int, int, const QMouseEvent& )> m_func;
+	std::function<void( int, int, Qt::KeyboardModifiers)> m_func;
 	int m_delta_x = 0;
 	int m_delta_y = 0;
+	Qt::KeyboardModifiers m_modifiers;
 public:
 	template<class Functor>
 	DeferredMotionDelta2( Functor func ) :
-		m_mouseMoveEvent( QEvent::MouseMove, QPointF(), Qt::MouseButton::NoButton, Qt::MouseButtons(), Qt::KeyboardModifiers() ),
 		m_func( func )
 	{
 	}
 	void motion_delta( int x, int y, const QMouseEvent *event ){
 		m_delta_x += x;
 		m_delta_y += y;
-		m_mouseMoveEvent = *event;
+		m_modifiers = event->modifiers();
 	}
 	void invoke(){
-		m_func( m_delta_x, m_delta_y, m_mouseMoveEvent );
+		m_func( m_delta_x, m_delta_y, m_modifiers );
 		m_delta_x = 0;
 		m_delta_y = 0;
 	}
@@ -151,7 +163,7 @@ protected:
 				m_trackingEstablished = mouseEvent->globalPos() == center;
 				QCursor::setPos( center );
 			}
-			else if( mouseEvent->globalPos() != center ){
+			else if( mouseEvent->globalPosition() != center ){
 				const QPoint delta = mouseEvent->globalPos() - center;
 				m_motion_delta_function( delta.x(), delta.y(), mouseEvent );
 				QCursor::setPos( center );

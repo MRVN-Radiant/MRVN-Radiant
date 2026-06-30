@@ -35,6 +35,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 BEGIN_ODDLPARSER_NS
 
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 static const char *Version = "0.4.0";
 
 namespace Grammar {

@@ -88,7 +88,7 @@ add_executable(radiant
 target_include_directories(radiant PRIVATE .
                            ${LIBXML2_INCLUDE_DIRS}
                            ${GLIB_INCLUDE_DIRS}
-                           ${QT5_INCLUDE_DIRS}
+                           ${QT6_INCLUDE_DIRS}
                           )
 
 target_link_libraries(radiant
@@ -98,9 +98,11 @@ target_link_libraries(radiant
                       quickhull
                       profile
                       xml
-                      Qt5::Gui
-                      Qt5::Widgets
-                      Qt5::Core
+                      Qt6::Gui
+                      Qt6::Widgets
+                      Qt6::Core
+                      Qt6::OpenGL
+                      Qt6::OpenGLWidgets
                       ${GLIB_LIBRARIES}
                       ${LIBXML2_LIBRARIES}
                       ${CMAKE_DL_LIBS}

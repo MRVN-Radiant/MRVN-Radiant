@@ -39,7 +39,7 @@
 #include "image.h"
 #include "gtkutil/messagebox.h"
 
-#include <QOpenGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QMouseEvent>
 #include <QTimer>
 
@@ -444,11 +444,11 @@ class XYGLWidget : public QOpenGLWidget
 	qreal m_scale;
 public:
 	XYGLWidget( XYWnd& xywnd ) : QOpenGLWidget(), m_xywnd( xywnd ),
-		m_deferred_motion( [this]( const QMouseEvent& event ){
-				if ( m_xywnd.chaseMouseMotion( event.x() * m_scale, event.y() * m_scale ) ) {
+		m_deferred_motion( [this]( QPointF& point, Qt::MouseButtons& mouse_buttons, Qt::KeyboardModifiers& ){
+				if ( m_xywnd.chaseMouseMotion( point.x() * m_scale, point.y() * m_scale ) ) {
 					return;
 				}
-				m_xywnd.XY_MouseMoved( event.x() * m_scale, event.y() * m_scale, buttons_for_state( event ) );
+				m_xywnd.XY_MouseMoved( point.x() * m_scale, point.y() * m_scale, mouse_buttons );
 			} )
 	{
 		setMouseTracking( true );

@@ -24,7 +24,7 @@
 - Run:
   ```sh
   pacman -S {make,cmake,gcc,pkg-config,unzip,base-devel}
-  pacman -S mingw-w64-x86_64-{cmake,openjpeg,qt5-base,glib2,libxml2,libpng,zlib}
+  pacman -S mingw-w64-x86_64-{cmake,openjpeg,qt6-base,glib2,libxml2,libpng,zlib}
   ```
 - Use `mingw-w64-x86_64` for 64-bit and `mingw-w64-i686` for 32-bit
 
@@ -46,7 +46,7 @@
 ## Linux
 ### Getting dependencies
 - Dependencies:
-    - qt5
+    - qt6-base-dev
     - glib
     - libxml2
     - zlib

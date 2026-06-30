@@ -42,8 +42,8 @@ add_library(gtkutil STATIC
             xorrectangle.h
            )
 
-target_link_libraries(gtkutil PRIVATE Qt5::Gui
-                      Qt5::Widgets
-                      Qt5::Core
+target_link_libraries(gtkutil PRIVATE Qt6::Gui
+                      Qt6::Widgets
+                      Qt6::Core
                       ${GLIB_LIBRARIES}
                      )

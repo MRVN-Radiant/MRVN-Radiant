@@ -57,6 +57,8 @@
 #include "gtkutil/guisettings.h"
 #include <QPlainTextEdit>
 #include <QComboBox>
+#include <QFile>
+#include <QTextStream>
 
 #include "os/path.h"
 #include "math/aabb.h"
