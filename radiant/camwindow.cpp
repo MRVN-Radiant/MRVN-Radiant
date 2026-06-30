@@ -1201,9 +1201,9 @@ static void selection_button_release( const QMouseEvent& event, WindowObserver* 
 	observer->onMouseUp( WindowVector( event.x(), event.y() ), button_for_button( event.button() ), modifiers_for_state( event.modifiers() ) );
 }
 
-void selection_motion( QPointF pos,Qt::KeyboardModifiers modifiers, WindowObserver* observer ){
+void selection_motion( QPointF pos, Qt::KeyboardModifiers modifiers, WindowObserver* observer ){
 	//globalOutputStream() << "motion... ";
-	observer->onMouseMotion( WindowVector( pos.x(),pos.y() ), modifiers_for_state( modifiers ) );
+	observer->onMouseMotion( WindowVector( pos.x(), pos.y() ), modifiers_for_state( modifiers ) );
 }
 
 inline WindowVector windowvector_for_widget_centre( const QWidget* widget ){
@@ -1684,7 +1684,7 @@ CamWnd::CamWnd() :
 	m_gl_widget( new CamGLWidget( *this ) ),
 	m_window_observer( NewWindowObserver() ),
 	m_deferredDraw( WidgetQueueDrawCaller( *m_gl_widget ) ),
-m_deferred_motion( [this]( QPointF pos,Qt::MouseButtons buttons,Qt::KeyboardModifiers modifiers ){ selection_motion(pos, modifiers, m_window_observer ); } ),
+m_deferred_motion( [this]( QPointF pos, Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers ){ selection_motion(pos, modifiers, m_window_observer ); } ),
 	m_drawing( false )
 {
 	m_bFreeMove = false;
