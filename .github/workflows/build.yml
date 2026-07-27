@@ -20,6 +20,15 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        aqtversion: '==3.3.*'
+        version: '6.10.2'
+        host: 'windows'
+        target: 'desktop'
+        arch: 'win64_msvc2022_64'
+
     - name: Download WinDeps
       shell: powershell
       run: |
