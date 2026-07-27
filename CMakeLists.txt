@@ -36,21 +36,36 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Compile flags
+# TODO: use target_compile_options etc. instead of set(CMAKE_..._FLAGS ...)
 set(CMAKE_CXX_FLAGS_RELEASE "-Os")
 set(CMAKE_C_FLAGS_RELEASE "")
 
 if(UNIX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wall")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -Wall")
+
     add_compile_definitions(RADIANT_EXECUTABLE="")
     add_compile_definitions(POSIX)
     add_compile_definitions(XWINDOWS)
 endif()
 
 if(WIN32)
-    # ignore C4068: unrecognised "#pragma GCC"
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /wd4068")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /wd4068")
+    # CMAKE_CXX_FLAGS
+    if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+      string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    else()
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+    endif()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4068")  # ignore "#pragma GCC"
+
+    # CMAKE_C_FLAGS
+    if(CMAKE_C_FLAGS MATCHES "/W[0-4]")
+      string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    else()
+      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4")
+    endif()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4068")  # ignore #"pragma GCC"
+
     add_compile_definitions(RADIANT_EXECUTABLE=".exe")
     add_compile_definitions(WIN32)
     add_compile_definitions(_WIN32)
@@ -59,6 +74,8 @@ endif()
 if(${MSVC})
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
     set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /MANIFEST:NO")
+    add_definitions( -D_CRT_SECURE_NO_WARNINGS )
+    remove_definitions( -DUNICODE -D_UNICODE )
 endif()
 
 # Debug
