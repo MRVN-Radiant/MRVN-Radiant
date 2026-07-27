@@ -48,8 +48,9 @@ if(UNIX)
 endif()
 
 if(WIN32)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4")
+    # ignore C4068: unrecognised "#pragma GCC"
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /wd4068")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /wd4068")
     add_compile_definitions(RADIANT_EXECUTABLE=".exe")
     add_compile_definitions(WIN32)
     add_compile_definitions(_WIN32)
