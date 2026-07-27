@@ -14,47 +14,48 @@ jobs:
       fail-fast: false
       matrix:
         arch: [x86_64]
-    
+
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v7
       with:
         submodules: recursive
-      
+
     - name: Download WinDeps
-      run: Invoke-WebRequest -Uri https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.2/windeps.7z -OutFile windeps.7z
       shell: powershell
-      
+      run: |
+        Invoke-WebRequest -Uri https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.2/windeps.7z -OutFile windeps.7z
+
     - name: Extract WinDeps
       run: 7z x windeps.7z
-  
-    - name: Setup msvc
-      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Setup MSVC
+      uses: ilammy/msvc-dev-cmd@9903b5ddb96b67d8ff27924e76011983224cfee5
 
     - name: Setup CMake
       run: cmake . -G "Ninja" -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
       run: cmake --build .
-      
+
     - name: Download Install Deps
-      run: Invoke-WebRequest -Uri https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.2/install.7z -OutFile install.7z
       shell: powershell
-      
+      run: |
+        Invoke-WebRequest -Uri https://github.com/MRVN-Radiant/MRVN-WinDeps/releases/download/v0.2/install.7z -OutFile install.7z
+
     - name: Extract Install Deps
       run: 7z x install.7z
-      
-    - name: Where am i
-      run: ls
 
     - name: Generate Artifact Name
-      run: echo "ARTIFACT_NAME=$(echo MRVN-Radiant_`date -u -Idate`_`git rev-parse --short HEAD`_Windows_${{ matrix.arch }})" >> $GITHUB_ENV
       shell: bash
+      run: |
+        echo "ARTIFACT_NAME=$(echo MRVN-Radiant_`date -u -Idate`_`git rev-parse --short HEAD`_Windows_${{ matrix.arch }})" >> $GITHUB_ENV
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: ${{ env.ARTIFACT_NAME }}
         path: install/
         if-no-files-found: error
+
 
   Linux:
     name: ${{ matrix.config }} Linux ${{ matrix.arch }}
@@ -65,26 +66,26 @@ jobs:
         arch: [x86_64]
 
     steps:
+    - uses: actions/checkout@v7
+      with:
+        submodules: recursive
+
     - name: Install tools
       run: |
           sudo apt-get -qq update
           sudo apt-get -y install mesa-common-dev qt6-base-dev glib-2.0 libpng-dev libjpeg-dev
-    - uses: actions/checkout@v3
-      with:
-        submodules: recursive
 
     - name: Setup CMake
       run: cmake . -G "Unix Makefiles"
 
     - name: Build
-      run: |
-        cmake --build .
+      run: cmake --build .
 
     - name: Generate Artifact Name
       run: |
         echo "ARTIFACT_NAME=$(echo MRVN-Radiant_`date -u -Idate`_`git rev-parse --short HEAD`_Linux_${{ matrix.arch }})" >> $GITHUB_ENV
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: ${{ env.ARTIFACT_NAME }}
         path: install/
