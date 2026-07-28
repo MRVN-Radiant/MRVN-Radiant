@@ -108,8 +108,6 @@ if (${MSVC}) # Visual studio
     find_package(LibXml2 REQUIRED)
     find_package(ZLib REQUIRED)
     find_package(LibJpeg REQUIRED)
-    find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGL OpenGLWidgets)
-    find_package(Threads REQUIRED)
 else() # Msys / Linux
     include(FindPkgConfig)
     pkg_check_modules(GLIB glib-2.0 REQUIRED)
@@ -117,10 +115,12 @@ else() # Msys / Linux
     pkg_check_modules(LIBXML2 libxml-2.0 REQUIRED)
     pkg_check_modules(ZLIB zlib REQUIRED)
     pkg_check_modules(JPEG libjpeg REQUIRED)
-
-    find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGL OpenGLWidgets)
-    find_package(Threads REQUIRED)
 endif()
+
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGL OpenGLWidgets)
+find_package(Threads REQUIRED)
+
+target_link_libraries(Qt6::Gui Qt6::Widgets Qt6::Core Qt6::OpenGL Qt6::OpenGLWidgets)
 
 # Global include dirs
 include_directories(include libs)
