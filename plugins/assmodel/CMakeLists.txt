@@ -12,9 +12,12 @@ target_include_directories(assmodel PRIVATE
                            assimp
                            ${QT6_INCLUDE_DIRS}
                           )
+
 target_link_libraries(assmodel PRIVATE
                       assimp
                       Qt6::Gui
+                      Qt6::OpenGL
+                      Qt6::OpenGLWidgets
                      )
 
 if(NOT ${MSVC})

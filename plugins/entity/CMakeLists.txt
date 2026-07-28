@@ -1,6 +1,4 @@
 add_library(entity MODULE
-            
-            
             angles.cpp
             angles.h
             colour.cpp
@@ -51,6 +49,9 @@ add_library(entity MODULE
 target_include_directories(entity PRIVATE
                            ${QT6_INCLUDE_DIRS}
                           )
+
 target_link_libraries(entity PRIVATE
                       Qt6::Gui
+                      Qt6::OpenGL
+                      Qt6::OpenGLWidgets
                      )
