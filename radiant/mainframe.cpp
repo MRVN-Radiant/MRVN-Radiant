@@ -186,7 +186,7 @@ void HomePaths_Realise(){
 #if defined( WIN32 )
 			TCHAR mydocsdir[MAX_PATH + 1];
 			wchar_t *mydocsdirw;
-			HMODULE shfolder = LoadLibrary( "shfolder.dll" );
+			HMODULE shfolder = LoadLibraryA( "shfolder.dll" );
 			if ( shfolder ) {
 				qSHGetKnownFolderPath = (qSHGetKnownFolderPath_t *) GetProcAddress( shfolder, "SHGetKnownFolderPath" );
 			}
