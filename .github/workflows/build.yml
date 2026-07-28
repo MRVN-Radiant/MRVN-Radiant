@@ -54,6 +54,9 @@ jobs:
     - name: Extract Install Deps
       run: 7z x install.7z
 
+    - name: Deploy Qt6 DLLs
+      run: windeployqt install/radiant.exe
+
     - name: Generate Artifact Name
       shell: bash
       run: |
