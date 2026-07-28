@@ -27,9 +27,9 @@ if(INSTALL_DLLS)
 endif()
 
 # Policy defaults
-cmake_policy(SET CMP0077 NEW)
-cmake_policy(SET CMP0175 OLD)
-cmake_policy(SET CMP0176 OLD)
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+set(CMAKE_POLICY_DEFAULT_CMP0175 OLD)
+set(CMAKE_POLICY_DEFAULT_CMP0176 OLD)
 
 # Build system setup
 set(CMAKE_CXX_STANDARD 17)
