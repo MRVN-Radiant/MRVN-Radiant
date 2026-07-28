@@ -120,7 +120,7 @@ endif()
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGL OpenGLWidgets)
 find_package(Threads REQUIRED)
 
-target_link_libraries(Qt6::Gui Qt6::Widgets Qt6::Core Qt6::OpenGL Qt6::OpenGLWidgets)
+target_link_libraries(PRIVATE Qt6::Gui Qt6::Widgets Qt6::Core Qt6::OpenGL Qt6::OpenGLWidgets)
 
 # Global include dirs
 include_directories(include libs)
