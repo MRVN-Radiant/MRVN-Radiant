@@ -98,7 +98,7 @@ public:
 #define FORMAT_BUFSIZE 2048
 const char* FormatGetLastError(){
 	static char buf[FORMAT_BUFSIZE];
-	FormatMessage(
+	FormatMessageA(
 	    FORMAT_MESSAGE_FROM_SYSTEM |
 	    FORMAT_MESSAGE_IGNORE_INSERTS,
 	    NULL,
@@ -118,7 +118,7 @@ public:
 	typedef int ( __stdcall * FunctionPointer )();
 
 	DynamicLibrary( const char* filename ){
-		m_library = LoadLibrary( filename );
+		m_library = LoadLibraryA( filename );
 		if ( m_library == 0 ) {
 			globalErrorStream() << "LoadLibrary failed: '" << filename << "'\n";
 			globalErrorStream() << "GetLastError: " << FormatGetLastError();
