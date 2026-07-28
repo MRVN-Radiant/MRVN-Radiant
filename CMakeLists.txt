@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
 
-
 # Project
 project(mrvnradiant VERSION 0.0)
 
@@ -27,8 +26,10 @@ if(INSTALL_DLLS)
     set(BUILD_TOOLS   OFF)
 endif()
 
-# Github actions moment
-set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+# Policy defaults
+cmake_policy(SET CMP0077 NEW)
+cmake_policy(SET CMP0175 OLD)
+cmake_policy(SET CMP0176 OLD)
 
 # Build system setup
 set(CMAKE_CXX_STANDARD 17)
