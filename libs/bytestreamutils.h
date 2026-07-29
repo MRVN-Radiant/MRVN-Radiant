@@ -34,6 +34,7 @@
 #endif
 
 #include <algorithm>
+#include <string>
 
 // if C99 is unavailable, fall back to the types most likely to be the right sizes
 #if !defined( int16_t )
@@ -149,4 +150,30 @@ inline typename InputStreamType::byte_type istream_read_byte( InputStreamType& i
 	typename InputStreamType::byte_type b;
 	istream.read( &b, sizeof( typename InputStreamType::byte_type ) );
 	return b;
+}
+
+template<typename INPUT_STREAM_TYPE_T, typename TYPE_T>
+inline bool istream_read_raw_safe(INPUT_STREAM_TYPE_T& istream, TYPE_T& value)
+{
+	const typename INPUT_STREAM_TYPE_T::byte_type bytesRead = istream.read(reinterpret_cast<typename INPUT_STREAM_TYPE_T::byte_type*>(&value), sizeof(TYPE_T));
+	return bytesRead == sizeof(TYPE_T);
+}
+
+template<typename INPUT_STREAM_TYPE_T>
+inline bool istream_read_string_safe(INPUT_STREAM_TYPE_T& istream, std::string& string)
+{
+	while (true) {
+		char character;
+		if (istream.read(reinterpret_cast<typename INPUT_STREAM_TYPE_T::byte_type*>(&character), sizeof(character)) != sizeof(character)) {
+			return false;
+		}
+
+		if (character == '\0') {
+			return true;
+		}
+
+		string.push_back(character);
+	}
+
+	// Unrechable
 }
