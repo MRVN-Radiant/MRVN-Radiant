@@ -59,5 +59,7 @@ target_link_libraries(bobtoolz
                       Qt6::Gui
                       Qt6::Widgets
                       Qt6::Core
+                      Qt6::OpenGL
+                      Qt6::OpenGLWidgets
                       ${GLIB_LIBRARIES}
                      )
