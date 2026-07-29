@@ -19,6 +19,9 @@ libs/assimp/assimp.pc
 cmake_uninstall.cmake
 libs/assimp/revision.h
 
+# Qt6 cmake dir
+/.qt/
+
 # Windows binary files
 *.dll
 *.exe
